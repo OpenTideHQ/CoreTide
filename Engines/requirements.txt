@@ -5,7 +5,7 @@ pandas
 tabulate
 mitrecve
 jsonschema
-git
+GitPython
 splunk-sdk
 carbon-black-cloud-sdk
 toml

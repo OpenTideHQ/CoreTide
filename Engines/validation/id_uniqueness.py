@@ -37,6 +37,10 @@ def run():
             )
 
             for model in os.listdir(PATHS[meta_name]):
+                #Skips for empty InitTide repositories
+                if model == ".gitignore":
+                    continue
+                
                 model_path = Path(PATHS[meta_name]) / model
 
                 model_body = yaml.safe_load(open(model_path, encoding="utf-8"))

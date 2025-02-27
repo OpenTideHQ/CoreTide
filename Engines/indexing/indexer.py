@@ -220,6 +220,11 @@ def indexer(write_index=False) -> dict:
         if meta_name not in SKIPS:
             model_cat_index = dict()
             for model in os.listdir(PATHS[meta_name]):
+                
+                #Skips for empty InitTide repositories
+                if model == ".gitignore":
+                    continue
+                
                 model_path = Path(PATHS[meta_name]) / model
                 if (not os.path.isdir(model_path)) and (str(model_path).endswith(".yaml")):
                     obj_counter += 1

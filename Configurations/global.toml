@@ -1,10 +1,10 @@
 models = [ "tvm", "cdm", "bdr", "mdr" ]
 
 [paths.tide]
-tvm = "Models/Threat Vector Models/"
-cdm = "Models/Cyber Detection Models/"
-mdr = "Models/Managed Detection Rules/"
-bdr = "Models/Business Detection Requests/"
+tvm = "Objects/Threat Vectors/"
+cdm = "Objects/Detection Models/"
+mdr = "Objects/Detection Rules/"
+bdr = "Objects/Business Detections/"
 lookups = "Lookups/"
 analytics = "Analytics/"
 snippet_file = ".vscode/Model Templates.code-snippets"

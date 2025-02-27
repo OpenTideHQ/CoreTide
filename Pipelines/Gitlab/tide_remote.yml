@@ -1,0 +1,18 @@
+# This file contains the remote imports to this repository, required when coretide
+# is consumed in a remote mode. This allows a single entry point to coretide.
+
+stages:
+  - 📝 Reporting
+  - 🧬 Mutation
+  - ✅ Validation
+  - 📖 Documentation
+  - 🗿 Framework
+  - 🚀 Deployment
+
+include: 
+  - remote: 'https://raw.githubusercontent.com/OpenTideHQ/CoreTide/refs/heads/development/Pipelines/Gitlab/modules/deployment.yml'
+  - remote: 'https://raw.githubusercontent.com/OpenTideHQ/CoreTide/refs/heads/development/Pipelines/Gitlab/modules/documentation.yml'
+  - remote: 'https://raw.githubusercontent.com/OpenTideHQ/CoreTide/refs/heads/development/Pipelines/Gitlab/modules/framework.yml'
+  - remote: 'https://raw.githubusercontent.com/OpenTideHQ/CoreTide/refs/heads/development/Pipelines/Gitlab/modules/mutation.yml'
+  - remote: 'https://raw.githubusercontent.com/OpenTideHQ/CoreTide/refs/heads/development/Pipelines/Gitlab/modules/reporting.yml'
+  - remote: 'https://raw.githubusercontent.com/OpenTideHQ/CoreTide/refs/heads/development/Pipelines/Gitlab/modules/validation.yml'

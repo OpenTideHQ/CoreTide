@@ -222,7 +222,7 @@ def indexer(write_index=False) -> dict:
             for model in os.listdir(PATHS[meta_name]):
                 
                 #Skips for empty InitTide repositories
-                if model == ".gitignore":
+                if model == ".gitkeep":
                     continue
                 
                 model_path = Path(PATHS[meta_name]) / model

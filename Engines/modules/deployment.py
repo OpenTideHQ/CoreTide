@@ -165,7 +165,7 @@ def diff_calculation(plan: DeploymentStrategy) -> list:
     scope = list()
     
     TARGET_CI = os.getenv("OpenTide.CI.Platform") or "GitlabCI"
-    
+
     match TARGET_CI:
         case "GitlabCI":
             REPO_DIR = os.getenv("CI_PROJECT_DIR")
@@ -207,8 +207,8 @@ def diff_calculation(plan: DeploymentStrategy) -> list:
                 
             elif plan is DeploymentStrategy.STAGING:
                 repo.remotes.origin.fetch()
-                source_branch = os.getenv("System.PullRequest.targetBranchName")
-                target_branch = os.getenv("Build.SourceBranchName")
+                source_branch = os.getenv("Build.SourceBranchName") 
+                target_branch = os.getenv("System.PullRequest.targetBranchName")
                 if not source_branch or not target_branch:
                     log("FATAL",
                         "Could not identify source and target branch using predefined Azure Pipeline variables",

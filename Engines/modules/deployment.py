@@ -194,7 +194,7 @@ def diff_calculation(plan: DeploymentStrategy) -> list:
                 log("FATAL", f"Illegal Deployment Plan {str(plan)} passed to diff_calculation algorithm")
                 raise KeyError
 
-        case "Azure":
+        case "AzurePipeline":
             REPO_DIR = os.getenv("Build.SourcesDirectory")
             TARGET = os.getenv("Build.SourceVersion")
             repo = Repo(REPO_DIR, search_parent_directories=True)

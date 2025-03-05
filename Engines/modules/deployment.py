@@ -164,7 +164,7 @@ def diff_calculation(plan: DeploymentStrategy) -> list:
     """
     scope = list()
     
-    TARGET_CI = os.getenv("OpenTide.CI.Platform") or "GitlabCI"
+    TARGET_CI = os.getenv("OPENTIDE_CI_PLATFORM") or "GitlabCI"
 
     match TARGET_CI:
         case "GitlabCI":

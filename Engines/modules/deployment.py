@@ -164,10 +164,33 @@ def diff_calculation(plan: DeploymentStrategy) -> list:
     """
     scope = list()
     
-    TARGET_CI = os.getenv("OPENTIDE_CI_PLATFORM") or "GitlabCI"
+    class CITargets(Enum):
+        """
+        Represents the supported CI options
+        """
+        AzurePipeline = auto()
+        GitlabCI = auto()
+
+    def check_ci_environment()->CITargets:
+        """
+        Dynamically asserts the build environment based on system specific
+        environment variables
+        """
+        if os.getenv("TF_BUILD"):
+            return CITargets.AzurePipeline
+        elif os.getenv("CI"):
+            return CITargets.GitlabCI
+        else:
+            log("FATAL",
+                "CI Target environment variable is not implemented",
+                "Ensure that you have configured a variable OpenTide.TargetCi as part of your pipeline",
+                "Current supported values: GitlabCI, AzurePipelines")
+            raise Exception
+
+    TARGET_CI = check_ci_environment()
 
     match TARGET_CI:
-        case "GitlabCI":
+        case CITargets.GitlabCI:
             log("INFO", "Identified Gitlab CI as the CI Runtime Platform")
             REPO_DIR = os.getenv("CI_PROJECT_DIR")
             LATEST_COMMIT = os.getenv("CI_COMMIT_SHA")
@@ -195,10 +218,10 @@ def diff_calculation(plan: DeploymentStrategy) -> list:
                 log("FATAL", f"Illegal Deployment Plan {str(plan)} passed to diff_calculation algorithm")
                 raise KeyError
 
-        case "AzurePipeline":
+        case CITargets.AzurePipeline:
             log("INFO", "Identified Azure Pipeline as the CI Runtime Platform")
-            REPO_DIR = os.getenv("AZURE_PIPELINE_BUILD_DIRECTORY")
-            LATEST_COMMIT = os.getenv("AZURE_PIPELINE_LATEST_COMMIT")
+            REPO_DIR = os.getenv("BUILD_SOURCESDIRECTORY")
+            LATEST_COMMIT = os.getenv("BUILD_SOURCEVERSION")
             repo = Repo(REPO_DIR, search_parent_directories=True)
             if plan is DeploymentStrategy.PRODUCTION:
                 commits = list(repo.iter_commits('HEAD', max_count=2))
@@ -209,12 +232,12 @@ def diff_calculation(plan: DeploymentStrategy) -> list:
                 
             elif plan is DeploymentStrategy.STAGING:
                 repo.remotes.origin.fetch()
-                source_branch = os.getenv("AZURE_PIPELINE_SOURCE_BRANCH") 
-                target_branch = os.getenv("AZURE_PIPELINE_TARGET_BRANCH")
+                source_branch = os.getenv("SYSTEM_PULLREQUEST_SOURCEBRANCH") 
+                target_branch = os.getenv("SYSTEM_PULLREQUEST_TARGETBRANCHNAME")
                 if not source_branch or not target_branch:
                     log("FATAL",
                         "Could not identify source and target branch using predefined Azure Pipeline variables",
-                        "Expected to find AZURE_PIPELINE_TARGET_BRANCH and AZURE_PIPELINE_SOURCE_BRANCH",
+                        "Expected to find SYSTEM_PULLREQUEST_SOURCEBRANCH and SYSTEM_PULLREQUEST_TARGETBRANCHNAME",
                         "Ensure this is runnning in a Pull Request pipeline")
                     raise KeyError
                 log("INFO", "Identified source and target branch in the pull request", f"source: {source_branch} -> target: {target_branch}")
@@ -229,13 +252,6 @@ def diff_calculation(plan: DeploymentStrategy) -> list:
                 log("FATAL", f"Illegal Deployment Plan {str(plan)} passed to diff_calculation algorithm")
                 raise KeyError
 
-
-        case _:
-            log("FATAL",
-                "CI Target environment variable is not implemented",
-                "Ensure that you have configured a variable OpenTide.TargetCi as part of your pipeline",
-                "Current supported values: GitlabCI, AzurePipelines")
-            raise Exception
 
     log(
         "INFO",

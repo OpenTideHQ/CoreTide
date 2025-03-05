@@ -232,6 +232,10 @@ def diff_calculation(plan: DeploymentStrategy) -> list:
                 
             elif plan is DeploymentStrategy.STAGING:
                 repo.remotes.origin.fetch()
+                log("INFO",
+                    "Discovered branches in current repository",
+                    str([branch.name for branch in repo.branches]))
+
                 source_branch = os.getenv("SYSTEM_PULLREQUEST_SOURCEBRANCH")
                 target_branch = os.getenv("SYSTEM_PULLREQUEST_TARGETBRANCHNAME")
                 if not source_branch or not target_branch:
@@ -242,9 +246,11 @@ def diff_calculation(plan: DeploymentStrategy) -> list:
                     raise KeyError
                 source_branch = source_branch.split("/")[-1] #Take last part of the ref
                 log("INFO", "Identified source and target branch in the pull request", f"source: {source_branch} -> target: {target_branch}")
-                base_commit = repo.merge_base(source_branch, target_branch)
-                if base_commit:
-                    BASE_COMMIT = base_commit[0].hexsha
+                source_commit = repo.commit(source_branch)
+                target_commit = repo.commit(target_branch)
+                merge_base = repo.merge_base(target_commit, source_commit)
+                if merge_base:
+                    BASE_COMMIT = merge_base[0].hexsha
                 else:
                     log("FATAL", "Could not identify the base of the Pull Request")
                     raise TideErrors

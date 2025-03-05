@@ -170,13 +170,13 @@ def diff_calculation(plan: DeploymentStrategy) -> list:
         case "GitlabCI":
             log("INFO", "Identified Gitlab CI as the CI Runtime Platform")
             REPO_DIR = os.getenv("CI_PROJECT_DIR")
-            TARGET = os.getenv("CI_COMMIT_SHA")
+            LATEST_COMMIT = os.getenv("CI_COMMIT_SHA")
             repo = Repo(REPO_DIR, search_parent_directories=True)
 
             if plan is DeploymentStrategy.PRODUCTION:
-                SOURCE = os.getenv("CI_COMMIT_BEFORE_SHA")
+                BASE_COMMIT = os.getenv("CI_COMMIT_BEFORE_SHA")
             elif plan is DeploymentStrategy.STAGING:
-                SOURCE = os.getenv("CI_MERGE_REQUEST_DIFF_BASE_SHA")
+                BASE_COMMIT = os.getenv("CI_MERGE_REQUEST_DIFF_BASE_SHA")
                 # Allows the proper base commit calculation for Merged Result pipelines
                 if os.getenv("CI_MERGE_REQUEST_EVENT_TYPE") == "merged_result":
                     log("INFO", "Currently running a diff calculation for merge results")
@@ -197,30 +197,30 @@ def diff_calculation(plan: DeploymentStrategy) -> list:
 
         case "AzurePipeline":
             log("INFO", "Identified Azure Pipeline as the CI Runtime Platform")
-            REPO_DIR = os.getenv("Build.SourcesDirectory")
-            TARGET = os.getenv("Build.SourceVersion")
+            REPO_DIR = os.getenv("AZURE_PIPELINE_BUILD_DIRECTORY")
+            LATEST_COMMIT = os.getenv("AZURE_PIPELINE_LATEST_COMMIT")
             repo = Repo(REPO_DIR, search_parent_directories=True)
             if plan is DeploymentStrategy.PRODUCTION:
                 commits = list(repo.iter_commits('HEAD', max_count=2))
                 if len(commits) > 1:
-                    SOURCE = commits[1].hexsha
+                    BASE_COMMIT = commits[1].hexsha
                 else:
                     return None
                 
             elif plan is DeploymentStrategy.STAGING:
                 repo.remotes.origin.fetch()
-                source_branch = os.getenv("Build.SourceBranchName") 
-                target_branch = os.getenv("System.PullRequest.targetBranchName")
+                source_branch = os.getenv("AZURE_PIPELINE_SOURCE_BRANCH") 
+                target_branch = os.getenv("AZURE_PIPELINE_TARGET_BRANCH")
                 if not source_branch or not target_branch:
                     log("FATAL",
                         "Could not identify source and target branch using predefined Azure Pipeline variables",
-                        "Expected to find System.PullRequest.targetBranchName and Build.SourceBranchName",
+                        "Expected to find AZURE_PIPELINE_TARGET_BRANCH and AZURE_PIPELINE_SOURCE_BRANCH",
                         "Ensure this is runnning in a Pull Request pipeline")
                     raise KeyError
                 log("INFO", "Identified source and target branch in the pull request", f"source: {source_branch} -> target: {target_branch}")
                 base_commit = repo.merge_base(source_branch, target_branch)
                 if base_commit:
-                    SOURCE = base_commit[0].hexsha
+                    BASE_COMMIT = base_commit[0].hexsha
                 else:
                     log("FATAL", "Could not identify the base of the Pull Request")
                     raise TideErrors
@@ -240,12 +240,12 @@ def diff_calculation(plan: DeploymentStrategy) -> list:
     log(
         "INFO",
         "Setting source and target commit for the diff calculation to",
-        f"{SOURCE} | {TARGET}",
+        f"{BASE_COMMIT} | {LATEST_COMMIT}",
     )
 
     source_commit = None
     try:
-        source_commit = repo.commit(SOURCE)
+        source_commit = repo.commit(BASE_COMMIT)
     except Exception:
         log(
             "INFO",
@@ -258,7 +258,7 @@ def diff_calculation(plan: DeploymentStrategy) -> list:
 
         for commit in repo.iter_commits("origin/main"):
             log("INFO", "Currently Evaluating", f"{commit.message}")
-            if commit.hexsha == SOURCE:
+            if commit.hexsha == BASE_COMMIT:
                 source_commit = commit
                 log(
                     "SUCCESS",
@@ -271,8 +271,8 @@ def diff_calculation(plan: DeploymentStrategy) -> list:
         log("FATAL", "No Source Commit could be identified")
         raise Exception("No Source Commit Found")
 
-    target_commit = repo.commit(TARGET)
-    diff = source_commit.diff(target_commit)
+    latest_commit = repo.commit(LATEST_COMMIT)
+    diff = source_commit.diff(latest_commit)
 
     log(
         "DEBUG",

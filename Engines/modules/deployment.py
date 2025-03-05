@@ -163,32 +163,78 @@ def diff_calculation(plan: DeploymentStrategy) -> list:
 
     """
     scope = list()
+    
+    TARGET_CI = os.getenv("OpenTide.CI.Platform") or "GitlabCI"
+    
+    match TARGET_CI:
+        case "GitlabCI":
+            REPO_DIR = os.getenv("CI_PROJECT_DIR")
+            TARGET = os.getenv("CI_COMMIT_SHA")
+            repo = Repo(REPO_DIR, search_parent_directories=True)
 
-    REPO_DIR = os.getenv("CI_PROJECT_DIR")
-    repo = Repo(REPO_DIR, search_parent_directories=True)
+            if plan is DeploymentStrategy.PRODUCTION:
+                SOURCE = os.getenv("CI_COMMIT_BEFORE_SHA")
+            elif plan is DeploymentStrategy.STAGING:
+                SOURCE = os.getenv("CI_MERGE_REQUEST_DIFF_BASE_SHA")
+                # Allows the proper base commit calculation for Merged Result pipelines
+                if os.getenv("CI_MERGE_REQUEST_EVENT_TYPE") == "merged_result":
+                    log("INFO", "Currently running a diff calculation for merge results")
+                    for commit in repo.iter_commits():
+                        if commit.hexsha == os.getenv("CI_COMMIT_BEFORE_SHA"):
+                            mr_correct_parent = commit.parents[1]
+                            log(
+                                "INFO",
+                                "Current evaluating commit and found parent",
+                                f"{commit.hexsha} | {commit.message}",
+                                str(mr_correct_parent),
+                            )
+                            TARGET = mr_correct_parent
+                            break
+            else:
+                log("FATAL", f"Illegal Deployment Plan {str(plan)} passed to diff_calculation algorithm")
+                raise KeyError
 
-    TARGET = os.getenv("CI_COMMIT_SHA")
+        case "Azure":
+            REPO_DIR = os.getenv("Build.SourcesDirectory")
+            TARGET = os.getenv("Build.SourceVersion")
+            repo = Repo(REPO_DIR, search_parent_directories=True)
+            if plan is DeploymentStrategy.PRODUCTION:
+                commits = list(repo.iter_commits('HEAD', max_count=2))
+                if len(commits) > 1:
+                    SOURCE = commits[1].hexsha
+                else:
+                    return None
+                
+            elif plan is DeploymentStrategy.STAGING:
+                repo.remotes.origin.fetch()
+                source_branch = os.getenv("System.PullRequest.targetBranchName")
+                target_branch = os.getenv("Build.SourceBranchName")
+                if not source_branch or not target_branch:
+                    log("FATAL",
+                        "Could not identify source and target branch using predefined Azure Pipeline variables",
+                        "Expected to find System.PullRequest.targetBranchName and Build.SourceBranchName",
+                        "Ensure this is runnning in a Pull Request pipeline")
+                    raise KeyError
+                log("INFO", "Identified source and target branch in the pull request", f"source: {source_branch} -> target: {target_branch}")
+                base_commit = repo.merge_base(source_branch, target_branch)
+                if base_commit:
+                    SOURCE = base_commit[0].hexsha
+                else:
+                    log("FATAL", "Could not identify the base of the Pull Request")
+                    raise TideErrors
 
-    if plan is DeploymentStrategy.PRODUCTION:
-        SOURCE = os.getenv("CI_COMMIT_BEFORE_SHA")
-    elif plan is DeploymentStrategy.STAGING:
-        SOURCE = os.getenv("CI_MERGE_REQUEST_DIFF_BASE_SHA")
-        if os.getenv("CI_MERGE_REQUEST_EVENT_TYPE") == "merged_result":
-            log("INFO", "Currently running a diff calculation for merge results")
-            for commit in repo.iter_commits():
-                if commit.hexsha == os.getenv("CI_COMMIT_BEFORE_SHA"):
-                    mr_correct_parent = commit.parents[1]
-                    log(
-                        "INFO",
-                        "Current evaluating commit and found parent",
-                        f"{commit.hexsha} | {commit.message}",
-                        str(mr_correct_parent),
-                    )
-                    TARGET = mr_correct_parent
-                    break
-    else:
-        log("FATAL", f"Illegal Deployment Plan {str(plan)} passed to diff_calculation algorithm")
-        raise KeyError
+            else:
+                log("FATAL", f"Illegal Deployment Plan {str(plan)} passed to diff_calculation algorithm")
+                raise KeyError
+
+
+        case _:
+            log("FATAL",
+                "CI Target environment variable is not implemented",
+                "Ensure that you have configured a variable OpenTide.TargetCi as part of your pipeline",
+                "Current supported values: GitlabCI, AzurePipelines")
+            raise Exception
+
     log(
         "INFO",
         "Setting source and target commit for the diff calculation to",

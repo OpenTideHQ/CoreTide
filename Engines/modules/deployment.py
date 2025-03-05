@@ -168,6 +168,7 @@ def diff_calculation(plan: DeploymentStrategy) -> list:
 
     match TARGET_CI:
         case "GitlabCI":
+            log("INFO", "Identified Gitlab CI as the CI Runtime Platform")
             REPO_DIR = os.getenv("CI_PROJECT_DIR")
             TARGET = os.getenv("CI_COMMIT_SHA")
             repo = Repo(REPO_DIR, search_parent_directories=True)
@@ -195,6 +196,7 @@ def diff_calculation(plan: DeploymentStrategy) -> list:
                 raise KeyError
 
         case "AzurePipeline":
+            log("INFO", "Identified Azure Pipeline as the CI Runtime Platform")
             REPO_DIR = os.getenv("Build.SourcesDirectory")
             TARGET = os.getenv("Build.SourceVersion")
             repo = Repo(REPO_DIR, search_parent_directories=True)

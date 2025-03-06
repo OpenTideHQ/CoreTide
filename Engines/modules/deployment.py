@@ -262,7 +262,7 @@ def diff_calculation(plan: DeploymentStrategy) -> list:
                 #    f"source: {source_commit.hexsha} -> target: {target_commit.hexsha}")
 
                 #merge_base = repo.merge_base(source_commit, target_commit)
-                merge_base = repo.merge_base(source_branch, target_branch)
+                merge_base = repo.merge_base(repo.refs[source_branch], repo.refs[target_branch])
                 if merge_base:
                     BASE_COMMIT = merge_base[0].hexsha
                 else:

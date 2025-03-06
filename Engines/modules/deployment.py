@@ -250,8 +250,8 @@ def diff_calculation(plan: DeploymentStrategy) -> list:
                         "Ensure this is runnning in a Pull Request pipeline")
                     raise KeyError
                 source_branch = source_branch.replace("refs/heads/", "")
-                source_branch = "refs/remotes/origin/" + source_branch
-                target_branch = "refs/remotes/origin/" + target_branch
+                source_branch = "origin/" + source_branch
+                target_branch = "origin/" + target_branch
                 log("INFO",
                     "Identified source and target branch in the pull request",
                     f"source: {source_branch} -> target: {target_branch}")
@@ -267,6 +267,11 @@ def diff_calculation(plan: DeploymentStrategy) -> list:
                 log("INFO",
                     "Using Refs",
                     f"source: {source_ref} -> target: {target_ref}")
+                if not source_ref.is_valid() or target_ref.is_valid():
+                    log("FATAL",
+                        "Could not identify source and target ref in the Azure Pipeline",
+                        "Ensure the refs are valid and the pipeline is running in a Pull Request")
+                    raise KeyError
                 merge_base = repo.merge_base(source_ref, repo.refs[target_branch])
                 if merge_base:
                     BASE_COMMIT = merge_base[0].hexsha

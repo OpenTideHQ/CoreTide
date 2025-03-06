@@ -1,0 +1,13 @@
+stages:
+  - stage: Framework
+    dependsOn: Validation
+    jobs:
+
+      - job: Framework
+        displayName: Framework Generation
+        condition: | 
+          or(eq(variables['Build.SourceBranch'], variables['OpenTide.DefaultBranch']),
+             eq(variables['Build.Reason'], 'Manual')
+             )
+        steps:
+          - template: ../jobs/framework.yml

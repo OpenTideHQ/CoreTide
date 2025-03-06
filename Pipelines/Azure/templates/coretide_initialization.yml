@@ -11,16 +11,6 @@ steps:
     displayName: Show environment variables
 
   - script: |
-      git clone $(OpenTide.CoreTide.Repo) ./coretide
-    displayName: Clone CoreTide repo in pipeline
-
-  - script: |
-      cd coretide
-      git fetch --all
-      git checkout $(OpenTide.CoreTide.Repo.Branch)
-    displayName: Checkout to selected CoreTide branch
-
-  - script: |
       cp coretide/Engines/requirements.txt $(Pipeline.Workspace)/requirements.txt
     displayName: 'Copy requirements.txt locally to support caching'
 

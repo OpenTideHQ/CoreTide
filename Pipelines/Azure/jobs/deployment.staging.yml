@@ -1,0 +1,9 @@
+steps:
+  - template: ../templates/coretide_initialization.yml
+  - script: |
+      cd coretide/Orchestration
+      python deploy.py
+    env: 
+      MDE_CLIENT_SECRET: $(MDE_CLIENT_SECRET)
+      DEPLOYMENT_PLAN: STAGING
+    displayName: Deployment Routine

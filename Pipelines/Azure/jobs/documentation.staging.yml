@@ -1,0 +1,42 @@
+steps:
+  - template: ../templates/coretide_initialization.yml
+  - script: |
+      cd coretide
+      git clone $(OpenTide.WikiRepo)
+    displayName: Clone Wiki
+  - script: |
+      cd coretide
+      if [ -e $(OpenTide.Wiki.RepoName)/staging_index.json ]
+        then cp $(OpenTide.Wiki.RepoName)/staging_index.json ./
+      fi
+      ls -lah
+    displayName: Extract Prod Index from Wiki for Reconcilitation
+  - script: |
+      cd coretide/Engines/indexing/
+      python ./staging_indexer.py
+    displayName: Generate Tide Index
+    env: 
+      MDE_CLIENT_SECRET: $(MDE_CLIENT_SECRET)
+      GENERATE_INDEX_FILE: True
+  - script: |
+      cd coretide
+      ls -lah
+      cp staging_index.json ./$(OpenTide.Wiki.RepoName)/
+    displayName: Copy Index to Wiki
+  - script: |
+      cd coretide/Orchestration
+      python document.py
+    displayName: Documentation Toolchain
+  - script: |
+      cd coretide
+      cp -fr wiki/. ./$(OpenTide.Wiki.RepoName)/ 
+    displayName: Copy Documentation in Wiki
+  - script: |
+      cd coretide/$(OpenTide.Wiki.RepoName)
+      [[ $(git status --porcelain) ]] || { echo "No changes, exiting"; exit 0; }
+      echo "Updated files, commiting"
+      git rebase
+      git add -A
+      git commit -m "CoreTide Staging Documentation Automation"
+      git push origin
+    displayName: Commit documentation

@@ -238,6 +238,7 @@ def diff_calculation(plan: DeploymentStrategy) -> list:
                 log("INFO",
                     "Discovered branches in current repository",
                     str([branch for branch in repo.branches]))
+                log("INFO", "ALL Refs", str([ref for ref in repo.refs]))
 
                 source_branch = os.getenv("SYSTEM_PULLREQUEST_SOURCEBRANCH")
                 target_branch = os.getenv("SYSTEM_PULLREQUEST_TARGETBRANCHNAME")

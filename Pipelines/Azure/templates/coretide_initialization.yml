@@ -4,8 +4,6 @@ steps:
     persistCredentials: true
     displayName: Checkout repo
   
-  #- checkout: coretide
-
   - script: |
       env | sort
     displayName: Show environment variables

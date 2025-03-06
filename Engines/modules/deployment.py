@@ -267,7 +267,7 @@ def diff_calculation(plan: DeploymentStrategy) -> list:
                 log("INFO",
                     "Using Refs",
                     f"source: {source_ref} -> target: {target_ref}")
-                if not source_ref.is_valid() or target_ref.is_valid():
+                if not source_ref.is_valid() or not target_ref.is_valid():
                     log("FATAL",
                         "Could not identify source and target ref in the Azure Pipeline",
                         "Ensure the refs are valid and the pipeline is running in a Pull Request")

@@ -235,6 +235,7 @@ def diff_calculation(plan: DeploymentStrategy) -> list:
                 
             elif plan is DeploymentStrategy.STAGING:
                 repo.remotes.origin.fetch()
+
                 log("INFO",
                     "Discovered branches in current repository",
                     str([branch for branch in repo.branches]))
@@ -248,7 +249,9 @@ def diff_calculation(plan: DeploymentStrategy) -> list:
                         "Expected to find SYSTEM_PULLREQUEST_SOURCEBRANCH and SYSTEM_PULLREQUEST_TARGETBRANCHNAME",
                         "Ensure this is runnning in a Pull Request pipeline")
                     raise KeyError
-                source_branch = source_branch.split("/")[-1] #Take last part of the ref
+                source_branch = source_branch.replace("refs/heads/", "")
+                source_branch = "origin/" + source_branch
+                target_branch = "origin/" + target_branch
                 log("INFO", "Identified source and target branch in the pull request", f"source: {source_branch} -> target: {target_branch}")
                 source_commit = repo.commit(source_branch)
                 target_commit = repo.commit(target_branch)

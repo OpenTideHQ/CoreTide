@@ -235,6 +235,7 @@ def diff_calculation(plan: DeploymentStrategy) -> list:
                 
             elif plan is DeploymentStrategy.STAGING:
                 repo.remotes.origin.fetch()
+                repo.remotes.origin.pull()
 
                 log("INFO",
                     "Discovered branches in current repository",
@@ -255,13 +256,14 @@ def diff_calculation(plan: DeploymentStrategy) -> list:
                 log("INFO",
                     "Identified source and target branch in the pull request",
                     f"source: {source_branch} -> target: {target_branch}")
-                source_commit = repo.commit(source_branch)
-                target_commit = repo.commit(target_branch)
-                log("INFO",
-                    "Identified source and target commits in the pull request",
-                    f"source: {source_commit.hexsha} -> target: {target_commit.hexsha}")
+                #source_commit = repo.commit(source_branch)
+                #target_commit = repo.commit(target_branch)
+                #log("INFO",
+                #    "Identified source and target commits in the pull request",
+                #    f"source: {source_commit.hexsha} -> target: {target_commit.hexsha}")
 
-                merge_base = repo.merge_base(target_commit, source_commit)
+                #merge_base = repo.merge_base(source_commit, target_commit)
+                merge_base = repo.merge_base(source_branch, target_branch)
                 if merge_base:
                     BASE_COMMIT = merge_base[0].hexsha
                 else:

@@ -222,7 +222,10 @@ def diff_calculation(plan: DeploymentStrategy) -> list:
             log("INFO", "Identified Azure Pipeline as the CI Runtime Platform")
             REPO_DIR = os.getenv("BUILD_SOURCESDIRECTORY")
             LATEST_COMMIT = os.getenv("BUILD_SOURCEVERSION")
-            repo = Repo(REPO_DIR, search_parent_directories=True)
+            log("INFO",
+                "Will initialize repository located on",
+                REPO_DIR)
+            repo = Repo(REPO_DIR)
             if plan is DeploymentStrategy.PRODUCTION:
                 commits = list(repo.iter_commits('HEAD', max_count=2))
                 if len(commits) > 1:

@@ -267,7 +267,9 @@ def diff_calculation(plan: DeploymentStrategy) -> list:
                     BASE_COMMIT = base_commit[0].hexsha
                 else:
                     log("FATAL",
-                        "Could not identify the base of the Pull Request")
+                        "Could not identify the base of the Pull Request",
+                        "You may not have a sufficient OpenTide.Repo.Checkout.Depth configuration",
+                        "If you run very old Pull Requests, this setting may need to be increased, or reopen a PR")
                     raise TideErrors
 
             else:

@@ -235,7 +235,6 @@ def diff_calculation(plan: DeploymentStrategy) -> list:
                 
             elif plan is DeploymentStrategy.STAGING:
                 repo.remotes.origin.fetch()
-                repo.remotes.origin.pull()
 
                 log("INFO",
                     "Discovered branches in current repository",

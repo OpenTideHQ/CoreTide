@@ -235,33 +235,23 @@ def diff_calculation(plan: DeploymentStrategy) -> list:
                 
             elif plan is DeploymentStrategy.STAGING:
                 repo.remotes.origin.fetch()
-
-                log("INFO",
-                    "Discovered branches in current repository",
-                    str([branch for branch in repo.branches]))
-                log("INFO", "ALL Refs", str([ref for ref in repo.refs]))
-
                 source_branch = os.getenv("SYSTEM_PULLREQUEST_SOURCEBRANCH")
                 target_branch = os.getenv("SYSTEM_PULLREQUEST_TARGETBRANCHNAME")
+                
                 if not source_branch or not target_branch:
                     log("FATAL",
                         "Could not identify source and target branch using predefined Azure Pipeline variables",
                         "Expected to find SYSTEM_PULLREQUEST_SOURCEBRANCH and SYSTEM_PULLREQUEST_TARGETBRANCHNAME",
                         "Ensure this is runnning in a Pull Request pipeline")
                     raise KeyError
+                
                 source_branch = source_branch.replace("refs/heads/", "")
                 source_branch = "origin/" + source_branch
                 target_branch = "origin/" + target_branch
                 log("INFO",
                     "Identified source and target branch in the pull request",
                     f"source: {source_branch} -> target: {target_branch}")
-                source_commit = repo.rev_parse(source_branch)
-                target_commit = repo.rev_parse(target_branch)
-                log("INFO",
-                    "Identified source and target commits in the pull request",
-                    f"source: {source_commit.hexsha} -> target: {target_commit.hexsha}")
-
-                base_commit = repo.merge_base(target_commit, source_commit)
+                base_commit = repo.merge_base(target_branch, source_branch)
                 
                 if base_commit:
                     BASE_COMMIT = base_commit[0].hexsha

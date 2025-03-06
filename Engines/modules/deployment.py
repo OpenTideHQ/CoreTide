@@ -234,7 +234,7 @@ def diff_calculation(plan: DeploymentStrategy) -> list:
                 repo.remotes.origin.fetch()
                 log("INFO",
                     "Discovered branches in current repository",
-                    str([branch.name for branch in repo.branches]))
+                    str([branch for branch in repo.branches]))
 
                 source_branch = os.getenv("SYSTEM_PULLREQUEST_SOURCEBRANCH")
                 target_branch = os.getenv("SYSTEM_PULLREQUEST_TARGETBRANCHNAME")

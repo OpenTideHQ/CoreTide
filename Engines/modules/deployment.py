@@ -255,30 +255,19 @@ def diff_calculation(plan: DeploymentStrategy) -> list:
                 log("INFO",
                     "Identified source and target branch in the pull request",
                     f"source: {source_branch} -> target: {target_branch}")
-                #source_commit = repo.commit(source_branch)
-                #target_commit = repo.commit(target_branch)
-                #log("INFO",
-                #    "Identified source and target commits in the pull request",
-                #    f"source: {source_commit.hexsha} -> target: {target_commit.hexsha}")
-
-                #merge_base = repo.merge_base(source_commit, target_commit)
-                source_ref = repo.refs[source_branch]
-                target_ref = repo.refs[target_branch]
+                source_commit = repo.rev_parse(source_branch)
+                target_commit = repo.rev_parse(target_branch)
                 log("INFO",
-                    "Using Refs",
-                    f"source: {source_ref} -> target: {target_ref}")
-                if not source_ref.is_valid() or not target_ref.is_valid():
-                    log("FATAL",
-                        "Could not identify source and target ref in the Azure Pipeline",
-                        "Ensure the refs are valid and the pipeline is running in a Pull Request")
-                    raise KeyError
-                merge_base = repo.merge_base(source_ref, repo.refs[target_branch])
-                if merge_base:
-                    BASE_COMMIT = merge_base[0].hexsha
+                    "Identified source and target commits in the pull request",
+                    f"source: {source_commit.hexsha} -> target: {target_commit.hexsha}")
+
+                base_commit = repo.merge_base(source_commit, target_commit)
+                
+                if base_commit:
+                    BASE_COMMIT = base_commit[0].hexsha
                 else:
                     log("FATAL",
-                        "Could not identify the base of the Pull Request",
-                        str(merge_base))
+                        "Could not identify the base of the Pull Request")
                     raise TideErrors
 
             else:

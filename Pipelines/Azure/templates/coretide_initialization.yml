@@ -4,6 +4,9 @@ steps:
     persistCredentials: true
     displayName: Checkout Instance Repo
 
+  - template: .azure/set_secrets.yml@self
+    displayName: Load Secrets as Environment Variables
+
   - checkout: coretide
     displayName: Checkout CoreTide
 

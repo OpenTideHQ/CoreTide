@@ -1,6 +1,5 @@
 stages:
   - stage: Validation
-    dependsOn: ConfigureEnvironmentVariables
     jobs:
       - job: ObjectValidation
         displayName: OpenTide Object Validation

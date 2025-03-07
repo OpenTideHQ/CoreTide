@@ -3,7 +3,7 @@ steps:
   - script: | 
       set -a
       source $(Pipeline.Workspace)/.env
-      set -a
+      set +a
       git rebase origin/$(OpenTide.DefaultBranch)
       cd coretide/Orchestration/
       python deploy.py

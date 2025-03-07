@@ -11,7 +11,6 @@ steps:
       cp -fr ./$(Build.Repository.Name)/. ./
       mkdir coretide
       cp -fr ./CoreTide/. ./coretide/
-      cp -fr .azure/set_pipeline_secrets.yml ./coretide/Pipelines/Azure/templates/
     displayName: Re-Nest CoreTide into Instance repo
 
   - script: |
@@ -19,12 +18,16 @@ steps:
       ls -lah
     displayName: Show current directory
 
-  - template: ../modules/set_pipeline_secrets.yml
-
   - script: |
       env | sort
     displayName: Show environment variables
 
+  - script: |
+      set -a
+      source $(Pipeline.Workspace)/build/.env
+      set +a
+    displayName: Load environment variables from .env file
+        
   - script: |
       cp coretide/Engines/requirements.txt $(Pipeline.Workspace)/requirements.txt
     displayName: 'Copy requirements.txt locally to support caching'

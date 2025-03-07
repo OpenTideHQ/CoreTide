@@ -22,12 +22,7 @@ steps:
       env | sort
     displayName: Show environment variables
 
-  - script: |
-      set -a
-      source $(Pipeline.Workspace)/build/.env
-      set +a
-    displayName: Load environment variables from .env file
-    dependsOn: EnvironmentVariables
+  - template: load_environment_variables.yml
 
   - script: |
       cp coretide/Engines/requirements.txt $(Pipeline.Workspace)/requirements.txt

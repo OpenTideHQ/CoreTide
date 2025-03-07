@@ -1,0 +1,6 @@
+steps:
+  - script: |
+      set -a
+      source $(Pipeline.Workspace)/build/.env
+      set +a
+    displayName: Load environment variables from .env file

@@ -37,7 +37,12 @@ if len(deployment_list) == 0:  # In case of no deployments possible, fail gracio
     sys.exit(19)
 
 for system in deployment_list:
-    system_name = DataTide.Configurations.Systems.Index[system]['tide']['name']
+    #TODO Temp support while we support both MDRv3 and MDRv4 deployers
+    try:
+        system_name = DataTide.Configurations.Systems.Index[system]['tide']['name']
+    except:
+        system_name = DataTide.Configurations.Systems.Index[system]['platform']['name']
+
     log("TITLE", f"Query Validation - {system_name}")
     log(
         "INFO",
@@ -45,7 +50,14 @@ for system in deployment_list:
     )
 
     if system in DeployTide.query_validation:
-        DeployTide.query_validation[system].validate(deployment=deployment_list[system])
+        log("ONGOING", f"Validating the query against {system_name}")
+        try:
+            DeployTide.query_validation[system].validate(deployment=deployment_list[system])
+        except:
+            log("WARNING", "Trying MDRv4 style method")
+            DeployTide.query_validation[system].validate(mdr_deployment=deployment_list[system],
+                                                         deployment_plan=DEPLOYMENT_PLAN)
+
     else:
         log(
             "SKIP",

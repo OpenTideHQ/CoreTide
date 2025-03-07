@@ -92,8 +92,21 @@ for system in deployment_list:
     )
 
     if system in DeployTide.mdr:
-        log("ONGOING", "Deploying MDR for target system", system)
-        DeployTide.mdr[system].deploy(deployment=deployment_list[system])
+        try:
+            log("ONGOING",
+                "Deploying MDR for target system",
+                system,
+                "Using MDRv3 standard methods")
+            DeployTide.mdr[system].deploy(deployment=deployment_list[system])
+        except:
+            log("WARNING", "Switching to MDRv4 new methods")
+            log("ONGOING",
+                "Deploying MDR for target system",
+                system,
+                "Using MDRv4 new methods")
+            DeployTide.mdr[system].deploy(mdr_deployment=deployment_list[system],
+                                          deployment_plan=DEPLOYMENT_PLAN)
+
     else:
         log(
             "FATAL",

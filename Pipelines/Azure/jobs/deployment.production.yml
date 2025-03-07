@@ -1,11 +1,13 @@
 steps:
   - template: ../templates/coretide_initialization.yml
   - script: | 
+      set -a
+      source $(Pipeline.Workspace)/.env
+      set -a
       git rebase origin/$(OpenTide.DefaultBranch)
       cd coretide/Orchestration/
       python deploy.py
     env: 
-      MDE_CLIENT_SECRET: $(MDE_CLIENT_SECRET)
       DEPLOYMENT_PLAN: PRODUCTION
     displayName: Deployment Routine
   - script: | 

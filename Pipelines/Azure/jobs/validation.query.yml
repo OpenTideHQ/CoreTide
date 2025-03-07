@@ -1,6 +1,9 @@
 steps:
   - template: ../templates/coretide_initialization.yml
   - script: |
+      set -a
+      source $(Pipeline.Workspace)/.env
+      set -a
       cd coretide/Orchestration
       python validate_query.py
     displayName: Run OpenTide Query Validation

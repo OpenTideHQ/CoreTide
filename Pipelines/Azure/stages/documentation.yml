@@ -1,7 +1,7 @@
 stages:
   - stage: Documentation
     dependsOn: Framework
-    condition: eq(variables['OpenTide.Wiki.Enabled'], 'true')
+    condition: eq(variables['OpenTide.Wiki.Enabled'], 'True')
     jobs:
 
       - job: Wiki

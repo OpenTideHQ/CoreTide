@@ -25,8 +25,9 @@ steps:
         exit 0
       fi
 
+      branch_name=$(echo "$(System.PullRequest.SourceBranch)" | sed 's|refs/heads/||')
       echo "Updated files, committing"
       git add -- ':!$(Build.Repository.Name)' ':!CoreTide'
       git commit -m "Rule ID [skip ci]"
-      git push origin "HEAD:$(Build.SourceBranchName)"
+      git push origin "HEAD:$branch_name"
     displayName: Commit New Rule ID

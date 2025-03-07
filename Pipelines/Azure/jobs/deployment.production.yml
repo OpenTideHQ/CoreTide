@@ -26,9 +26,8 @@ steps:
         exit 0
       fi
 
-      branch_name=$(echo "$(System.PullRequest.SourceBranch)" | sed 's|refs/heads/||')
       echo "Updated files, committing"
       git add -- ':!$(Build.Repository.Name)' ':!CoreTide'
       git commit -m "Detection Rules Promotion [skip ci]"
-      git push origin "HEAD:$branch_name"
+      git push origin "HEAD:$(Build.SourceBranchName)"
     displayName: Commit Promotion if Changes

@@ -5,13 +5,14 @@ steps:
     displayName: Checkout Instance Repo
   
   - checkout: coretide
+
     displayName: Checkout CoreTide
 
   - script: |
-      cp $(Build.RepositoryName)/. ./
-      rm -rf $(Build.RepositoryName)
+      cp ./$(Build.Repository.Name)/. ./
+      rm -rf $(Build.Repository.Name)
       mkdir coretide
-      cp CoreTide/. ./coretide/
+      cp ./CoreTide/. ./coretide/
       rm -rf CoreTide
     displayName: Re-Nest CoreTide into Instance repo
 

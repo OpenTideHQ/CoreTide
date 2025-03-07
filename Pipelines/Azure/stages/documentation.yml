@@ -1,11 +1,12 @@
 stages:
   - stage: Documentation
     dependsOn: Framework
+    condition: eq(variables['OpenTide.Wiki.Enabled'], 'true')
     jobs:
 
       - job: Wiki
         displayName: Wiki Generation
-        condition: | 
+        condition: |
           or(eq(variables['Build.SourceBranch'], variables['OpenTide.DefaultBranch']),
              eq(variables['Build.Reason'], 'Manual')
              )

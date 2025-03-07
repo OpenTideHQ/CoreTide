@@ -9,7 +9,11 @@ steps:
     displayName: Show environment variables
 
   - script: |
+      pwd
       ls -lah
+    displayName: Show current directory
+    
+  - script: |
       cp coretide/Engines/requirements.txt $(Pipeline.Workspace)/requirements.txt
     displayName: 'Copy requirements.txt locally to support caching'
 

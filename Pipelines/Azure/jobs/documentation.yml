@@ -35,6 +35,6 @@ steps:
       echo "Updated files, commiting"
       git rebase
       git add -A
-      git commit -m "CoreTide Documentation Automation"
+      git commit -m "OpenTide Documentation Automation"
       git push origin
     displayName: Commit documentation

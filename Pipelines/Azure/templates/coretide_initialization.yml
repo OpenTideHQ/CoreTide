@@ -21,12 +21,6 @@ steps:
     displayName: Show current directory
 
   - script: |
-      env | sort
-    displayName: Show environment variables
-
-  - template: load_environment_variables.yml
-
-  - script: |
       cp coretide/Engines/requirements.txt $(Pipeline.Workspace)/requirements.txt
     displayName: 'Copy requirements.txt locally to support caching'
 

@@ -3,25 +3,27 @@ steps:
     fetchDepth: $(OpenTide.Repo.Checkout.Depth)
     persistCredentials: true
     displayName: Checkout Instance Repo
-  
-  - checkout: coretide
 
+  - checkout: coretide
     displayName: Checkout CoreTide
 
   - script: |
       cp -fr ./$(Build.Repository.Name)/. ./
       mkdir coretide
       cp -fr ./CoreTide/. ./coretide/
+      cp -fr .azure/set_pipeline_secrets.yml ./coretide/Pipelines/Azure/templates/
     displayName: Re-Nest CoreTide into Instance repo
-
-  - script: |
-      env | sort
-    displayName: Show environment variables
 
   - script: |
       pwd
       ls -lah
     displayName: Show current directory
+
+  - template: ../modules/set_pipeline_secrets.yml
+
+  - script: |
+      env | sort
+    displayName: Show environment variables
 
   - script: |
       cp coretide/Engines/requirements.txt $(Pipeline.Workspace)/requirements.txt

@@ -28,8 +28,8 @@ steps:
     displayName: 'Copy requirements.txt locally to support caching'
 
   - script: |
-      git config --global user.email "secops@pandora.net"
-      git config --global user.name "PanTide Automation"
+      git config --global user.email $(OpenTide.Commiter.UserEmail)
+      git config --global user.name $(OpenTide.Commiter.UserName)
     displayName: Git Configuration
 
   - task: UsePythonVersion@0
@@ -42,10 +42,10 @@ steps:
     displayName: Load pip cache
     inputs:
       key: 'pip | "$(Agent.OS)" | $(Pipeline.Workspace)/requirements.txt'
-      path: $(PipDownloadDir)
+      path: $(Pipeline.Workspace)/.pip
 
   - script: |
-      pip install --cache-dir $(PipDownloadDir) -r $(Pipeline.Workspace)/requirements.txt
+      pip install --cache-dir $(Pipeline.Workspace)/.pip -r $(Pipeline.Workspace)/requirements.txt
     displayName: 'Install Python Dependencies'
   
     

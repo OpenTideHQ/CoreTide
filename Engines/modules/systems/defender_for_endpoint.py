@@ -186,9 +186,6 @@ class DefenderForEndpointService:
         else:
             Proxy.unset_proxy()
         
-        log("INFO",
-            "VARIABLES",
-            f"client_id: {tenant_config.setup.client_id}, tenant_id: {tenant_config.setup.tenant_id}, client_secret: {tenant_config.setup.client_secret[:10]}...")
         self.access_token = self._connect_to_tenant(self.tenant_config.setup.client_id,
                                                    self.tenant_config.setup.tenant_id,
                                                    self.tenant_config.setup.client_secret)
@@ -217,7 +214,8 @@ class DefenderForEndpointService:
         else:
             log("FATAL",
                 f"Cannot authenticate against {self.tenant_config.name}",
-                str(response.json()))
+                str(response.json()),
+                f"client_id: {client_id}, tenant_id: {tenant_id}, client_secret: {client_secret[:10]}...")
             raise TideErrors.TenantConnectionError("Cannot authenticate with the tenant configuration")
 
     

@@ -29,4 +29,4 @@ steps:
       git add -- ':!$(Build.Repository.Name)' ':!CoreTide'
       git commit -m "Rule ID [skip ci]"
       git push origin "HEAD:$(Build.SourceBranchName)"
-    displayName: Change Rule ID
+    displayName: Commit New Rule ID

@@ -186,6 +186,9 @@ class DefenderForEndpointService:
         else:
             Proxy.unset_proxy()
         
+        log("INFO",
+            "VARIABLES",
+            f"client_id: {tenant_config.setup.client_id}, tenant_id: {tenant_config.setup.tenant_id}, client_secret: {tenant_config.setup.client_secret[:10]}...")
         self.access_token = self._connect_to_tenant(self.tenant_config.setup.client_id,
                                                    self.tenant_config.setup.tenant_id,
                                                    self.tenant_config.setup.client_secret)

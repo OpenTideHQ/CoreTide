@@ -4,8 +4,6 @@ steps:
     persistCredentials: true
     displayName: Checkout Instance Repo
 
-  - template: .azure/set_secrets.yml@self
-
   - checkout: coretide
     displayName: Checkout CoreTide
 
@@ -45,4 +43,4 @@ steps:
       pip install --cache-dir $(Pipeline.Workspace)/.pip -r $(Pipeline.Workspace)/requirements.txt
     displayName: 'Install Python Dependencies'
   
-    
+  - template: .azure/set_secrets.yml@self

@@ -17,9 +17,7 @@ stages:
 
       - job: ProductionDeployment
         displayName: Deploy to Production
-        dependsOn:
-          - CheckForChanges
-          - EnvironmentVariables
+        dependsOn: CheckForChanges
         condition: |
           and(eq(dependencies.CheckForChanges.outputs['FilesChanged.ChangesDetected'], 'true'),
               or(eq(variables['Build.SourceBranch'], variables['OpenTide.DefaultBranch']),

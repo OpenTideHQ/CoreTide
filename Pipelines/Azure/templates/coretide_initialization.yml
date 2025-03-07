@@ -2,8 +2,11 @@ steps:
   - checkout: self
     fetchDepth: $(OpenTide.Repo.Checkout.Depth)
     persistCredentials: true
-    displayName: Checkout repo
+    displayName: Checkout Instance Repo
   
+  - checkout: coretide
+    displayName: Checkout CoreTide
+
   - script: |
       env | sort
     displayName: Show environment variables
@@ -12,7 +15,7 @@ steps:
       pwd
       ls -lah
     displayName: Show current directory
-    
+
   - script: |
       cp coretide/Engines/requirements.txt $(Pipeline.Workspace)/requirements.txt
     displayName: 'Copy requirements.txt locally to support caching'

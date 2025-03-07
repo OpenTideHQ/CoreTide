@@ -1,6 +1,8 @@
 steps:
+  - download: current
+    artifact: .env
   - script: |
       set -a
-      source $(Pipeline.Workspace)/build/.env
+      source $(Pipeline.Workspace)/.env
       set +a
     displayName: Load environment variables from .env file

@@ -1,5 +1,6 @@
 stages:
   - stage: Validation
+    dependsOn: ConfigureEnvironmentVariables
     jobs:
       - job: ObjectValidation
         displayName: OpenTide Object Validation
@@ -14,8 +15,6 @@ stages:
 
       - job: QueryValidation
         displayName: OpenTide Detection Rule Query Validation
-        dependsOn:
-          - CheckForChanges
-          - EnvironmentVariables
+        dependsOn: CheckForChanges
         steps:
           - template: ../jobs/validation.query.yml

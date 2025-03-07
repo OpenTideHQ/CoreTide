@@ -1,7 +1,9 @@
 stages:
   - stage: Deployment
     displayName: Detection Rule Deployment
-    dependsOn: Validation
+    dependsOn:
+      - Validation
+      - ConfigureEnvironmentVariables
     condition: | 
       or(eq(variables['Build.SourceBranch'], variables['OpenTide.DefaultBranch']),
          eq(variables['Build.Reason'], 'Manual'),
@@ -29,9 +31,7 @@ stages:
 
       - job: StagingDeployment
         displayName: Deploy to Staging
-        dependsOn:
-          - CheckForChanges
-          - EnvironmentVariables
+        dependsOn: CheckForChanges
         condition:
           and(eq(dependencies.CheckForChanges.outputs['FilesChanged.ChangesDetected'], 'true'),
               eq(variables['Build.Reason'], 'PullRequest')

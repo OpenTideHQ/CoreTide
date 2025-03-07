@@ -1,0 +1,17 @@
+steps:
+  - checkout: self
+    fetchDepth: 2
+
+  - script: |
+      echo "##[group]Checking for changes in $(OpenTide.DetectionRules.Path)"
+      changes=$(git diff HEAD HEAD~ --name-only | grep '^$(OpenTide.DetectionRules.Path)')
+      if [ -n "$changes" ]; then
+        echo "Detection Rules file modified, will execute a deployment routine"
+        echo "##vso[task.setvariable variable=ChangesDetected;isOutput=true]true"
+      else
+        echo "No Detection Rules file modified, will skip the deployment routine"
+        echo "##vso[task.setvariable variable=ChangesDetected;isOutput=true]false"
+      fi
+      echo "##[endgroup]"
+    displayName: 'Detect changes'
+    name: FilesChanged

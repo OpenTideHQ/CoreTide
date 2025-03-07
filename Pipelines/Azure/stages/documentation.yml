@@ -1,0 +1,30 @@
+stages:
+  - stage: Documentation
+    dependsOn: Framework
+    condition: eq(variables['OpenTide.Wiki.Enabled'], 'True')
+    jobs:
+
+      - job: Wiki
+        displayName: Wiki Generation
+        condition: |
+          or(eq(variables['Build.SourceBranch'], variables['OpenTide.DefaultBranch']),
+             eq(variables['Build.Reason'], 'Manual')
+             )
+        steps:
+          - template: ../jobs/documentation.yml
+
+      - job: CheckForChanges
+        displayName: 'Check for Detection Rules changes'
+        condition: eq(variables['Build.Reason'], 'PullRequest')
+        steps:
+          - template: ../templates/check_mdr_changes.yml
+    
+      - job: DetectionRulesStagingWiki
+        displayName: Staging Documentation
+        dependsOn: CheckForChanges
+        condition:
+          and(eq(dependencies.CheckForChanges.outputs['FilesChanged.ChangesDetected'], 'true'),
+              eq(variables['Build.Reason'], 'PullRequest')
+              )
+        steps:
+          - template: ../jobs/documentation.staging.yml

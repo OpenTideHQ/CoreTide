@@ -1,0 +1,6 @@
+steps:
+  - template: ../templates/coretide_initialization.yml
+  - script: |
+      cd coretide/Orchestration
+      python validate.py
+    displayName: Run OpenTide Object Validation

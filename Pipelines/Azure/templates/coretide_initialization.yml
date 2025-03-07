@@ -1,0 +1,51 @@
+steps:
+  - checkout: self
+    fetchDepth: $(OpenTide.Repo.Checkout.Depth)
+    persistCredentials: true
+    displayName: Checkout Instance Repo
+  
+  - checkout: coretide
+
+    displayName: Checkout CoreTide
+
+  - script: |
+      cp -fr ./$(Build.Repository.Name)/. ./
+      mkdir coretide
+      cp -fr ./CoreTide/. ./coretide/
+    displayName: Re-Nest CoreTide into Instance repo
+
+  - script: |
+      env | sort
+    displayName: Show environment variables
+
+  - script: |
+      pwd
+      ls -lah
+    displayName: Show current directory
+
+  - script: |
+      cp coretide/Engines/requirements.txt $(Pipeline.Workspace)/requirements.txt
+    displayName: 'Copy requirements.txt locally to support caching'
+
+  - script: |
+      git config --global user.email $(OpenTide.Commiter.UserEmail)
+      git config --global user.name $(OpenTide.Commiter.UserName)
+    displayName: Git Configuration
+
+  - task: UsePythonVersion@0
+    inputs:
+      versionSpec: '3.12'
+      addToPath: true
+    displayName: Use Python 3.12
+  
+  - task: Cache@2
+    displayName: Load pip cache
+    inputs:
+      key: 'pip | "$(Agent.OS)" | $(Pipeline.Workspace)/requirements.txt'
+      path: $(Pipeline.Workspace)/.pip
+
+  - script: |
+      pip install --cache-dir $(Pipeline.Workspace)/.pip -r $(Pipeline.Workspace)/requirements.txt
+    displayName: 'Install Python Dependencies'
+  
+    

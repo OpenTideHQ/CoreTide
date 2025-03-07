@@ -1,0 +1,8 @@
+steps:
+  - template: ../templates/coretide_initialization.yml
+  - script: |
+      cd coretide/Orchestration
+      python deploy.py
+    env: 
+      DEPLOYMENT_PLAN: STAGING
+    displayName: Deployment Routine

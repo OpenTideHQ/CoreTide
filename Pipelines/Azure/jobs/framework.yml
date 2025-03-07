@@ -1,0 +1,27 @@
+steps:
+  - template: ../templates/coretide_initialization.yml
+  - script: |
+      cd coretide/Orchestration
+      python generate.py
+    displayName: Run OpenTide Framework Generation
+  - script: |
+      rm -rf coretide
+    displayName: Remove CoreTide repo before commiting
+  - script: |
+      changes=$(git status --porcelain)
+      if [[ -z "$changes" ]]; then
+        echo "No changes, exiting"
+        exit 0
+      fi
+
+      filtered_changes=$(echo "$changes" | grep -vE '^(M|A|D) $(Build.Repository.Name)/|^(M|A|D) CoreTide/')
+      if [[ -z "$filtered_changes" ]]; then
+        echo "Changes only in Local Instance or CoreTide directories, not committing"
+        exit 0
+      fi
+
+      echo "Updated files, committing"
+      git add -- ':!PanTide' ':!CoreTide'
+      git commit -m "CoreTide Framework Automation [skip ci]"
+      git push origin "HEAD:$(Build.SourceBranchName)"
+    displayName: 'Check for changes and commit if any'

@@ -1,0 +1,19 @@
+stages:
+  - stage: Validation
+    jobs:
+      - job: ObjectValidation
+        displayName: OpenTide Object Validation
+        steps:
+          - template: ../jobs/validation.schema.yml
+
+      - job: CheckForChanges
+        displayName: 'Check for Detection Rules changes'
+        condition: eq(variables['Build.Reason'], 'PullRequest')
+        steps:
+          - template: ../templates/check_mdr_changes.yml
+
+      - job: QueryValidation
+        displayName: OpenTide Detection Rule Query Validation
+        dependsOn: CheckForChanges
+        steps:
+          - template: ../jobs/validation.query.yml

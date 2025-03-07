@@ -1,0 +1,5 @@
+stages:
+  - template: ./stages/validation.yml
+  - template: ./stages/framework.yml
+  - template: ./stages/documentation.yml
+  - template: ./stages/deployment.yml

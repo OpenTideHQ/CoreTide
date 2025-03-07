@@ -1,0 +1,31 @@
+steps:
+  - template: ../templates/coretide_initialization.yml
+  - script: | 
+      git rebase origin/$(OpenTide.DefaultBranch)
+      cd coretide/Orchestration/
+      python deploy.py
+    env: 
+      MDE_CLIENT_SECRET: $(MDE_CLIENT_SECRET)
+      DEPLOYMENT_PLAN: PRODUCTION
+    displayName: Deployment Routine
+  - script: | 
+      rm -rf coretide
+    displayName: Remove CoreTide Repository
+  - script: |
+      changes=$(git status --porcelain)
+      if [[ -z "$changes" ]]; then
+        echo "No changes, exiting"
+        exit 0
+      fi
+
+      filtered_changes=$(echo "$changes" | grep -vE '^(M|A|D) $(Build.Repository.Name)/|^(M|A|D) CoreTide/')
+      if [[ -z "$filtered_changes" ]]; then
+        echo "Changes only in Local Instance or CoreTide directories, not committing"
+        exit 0
+      fi
+
+      echo "Updated files, committing"
+      git add -- ':!PanTide' ':!CoreTide'
+      git commit -m "Detection Rules Promotion [skip ci]"
+      git push origin "HEAD:$(Build.SourceBranchName)"
+    displayName: Commit Promotion if Changes

@@ -1,4 +1,3 @@
-dependsOn: EnvironmentVariables
 steps:
   - checkout: self
     fetchDepth: $(OpenTide.Repo.Checkout.Depth)
@@ -28,7 +27,8 @@ steps:
       source $(Pipeline.Workspace)/build/.env
       set +a
     displayName: Load environment variables from .env file
-        
+    dependsOn: EnvironmentVariables
+
   - script: |
       cp coretide/Engines/requirements.txt $(Pipeline.Workspace)/requirements.txt
     displayName: 'Copy requirements.txt locally to support caching'

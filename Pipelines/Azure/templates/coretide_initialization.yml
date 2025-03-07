@@ -1,3 +1,4 @@
+dependsOn: EnvironmentVariables
 steps:
   - checkout: self
     fetchDepth: $(OpenTide.Repo.Checkout.Depth)

@@ -8,6 +8,14 @@ steps:
     displayName: Checkout CoreTide
 
   - script: |
+      cp $(Build.RepositoryName)/. ./
+      rm -rf $(Build.RepositoryName)
+      mkdir coretide
+      cp CoreTide/. ./coretide/
+      rm -rf CoreTide
+    displayName: Re-Nest CoreTide into Instance repo
+
+  - script: |
       env | sort
     displayName: Show environment variables
 

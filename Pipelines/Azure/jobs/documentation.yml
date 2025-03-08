@@ -1,19 +1,14 @@
 steps:
   - template: ../templates/coretide_initialization.yml
+  - checkout: Wiki
   - script: |
-      cd coretide
-      WIKI_URL=$(echo $(OpenTide.WikiRepo) | sed 's|^https://||')
-      git clone https://$SYSTEM_ACCESSTOKEN@$WIKI_URL
-    displayName: Clone Wiki
-    env:
-      SYSTEM_ACCESSTOKEN: $(System.AccessToken)
-
+      mv $(OpenTide.Wiki.RepoName) ./coretide
+    displayName: Move Wiki to CoreTide
   - script: |
       cd coretide/Engines/indexing/
       export GENERATE_INDEX_FILE=True
       python ./indexer.py
     displayName: Generate Tide Index
-
   - script: |
       cd coretide
       cp index.json $(OpenTide.Wiki.RepoName)/
@@ -27,8 +22,6 @@ steps:
   - script: |
       cd coretide/Orchestration
       python document.py
-    env: 
-      OPENTIDE_CI_PLATFORM: $(OpenTide.CI.Platform)
     displayName: Documentation Toolchain
   - script: |
       cd coretide

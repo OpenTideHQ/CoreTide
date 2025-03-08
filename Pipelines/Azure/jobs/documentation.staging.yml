@@ -2,8 +2,10 @@ steps:
   - template: ../templates/coretide_initialization.yml
   - script: |
       cd coretide
-      git clone $(OpenTide.WikiRepo)
+      git clone https://$SYSTEM_ACCESSTOKEN@$(OpenTide.WikiRepo)
     displayName: Clone Wiki
+    env:
+      SYSTEM_ACCESSTOKEN: $(System.AccessToken)
   - script: |
       cd coretide
       if [ -e $(OpenTide.Wiki.RepoName)/staging_index.json ]

@@ -2,7 +2,8 @@ steps:
   - template: ../templates/coretide_initialization.yml
   - script: |
       cd coretide
-      git clone https://$SYSTEM_ACCESSTOKEN@$(OpenTide.WikiRepo)
+      WIKI_URL=$(echo $(OpenTide.WikiRepo) | sed 's|^https://||')
+      git clone https://$SYSTEM_ACCESSTOKEN@$WIKI_URL
     displayName: Clone Wiki
     env:
       SYSTEM_ACCESSTOKEN: $(System.AccessToken)

@@ -12,6 +12,9 @@ steps:
   #    SYSTEM_ACCESSTOKEN: $(System.AccessToken)
   - checkout: Wiki
   - script: |
+      mv $(OpenTide.Wiki.RepoName) ./coretide
+    displayName: Move Wiki to CoreTide
+  - script: |
       ls -lah
       cd coretide
       if [ -e $(OpenTide.Wiki.RepoName)/staging_index.json ]

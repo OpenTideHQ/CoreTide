@@ -31,7 +31,7 @@ steps:
       cd coretide/$(OpenTide.Wiki.RepoName)
       [[ $(git status --porcelain) ]] || { echo "No changes, exiting"; exit 0; }
       echo "Updated files, commiting"
-      git rebase
+      git rebase wikiMaster
       git add -A
       git commit -m "OpenTide Documentation Automation"
       git push origin

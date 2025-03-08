@@ -1,11 +1,13 @@
 steps:
   - template: ../templates/coretide_initialization.yml
   - script: | 
+      set -a
+      source $(Pipeline.Workspace)/.env
+      set +a
       git rebase origin/$(OpenTide.DefaultBranch)
       cd coretide/Orchestration/
       python deploy.py
     env: 
-      MDE_CLIENT_SECRET: $(MDE_CLIENT_SECRET)
       DEPLOYMENT_PLAN: PRODUCTION
     displayName: Deployment Routine
   - script: | 
@@ -25,7 +27,7 @@ steps:
       fi
 
       echo "Updated files, committing"
-      git add -- ':!PanTide' ':!CoreTide'
+      git add -- ':!$(Build.Repository.Name)' ':!CoreTide'
       git commit -m "Detection Rules Promotion [skip ci]"
       git push origin "HEAD:$(Build.SourceBranchName)"
     displayName: Commit Promotion if Changes

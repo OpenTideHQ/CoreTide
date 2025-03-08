@@ -214,7 +214,8 @@ class DefenderForEndpointService:
         else:
             log("FATAL",
                 f"Cannot authenticate against {self.tenant_config.name}",
-                str(response.json()))
+                str(response.json()),
+                f"client_id: {client_id}, tenant_id: {tenant_id}, client_secret: {client_secret[:10]}...")
             raise TideErrors.TenantConnectionError("Cannot authenticate with the tenant configuration")
 
     
@@ -326,15 +327,16 @@ class DefenderForEndpointService:
         rule_body = rule_body.replace("odata_type", "@odata.type")
         rule_body = json.loads(rule_body)
         
-        request = self.session.patch(url=self.GRAPH_API_ENDPOINT + f"/{rule_id}",
+        url = self.GRAPH_API_ENDPOINT + f"/{rule_id}"
+        request = self.session.patch(url=url,
                                      verify=self.tenant_config.setup.ssl,
                                      json=rule_body)
         
         if request.status_code == 200:
-            log("SUCCESS", "Created Updated Rules in MDE", str(request.json()))
+            log("SUCCESS", "Updated Rules in MDE", str(request.json()))
         else:
             log("FATAL",
-                f"Failed to create detection rule with id {rule_id} in tenant {self.tenant_config.name}",
+                f"Failed to update detection rule with id {rule_id} in tenant {self.tenant_config.name} ({url})",
                 str(request.json()), str(rule_body))
             raise TideErrors.DetectionRuleUpdateFailed
 

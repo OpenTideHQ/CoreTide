@@ -1,10 +1,11 @@
 steps:
   - template: ../templates/coretide_initialization.yml
+  - checkout: Wiki
   - script: |
-      cd coretide
-      git clone $(OpenTide.WikiRepo)
-    displayName: Clone Wiki
+      mv $(OpenTide.Wiki.RepoName) ./coretide
+    displayName: Move Wiki to CoreTide
   - script: |
+      ls -lah
       cd coretide
       if [ -e $(OpenTide.Wiki.RepoName)/staging_index.json ]
         then cp $(OpenTide.Wiki.RepoName)/staging_index.json ./
@@ -16,7 +17,6 @@ steps:
       python ./staging_indexer.py
     displayName: Generate Tide Index
     env: 
-      MDE_CLIENT_SECRET: $(MDE_CLIENT_SECRET)
       GENERATE_INDEX_FILE: True
   - script: |
       cd coretide

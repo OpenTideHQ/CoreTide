@@ -1,9 +1,9 @@
 steps:
   - template: ../templates/coretide_initialization.yml
+  - checkout: Wiki
   - script: |
-      cd coretide
-      git clone $(OpenTide.WikiRepo)
-    displayName: Clone Wiki
+      mv $(OpenTide.Wiki.RepoName) ./coretide
+    displayName: Move Wiki to CoreTide
   - script: |
       cd coretide/Engines/indexing/
       export GENERATE_INDEX_FILE=True
@@ -22,8 +22,6 @@ steps:
   - script: |
       cd coretide/Orchestration
       python document.py
-    env: 
-      OPENTIDE_CI_PLATFORM: $(OpenTide.CI.Platform)
     displayName: Documentation Toolchain
   - script: |
       cd coretide

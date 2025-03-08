@@ -3,9 +3,8 @@ steps:
     fetchDepth: $(OpenTide.Repo.Checkout.Depth)
     persistCredentials: true
     displayName: Checkout Instance Repo
-  
-  - checkout: coretide
 
+  - checkout: coretide
     displayName: Checkout CoreTide
 
   - script: |
@@ -13,10 +12,6 @@ steps:
       mkdir coretide
       cp -fr ./CoreTide/. ./coretide/
     displayName: Re-Nest CoreTide into Instance repo
-
-  - script: |
-      env | sort
-    displayName: Show environment variables
 
   - script: |
       pwd
@@ -48,4 +43,4 @@ steps:
       pip install --cache-dir $(Pipeline.Workspace)/.pip -r $(Pipeline.Workspace)/requirements.txt
     displayName: 'Install Python Dependencies'
   
-    
+  - template: .azure/set_secrets.yml@self

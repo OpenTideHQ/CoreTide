@@ -3,6 +3,8 @@ steps:
   - script: |
       cd coretide
       WIKI_URL=$(echo $(OpenTide.WikiRepo) | sed 's|^https://||')
+      echo "WIKI_URL $WIKI_URL"
+      echo "ACCESS_TOKEN $SYSTEM_ACCESSTOKEN"
       git clone https://$SYSTEM_ACCESSTOKEN@$WIKI_URL
     displayName: Clone Wiki
     env:

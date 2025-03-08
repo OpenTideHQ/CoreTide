@@ -13,6 +13,7 @@ steps:
       export GENERATE_INDEX_FILE=True
       python ./indexer.py
     displayName: Generate Tide Index
+
   - script: |
       cd coretide
       cp index.json $(OpenTide.Wiki.RepoName)/

@@ -327,7 +327,7 @@ class DefenderForEndpointService:
         rule_body = rule_body.replace("odata_type", "@odata.type")
         rule_body = json.loads(rule_body)
         
-        url = self.GRAPH_API_ENDPOINT + f"/{rule_id}"
+        url = self.DETECTION_RULES_ENDPOINT + f"/{rule_id}"
         request = self.session.patch(url=url,
                                      verify=self.tenant_config.setup.ssl,
                                      json=rule_body)

@@ -13,8 +13,9 @@ stages:
         steps:
           - template: ../templates/check_mdr_changes.yml
 
-      - job: ProductionDeployment
+      - deployment: ProductionDeployment
         displayName: Deploy to Production
+        environment: $(OpenTide.Deployment.Environment.Production)
         dependsOn: CheckForChanges
         condition: |
           and(eq(dependencies.CheckForChanges.outputs['FilesChanged.ChangesDetected'], 'true'),
@@ -22,15 +23,22 @@ stages:
                  eq(variables['Build.Reason'], 'Manual')
                  )
             )
-        steps:
-          - template: ../jobs/deployment.production.yml
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - template: ../jobs/deployment.production.yml
 
-      - job: StagingDeployment
+      - deployment:  StagingDeployment
         displayName: Deploy to Staging
         dependsOn: CheckForChanges
+        environment: $(OpenTide.Deployment.Environment.Staging)
         condition:
           and(eq(dependencies.CheckForChanges.outputs['FilesChanged.ChangesDetected'], 'true'),
               eq(variables['Build.Reason'], 'PullRequest')
               )
-        steps:
-          - template: ../jobs/deployment.staging.yml
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - template: ../jobs/deployment.staging.yml

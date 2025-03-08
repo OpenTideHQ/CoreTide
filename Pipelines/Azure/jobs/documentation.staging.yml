@@ -38,5 +38,5 @@ steps:
       git rebase origin/wikiMaster
       git add -A
       git commit -m "CoreTide Staging Documentation Automation"
-      git push HEAD:wikiMaster
+      git push origin HEAD:wikiMaster
     displayName: Commit documentation

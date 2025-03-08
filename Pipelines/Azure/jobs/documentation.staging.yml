@@ -21,7 +21,6 @@ steps:
       python ./staging_indexer.py
     displayName: Generate Tide Index
     env: 
-      MDE_CLIENT_SECRET: $(MDE_CLIENT_SECRET)
       GENERATE_INDEX_FILE: True
   - script: |
       cd coretide

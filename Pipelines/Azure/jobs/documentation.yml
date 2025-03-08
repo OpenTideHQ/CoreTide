@@ -1,6 +1,7 @@
 steps:
   - template: ../templates/coretide_initialization.yml
   - checkout: Wiki
+    persistCredentials: true
   - script: |
       mv $(OpenTide.Wiki.RepoName) ./coretide
     displayName: Move Wiki to CoreTide

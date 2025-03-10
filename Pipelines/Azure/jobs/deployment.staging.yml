@@ -2,7 +2,8 @@ steps:
   - template: ../templates/initialization.yml
   - script: |
       git fetch --all
-      git switch ${System.PullRequest.SourceBranch#refs/heads/}
+      CURRENT_BRANCH=$(System.PullRequest.SourceBranch) 
+      git switch ${CURRENT_BRANCH#refs/heads/}
     displayName: Switch to Current Branch #Avoids detached HEAD state
   - script: |
       set -a

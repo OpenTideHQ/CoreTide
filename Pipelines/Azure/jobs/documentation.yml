@@ -1,5 +1,5 @@
 steps:
-  - template: ../templates/coretide_initialization.yml
+  - template: ../templates/initialization.yml
   - checkout: Wiki
     persistCredentials: true
   - script: |

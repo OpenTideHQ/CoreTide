@@ -1,6 +1,9 @@
 steps:
   - template: ../templates/initialization.yml
   - script: |
+      git switch $(System.PullRequest.SourceBranch)
+    displayName: Switch to Current Branch #Avoids detached HEAD state
+  - script: |
       set -a
       source $(Pipeline.Workspace)/.env
       set +a

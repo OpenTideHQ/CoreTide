@@ -3,7 +3,7 @@ steps:
   - checkout: Wiki
     persistCredentials: true
   - script: |
-      mv $(OpenTide.Wiki.RepoName) ./coretide
+      cp -fr $(OpenTide.Wiki.RepoName) ./coretide
     displayName: Move Wiki to CoreTide
   - script: |
       cd coretide/Engines/indexing/

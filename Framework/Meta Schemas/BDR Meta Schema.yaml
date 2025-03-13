@@ -41,9 +41,9 @@ properties:
     tide.meta.definition: true
 
   metadata:
+    tide.template.spacer: true
     tide.meta.definition: true
-    tide.placeholders:
-      $SCHEMA_VERSION: bdr::2.0
+
 
   request:
     title: Description of the detection objective

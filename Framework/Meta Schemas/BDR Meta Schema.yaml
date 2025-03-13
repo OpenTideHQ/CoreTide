@@ -43,7 +43,7 @@ properties:
   metadata:
     tide.meta.definition: true
     tide.placeholders:
-      $SCHEMA_VERSION: tvm::2.0
+      $SCHEMA_VERSION: bdr::2.0
 
   request:
     title: Description of the detection objective

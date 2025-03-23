@@ -9,7 +9,7 @@
     - rm -rf $TIDE_CORE_REPO #Delete injected Core
     - git add -A
     - if ! git diff-index --quiet HEAD; then
-    -   git fetch origin
+    -   git fetch
     -   git rebase origin/$CI_DEFAULT_BRANCH
     -   git commit -m "[CoreTIDE] Framework Generation $CI_COMMIT_MESSAGE"
     -   git push $TIDE_REPO_ACCESS HEAD:$CI_COMMIT_REF_NAME

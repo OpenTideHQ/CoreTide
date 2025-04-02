@@ -13,7 +13,8 @@ properties:
     title: Schema identifier and version
     type: string
     description: Identifier of the schema at its current version 
-    const: splunk::2.0
+    pattern: ^splunk::[1-9].[0-9]$
+    default: splunk::2.1
 
   status: 
     title: Status of the use-case
@@ -326,24 +327,59 @@ properties:
 
             type:
               type: string
-              description: Identification of the threat object
+              description: Identification of the threat object, inspired by https://splunk.github.io/rba/searches/threat_object_types/#other-types
               icon: ❓
               tide.mdr.parameter: threat_object_type
-              enum: # To parametize since new ES version have more options
-                - domain
+              enum:
+                - app
+                - ssid
+                - url_domain
                 - url
                 - ip
                 - asn
-                - user_agent
+                - http_user_agent
                 - location
                 - file_hash
                 - file_name
-                - command_line
+                - command
                 - process_name
-                - certificate
-                - registry
-                - email_sender
-                - email_subject
+                - ssl_certificate
+                - user
+                - subject
+                - parent_process
+                - parent_process_name
+                - parent_process_path
+                - parent_process_hash
+                - process_name
+                - process_hash
+                - process_path
+                - registry_path
+                - registry_hive
+                - registry_key_name
+                - registry_value_name
+                - registry_value_text
+                - registry_value_data
+                - registry_value_type
+                - service
+                - service_dll
+                - service_dll_hash
+                - service_dll_path
+                - service_hash
+                - service_name
+                - service_path
+                - ssl_issuer_common_name
+                - ssl_subject_common_name
+                - ssl_issuer_organization
+                - ssl_subject_organization
+                - ssl_serial
+                - ssl_issuer_unit
+                - ssl_subject_unit
+                - http_referrer
+                - ja3_hash
+                - ja4_hash
+                - jarm_hash
+                - cyu_hash
+                - location
                 - other
 
   query: 

@@ -335,17 +335,14 @@ properties:
                 - ssid
                 - url_domain
                 - url
+                - http_user_agent
                 - ip
                 - asn
-                - http_user_agent
-                - location
-                - file_hash
-                - file_name
                 - command
-                - process_name
-                - ssl_certificate
                 - user
                 - subject
+                - file_name
+                - file_hash
                 - parent_process
                 - parent_process_name
                 - parent_process_path
@@ -367,6 +364,7 @@ properties:
                 - service_hash
                 - service_name
                 - service_path
+                - ssl_certificate
                 - ssl_issuer_common_name
                 - ssl_subject_common_name
                 - ssl_issuer_organization

@@ -90,9 +90,10 @@ def run():
         folder = MODELS_FOLDER[model_type]
         log("INFO", "Now processing all files under model type", model_type)
         for file in sorted(os.listdir(folder)):
-            if not file.endswith(".yaml") or not file.endswith(".yml"):
-                log("INFO", "The file doesn't end with .yaml or .yml, skipping", file)
-                continue  
+            if not file.endswith(".yaml"):
+                if not file.endswith(".yml"):
+                    log("INFO", "The file doesn't end with .yaml or .yml, skipping", mdr)
+                    continue  
 
             raw_body = open(folder / file, "r", encoding="utf-8").read()
             yaml_body = yaml.safe_load(raw_body)

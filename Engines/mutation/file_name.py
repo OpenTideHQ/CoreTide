@@ -29,9 +29,10 @@ def run():
     MODELS_TYPES.remove("mdr")
     for model in MODELS_TYPES:
         for file in sorted(os.listdir(PATHS[model])):
-            if not file.endswith(".yaml") or not file.endswith(".yml"):
-                log("INFO", "The file doesn't end with .yaml or .yml, skipping", file)
-                continue  
+            if not file.endswith(".yaml"):
+                if not file.endswith(".yml"):
+                    log("INFO", "The file doesn't end with .yaml or .yml, skipping", mdr)
+                    continue  
 
             data = yaml.safe_load(open(PATHS[model] / file, encoding="utf-8"))
             model_name = data["name"]

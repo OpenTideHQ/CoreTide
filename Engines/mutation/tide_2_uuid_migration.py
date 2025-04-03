@@ -29,9 +29,10 @@ def id_to_uuid_mapper():
         if model == "mdr":
             continue
         for file in sorted(os.listdir(PATHS[model])):
-            if not file.endswith(".yaml") or not file.endswith(".yml"):
-                log("INFO", "The file doesn't end with .yaml or .yml, skipping", file)
-                continue  
+            if not file.endswith(".yaml"):
+                if not file.endswith(".yml"):
+                    log("INFO", "The file doesn't end with .yaml or .yml, skipping", file)
+                    continue  
 
             data = yaml.safe_load(open(PATHS[model] / file, encoding="utf-8"))
             old_id:str = data.get("id")

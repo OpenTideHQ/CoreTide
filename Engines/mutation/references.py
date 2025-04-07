@@ -92,7 +92,7 @@ def run():
         for file in sorted(os.listdir(folder)):
             if not file.endswith(".yaml"):
                 if not file.endswith(".yml"):
-                    log("INFO", "The file doesn't end with .yaml or .yml, skipping", mdr)
+                    log("INFO", "The file doesn't end with .yaml or .yml, skipping", file)
                     continue  
 
             raw_body = open(folder / file, "r", encoding="utf-8").read()

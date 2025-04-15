@@ -1,14 +1,13 @@
 [platform]
 enabled = false
-identifier = "defender_for_endpoint"
-name = "Microsoft Defender for Endpoint"
-subschema = "Defender for Endpoint"
-description = """Defender for Endpoint is a comprehensive, cloud-native endpoint
-security solution that delivers visibility and AI-powered cyberthreat protection
-to help stop cyberattacks across Windows, macOS, Linux, Android, iOS, and IoT devices.
+identifier = "crowdstrike"
+name = "Crowdstrike Falcon Correlation Rules"
+subschema = "Crowdstrike"
+description = """The CrowdStrike Falcon® platform delivers real-time
+threat detection, simplified management, and proactive threat hunting
+for unmatched protection.
 """
 flags = [""]
-device_groups = [""]
 
 #[[modifiers]]
 #name = "Modifier Demo"
@@ -26,6 +25,7 @@ device_groups = [""]
 #[tenants.setup]
 #proxy = false
 #ssl = true
-#tenant_id = "$MDE_TENANT_ID"
-#client_id = "$MDE_CLIENT_ID"
-#client_secret = "$MDE_CLIENT_SECRET"
+#api = ""
+#customer_id = ""
+#client_id = ""
+#client_secret = ""

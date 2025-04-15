@@ -20,12 +20,12 @@
     #event:
       #title: 
       #description: |
-        #Type Here
+        #...
   
     #drilldown:
       #name: 
       #search: |
-        #Type Here
+        #...
   
     #security_domain: 
   
@@ -40,4 +40,4 @@
         #type: 
   
   query: |
-    Type Here
+    ...

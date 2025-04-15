@@ -1,0 +1,341 @@
+required: 
+  - status
+  - schema
+  - details
+  - schedule
+  - query
+
+patternProperties:
+  "rule_id::.+$":
+    title: Internal Crowdstrike Rule Identifier
+    type: string
+    description: |
+      IMPORTANT: This is used by the automation to correctly
+      Target the rule on Crowdstrike, which uses its own ID system. 
+      This key will appear as many tenant as this rule is deployed to.
+      Do not alter this field manually, or create new fields.
+
+properties:
+  
+  schema:
+    title: Schema identifier and version
+    type: string
+    description: Identifier of the schema at its current version 
+    default: crowdstrike::2.0
+    pattern: ^crowdstrike::[1-9].[0-9]$
+
+  status: 
+    title: Status of the use-case
+    type: string
+    description: Define the status according to use case development life cycle process
+    tide.vocab: true
+    example: STAGING
+    default: DEVELOPMENT
+
+  contributors:
+    title: Development Contributors
+    type: array
+    description: Individuals who supported creating, enriching or tuning the detection. 
+    items:
+      type: string
+      format: email
+
+  tenants: 
+    title: Target Tenants
+    icon: 🏢
+    description: |
+      Override the default organizations and deploy to selected tenants only.
+    type: array
+    tide.config.system.tenants: crowdstrike
+
+  flags:
+    title: Flags
+    icon: 🚩
+    description: Flags allow to customize the rule behaviour using the modifiers framework
+    type: array
+    tide.config.parameter-list: systems.crowdstrike.platform.flags
+
+  details:
+    title: Correlation Rules Details
+    description: Some of those parameters are optional, and generic MDR details will be used in place
+    type: object
+    required:
+      - trigger
+      - outcome
+
+    allOf:
+      - if:
+          not:
+            required:
+              - tactic
+        then:
+          not:
+            required: 
+              - technique 
+      - if :
+          properties:
+            tactic: 
+              const : CSTA0008
+        then: 
+          properties:
+            technique:
+              enum : 
+                - CST0021
+                - CST0022
+              markdownEnumDescriptions:
+                - "**Command and Scripting Interpreter**\n\nAdversaries may abuse command and script interpreters to execute commands, scripts, or binaries. These interfaces and languages provide ways of interacting with computer systems and are a common feature across many different platforms.\n\nMost systems come with some built-in command-line interface and scripting capabilities, for example, macOS and Linux distributions include some flavor of Unix Shell while Windows installations include the Windows Command Shell and PowerShell.\n\nThere are also cross-platform interpreters such as Python, as well as those commonly associated with client applications such as JavaScript and Visual Basic. Adversaries may abuse these technologies in various ways as a means of executing arbitrary commands.\n\nCommands and scripts can be embedded in Initial Access payloads delivered to victims as lure documents or as secondary payloads downloaded from an existing C2. Adversaries may also execute commands through interactive terminals/shells."
+                - "**Malicious File**\n\nMalicious file detections are similar to known hash detections, but these aren't signature-based and there's a higher likelihood it's a false positive.\n\nThe triggering file is non-standard and has behaviors consistent with malicious files. However, people create legitimate non-standard files all the time, so context may show it's benign and expected in your environment.\n\nYour organization might choose to prevent these file types because the file creator should follow best practices. If there's an OverWatch badge on the detection, an OverWatch threat hunter is confident this file is malicious.\n\nInvestigate related activities, even if it was prevented."
+      - if:
+          properties:
+            tactic:
+              const: CSTA0005
+        then:
+          properties:
+            technique:
+              enum:
+                - CST0004
+                - CST0005
+              markdownEnumDescriptions:
+                - "**Indicator of Attack**\n\nA pattern of suspicious behavior that suggests an attack may be underway.\n\nThese patterns deviate from typical events because of unusual or unexpected behavior that we consider suspicious or malicious."
+                - "**Indicator of Compromise**\n\nIndicator of Compromise (IOC) detections trigger based on a custom IOC, created by your organization using the Query API.\n\nEach custom IOC specifies the indicator type (like SHA256, domain, or IP address) and value combination, and what action to take (like detect).\n\nWhen investigating Custom IOC detections, work with your internal teams on researching and troubleshooting. They best understand what they intend to detect and prevent."
+      - if:
+          properties:
+            tactic:
+              const: CSTA0002
+        then:
+          properties:
+            technique:
+              enum:
+                - CST0012
+              markdownEnumDescriptions:
+                - "**Exploit Mitigation**\n\nAn exploit triggered this detection because it matched an enabled setting in Exploit Mitigation.\n\nCheck the detection’s description to know which one."
+      - if:
+          properties:
+            tactic:
+              const: CSTA0007
+        then:
+          properties:
+            technique:
+              enum:
+                - CSTA0020
+                - CSTA0018
+                - CSTA0019
+              markdownEnumDescriptions:
+                - "**Attributed to adversary**\n\nFor CrowdStrike Intelligence customers. Our CrowdStrike Intel team has high confidence that these activities are from an adversary.\n\nYour top priority should be investigating any detections, even for prevented activity. Refer to Intel's actor profiles and related reports for more context."
+                - "**Intelligence Indicator - Domain**\n\nTriggered by a domain that matches a CrowdStrike Intelligence indicator.\n\nThis could be a malicious domain previously used in a targeted attack or non-targeted, commodity malware. This should be investigated with top priority."
+                - "**Intelligence Indicator - Hash**\n\nTriggered by a hash that matches a CrowdStrike Intelligence indicator.\n\nThis could be a malicious file previously used in a targeted attack or non-targeted, commodity malware. This should be investigated with top priority."
+      - if:
+          properties:
+            tactic:
+              const: CSTA0006
+        then:
+          properties:
+            technique:
+              enum:
+                - CST0002
+                - CST0015
+                - CST0003
+              markdownEnumDescriptions:
+                - "**Malicious Activity**\n\nAn OverWatch threat hunter is confident this is malicious.\n\nInvestigate related activities, even if it was prevented."
+                - "**Malicious File**\n\nMalicious file detections are similar to known hash detections, but these aren't signature-based and there's a higher likelihood it's a false positive.\n\nThe triggering file is non-standard and has behaviors consistent with malicious files. However, people create legitimate non-standard files all the time, so context may show it's benign and expected in your environment.\n\nYour organization might choose to prevent these file types because the file creator should follow best practices. If there's an OverWatch badge on the detection, an OverWatch threat hunter is confident this file is malicious.\n\nInvestigate related activities, even if it was prevented."
+                - "**Suspicious Activity**\n\nAn OverWatch threat hunter identified this as a concern, but there’s a chance it could be a false positive or penetration testing.\n\nInvestigate related activities, even if it was prevented."
+      - if:
+          properties:
+            tactic:
+              const: CSTA0004
+        then:
+          properties:
+            technique:
+              enum:
+                - CST0006
+                - CST0008
+                - CST0007
+              markdownEnumDescriptions:
+                - "**Adware/PUP**\n\nTriggered by processes and files machine learning identifies as adware and potentially unwanted programs (PUP).\n\nTypically these are low severity and not from an adversary, but very often unwanted."
+                - "**Cloud-based ML**\n\nCrowdStrike cloud-based machine learning (ML) is informed by global analysis of executables that classifies and identifies malware.\n\nThis technique is triggered by files and file attributes associated with known malware. This is similar to the Sensor-based ML technique.\n\nThe key difference is sensor-based ML can run when a host is offline, and it identifies and analyzes unknown executables as they run."
+                - "**Sensor-based ML**\n\nCrowdStrike sensor-based machine learning (ML) identifies and analyzes unknown executables as they run on hosts.\n\nThis technique is triggered by files and file attributes associated with known malware. This is similar to the Cloud-based ML technique.\n\nCloud-based ML is informed by global analysis of executables that classifies and identifies malware. The key difference is that it doesn't run on hosts when they're offline."
+      - if:
+          properties:
+            tactic:
+              const: CSTA0003
+        then:
+          properties:
+            technique:
+              enum:
+                - CST0011
+                - CST0010
+              markdownEnumDescriptions:
+                - "**Malicious Tool Delivery**\n\nMalicious tools are programs created to be delivered to hosts and then spread malware.\n\nTools have many possibilities, like generating viruses, executing commands, or starting distributed denial of service attacks (DDoS).\n\nThis technique triggers when the malicious tool is delivered to the host. It’s more common to see [Malicious Tool Execution](/support/documentation/detections/technique/malicious-tool-execution) detections."
+                - "**Malicious Tool Execution**\n\nMalicious tools are programs created to be delivered to hosts and then spread malware.\n\nTools have many possibilities, like generating viruses, executing commands, or starting distributed denial of service attacks (DDoS).\n\nThis technique triggers when the suspected malicious tool executes its payload."
+
+    properties:
+
+      name:
+        title: The name of the rule.
+        type: string
+      
+      description:
+        title: The description of the rule.
+        type: string
+        tide.template.multiline: True
+
+      severity: 
+        title: Rule Severity
+        type: string
+        enum:
+          - Informational
+          - Low
+          - Medium
+          - High
+          - Critical
+
+      trigger:
+        title: Trigger Type
+        description: |
+          - Verbose: One outcome generated for each result matching the query
+            Total outcomes are limited per rule trigger. 
+          - Summary: One outcome generated for all results matching the query
+            Total results included in the outcome are limited per rule trigger.
+        type: string
+        enum:
+          - Verbose
+          - Summary
+
+      outcome:
+        title: Rule Outcome
+        description: Whether to create a detection or incident if a match is found
+        type: string
+        enum:
+          - Incident
+          - Detection
+
+      tactic:
+        title: MITRE ATT&CK Tactic
+        description: The relevant MITRE ATT&CK Tactic mapping to this detection
+        type: string
+        enum: 
+          - TA0043
+          - TA0042
+          - TA0001
+          - TA0002
+          - TA0003
+          - TA0004
+          - TA0005
+          - TA0006
+          - TA0007
+          - TA0008
+          - TA0009
+          - TA0011
+          - TA0010
+          - TA0040
+          - TA0027
+          - TA0041
+          - TA0028
+          - TA0029
+          - TA0030
+          - TA0031
+          - TA0032
+          - TA0033
+          - TA0035
+          - TA0037
+          - TA0036
+          - TA0034
+          - CSTA0008
+          - CSTA0005
+          - CSTA0002
+          - CSTA0007
+          - CSTA0006
+          - CSTA0004
+          - CSTA0003
+
+        markdownEnumDescriptions:
+          - Enterprise::Reconnaissance
+          - Enterprise::Resource Development
+          - Enterprise::Initial Access
+          - Enterprise::Execution
+          - Enterprise::Persistence
+          - Enterprise::Privilege Escalation
+          - Enterprise::Defense Evasion
+          - Enterprise::Credential Access
+          - Enterprise::Discovery
+          - Enterprise::Lateral Movement 
+          - Enterprise::Collection
+          - Enterprise::Command and Control
+          - Enterprise::Exfiltration
+          - Enterprise::Impact
+          - Mobile::Initial Access
+          - Mobile::Execution
+          - Mobile::Persistence
+          - Mobile::Privilege Escalation
+          - Mobile::Defense Evasion
+          - Mobile::Credential Access
+          - Mobile::Discovery
+          - Mobile::Lateral Movement
+          - Mobile::Collection
+          - Mobile::Command and Control
+          - Mobile::Exfiltration 
+          - Mobile::Impact
+          - AI Powered IOA
+          - "**Custom Intelligence**\n\nIndicator of Compromise (IOC) detections trigger based on a custom IOC, created by your organization using the Query API.\n\nEach custom IOC specifies the indicator type (like SHA256, domain, or IP address) and value combination, and what action to take (like detect).\n\nWhen investigating Custom IOC detections, work with your internal teams on researching and troubleshooting. They best understand what they intend to detect and prevent."
+          - "**Exploit**\n\nAn exploit takes advantage of a software vulnerability, typically to gain control over a target endpoint.\n\nThe related attacks are often part of an adversary working to gain access to your environment, and can be similar to MITRE’s Initial Access tactic. Examples of exploits:\n\n* Running malicious code remotely (for example, buffer overflows)\n* Leveraging a logic bug (for example, appears to be normal interaction with the program but gets it to expose data intended to stay private)"
+          - "**Falcon Intel**\n\nFor CrowdStrike Intelligence customers. Our CrowdStrike Intel team has high confidence that these activities are from an adversary.\n\nYour top priority should be investigating any detections, even for prevented activity. Refer to Intel's actor profiles and related reports for more context."
+          - "**Falcon Overwatch**\n\nFor OverWatch customers. Our OverWatch team identified activity they consider suspicious or malicious. These alerts are marked with a black falcon badge, and should always be investigated with top priority. They have high confidence these activities are from an adversary. For more information about OverWatch dashboards and services, see Falcon OverWatch."
+          - "**Machine Learning**\n\nCrowdStrike Falcon uses machine learning (ML) to analyze higher-level traits to decide if a file is malicious. Machine learning learns by being fed a dataset of multiple, relevant examples – the more examples it gets, the better it can learn. Falcon can take in data at a global scale with cloud-based ML, and use sensor-based ML to identify and analyze local unknown executables. NGAV-scenario detections now map to this tactic. Configure detection and prevention levels in [prevention policies](/configuration/prevention/policies)."
+          - "**Post Exploit**\n\nAfter an adversary gains access, they often launch or spawn new exploits to keep their access or gain more access. For example, using browsers or productivity apps to drop an executable or generate a new one."
+
+      technique:
+        title: MITRE ATT&CK Technique
+        description: | 
+          Relevant MITRE ATT&CK Technique to map. You may only use it if tactic is first filled in. Important - double check on the GUI
+          which Techniques are available first, then lookup their ID. Crowdstrike only
+          supports a subset of the latest ATT&CK definition.
+        type: string
+        pattern: ^(CST|T)\d{4}(\.\d{3})?$
+  
+  schedule:
+    title: Correlation Rule Schedule
+    type: object
+    required:
+      - frequency
+      - lookback
+    properties:
+      start:
+        title: Schedule Start
+        description: |
+          The UTC time to start running the query. For example: 2024-11-19T19:00:00Z
+          If no value is specified, this defaults to 15 minutes from the current time.
+        type: string
+        pattern: '^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z'
+
+      end:
+        title: Schedule End
+        description: |
+          The UTC time to stop running the query. For example: 2024-11-19T19:00:00Z
+          If no value is specified, no stop time is used.
+        type: string
+        pattern: '^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z'
+
+      frequency:
+        title: Schedule Frequency
+        description: |
+          How often to run the query. The format is as follow:
+          NdNhNm, where d, h and m can be combined, for example
+          1m, 5h10m, 1d2h etc. A minimal of 5m is required.
+        type: string
+        pattern: '^(?:7d|[1-6]d(?:[0-9]|1[0-9]|2[0-3])h(?:[5-9]|[1-5][0-9])m?|[1-6]d(?:[0-9]|1[0-9]|2[0-3])h|[1-6]d(?:[5-9]|[1-5][0-9])m|[1-6]d|(?:[0-9]|1[0-9]|2[0-3])h(?:[5-9]|[1-5][0-9])m?|(?:[0-9]|1[0-9]|2[0-3])h|(?:[5-9]|[1-5][0-9])m)$'
+
+      lookback:
+        title: Schedule Lookback/Window
+        description: |
+          To ensure that all relevant data is searched, configure the lookback to be at least as long as the search frequency.
+          Overlapping searches help to ensure that all relevant data is included, regardless of when logs are uploaded.
+          However, with overlapping searches, a given event or indicator might appear in more than one resulting incident.
+        type: string
+        pattern: '^(?:7d|[1-6]d(?:[0-9]|1[0-9]|2[0-3])h(?:[5-9]|[1-5][0-9])m?|[1-6]d(?:[0-9]|1[0-9]|2[0-3])h|[1-6]d(?:[5-9]|[1-5][0-9])m|[1-6]d|(?:[0-9]|1[0-9]|2[0-3])h(?:[5-9]|[1-5][0-9])m?|(?:[0-9]|1[0-9]|2[0-3])h|(?:[5-9]|[1-5][0-9])m)$'
+
+  query:
+    title: Search Query
+    descrption: The query to base the rule on
+    type: string
+    tide.template.multiline: True
+    tide.template.spacer: True

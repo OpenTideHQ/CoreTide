@@ -226,10 +226,10 @@ class SentinelOneDeploy(DeployMDR):
                                     strategy=deployment_plan)
 
         for tenant_deployment in deployment.rule_deployment:
-            service = SentinelOneService(tenant_deployment.tenant)
+            service = SentinelOneService(tenant_deployment.tenant) #type: ignore
 
             for mdr in tenant_deployment.rules:
-                self.deploy_mdr(data=mdr, service=service, tenant_config=tenant_deployment.tenant)
+                self.deploy_mdr(data=mdr, service=service, tenant_config=tenant_deployment.tenant) #type: ignore
 
 def declare():
     return SentinelOneDeploy()

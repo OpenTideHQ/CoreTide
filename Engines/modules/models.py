@@ -35,6 +35,7 @@ class DetectionSystems(Enum):
     SPLUNK = auto()
     SENTINEL = auto()
     SENTINEL_ONE = auto()
+    CROWDSTRIKE = auto()
 
 class DeploymentStrategy(Enum):
     STAGING = auto()
@@ -173,7 +174,22 @@ class TideConfigs:
             platform: Platform
             tenants: Optional[Sequence[Tenant]]
 
+        @dataclass
+        class Crowdstrike(SystemConfig):
+            
+            @dataclass
+            class Tenant(SystemConfig.Tenant):
 
+                @dataclass
+                class Setup(SystemConfig.Tenant.Setup):
+                    api: str
+                    client_id: str
+                    client_secret: str
+                    customer_id: str
+
+                setup:Setup
+
+            tenants: Optional[Sequence[Tenant]]
 
 
 class TideDefinitionsModels:
@@ -341,6 +357,31 @@ class TideModels:
                 actions: Optional[ResponseActions] = None
                 scope: Optional[GroupScoping] = None
             
+            
+            @dataclass
+            class Crowdstrike(TideDefinitionsModels.SystemConfigurationModel):
+                @dataclass
+                class Details:
+                    trigger: str
+                    outcome: str
+                    name: Optional[str] = None
+                    description: Optional[str] = None
+                    severity: Optional[str] = None
+                    tactic: Optional[str] = None
+                    technique: Optional[str] = None
+                
+                @dataclass
+                class Schedule:
+                    frequency: str
+                    lookback: str
+                    start: Optional[str] = None
+                    end: Optional[str] = None
+
+                details: Details
+                schedule: Schedule
+                query: str
+                rule_id_bundle: Optional[Mapping[str, str]] = None
+
             @dataclass
             class Splunk(TideDefinitionsModels.SystemConfigurationModel):
                 ...
@@ -355,6 +396,7 @@ class TideModels:
                         
             defender_for_endpoint: Optional[DefenderForEndpoint] = None
             sentinel_one: Optional[SentinelOne] = None
+            crowdstrike: Optional[Crowdstrike] = None
             carbon_black_cloud: Optional[Mapping] = None
             splunk: Optional[Mapping] = None
             sentinel: Optional[Mapping] = None
@@ -398,3 +440,7 @@ class TenantDeployment:
     @dataclass
     class DefenderForEndpoint(TenantDeploymentModel):
         tenant: TideConfigs.Systems.DefenderForEndpoint.Tenant
+
+    @dataclass
+    class Crowdstrike(TenantDeploymentModel):
+        tenant: TideConfigs.Systems.Crowdstrike.Tenant

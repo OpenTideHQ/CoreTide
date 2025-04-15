@@ -1,0 +1,19 @@
+  
+  details:
+    #name: 
+    #description: |
+      #...
+    #severity: 
+    trigger: 
+    outcome: 
+    #tactic: 
+    #technique: 
+  
+  schedule:
+    #start: 
+    #end: 
+    frequency: 
+    lookback: 
+  
+  query: |
+    ...

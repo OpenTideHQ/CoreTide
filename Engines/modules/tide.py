@@ -249,7 +249,7 @@ class SystemLoader:
                                             contributors=contributors)
 
     @staticmethod
-    def _external_rule_id(mdr_config:dict[str, Any])->Tuple[dict[str, Any], Mapping[str, int]]:
+    def _external_rule_id(mdr_config:dict[str, Any])->Tuple[dict[str, Any], Union[Mapping[str, int], Mapping[str,str]]]:
         rule_id_bundle = {}
         
         # In case was already parsed into bundle
@@ -265,6 +265,28 @@ class SystemLoader:
         return mdr_config, rule_id_bundle
 
     @staticmethod
+    def crowdstrike(mdr_config:dict[str, Any])->TideModels.MDR.Configurations.Crowdstrike:
+
+        Crowdstrike = TideModels.MDR.Configurations.Crowdstrike
+
+        mdr_config, base_config = SystemLoader._base_configuration(mdr_config)
+        mdr_config, rule_id_bundle = SystemLoader._external_rule_id(mdr_config)
+        
+        details = Crowdstrike.Details(**mdr_config.pop("details"))
+        schedule = Crowdstrike.Schedule(**mdr_config.pop("schedule"))
+        query = mdr_config.pop("query")
+
+        return Crowdstrike(schema=base_config.schema,
+                           status=base_config.status,
+                           contributors=base_config.contributors,
+                           tenants=base_config.tenants,
+                           flags=base_config.flags,
+                           rule_id_bundle=rule_id_bundle, #type:ignore
+                           details=details,
+                           schedule=schedule,
+                           query=query)
+
+    @staticmethod
     def sentinel_one(mdr_config:dict[str, Any])->TideModels.MDR.Configurations.SentinelOne:
 
         SentinelOne = TideModels.MDR.Configurations.SentinelOne
@@ -272,9 +294,6 @@ class SystemLoader:
         mdr_config, base_config = SystemLoader._base_configuration(mdr_config)
         mdr_config, rule_id_bundle = SystemLoader._external_rule_id(mdr_config)
         
-        print("HERREERR")
-        print(rule_id_bundle)
-
         details = None
         if mdr_config.get("details"):
             details = SentinelOne.Details(**mdr_config.pop("details"))
@@ -305,7 +324,7 @@ class SystemLoader:
                            contributors=base_config.contributors,
                            tenants=base_config.tenants,
                            flags=base_config.flags,
-                           rule_id_bundle=rule_id_bundle,
+                           rule_id_bundle=rule_id_bundle, #type: ignore
                            details=details,
                            condition=condition,
                            response=response)
@@ -403,6 +422,8 @@ class TideLoader:
             configurations.defender_for_endpoint = SystemLoader.defender_for_endpoint(system_configurations.pop("defender_for_endpoint"))
         if system_configurations.get("sentinel_one"):
             configurations.sentinel_one = SystemLoader.sentinel_one(system_configurations.pop("sentinel_one"))
+        if system_configurations.get("crowdstrike"):
+            configurations.crowdstrike = SystemLoader.crowdstrike(system_configurations.pop("crowdstrike"))
 
         return TideModels.MDR(**mdr,
                                 metadata=metadata,
@@ -411,6 +432,9 @@ class TideLoader:
                                 configurations=configurations)
 
 
+    @overload
+    @staticmethod
+    def load_platform_config(platform_config:dict, system:Literal[DetectionSystems.CROWDSTRIKE])->TideConfigs.Systems.Crowdstrike.Platform: ...
     @overload
     @staticmethod
     def load_platform_config(platform_config:dict, system:Literal[DetectionSystems.SENTINEL_ONE])->TideConfigs.Systems.SentinelOne.Platform: ...
@@ -485,6 +509,8 @@ class TideLoader:
                 case DetectionSystems.SENTINEL_ONE:
                     setup = TideConfigs.Systems.SentinelOne.Tenant.Setup(**setup_with_secrets)
 
+                case DetectionSystems.CROWDSTRIKE:
+                    setup = TideConfigs.Systems.Crowdstrike.Tenant.Setup(**setup_with_secrets)
 
                 case _:
                     raise NotImplementedError(f"Platform {platform.name} is not recognized")
@@ -715,7 +741,6 @@ class DataTide:
                 platform = TideLoader.load_platform_config(dict(raw["platform"]), DetectionSystems.DEFENDER_FOR_ENDPOINT)
                 modifiers = TideLoader.load_modifiers_config(raw["modifiers"]) if raw.get("modifiers") else None
                 tenants = TideLoader.load_tenants_config(raw["tenants"], DetectionSystems.DEFENDER_FOR_ENDPOINT) if raw.get("tenants") else None
-                defaults = dict(raw.get("defaults", {}))
 
             @dataclass
             class SentinelOne(TideConfigs.Systems.SentinelOne):
@@ -725,8 +750,15 @@ class DataTide:
                 platform = TideLoader.load_platform_config(dict(raw["platform"]), DetectionSystems.SENTINEL_ONE)
                 modifiers = TideLoader.load_modifiers_config(raw["modifiers"]) if raw.get("modifiers") else None
                 tenants = TideLoader.load_tenants_config(raw["tenants"], DetectionSystems.SENTINEL_ONE) if raw.get("tenants") else None
-                defaults = dict(raw.get("defaults", {}))
 
+            @dataclass
+            class Crowdstrike(TideConfigs.Systems.Crowdstrike):
+                raw = dict(
+                    IndexTide.load()["configurations"]["systems"]["crowdstrike"]
+                )
+                platform = TideLoader.load_platform_config(dict(raw["platform"]), DetectionSystems.CROWDSTRIKE)
+                modifiers = TideLoader.load_modifiers_config(raw["modifiers"]) if raw.get("modifiers") else None
+                tenants = TideLoader.load_tenants_config(raw["tenants"], DetectionSystems.CROWDSTRIKE) if raw.get("tenants") else None
 
         @dataclass(frozen=True)
         class Documentation:

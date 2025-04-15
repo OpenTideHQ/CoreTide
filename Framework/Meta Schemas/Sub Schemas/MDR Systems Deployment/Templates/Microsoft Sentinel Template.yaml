@@ -15,7 +15,7 @@
     #suppression: 
     #title: 
     #description: |
-      #Type Here
+      #...
     #custom_details:
       #- key: 
         #column: 
@@ -39,4 +39,4 @@
           #column: 
   
   query: |
-    Type Here
+    ...

@@ -1,4 +1,4 @@
-title: Defender For Endpoint Configuration
+title: Crowdstrike Falcon Configuration
 description: Validates and Documents the Defender for Endpoint Configuration file
 
 $schema: https://json-schema.org/draft/2020-12/schema
@@ -37,7 +37,7 @@ properties:
           especially within the MDR configuration section. Cannot be overwritten,
           need to be changed at a schema level first 
         type: string
-        const: defender_for_endpoint
+        const: crowdstrike
 
       name:
         title: System Name
@@ -45,7 +45,7 @@ properties:
           The usual commercial or commonly known term for the system. Mostly
           used for documentation or enrichment purposes
         type: string
-        const: Microsoft Defender for Endpoint
+        const: Crowdstrike Falcon
       
       subschema:
         title: System Sub Schema 
@@ -53,7 +53,7 @@ properties:
           Name of the file containing the schema definition for the system, without
           path or extension. Should not be usually modified. 
         type: string
-        const: Defender for Endpoint
+        const: Crowdstrike 
 
       description:
         title: System Description
@@ -70,24 +70,6 @@ properties:
         type: array
         items:
           type: string
-
-      device_groups:
-        title: Device Groups
-        description: |
-          The list of device groups, must be EXACTLY what is represented in the MDE GUI. 
-          This can be used by Detection Engineers in certain parts of the MDR to define the 
-          detection rule response actions and detection scope. 
-          --- 
-          In an enterprise scenario, security operation teams are typically assigned a set of devices.
-          These devices are grouped together based on a set of attributes such as their domains,
-          computer names, or designated tags.
-
-          In Microsoft Defender for Endpoint, you can create device groups and use them to:
-
-          - Limit access to related alerts and data to specific Microsoft Entra user groups with assigned RBAC roles
-          - Configure different auto-remediation settings for different sets of devices
-          - Assign specific remediation levels to apply during automated investigations
-          - In an investigation, filter the Devices list to specific device groups by using the Group filter.
 
   modifiers:
     title: Deployment Modifiers
@@ -262,7 +244,8 @@ properties:
           required: 
             - proxy
             - ssl
-            - tenant_id
+            - url
+            - customer_id
             - client_id
             - client_secret
           
@@ -293,22 +276,33 @@ properties:
               type: boolean
               default: true
 
-            tenant_id:
-              title: Microsoft Entra ID Tenant ID
+            api:
+              title: Crowdstrike API Domain
               description: |
-                The Tenant ID (also known as the Directory ID) for the Microsoft Entra ID tenant associated
-                with your Defender for Endpoint license. This is recommended to be hidden in CI variables.
+                The location of the API, corresponding to where the tenant is hosted.
+                Determines the final API endpoint. 
               type: string
+              enum:
+                - US-1
+                - US-2
+                - EU-1
+                - US-GOV-1
+                - US-GOV-2
             
-            client_id: 
-              title: App Registration Client ID
+            customer_id:
+              title: Customer ID
               description: |
-                The Client ID (also know as the Application ID) for the Entra ID App Registration you created
-                in the Prerequisites section.
+                The CID of the environment. You will find it under Host Management > Sensor Download
+              type: string
+
+            client_id: 
+              title: API Client ID
+              description: |
+                The Client ID Value for the API Client you created.
               type: string
             
             client_secret:
-              title: App Registration Client Secret Value
+              title: API Client Secret
               description: |
-                The Client Secret Value for the credentials you created for your App Registration.
+                The Client Secret Value for the API Client you created.
               type: string

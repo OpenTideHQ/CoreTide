@@ -211,7 +211,7 @@ def diff_calculation(plan: DeploymentStrategy) -> list:
                                 f"{commit.hexsha} | {commit.message}",
                                 str(mr_correct_parent),
                             )
-                            TARGET = mr_correct_parent
+                            LATEST_COMMIT = mr_correct_parent
                             break
             else:
                 log("FATAL", f"Illegal Deployment Plan {str(plan)} passed to diff_calculation algorithm")

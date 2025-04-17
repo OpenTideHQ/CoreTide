@@ -495,15 +495,18 @@ class TideLoader:
             raise NotImplementedError("Missing Configuration Segment")
         tenants = []
         for tenant in tenants_config:
+            tenant = tenant.copy() #Avoids removing data from index with .pop() operations later
             if "setup" not in tenant:
                 log("FATAL", f"Could not find a tenant setup configuration for platform {platform.name}",
                     "Ensure that the setup section is correctly entered in platform configuration TOML file")
                 raise NotImplementedError("Missing Configuration Segment")
 
             setup_with_secrets = HelperTide.fetch_config_envvar(tenant.pop("setup"))
-
+            parameters = tenant.pop("parameters", None)
             match platform:
                 case DetectionSystems.DEFENDER_FOR_ENDPOINT:
+                    if parameters:
+                        parameters = TideConfigs.Systems.DefenderForEndpoint.Tenant.Parameters(**parameters)
                     setup = TideConfigs.Systems.DefenderForEndpoint.Tenant.Setup(**setup_with_secrets)
 
                 case DetectionSystems.SENTINEL_ONE:
@@ -515,7 +518,9 @@ class TideLoader:
                 case _:
                     raise NotImplementedError(f"Platform {platform.name} is not recognized")
 
-            tenants.append(SystemConfig.Tenant(**tenant, setup=setup))
+            tenants.append(SystemConfig.Tenant(**tenant,
+                                               setup=setup,
+                                               parameters=parameters)) #type: ignore
 
         return tenants
 

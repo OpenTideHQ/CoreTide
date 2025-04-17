@@ -2,10 +2,8 @@
   status: DEVELOPMENT
   #contributors:
     #-
-  
   #tenants:
     #-
-  
   #flags:
     #-
   
@@ -14,11 +12,13 @@
   alert:
     #title: 
     category: 
+    #techniques:
+      #-
     #severity: 
     #recommendation: |
-      #Type Here
+      #...
   
-  #impacted_entities:
+  impacted_entities:
     #device: 
     #mailbox: 
     #user: 
@@ -27,25 +27,30 @@
   
     #devices:
       #isolate_device: 
-      #collect_investigation_package: true
-      #run_antivirus_scan: true
-      #initiate_investigation: true
-      #restrict_app_execution: true
+      #collect_investigation_package: false
+      #run_antivirus_scan: false
+      #initiate_investigation: false
+      #restrict_app_execution: false
   
     #files:
       #allow_block:
         #action: 
-        #column: 
+        #identifier: 
         #groups:
-          #selection: 
+          selection: 
           #device_groups:
             #-
       #quarantine_file: 
   
-  #scope:
-    #selection: All
+    #users:
+      #mark_as_compromised: 
+      #disable_user: 
+      #force_password_reset: 
+  
+  scope:
+    selection: All
     #device_groups:
       #-
   
   query: |
-    Type Here
+    ...

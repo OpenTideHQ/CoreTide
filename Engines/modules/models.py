@@ -108,10 +108,15 @@ class SystemConfig:
             proxy: bool
             ssl: bool
 
+        @dataclass
+        class Parameters:
+            ...
+        
         name: str
         description: str
         deployment: Union[DeploymentStrategy, str]
         setup: Setup
+        parameters: Optional[Parameters] = None
 
         def __post_init__(self):
             if type(self.deployment) is str:
@@ -164,12 +169,18 @@ class TideConfigs:
             class Tenant(SystemConfig.Tenant):
 
                 @dataclass
+                class Parameters:
+                    device_groups: Optional[Sequence[str]] = None
+
+                @dataclass
                 class Setup(SystemConfig.Tenant.Setup):
                     tenant_id: str
                     client_id: str
                     client_secret: str
 
                 setup:Setup
+                parameters: Optional[Parameters] = None
+
 
             platform: Platform
             tenants: Optional[Sequence[Tenant]]
@@ -296,6 +307,7 @@ class TideModels:
                     title: Optional[str] = None
                     severity: Optional[str] = None
                     recommendation: Optional[str] = None
+                    techniques: Optional[Sequence[str]] = None
 
                 @dataclass
                 class ImpactedEntities:

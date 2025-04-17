@@ -29,3 +29,5 @@ device_groups = [""]
 #tenant_id = "$MDE_TENANT_ID"
 #client_id = "$MDE_CLIENT_ID"
 #client_secret = "$MDE_CLIENT_SECRET"
+#[tenants.parameters]
+#device_groups = [""]

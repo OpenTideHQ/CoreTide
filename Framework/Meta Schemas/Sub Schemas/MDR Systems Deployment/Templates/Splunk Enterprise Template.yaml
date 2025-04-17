@@ -1,4 +1,4 @@
-  schema: splunk::2.0
+  schema: splunk::2.1
   status: DEVELOPMENT
   #contributors:
     #-

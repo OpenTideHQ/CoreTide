@@ -122,6 +122,19 @@ properties:
           - Discovery
           - Impact 
 
+      techniques:
+        title: ATT&CK Techniques
+        description: |
+          Relevant techniques to map this rule onto. The available techniques are category-dependent,
+          at the moment we do not provide a structured support to validate those techniques.
+          You may refer to the GUI - create a mock detection rule, input the desired category,
+          and see which techniques are presented. You may then input the relevant Technique IDs.
+        type: array
+        items:
+          type: string
+          pattern: ^T\d{4}(\.\d{3})?$
+  
+      
       severity:
         title: Alert Severity
         description: |
@@ -354,7 +367,7 @@ properties:
                       Device groups to which this response action will be applied to
                     type: array
                     tide.mdr.parameter: detectionAction.responseActions[allow/blockFileResponseAction].deviceGroupNames
-                    tide.config.parameter-list: systems.defender_for_endpoint.platform.device_groups
+                    tide.config.parameter-list: systems.defender_for_endpoint.tenants.device_groups
 
           quarantine_file:
             title: Stop and Quarantine File

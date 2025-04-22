@@ -51,6 +51,7 @@ NAV_INDEX_FIELDS = {
         "criticality",
         "tlp",
         "description",
+        "modified",
         "implementations",
         "criticality",
         "targets",
@@ -67,6 +68,7 @@ NAV_INDEX_FIELDS = {
         "tlp",
         "att&ck",
         "guidelines",
+        "modified",
         "vectors",
         "implementations",
         "criticality",
@@ -81,6 +83,7 @@ NAV_INDEX_FIELDS = {
         "criticality",
         "tlp",
         "description",
+        "modified"
         "implementations",
         "criticality",
         "violation",
@@ -90,6 +93,7 @@ NAV_INDEX_FIELDS = {
         "uuid",
         "name",
         "description",
+        "modified",
         "statuses",
         "att&ck",
         "detection_model"    

@@ -50,8 +50,10 @@ class CIEnvironment:
     def _check_ci_environment(self) -> CIPlatforms:
         
         if os.getenv("TF_BUILD"):
+            log("SUCCESS", "Discovered CI Environment to be Azure Pipeline")
             return self.CIPlatforms.AzurePipeline
         elif os.getenv("CI"):
+            log("SUCCESS", "Discovered CI Environment to be Gitlab CI")
             return self.CIPlatforms.GitlabCI
         else:
             log("FATAL",
@@ -272,6 +274,12 @@ def diff_calculation(plan: DeploymentStrategy) -> list:
                 log("FATAL", f"Illegal Deployment Plan {str(plan)} passed to diff_calculation algorithm")
                 raise KeyError
 
+        case _: 
+            log("FATAL",
+                "Illegal CI Environment detected",
+                str(TARGET_CI))
+            
+            raise Exception
 
     log(
         "INFO",

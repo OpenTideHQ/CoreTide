@@ -7,7 +7,11 @@ import traceback
 
 sys.path.append(str(git.Repo(".", search_parent_directories=True).working_dir))
 
-from Engines.modules.deployment import enabled_systems, modified_mdr_files, make_deploy_plan, DeploymentStrategy
+from Engines.modules.deployment import (enabled_systems,
+                                        modified_mdr_files,
+                                        make_deploy_plan,
+                                        DeploymentStrategy,
+                                        CIEnvironment)
 from Engines.modules.logs import log, ANSI, coretide_intro
 from Engines.modules.tide import DataTide, IndexTide
 from Engines.mutation.promotion import PromoteMDR
@@ -104,8 +108,8 @@ for system in deployment_list:
                 "Deploying MDR for target system",
                 system,
                 "Using MDRv4 new methods")
-            DeployTide.mdr[system].deploy(mdr_deployment=deployment_list[system],
-                                          deployment_plan=DEPLOYMENT_PLAN)
+            DeployTide.mdr[system].deploy(mdr_deployment=deployment_list[system], #type: ignore
+                                          deployment_plan=DEPLOYMENT_PLAN) #type: ignore
 
     else:
         log(
@@ -124,8 +128,15 @@ if os.environ.get("DEPLOYMENT_ERROR_RAISED"):
     raise Exception("Deployment Failed")
 
 if os.environ.get("DEPLOYMENT_WARNING_RAISED"):
+    environment = CIEnvironment().environment
     log("WARNING", "Passed deployment, but with some warning", 
                 "Review the warning logs to discover the problem")
-    sys.exit(19)
+
+    # We only exit with a specific error code for Gitlab CI
+    # as it will be caught by the pipeline and will warn the job
+    # that it has failed, but not block the pipeline.
+    if environment is CIEnvironment.CIPlatforms.GitlabCI:
+        sys.exit(19)
+
 else:
     log("SUCCESS", "All content passed validation")

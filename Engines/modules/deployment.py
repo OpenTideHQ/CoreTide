@@ -33,6 +33,33 @@ PRODUCTION_STATUS = DataTide.Configurations.Deployment.status["production"]
 SAFE_STATUS = DataTide.Configurations.Deployment.status["safe"]
 
 
+class CIEnvironment:
+    """
+    Returns the CI Environment based on the environment variables
+    """
+    def __init__(self):
+        self.environment = self._check_ci_environment
+
+    class CIPlatforms(Enum):
+        """
+        Represents the supported CI options
+        """
+        AzurePipeline = auto()
+        GitlabCI = auto()
+
+    def _check_ci_environment(self) -> CIPlatforms:
+        
+        if os.getenv("TF_BUILD"):
+            return self.CIPlatforms.AzurePipeline
+        elif os.getenv("CI"):
+            return self.CIPlatforms.GitlabCI
+        else:
+            log("FATAL",
+                "CI Target environment variable is not implemented",
+                "Ensure that you have configured a variable OpenTide.TargetCi as part of your pipeline",
+                "Current supported values: GitlabCI, AzurePipelines")
+            raise Exception
+
 def make_deploy_plan(
     plan: DeploymentStrategy,
     wide_scope = False
@@ -147,6 +174,8 @@ def modified_mdr_files(plan: DeploymentStrategy)->list[Path]:
     return mdr_files
 
 
+
+
 def diff_calculation(plan: DeploymentStrategy) -> list:
     """
     Calculates the files in scope of deployment based on the execution context.
@@ -163,33 +192,11 @@ def diff_calculation(plan: DeploymentStrategy) -> list:
     """
     scope = list()
     
-    class CITargets(Enum):
-        """
-        Represents the supported CI options
-        """
-        AzurePipeline = auto()
-        GitlabCI = auto()
 
-    def check_ci_environment()->CITargets:
-        """
-        Dynamically asserts the build environment based on system specific
-        environment variables
-        """
-        if os.getenv("TF_BUILD"):
-            return CITargets.AzurePipeline
-        elif os.getenv("CI"):
-            return CITargets.GitlabCI
-        else:
-            log("FATAL",
-                "CI Target environment variable is not implemented",
-                "Ensure that you have configured a variable OpenTide.TargetCi as part of your pipeline",
-                "Current supported values: GitlabCI, AzurePipelines")
-            raise Exception
-
-    TARGET_CI = check_ci_environment()
+    TARGET_CI = CIEnvironment().environment
 
     match TARGET_CI:
-        case CITargets.GitlabCI:
+        case CIEnvironment.CIPlatforms.GitlabCI:
             log("INFO", "Identified Gitlab CI as the CI Runtime Platform")
             REPO_DIR = os.getenv("CI_PROJECT_DIR")
             LATEST_COMMIT = os.getenv("CI_COMMIT_SHA")
@@ -217,7 +224,7 @@ def diff_calculation(plan: DeploymentStrategy) -> list:
                 log("FATAL", f"Illegal Deployment Plan {str(plan)} passed to diff_calculation algorithm")
                 raise KeyError
 
-        case CITargets.AzurePipeline:
+        case CIEnvironment.CIPlatforms.AzurePipeline:
             log("INFO", "Identified Azure Pipeline as the CI Runtime Platform")
             REPO_DIR = os.getenv("BUILD_SOURCESDIRECTORY")
             LATEST_COMMIT = os.getenv("BUILD_SOURCEVERSION")

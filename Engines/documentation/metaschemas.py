@@ -195,19 +195,20 @@ def run():
         for sub in SUBSCHEMAS_INDEX[recomp]:
             icon = ICONS.get("subschemas")
             subschema = SUBSCHEMAS_INDEX[recomp][sub]
-            sub_template = TEMPLATES_INDEX[recomp][sub]
-            subschema_name = name_subschema_doc(recomp, sub)
+            sub_template = TEMPLATES_INDEX[recomp].get(sub)
+            if sub_template:
+                subschema_name = name_subschema_doc(recomp, sub)
 
-            log("ONGOING", "Generating Sub Schema Documentation", subschema_name)
+                log("ONGOING", "Generating Sub Schema Documentation", subschema_name)
 
-            doc = gen_schema_md(subschema, sub_template)
-            output_path = SCHEMA_DOCS_PATH / (subschema_name + ".md")
-        
-            if DOCUMENTATION_TARGET == "gitlab":
-                output_path = Path(str(output_path).replace(" ", "-"))
+                doc = gen_schema_md(subschema, sub_template)
+                output_path = SCHEMA_DOCS_PATH / (subschema_name + ".md")
+            
+                if DOCUMENTATION_TARGET == "gitlab":
+                    output_path = Path(str(output_path).replace(" ", "-"))
 
-            with open(output_path, "w+", encoding='utf-8') as output:
-                output.write(doc)
+                with open(output_path, "w+", encoding='utf-8') as output:
+                    output.write(doc)
 
 
     if DOCUMENTATION_TARGET == "gitlab":

@@ -81,14 +81,10 @@ def fetch_config_parameter_list(dot_path:str)->list:
             print(config_index)
             parameter_list = []
             parameter_key = config_path[config_path.index(key) + 1] 
-            print("PARAM KEY")
-            print(parameter_key)
             for tenant in config_index["tenants"]:
                 tenant_name = tenant.get("name").strip()                
                 if parameter_key in tenant.get("parameters"):
                     parameter_list.extend([tenant_name + "::" + item.strip() for item in tenant["parameters"][parameter_key]])
-            print("DEBUG")
-            print(parameter_list)
             return parameter_list
         
         if key in config_index:

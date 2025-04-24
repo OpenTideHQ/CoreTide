@@ -70,7 +70,7 @@ class SplunkMetadataDeploy(SplunkEngineInit, DeployMetadata):
             entry["MDR_name"] = body.get("name")
             entry["MDR_author"] = metadata.get("author")
             entry["MDR_version"] = metadata.get("version")
-            entry["MDR_last_modified"] = metadata.get("modified")
+            entry["MDR_last_modified"] = str(metadata.get("modified"))
             entry["MDR_detection_model"] = body.get("detection_model")
             entry["MDR_severity"] = body.get("response", {}).get("alert_severity")
             entry["MDR_alert_handling_team"] = (

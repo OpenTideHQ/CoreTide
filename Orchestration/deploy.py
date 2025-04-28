@@ -54,8 +54,18 @@ if len(deployment_list) == 0:  # In case of no deployments possible, fail gracio
         "SKIP",
         "Nothing could deploy, no MDR can be addressed within this deployment context",
     )
-    traceback.print_exc()
-    sys.exit(19)
+    
+    environment = CIEnvironment().environment
+    log("FAILURE",
+        "Nothing could deploy, no MDR can be addressed within this deployment context",
+        "This may not be an issue if you didn't intend a deployment")
+
+    # We only exit with a specific error code for Gitlab CI
+    # as it will be caught by the pipeline and will warn the job
+    # that it has failed, but not block the pipeline.
+    if environment is CIEnvironment.CIPlatforms.GitlabCI:
+        traceback.print_exc()
+        sys.exit(19)
 
 # Need reindexation after MDR promotion is complete.
 IndexTide.reload()

@@ -14,6 +14,7 @@ from Engines.validation import (
     uuid_v4,
     cve,
 )
+from Engines.modules.deployment import CIEnvironment
 
 print(coretide_intro())
 
@@ -48,6 +49,15 @@ if os.environ.get("VALIDATION_ERROR_RAISED"):
     raise Exception("Validation Failed")
 
 if os.environ.get("VALIDATION_WARNING_RAISED"):
-    sys.exit(19)
+    environment = CIEnvironment().environment
+    log("WARNING", "Passed validation, but with some warning", 
+                    "Review the warning logs to discover the problem")
+
+
+    # We only exit with a specific error code for Gitlab CI
+    # as it will be caught by the pipeline and will warn the job
+    # that it has failed, but not block the pipeline.
+    if environment is CIEnvironment.CIPlatforms.GitlabCI:
+        sys.exit(19)
 else:
     log("SUCCESS", "All content successfully passed validation")

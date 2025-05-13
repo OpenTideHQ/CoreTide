@@ -149,7 +149,11 @@ def gen_template(metaschema, required):
 
                 if keyword_type == "object":
                     if key not in required:
-                        key = "#" + key
+                        if config:=metaschema[key].get("tide.template.config.required"):
+                            if fetch_config_template(config) == "False":
+                                key = "#" + key
+                        else:
+                            key = "#" + key
 
                     if "recomposition" in metaschema[key.replace("#", "")].keys():
                         recomp_cat = metaschema[key.replace("#", "")]["recomposition"]
@@ -245,18 +249,34 @@ def gen_template(metaschema, required):
 
                     content = "blank"
 
-                    if config_path:=metaschema[key].get("tide.config.template"):
-                        content = fetch_config_template(config_path)
-                        if not content:
-                            content = "..."
-                        if key in required:
-                            # Trick to respect newlines
-                            content = content.replace("\n\n", "\nforce_space")
-                        else:
-                            # When commented out, newlines are respected as-is
-                            content = "\n".join(["#" + line for line in content.split("\n")])
+                    # Additional custom requirements checks, easiest to resolve it at this 
+                    # final level
+                    local_required = False
+                    if key in required:
+                        local_required = True
+                    if config:=metaschema[key].get("tide.template.config.required"):
+                        enabled = fetch_config_template(config)
+                        if enabled == "True":
+                            local_required = True
+                        elif enabled == "False":
+                            local_required = False
+                            
+                    if config_path:=metaschema[key].get("tide.template.config.default.enabled"):
+                        if fetch_config_template(config_path) != "False":
+                            if config_path:=metaschema[key].get("tide.template.config.default"):
+                                content = fetch_config_template(config_path)
+                                if metaschema[key].get("tide.template.multiline"):
+                                    if not content:
+                                        content = "..."
+                                    if local_required:
+                                        # Trick to respect newlines
+                                        content = content.replace("\n\n", "\nforce_space")
+                                    else:
+                                        # When commented out, newlines are respected as-is
+                                        content = "\n".join(["#" + line for line in content.split("\n")])
 
-                        content = "|\n'" + content
+                                    content = "|\n'" + content
+
                     elif metaschema[key].get("format") == "date":
                         content = "YYYY-MM-DD"
                     elif metaschema[key].get("format") == "number":
@@ -266,7 +286,7 @@ def gen_template(metaschema, required):
                     elif metaschema[key].get("format") == "uri":
                         content = "https://"
                     elif metaschema[key].get("tide.template.multiline"):
-                        if key in required:
+                        if local_required:
                             content = "|\n'..."
                         else:
                             content = "|\n'#..."
@@ -276,14 +296,14 @@ def gen_template(metaschema, required):
                         content = metaschema[key]["const"]
 
                     if keyword_type == "array":
-                        if key not in required:
+                        if not local_required:
                             key = "#" + key
                             content = "Comment out"
 
                         body[key] = [content]
 
                     else:
-                        if key not in required:
+                        if not local_required:
                             key = "#" + key
 
                         body[key] = content

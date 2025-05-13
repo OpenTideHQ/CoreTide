@@ -48,7 +48,7 @@ properties:
     description: Explanation of what the detection rule is detecting, in order to give context to alerts receivers.
     type: string
     tide.template.multiline : True
-    tide.config.template: schema.templates.mdr::description
+    tide.template.config.default: schema.templates.mdr::description
 
   detection_model: 
     title: CoreTIDE Cyber Detection Model
@@ -99,7 +99,7 @@ properties:
             type: string
             description: Guidelines to handle the alert 
             tide.template.multiline: True
-            tide.config.template: schema.templates.mdr::response::procedure::analysis 
+            tide.template.config.default: schema.templates.mdr::response::procedure::analysis 
 
           searches:
             title: Supporting searches
@@ -134,7 +134,7 @@ properties:
             type: string
             description: Guidelines to contain the incident, once assessed to be a True Positive
             tide.template.multiline: True
-            tide.config.template: schema.templates.mdr::response::procedure::containment 
+            tide.template.config.default: schema.templates.mdr::response::procedure::containment 
 
 
 

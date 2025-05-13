@@ -9,8 +9,11 @@ required:
   - tlp
   - created
   - modified
-  - author
-  
+
+oneOf:
+  - required: [author]
+  - required: [organisation]
+
 properties:
 
   uuid: 
@@ -50,7 +53,7 @@ properties:
     example: 2022-09-13
 
   tlp:
-    title: Traffic Light Protocol
+    title: Traffic Light Protocol 2.0
     type: string
     tide.vocab: true
     description: "The Traffic Light Protocol - or short: TLP - was designed with the objective to create a favorable classification scheme for sharing sensitive information while keeping the control over its distribution at the same time." 
@@ -67,7 +70,6 @@ properties:
   author:
     title: Model author
     type: string
-    format: email
     description: Creator of latest version
     example: amine.besson@ext.ec.europa.eu
 
@@ -77,4 +79,33 @@ properties:
     description: Individuals who supported creating, enriching or informing the information contained in the document. 
     items:
       type: string
-      format: email
+  
+  organisation:
+    title: Sharing Organisation
+    description: Details about the organisation who created and/or maintains the object
+    tide.template.config.required: sharing.organisation.enabled
+    tide.template.spacer: false
+    type: object
+
+    required:
+      - uuid
+      - name
+    
+    properties:
+
+      uuid:
+        title: Organisation UUID
+        description: UUID of the Sharing Organisation, version 4
+        type: string
+        pattern: ^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$
+        tide.template.config.required: sharing.organisation.enabled
+        tide.template.config.default: sharing.organisation.uuid
+        tide.template.config.default.enabled: sharing.organisation.enabled
+
+      name: 
+        title: Organisation Name
+        description: Name of the Sharing Organisation
+        type: string
+        tide.template.config.required: sharing.organisation.enabled
+        tide.template.config.default: sharing.organisation.name
+        tide.template.config.default.enabled: sharing.organisation.enabled

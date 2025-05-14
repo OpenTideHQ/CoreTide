@@ -15,5 +15,9 @@ stages:
       - job: QueryValidation
         displayName: OpenTide Detection Rule Query Validation
         dependsOn: CheckForChanges
+        condition:
+          and(eq(dependencies.CheckForChanges.outputs['FilesChanged.ChangesDetected'], 'true'),
+              eq(variables['Build.Reason'], 'PullRequest')
+              )
         steps:
           - template: ../jobs/validation.query.yml

@@ -295,6 +295,9 @@ def gen_template(metaschema, required):
                     elif "const" in metaschema[key]:
                         content = metaschema[key]["const"]
 
+                    if metaschema[key].get("tide.template.no-space"):
+                        content = "no-space" + str(content)
+
                     if keyword_type == "array":
                         if not local_required:
                             key = "#" + key
@@ -319,15 +322,19 @@ def make_spaces(template_path, metaschema):
     for line in template:
         key = line.split(":")[0].replace(" ", "")
         force_space = True if "force_space" in line else False
+        no_space = True if "no-space" in line else False
         spacer = get_value_metaschema(
             key.replace("#", ""), metaschema, "tide.template.spacer"
         )
         key_type = get_value_metaschema(key.replace("#", ""), metaschema, "type")
         if key_type == "object" or spacer or force_space:
             if spacer != False:
-                spaced.append("\n")
+                if not no_space:
+                    spaced.append("\n")
             if force_space:
                 line = line.replace("force_space", "")
+            if no_space:
+                line = line.replace("no-space", "")
 
         spaced.append(line)
 

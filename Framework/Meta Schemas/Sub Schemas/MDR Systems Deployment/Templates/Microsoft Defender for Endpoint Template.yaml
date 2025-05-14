@@ -54,3 +54,10 @@
   
   query: |
     ...
+  
+  #exclusions:
+    #- tenant: 
+      #reason: |
+        #...
+      #query: |
+        #...

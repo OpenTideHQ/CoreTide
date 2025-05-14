@@ -136,9 +136,16 @@ class DefenderForEndpointDeploy(DeployMDR):
         
         is_enabled = False if mdr_config.status == "DISABLED" else True
         
+        # Handle Query and Exclusions
+        query = mdr_config.query.replace("\n","")
+        if exclusions:=mdr_config.exclusions:
+            for exclusion in exclusions:
+                if exclusion.tenant == tenant:
+                    query += exclusion.query.replace("\n","")
+                    
         rule = DetectionRule(displayName=data.name,
                             isEnabled=is_enabled,
-                            queryCondition=DetectionRule.QueryCondition(queryText=mdr_config.query.replace("\n","")),
+                            queryCondition=DetectionRule.QueryCondition(queryText=query),
                             schedule=DetectionRule.Schedule(period=scheduling), # type: ignore
                             detectionAction=DetectionRule.DetectionAction(alertTemplate=alert_template,
                                                                             responseActions=response_actions))

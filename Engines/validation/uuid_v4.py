@@ -30,13 +30,12 @@ def run():
             tide_object_uuid = tide_object_data.get("uuid") or tide_object_data["metadata"]["uuid"]
             tide_object_name = tide_object_data["name"]
             tide_object_metadata = tide_object_data.get("metadata") or tide_object_data["meta"]
-            tide_object_author = tide_object_metadata["author"]
 
             try:
                 UUID(tide_object_uuid, version=4)
             except:
                 error_registry.append(
-                    {"Object Name": tide_object_name, "UUID": tide_object_uuid, "Author": tide_object_author}
+                    {"Object Name": tide_object_name, "UUID": tide_object_uuid}
                 )
 
             counter += 1

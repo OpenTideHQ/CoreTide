@@ -5,7 +5,7 @@ import traceback
 
 sys.path.append(str(git.Repo(".", search_parent_directories=True).working_dir))
 
-from Engines.modules.deployment import make_deploy_plan, DeploymentStrategy
+from Engines.modules.deployment import make_deploy_plan, DeploymentStrategy, CIEnvironment
 from Engines.modules.logs import log, ANSI, coretide_intro
 from Engines.modules.plugins import DeployTide
 from Engines.modules.tide import DataTide
@@ -74,8 +74,15 @@ if os.environ.get("VALIDATION_ERROR_RAISED"):
     raise Exception("Validation Failed")
 
 if os.environ.get("VALIDATION_WARNING_RAISED"):
-    log("WARNING", "Passed validation with some warning", 
-                "Review the warning logs to discover the problem")
-    sys.exit(19)
+    environment = CIEnvironment().environment
+    log("WARNING", "Passed validation, but with some warning", 
+                    "Review the warning logs to discover the problem")
+
+
+    # We only exit with a specific error code for Gitlab CI
+    # as it will be caught by the pipeline and will warn the job
+    # that it has failed, but not block the pipeline.
+    if environment is CIEnvironment.CIPlatforms.GitlabCI:
+        sys.exit(19)
 else:
-    log("SUCCESS", "All content passed validation")
+    log("SUCCESS", "All content successfully passed validation")

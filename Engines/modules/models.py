@@ -359,6 +359,11 @@ class TideModels:
                     files: Optional[Files] = None
                     users: Optional[Users] = None
 
+                @dataclass
+                class Exclusion:
+                    tenant: str
+                    query: str
+                    reason: Optional[str]=None
                     
                 schema: str
                 alert: Alert
@@ -368,6 +373,7 @@ class TideModels:
                 rule_id: Optional[Mapping[str, int]] = None
                 actions: Optional[ResponseActions] = None
                 scope: Optional[GroupScoping] = None
+                exclusions: Optional[Sequence[Exclusion]] = None
             
             
             @dataclass

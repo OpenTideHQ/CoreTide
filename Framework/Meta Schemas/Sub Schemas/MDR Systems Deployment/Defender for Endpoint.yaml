@@ -468,8 +468,49 @@ properties:
     type: string
     tide.template.spacer: true
     tide.mdr.parameter: queryCondition.queryText
-    tide.template.multiline : True
+    tide.template.multiline : true
     description: KQL Query
     example: |
       DeviceFileEvents
       | where (ActionType == "FileCreated" and FileName endswith ".zip" and (FileOriginUrl != "" or FileOriginReferrerUrl != ""))
+
+  exclusions:
+    title: Tenant-Scoped Exclusions
+    type: array
+    description: |
+      This section adds exclusions, using queries that will be appended to the final
+      query deployed in a per-tenant fashion, and fully documented.
+      You may remove the tenant field, in which case the exclusion will apply to all
+      tenants.
+      You may add multiple exclusion section for the same tenant - in which case they 
+      will be appended in the order that they appear. 
+    tide.template.spacer: true 
+    items:
+      type: object
+      required:
+        - reason
+        - query
+      properties:
+        tenant:
+          title: Tenant
+          type: string
+          description: |
+            The tenant to which the exclusion applied. Remove if the exclusion should
+            be applied to all tenants. 
+          tide.config.system.tenants: defender_for_endpoint
+        
+        reason:
+          title: Exclusion Reason
+          type: string
+          description: |
+            Document why the exclusion was added
+          tide.template.multiline: true
+          tide.template.config.default: schema.templates.mdr::exclusions::reason
+
+        query:
+          title: Exclusion Query 
+          type: string
+          description: |
+            Write here the exclusion query, that will be appended to the base query
+          tide.template.multiline: true
+          tide.template.no-space: true

@@ -380,6 +380,11 @@ class SystemLoader:
                 response_actions = DefenderForEndpoint.ResponseActions(devices=devices,
                                                                         files=files,
                                                                         users=users)
+        exclusions = None
+        if mdr_config.get("exclusions"):
+            exclusions = []
+            for exclusion in mdr_config.pop("exclusions"):
+                exclusions.append(DefenderForEndpoint.Exclusion(**exclusion))
 
         return DefenderForEndpoint(**mdr_config,
                                     rule_id=rule_id,
@@ -389,7 +394,8 @@ class SystemLoader:
                                     alert=alert,
                                     actions=response_actions,
                                     impacted_entities=impacted_entities,
-                                    scope=group_scoping)
+                                    scope=group_scoping,
+                                    exclusions=exclusions)
 
 
 class TideLoader:

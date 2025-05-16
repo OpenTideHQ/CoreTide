@@ -10,7 +10,7 @@ required:
   - created
   - modified
 
-oneOf:
+anyOf:
   - required: [author]
   - required: [organisation]
 

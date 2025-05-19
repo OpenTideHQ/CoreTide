@@ -361,9 +361,9 @@ class TideModels:
 
                 @dataclass
                 class Exclusion:
-                    tenant: str
                     query: str
-                    reason: Optional[str]=None
+                    reason: str
+                    tenant: Optional[str]=None
                     
                 schema: str
                 alert: Alert

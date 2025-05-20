@@ -148,7 +148,8 @@ class DefenderForEndpointDeploy(DeployMDR):
                     log("INFO", "Applying exclusion", exclusion.query)
                     query += " " + exclusion.query.replace("\n"," ")
         query = query.replace("|", "\n|")
-        log("INFO", "Final compiled query", query)
+        log("INFO", "Final compiled query")
+        print(query)
 
         rule = DetectionRule(displayName=data.name,
                             isEnabled=is_enabled,

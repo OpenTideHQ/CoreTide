@@ -236,7 +236,7 @@ class SystemLoader:
     @staticmethod
     def _base_configuration(mdr_config:dict[str, Any])->Tuple[dict[str, Any], TideDefinitionsModels.SystemConfigurationModel]:
         BaseConfigModel = TideDefinitionsModels.SystemConfigurationModel
-        schema = mdr_config.pop("contributors", None)
+        schema = mdr_config.pop("schema", None)
         status = mdr_config.pop("status", None)
         tenants:list[str] = mdr_config.pop("tenants", None)
         flags:list[str] = mdr_config.pop("flags", None)

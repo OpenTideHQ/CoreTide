@@ -124,10 +124,13 @@ class DefenderForEndpointDeploy(DeployMDR):
             severity = data.response.alert_severity
             severity = SeverityMapping[severity].value
 
+        # Remove spaces in category
+        category = mdr_config.alert.category.replace(" ", "")
+
         alert_template = DetectionRule.DetectionAction.AlertTemplate(title = mdr_config.alert.title or data.name,
                                                                     description=data.description,
                                                                     severity=severity, 
-                                                                    category=mdr_config.alert.category,
+                                                                    category=category,
                                                                     mitreTechniques=[],
                                                                     impactedAssets=impacted_assets,
                                                                     recommendedActions=mdr_config.alert.recommendation or None)

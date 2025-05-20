@@ -520,6 +520,11 @@ class TideDeployment:
         tenants = self.system_configuration_resolver(system).tenants #type: ignore
         mdr_tenants = self.mdr_configuration_resolver(data, system).tenants
         target_tenants = list()
+                    
+        log("ONGOING",
+            "Currently resolving available tenant deployments for rule",
+            data.name,
+            data.metadata.uuid)
         
         if not tenants:
             log("FATAL",
@@ -533,11 +538,12 @@ class TideDeployment:
             
             # If Deployment Plan is ALWAYS, we always target the tenant
             if tenant.deployment is DeploymentStrategy.ALWAYS:
+                log("SUCCESS",
+                    "Assigned to tenant")
                 target_tenants.append(tenant)
                 continue
             
-            # If MDR defines target tenants, we can skip the tenant if
-            # it's not defined in the MDR
+            # Resolve tenant deployments when they are specific or not in the MDR spec
             if mdr_tenants:
                 log("INFO",
                     "Found specific tenants targeted by rule",
@@ -545,27 +551,23 @@ class TideDeployment:
                     str(mdr_tenants))
 
                 if tenant.name in mdr_tenants:
-                    log("SKIP",
-                        f"Skipping tenant {tenant.name} as is not defined by MDR tenant list",
-                        str(mdr_tenants))
-                    continue
-                else:
-                    if tenant.deployment is DeploymentStrategy.MANUAL:
+                    if (tenant.deployment is DeploymentStrategy.MANUAL) or (tenant.deployment is deployment_strategy):
                         target_tenants.append(tenant)
                         log("SUCCESS",
-                            f"Adding tenant {tenant.name} to the tenant deployment list")
-                    elif tenant.deployment is deployment_strategy:
-                        target_tenants.append(tenant)
-                        log("SUCCESS",
-                            f"Adding tenant {tenant.name} to the tenant deployment list")
+                            f"Adding tenant {tenant.name} to the tenant deployment list",
+                            f"Compatible with current deployment plan : {deployment_strategy}")
                     else:
                         log("SKIP",
                             f"Skipping tenant {tenant.name} as is not compatible with current deployment plan",
                             f"Tenant deployment plan : {tenant.deployment}, current deployment plan : {deployment_strategy.name}")
+                else:
+                    log("SKIP",
+                        f"Skipping tenant {tenant.name} as is not defined by MDR tenant list",
+                        str(mdr_tenants))
                                 
             else:
                 log("INFO",
-                    "Did not find tenants specified in detection rule",
+                    "Did not find tenants specified in detection rule, will resolve available ones",
                     data.name)
                 
                 if tenant.deployment is DeploymentStrategy.MANUAL:
@@ -573,11 +575,12 @@ class TideDeployment:
                         f"Skipping tenant {tenant.name} as can only be assigned within the MDR defined tenant",
                         "You can define custom target tenants under the tenants keyword")
                     continue
-                
+
                 elif tenant.deployment is deployment_strategy:
                     target_tenants.append(tenant)
                     log("SUCCESS",
-                        f"Adding tenant {tenant.name} to the tenant deployment list")
+                        f"Adding tenant {tenant.name} to the tenant deployment list",
+                        f"Compatible with current deployment plan : {deployment_strategy}")
                 else:
                     log("SKIP",
                         f"Skipping tenant {tenant.name} as is not compatible with current deployment plan",

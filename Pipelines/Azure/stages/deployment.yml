@@ -3,7 +3,7 @@ stages:
     displayName: Detection Rule Deployment
     dependsOn: Validation
     condition: | 
-      or(eq(variables['Build.SourceBranch'], variables['OpenTide.DefaultBranch']),
+      or(eq(variables['Build.SourceBranchName'], variables['OpenTide.DefaultBranch']),
          eq(variables['Build.Reason'], 'Manual'),
          eq(variables['Build.Reason'], 'PullRequest')
         )
@@ -19,7 +19,7 @@ stages:
         dependsOn: CheckForChanges
         condition: |
           and(eq(dependencies.CheckForChanges.outputs['FilesChanged.ChangesDetected'], 'true'),
-              or(eq(variables['Build.SourceBranch'], variables['OpenTide.DefaultBranch']),
+              or(eq(variables['Build.SourceBranchName'], variables['OpenTide.DefaultBranch']),
                  eq(variables['Build.Reason'], 'Manual')
                  )
             )

@@ -336,6 +336,14 @@ class SystemLoader:
 
         mdr_config, base_config = SystemLoader._base_configuration(mdr_config)
         #TODO Migrate to new rule ID bundle method
+        
+        rule_id_bundle = {}
+        for key in mdr_config.copy():
+            if key.startswith("rule_id::"):
+                tenant = key.split("rule_id::")[1]
+                rule_id_bundle[tenant] = mdr_config.pop(key)
+        rule_id = rule_id_bundle if rule_id_bundle else mdr_config.pop("rule_id", None)
+
 
         alert = DefenderForEndpoint.Alert(**mdr_config.pop("alert"))
         impacted_entities = DefenderForEndpoint.ImpactedEntities(**mdr_config.pop("impacted_entities"))

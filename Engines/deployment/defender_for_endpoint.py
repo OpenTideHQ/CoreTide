@@ -146,8 +146,10 @@ class DefenderForEndpointDeploy(DeployMDR):
                 # Applies exclusion if 
                 if (exclusion.tenant == tenant) or (not exclusion.tenant):
                     log("INFO", "Applying exclusion", exclusion.query)
-                    query += exclusion.query.replace("\n","")
-                    
+                    query += " " + exclusion.query.replace("\n"," ")
+        
+        log("INFO", "Final compiled query", query)
+
         rule = DetectionRule(displayName=data.name,
                             isEnabled=is_enabled,
                             queryCondition=DetectionRule.QueryCondition(queryText=query),
@@ -230,8 +232,8 @@ class DefenderForEndpointDeploy(DeployMDR):
                                     system=DetectionSystems.DEFENDER_FOR_ENDPOINT,
                                     strategy=deployment_plan)
         for tenant_deployment in deployment.rule_deployment:
-            a = tenant_deployment.tenant
             service = DefenderForEndpointService(tenant_deployment.tenant) #type: ignore
+            log("ONGOING", "Planned Deployment", tenant_deployment.tenant.name, str(tenant_deployment.rules))
 
             for mdr in tenant_deployment.rules:
                 self.deploy_mdr(data=mdr, service=service, tenant=tenant_deployment.tenant.name)

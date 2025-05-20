@@ -539,6 +539,11 @@ class TideDeployment:
             # If MDR defines target tenants, we can skip the tenant if
             # it's not defined in the MDR
             if mdr_tenants:
+                log("INFO",
+                    "Found specific tenants targeted by rule",
+                    data.name,
+                    str(mdr_tenants))
+
                 if tenant.name in mdr_tenants:
                     log("SKIP",
                         f"Skipping tenant {tenant.name} as is not defined by MDR tenant list",
@@ -559,6 +564,10 @@ class TideDeployment:
                             f"Tenant deployment plan : {tenant.deployment}, current deployment plan : {deployment_strategy.name}")
                                 
             else:
+                log("INFO",
+                    "Did not find tenants specified in detection rule",
+                    data.name)
+                
                 if tenant.deployment is DeploymentStrategy.MANUAL:
                     log("SKIP",
                         f"Skipping tenant {tenant.name} as can only be assigned within the MDR defined tenant",

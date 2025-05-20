@@ -140,14 +140,14 @@ class DefenderForEndpointDeploy(DeployMDR):
         is_enabled = False if mdr_config.status == "DISABLED" else True
         
         # Handle Query and Exclusions
-        query = mdr_config.query.replace("\n","")
+        query = mdr_config.query
         if exclusions:=mdr_config.exclusions:
             for exclusion in exclusions:
                 # Applies exclusion if 
                 if (exclusion.tenant == tenant) or (not exclusion.tenant):
                     log("INFO", "Applying exclusion", exclusion.query)
-                    query += " " + exclusion.query.replace("\n"," ")
-        query = query.replace("|", "\n|")
+                    query += "\n" + exclusion.query
+        
         log("INFO", "Final compiled query")
         print(query)
 

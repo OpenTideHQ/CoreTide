@@ -334,17 +334,8 @@ class SystemLoader:
     
         DefenderForEndpoint = TideModels.MDR.Configurations.DefenderForEndpoint
 
-        tenants:list[str] = mdr_config.pop("contributors", None)
-        flags:list[str] = mdr_config.pop("flags", None)
-        contributors:list[str] = mdr_config.pop("tenants", None)
-
-        rule_id_bundle = {}
-        for key in mdr_config.copy():
-            if key.startswith("rule_id::"):
-                tenant = key.split("rule_id::")[1]
-                rule_id_bundle[tenant] = mdr_config.pop(key)
-        rule_id = rule_id_bundle if rule_id_bundle else mdr_config.pop("rule_id", None)
-
+        mdr_config, base_config = SystemLoader._base_configuration(mdr_config)
+        #TODO Migrate to new rule ID bundle method
 
         alert = DefenderForEndpoint.Alert(**mdr_config.pop("alert"))
         impacted_entities = DefenderForEndpoint.ImpactedEntities(**mdr_config.pop("impacted_entities"))
@@ -386,11 +377,13 @@ class SystemLoader:
             for exclusion in mdr_config.pop("exclusions"):
                 exclusions.append(DefenderForEndpoint.Exclusion(**exclusion))
 
-        return DefenderForEndpoint(**mdr_config,
+        return DefenderForEndpoint( **mdr_config,
+                                    schema=base_config.schema,
+                                    status=base_config.status,
                                     rule_id=rule_id,
-                                    contributors=contributors,
-                                    flags=flags,
-                                    tenants=tenants,
+                                    contributors=base_config.contributors,
+                                    flags=base_config.flags,
+                                    tenants=base_config.tenants,
                                     alert=alert,
                                     actions=response_actions,
                                     impacted_entities=impacted_entities,

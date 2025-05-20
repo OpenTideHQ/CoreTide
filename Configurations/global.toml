@@ -1,10 +1,11 @@
-models = [ "tvm", "cdm", "bdr", "mdr" ]
+models = [ "tvm", "cdm", "dom", "bdr", "mdr" ]
 
 [paths.tide]
 tvm = "Objects/Threat Vectors/"
 cdm = "Objects/Detection Models/"
 mdr = "Objects/Detection Rules/"
 bdr = "Objects/Business Detections/"
+dom = "Objects/Detection Objectives/"
 lookups = "Lookups/"
 analytics = "Analytics/"
 snippet_file = ".vscode/Model Templates.code-snippets"
@@ -32,6 +33,7 @@ tvm = "TVM Meta Schema.yaml"
 cdm = "CDM Meta Schema.yaml"
 mdr = "MDR Meta Schema.yaml"
 bdr = "BDR Meta Schema.yaml"
+dom = "Detection Objectives.meta.yaml"
 lookup_metadata = "Lookup Metadata Meta Schema.yaml"
 
 [recomposition]
@@ -42,6 +44,7 @@ tvm = "TVM Schema.json"
 cdm = "CDM Schema.json"
 mdr = "MDR Schema.json"
 bdr = "BDR Schema.json"
+dom = "Detection Objectives.schema.json"
 lookup_metadata = "Lookup Metadata Schema.json"
 
 [data_fields]
@@ -49,10 +52,12 @@ tvm = "threat"
 cdm = "detection"
 mdr = "rule"
 bdr = "request"
+dom = "objective"
 
 [templates]
 tvm = "TVM TEMPLATE.yaml"
 cdm = "CDM TEMPLATE.yaml"
 mdr = "MDR TEMPLATE.yaml"
 bdr = "BDR TEMPLATE.yaml"
+dom = "Detection Objective.template.yaml"
 lookup_metadata = "LOOKUP METADATA TEMPLATE.yaml"

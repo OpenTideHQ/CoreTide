@@ -147,7 +147,7 @@ class DefenderForEndpointDeploy(DeployMDR):
                 if (exclusion.tenant == tenant) or (not exclusion.tenant):
                     log("INFO", "Applying exclusion", exclusion.query)
                     query += " " + exclusion.query.replace("\n"," ")
-        
+        query = query.replace("|", "\n|")
         log("INFO", "Final compiled query", query)
 
         rule = DetectionRule(displayName=data.name,

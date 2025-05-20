@@ -238,9 +238,9 @@ class SystemLoader:
         BaseConfigModel = TideDefinitionsModels.SystemConfigurationModel
         schema = mdr_config.pop("contributors", None)
         status = mdr_config.pop("status", None)
-        tenants:list[str] = mdr_config.pop("contributors", None)
+        tenants:list[str] = mdr_config.pop("tenants", None)
         flags:list[str] = mdr_config.pop("flags", None)
-        contributors:list[str] = mdr_config.pop("tenants", None)
+        contributors:list[str] = mdr_config.pop("contributors", None)
 
         return mdr_config, BaseConfigModel(schema=schema,
                                             tenants=tenants,

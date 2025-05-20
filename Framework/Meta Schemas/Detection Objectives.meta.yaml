@@ -1,0 +1,320 @@
+title: OpenTide Detection Objective Schema
+description: |
+  Detection Objectives represent a modelling of detection opportunities
+  against identified Threat Vectors
+
+$schema: http://json-schema.org/draft-07/schema#
+additionalProperties: false
+
+tide.placeholders:
+  SCHEMA_VERSION: dom::2.1
+
+required:
+  - name
+  - metadata
+  - objective
+  - correlation
+
+
+properties:
+
+  name: 
+    title: Object Name
+    type: string
+    description: Name of the OpenTide Detection Objective
+
+  references:
+    tide.meta.definition: true
+
+  metadata:
+    tide.template.spacer: true
+    tide.meta.definition: true
+
+
+  objective:
+    title: Detection Objective
+    type: object
+    description: |
+      Describes a detection concept, alongside technical descriptions
+      for precise detection opportunities called signals.
+    required:
+      - priority
+      - type
+      - threats
+      - description
+      - signals
+    
+    properties:
+
+      priority:
+        title: Priority
+        type: string
+        description: |
+          How important the detection objective is to implement
+        enum:
+          - Low
+          - Medium 
+          - High
+          - Critical
+
+      att&ck:
+        title: MITRE ATT&CK Technique Mapping
+        type: array
+        tide.vocab: true
+        description: |
+          Optional, allows a more precise mapping of the ATT&CK techniques
+          associated with the detection objectives. If not precised, the ATT&CK
+          Techniques mapped by the related Threat Vectors must be considered instead. 
+        tide.vocab.hints.no-wrap: true 
+        items: 
+          type: string
+          pattern: 'T\d{4}'
+
+      type:
+        title: Detection Objective Type
+        type: string
+        description: |
+          Purpose of the Detection Objective
+        tide.vocab: detection.types
+      
+      threats:
+        title: Threat Vectors Coverage
+        description: |
+          OpenTide Threat Vectors which are covered by this Detection Objective
+        type: array
+        tide.vocab: tvm
+        items:
+          type: string 
+        
+      description: 
+        title: Objective Description
+        description: |
+          High Level description of the Detection Objective goal and key concept.
+          Technical description of different detection methodologies/signals must
+          be done under signals. 
+        type: string
+        tide.template.multiline: True 
+
+      signals:
+        title: Detection Signals
+        description: |
+          Detailed, technical description of each detection opportunies, aligned
+          with the overarching Detection Objectives. These signals can all be independent
+          opportunities, or related within a larger higher-order detection strategy which
+          can be documented under correlation. 
+        type: array
+        items:
+          type: object
+          required:
+            - name 
+            - uuid
+            - description
+            - severity
+            - data 
+            - methodology
+            - entities
+
+          properties:
+            name:
+              title: Signal Name
+              description: |
+                Name of the Detection Signal - in general, this should be a good name
+                for an alert.
+              type: string
+            
+            uuid:
+              title: Signal UUID
+              description: |
+                A UUIDv4 to uniquely identify the Detection Signal.
+              type: string
+              format: uuid
+              pattern: ^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$
+
+            description: 
+              title: Signal Description
+              description: |
+                Detailed, low level technical details allowing to transform this
+                specification into Detection Rules.
+              type: string
+              tide.template.multiline: True 
+
+            severity:
+              title: Signal Severity
+              description: |
+                How critical this signal should be processed. In general, this should map closely
+                to the alert severity that the detection rule would raise. 
+              type: string
+              enum:
+                - Informational
+                - Low
+                - Medium
+                - High
+                - Critical
+            
+            methodology:
+              title: Detection Methodology
+              description: |
+                High level category of the type of detection approach that the signal specification is proposing.
+              type: string
+              tide.vocab: detection.methodology
+            
+            data:
+              title: Required Data
+              description: |
+                Modelling of the required data to implement the signal 
+              type: object
+              
+              required:
+                - availability
+                - requirements
+
+              properties:
+
+                availability:
+                  title: Data Availability
+                  description: |
+                    Represents whether the necessary data is already captured
+                  tide.template.required: True
+                  type: string
+                  enum:
+                    - Unknown
+                    - Not Available
+                    - Partial
+                    - Complete
+                
+                requirements:
+                  title: Data Requirements
+                  description: |
+                    Technical details of the required data
+                  type: string
+                  tide.template.multiline: True
+
+                logsources:
+                  title: Possible Logsources
+                  description: |
+                    Existing, available logsources which cover the data requirements for the signal
+                  type: array
+                  items:
+                    type: string
+
+            entities:
+              title: Entities
+              description: |
+                Entities that the signal is using to perform its detection.
+                Particularly useful to know for alert processing, entity grouping etc.
+              #TODO : Entity Vocab
+              type: array
+              items:
+                type: string 
+          
+            external:
+              title: External Detections
+              description: |
+                Detection existing in some toolings/platforms, but which does not exist as an OpenTide
+                Detection Rule, stored as-code. Useful to represent detectors, vendor detections, and
+                black-box capabilities documented by vendors but not necessarily fully controlled.
+              type: array
+              items:
+                type: object
+                
+                required:
+                  - name
+                  - technology
+                  - description 
+
+                properties:
+
+                  name:
+                    title: External Detection Name
+                    description: |
+                      Name of the external detector, either as documented by the vendor if available,
+                      else close to the alerts generated by the tool.
+                    type: string
+
+                  technology: 
+                    title: External Technology
+                    description: |
+                      The technology that contains the detector this signal is mapping to.
+                      This vocabulary is documented under `schema.toml`
+                    type: string 
+                    tide.config.parameter-list: schema.external.technologies
+
+                  description: 
+                    title: External Detection Description
+                    description: |
+                      High level overview over the external detection capabilities
+                    type: string
+                    tide.template.multiline: True 
+
+                  link:
+                    title: External Detection Reference
+                    type: string
+                    description: |
+                      Link to relevant docs, if available, for the external detection
+
+            community:
+              title:  Community Detections
+              description: |
+                When available, relevant queries/detection rules already shared in the community
+              type: array 
+
+              items:
+                type: object
+                required:
+                  - description
+                  - link
+              
+                properties:
+
+                  description: 
+                    title: Community Detection Description
+                    description: |
+                      High level overview over the community detection capabilities
+                    type: string
+                    tide.template.multiline: True 
+
+                  link:
+                    title: Community Detection Link
+                    description: |
+                      Link to the shared detection (github, blog post...)
+                    type: string
+                  
+                  language:
+                    title: Query Language
+                    type: string
+                    description: |
+                      When relevant, the language of the shared detection query 
+
+                  query:
+                    title: Detection Query
+                    type: string
+                    description: |
+                      When relevant, the detection query that was shared in the community
+                    tide.template.multiline: True
+
+      correlation:
+        title: Signal Correlation
+        description: |
+          Models how the signals described should be used as part of a final
+          detection implementation
+        type: object
+
+        required:
+          - strategy
+          - description 
+        
+        properties:
+
+          strategy:
+            title: Signal Correlation Strategy
+            description: |
+              Describes how signals should be used - from fully synergetic, to fully separate
+            type: string 
+            tide.vocab: detection.correlation.strategy
+          
+          description:
+            title: Correlation Strategy
+            description: |
+              Technical details about the recommended strategy
+            type: string
+            tide.template.multiline: True

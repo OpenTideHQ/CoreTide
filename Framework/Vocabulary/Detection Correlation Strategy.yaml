@@ -1,0 +1,33 @@
+name: Detection Correlation Strategy
+field: detection.correlation.strategy
+description: Describes how signals should be used in conjuntion, or separated 
+keys:
+  - id: 9fd1e42c-ff0d-468c-988c-8f0571d8f0f9
+    name: Direct
+    description: |
+      No particular correlation performed, one signal triggers one alert
+      which has to be processed as-is. 
+  - id: 9fd1e42c-ff0d-468c-988c-8f0571d8f0f9
+    name: Thresholding
+    description: |
+      Each signal must be considered separately - but only when a certain amount
+      of repeated alerts triggers within a span on time.
+  - id: e9e5a900-8f5a-4c60-9986-055886d22738
+    name: Entity Grouping
+    description: |
+      When the same entity is appearing across alerts raised by signals, 
+      they should be grouped around the entity into a single incident, case,
+      or higher-order alert (alert of alert)
+  - id: 0812b927-9eee-439f-879c-b7cdc6c1bfc5
+    name: Time Sequence
+    description: |
+      Signals must be tracked across time, and correlated based on a succession of events.
+      Particularly useful for weak signals, but which assembled over time with reinforcing
+      signal provide a high fidelity detection - for example, anomalous logons.
+  - id: c5a6f86a-410e-4f98-91b3-ef366101ff7e
+    name: Risk Scoring
+    description: |
+      Advanced strategy where signals contribute a risk score over time to entities
+      in a permanent risk store. This allows weak and strong signals to coexist, while
+      response switch from processing alerts, to process a bundle of contributing signals
+      around a high risk entity. 

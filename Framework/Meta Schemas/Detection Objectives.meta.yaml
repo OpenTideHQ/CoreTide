@@ -25,6 +25,7 @@ properties:
   references:
     tide.meta.definition: true
     tide.template.spacer: true
+    tide.template.spacer: true
 
   metadata:
     tide.template.spacer: true

@@ -1,9 +1,9 @@
 <table align="center"><tr><td align="center" width="9999">
 <img src="coretide-logo.png" align="center" width="150" alt="Project icon">
 
-# The first DetectionOps open platform
+# CoreTide
 
-_Threat Informed Detection Engineering_
+_The Open Source DetectionOps Backend_
 
 </td></tr></table>
 

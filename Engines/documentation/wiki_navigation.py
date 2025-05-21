@@ -57,7 +57,7 @@ NAV_INDEX_FIELDS = {
         "targets",
         "platforms",
         "att&ck",
-        "actors"
+        "actors",
         "cve",
         "impact",
         "leverage",

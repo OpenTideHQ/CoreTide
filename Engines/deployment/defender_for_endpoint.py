@@ -143,10 +143,11 @@ class DefenderForEndpointDeploy(DeployMDR):
         query = mdr_config.query
         if exclusions:=mdr_config.exclusions:
             for exclusion in exclusions:
-                # Applies exclusion if 
+                # Applies exclusion if scoped tenant is matching with ongoing deployment
+                # or if no tenant is specified
                 if (exclusion.tenant == tenant) or (not exclusion.tenant):
                     log("INFO", "Applying exclusion", exclusion.query)
-                    query += "\n" + exclusion.query
+                    query += exclusion.query
         
         log("INFO", "Final compiled query")
         print(query)

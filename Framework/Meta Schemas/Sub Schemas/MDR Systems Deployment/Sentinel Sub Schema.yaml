@@ -361,7 +361,7 @@ properties:
                 - CloudApplication
                 - DNS
                 - File
-                - FileHas
+                - FileHash
                 - Host
                 - IP
                 - MailCluster

@@ -70,6 +70,28 @@ FOLDABLE = """
 </details>
 """.strip()
     
+def fetch_logsources()->None|dict[str, str]:
+    logsources = DataTide.Configurations.Logsources.logsources
+    if not logsources:
+        return None 
+    logsources_entries = {}
+    for logsource in logsources:
+        base_logsource = {}
+        events_logsource = {}
+        if tenants:=logsource.tenants:
+            for tenant in tenants:
+                base_logsource[logsource.system + "::" + tenant + "::" + logsource.name] = logsource.description
+        else:
+            base_logsource[logsource.system + logsource.name] = logsource.description
+        if events:=logsource.events:
+            for event in events:
+                for base in base_logsource:
+                    events_logsource[base + "::" + event] = logsource.description
+
+        logsources_entries.update(base_logsource)
+        logsources_entries.update(events_logsource)
+    
+    return logsources_entries
 
 def fetch_config_parameter_list(dot_path:str)->list:
     config_index = DataTide.Configurations.Index
@@ -527,6 +549,14 @@ def gen_json_schema(dictionary):
 
                 # Handles the case when a list of values has to be fetched from
                 # the configuration files.
+                if dict_foo[field].get("tide.config.logsources"):
+                    values_list = fetch_logsources()
+                    if values_list:
+                        dictionary[field]["items"] = {}
+                        dictionary[field]["items"]["enum"] = [log for log in values_list.keys()]
+                        dictionary[field]["items"]["markdownEnumDescriptions"] = [description for description in values_list.values()]
+                        dictionary[field]["items"]["uniqueItems"] = True
+
                 if config_fetch:=dict_foo[field].get("tide.config.parameter-list"):
                     values_list = fetch_config_parameter_list(config_fetch)
                     if dict_foo[field].get("type") == "string":

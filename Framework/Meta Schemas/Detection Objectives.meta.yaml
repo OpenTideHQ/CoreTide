@@ -25,6 +25,7 @@ properties:
 
   references:
     tide.meta.definition: true
+    tide.template.spacer: true
 
   metadata:
     tide.template.spacer: true
@@ -163,7 +164,8 @@ properties:
               description: |
                 Modelling of the required data to implement the signal 
               type: object
-              
+              tide.template.spacer: False
+
               required:
                 - availability
                 - requirements
@@ -188,12 +190,14 @@ properties:
                     Technical details of the required data
                   type: string
                   tide.template.multiline: True
+                  tide.template.required: True
 
                 logsources:
                   title: Possible Logsources
                   description: |
                     Existing, available logsources which cover the data requirements for the signal
                   type: array
+                  tide.config.logsources: True
                   items:
                     type: string
 
@@ -202,7 +206,7 @@ properties:
               description: |
                 Entities that the signal is using to perform its detection.
                 Particularly useful to know for alert processing, entity grouping etc.
-              #TODO : Entity Vocab
+              tide.vocab: signal.entities
               type: array
               items:
                 type: string 

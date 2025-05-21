@@ -19,7 +19,8 @@ from Engines.modules.models import (DetectionSystems,
                                     TideModels,
                                     TideDefinitionsModels,
                                     TideConfigs,
-                                    SystemConfig)
+                                    SystemConfig,
+                                    Configurations)
 from Engines.modules.patching import Tide2Patching
 
 ROOT = Path(str(git.Repo(".", search_parent_directories=True).working_dir))
@@ -400,6 +401,17 @@ class SystemLoader:
 
 
 class TideLoader:
+
+    @staticmethod
+    def load_logsources(config:dict)->Sequence[Configurations.Logsource]|None:
+        logsources_config = config.get("logsource")
+        if not logsources_config:
+            return None
+        else:
+            logsources = [] 
+            for logsource in logsources_config:
+                logsources.append(Configurations.Logsource(**logsource))
+            return logsources
 
     @staticmethod
     def load_mdr(mdr:dict)->TideModels.MDR:
@@ -828,6 +840,11 @@ class DataTide:
             Index = dict(IndexTide.load()["configurations"]["lookups"])
             validation = dict(Index["validation"])
 
+        @dataclass(frozen=True)
+        class Logsources:
+            """OpenTide instance logsource definition"""
+            Index = dict(IndexTide.load()["configurations"]["logsources"])
+            logsources = TideLoader.load_logsources(Index)
         """TIDE Configuration Interface.
 
         Exposes all the configurations of the instance

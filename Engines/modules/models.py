@@ -75,6 +75,19 @@ class DeploymentStrategy(Enum):
 
         return DEPLOYMENT_PLAN
 
+@dataclass
+class Configurations:
+
+    @dataclass
+    class Logsource:
+        name: str
+        description: str
+        system: str
+        tenants: Optional[Sequence[str]] = None
+        references: Optional[Sequence[str]] = None
+        scopes: Optional[Sequence[str]] = None
+        events: Optional[Sequence[str]] = None
+
 
 @dataclass
 class SystemConfig:

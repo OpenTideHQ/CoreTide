@@ -207,6 +207,7 @@ properties:
                 Entities that the signal is using to perform its detection.
                 Particularly useful to know for alert processing, entity grouping etc.
               tide.vocab: signal.entities
+              tide.vocab.scoped: true
               type: array
               items:
                 type: string 

@@ -213,14 +213,30 @@ def chaining_graph(tvm):
     graph_properties = {
         "cve": {"relation": "exploits", "direction": "to", "shape": "flag"},
         "platforms": {"relation": "targets", "direction": "to", "shape": "database"},
+        "actors" : {"relation" : "performs", "direction": "from", "shape": "hexagon"}  
     }
 
     properties_node_graph = []
     properties_link_graph = []
     for prop in graph_properties:
         for v in header:
-            data = model_value(v, prop)
+            data = model_value(v, prop)            
             if data:
+                # Processing and cleaning up actors for graph display
+                if prop == "actors":
+                    if type(data[0]) is dict:
+                        clean_data = []
+                        for actor in data:
+                            actor_name = get_vocab_entry("actors", actor.get("name").split("::")[1], "name")
+                            actor_name = actor_name.replace("[Enterprise]", "")
+                            actor_name = actor_name.replace("[Mobile]", "")
+                            actor_name = actor_name.replace("[ICS]", "")
+                            actor_name = actor_name.strip()
+                            clean_data.append(actor_name)   
+                        data = clean_data
+                    else:
+                        continue  
+
                 for value in data:
                     if (
                         value != "Unknown"
@@ -236,6 +252,8 @@ def chaining_graph(tvm):
                         elif shape == "pill":
                             node = f"{value.replace(' ', '')}([{value}])"
                         # Append new shapes from this code block
+                        elif shape == "hexagon":
+                            node = f"{value.replace(' ', '')}" + '{{' + value + '}}'
 
                         if node not in properties_node_graph:
                             properties_node_graph.append(node)

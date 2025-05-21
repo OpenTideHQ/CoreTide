@@ -57,6 +57,7 @@ NAV_INDEX_FIELDS = {
         "targets",
         "platforms",
         "att&ck",
+        "actors"
         "cve",
         "impact",
         "leverage",
@@ -160,6 +161,16 @@ def build_search(model_type, mdr_status:Optional[Literal["ACTIVE", "DEPRECATED"]
                     implementations.append(title)
 
                 row[implementation_column] = " // ".join(implementations)
+
+            elif model_type == "tvm":
+                if value == "actors":
+                    actors_list = []
+                    actors = model_value_doc(entry, "actors") or []
+                    for actor in actors:
+                        if type(actor) is dict:
+                            actors_list.append(actor.get("name"))
+                    actors_list = ", ".join(actors_list)
+                    row[value] = actors
 
             elif model_type == "cdm" and value == "att&ck":
                 techniques = ", ".join(techniques_resolver(entry))

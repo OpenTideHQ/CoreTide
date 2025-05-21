@@ -197,7 +197,6 @@ keys:
       - NOBELIUM
       - NobleBaron
       - SolarStorm
-      - StellarParticle
       - The Dukes
       - UNC2452
       - UNC3524
@@ -339,11 +338,14 @@ keys:
     description: '[APT41](https://attack.mitre.org/groups/G0096) is a threat group
       that researchers have assessed as Chinese state-sponsored espionage group that
       also conducts financially-motivated operations. Active since at least 2012,
-      [APT41](https://attack.mitre.org/groups/G0096) has been observed targeting healthcare,
-      telecom, technology, and video game industries in 14 countries. [APT41](https://attack.mitre.org/groups/G0096)
-      overlaps at least partially with public reporting on groups including BARIUM
-      and [Winnti Group](https://attack.mitre.org/groups/G0044).(Citation: FireEye
-      APT41 Aug 2019)(Citation: Group IB APT 41 June 2021)
+      [APT41](https://attack.mitre.org/groups/G0096) has been observed targeting various
+      industries, including but not limited to healthcare, telecom, technology, finance,
+      education, retail and video game industries in 14 countries.(Citation: apt41_mandiant)
+      Notable behaviors include using a wide range of malware and tools to complete
+      mission objectives. [APT41](https://attack.mitre.org/groups/G0096) overlaps
+      at least partially with public reporting on groups including BARIUM and [Winnti
+      Group](https://attack.mitre.org/groups/G0044).(Citation: FireEye APT41 Aug 2019)(Citation:
+      Group IB APT 41 June 2021)
 
       '
     link: https://attack.mitre.org/groups/G0096
@@ -372,6 +374,21 @@ keys:
       - MANGANESE
       - Mulberry Typhoon
       - UNC2630
+    tide.vocab.stages: att&ck
+  - id: G1030
+    description: '[Agrius](https://attack.mitre.org/groups/G1030) is an Iranian threat
+      actor active since 2020 notable for a series of ransomware and wiper operations
+      in the Middle East, with an emphasis on Israeli targets.(Citation: SentinelOne
+      Agrius 2021)(Citation: CheckPoint Agrius 2023) Public reporting has linked [Agrius](https://attack.mitre.org/groups/G1030)
+      to Iran''s Ministry of Intelligence and Security (MOIS).(Citation: Microsoft
+      Iran Cyber 2023)'
+    link: https://attack.mitre.org/groups/G1030
+    name: '[Enterprise] Agrius'
+    alias:
+      - AMERICIUM
+      - Agonizing Serpens
+      - BlackShadow
+      - Pink Sandstorm
     tide.vocab.stages: att&ck
   - id: G0130
     description: '[Ajax Security Team](https://attack.mitre.org/groups/G0130) is a
@@ -545,18 +562,22 @@ keys:
     tide.vocab.stages: att&ck
   - id: G1012
     description: '[CURIUM](https://attack.mitre.org/groups/G1012) is an Iranian threat
-      group first reported in November 2021 that has invested in building a relationship
-      with potential targets via social media over a period of months to establish
-      trust and confidence before sending malware. Security researchers note [CURIUM](https://attack.mitre.org/groups/G1012)
-      has demonstrated great patience and persistence by chatting with potential targets
-      daily and sending benign files to help lower their security consciousness.(Citation:
-      Microsoft Iranian Threat Actor Trends November 2021)'
+      group, first reported in September 2019 and active since at least July 2018,
+      targeting IT service providers in the Middle East.(Citation: Symantec Tortoiseshell
+      2019) [CURIUM](https://attack.mitre.org/groups/G1012) has since invested in
+      building relationships with potential targets via social media over a period
+      of months to establish trust and confidence before sending malware. Security
+      researchers note [CURIUM](https://attack.mitre.org/groups/G1012) has demonstrated
+      great patience and persistence by chatting with potential targets daily and
+      sending benign files to help lower their security consciousness.(Citation: Microsoft
+      Iranian Threat Actor Trends November 2021)'
     link: https://attack.mitre.org/groups/G1012
     name: '[Enterprise] CURIUM'
     alias:
       - Crimson Sandstorm
       - TA456
       - Tortoise Shell
+      - Yellow Liderc
     tide.vocab.stages: att&ck
   - id: G0008
     description: '[Carbanak](https://attack.mitre.org/groups/G0008) is a cybercriminal
@@ -658,6 +679,21 @@ keys:
       CopyKittens Nov 2015)'
     link: https://attack.mitre.org/groups/G0052
     name: '[Enterprise] CopyKittens'
+    tide.vocab.stages: att&ck
+  - id: G1034
+    description: '[Daggerfly](https://attack.mitre.org/groups/G1034) is a People''s
+      Republic of China-linked APT entity active since at least 2012. [Daggerfly](https://attack.mitre.org/groups/G1034)
+      has targeted individuals, government and NGO entities, and telecommunication
+      companies in Asia and Africa. [Daggerfly](https://attack.mitre.org/groups/G1034)
+      is associated with exclusive use of [MgBot](https://attack.mitre.org/software/S1146)
+      malware and is noted for several potential supply chain infection campaigns.(Citation:
+      Symantec Daggerfly 2023)(Citation: ESET EvasivePanda 2023)(Citation: Symantec
+      Daggerfly 2024)(Citation: ESET EvasivePanda 2024)'
+    link: https://attack.mitre.org/groups/G1034
+    name: '[Enterprise] Daggerfly'
+    alias:
+      - BRONZE HIGHLAND
+      - Evasive Panda
     tide.vocab.stages: att&ck
   - id: G0070
     description: '[Dark Caracal](https://attack.mitre.org/groups/G0070) is threat
@@ -809,23 +845,29 @@ keys:
       - Sneaky Panda
     tide.vocab.stages: att&ck
   - id: G1003
-    description: '[Ember Bear](https://attack.mitre.org/groups/G1003) is a suspected
-      Russian state-sponsored cyber espionage group that has been active since at
-      least March 2021. [Ember Bear](https://attack.mitre.org/groups/G1003) has primarily
-      focused their operations against Ukraine and Georgia, but has also targeted
-      Western European and North American foreign ministries, pharmaceutical companies,
-      and financial sector organizations. Security researchers assess [Ember Bear](https://attack.mitre.org/groups/G1003)
-      likely conducted the [WhisperGate](https://attack.mitre.org/software/S0689)
-      destructive wiper attacks against Ukraine in early 2022.(Citation: CrowdStrike
-      Ember Bear Profile March 2022)(Citation: Mandiant UNC2589 March 2022)(Citation:
-      Palo Alto Unit 42 OutSteel SaintBot February 2022 ) '
+    description: '[Ember Bear](https://attack.mitre.org/groups/G1003) is a Russian
+      state-sponsored cyber espionage group that has been active since at least 2020,
+      linked to Russia''s General Staff Main Intelligence Directorate (GRU) 161st
+      Specialist Training Center (Unit 29155).(Citation: CISA GRU29155 2024) [Ember
+      Bear](https://attack.mitre.org/groups/G1003) has primarily focused operations
+      against Ukrainian government and telecommunication entities, but has also operated
+      against critical infrastructure entities in Europe and the Americas.(Citation:
+      Cadet Blizzard emerges as novel threat actor) [Ember Bear](https://attack.mitre.org/groups/G1003)
+      conducted the [WhisperGate](https://attack.mitre.org/software/S0689) destructive
+      wiper attacks against Ukraine in early 2022.(Citation: CrowdStrike Ember Bear
+      Profile March 2022)(Citation: Mandiant UNC2589 March 2022)(Citation: CISA GRU29155
+      2024) There is some confusion as to whether [Ember Bear](https://attack.mitre.org/groups/G1003)
+      overlaps with another Russian-linked entity referred to as [Saint Bear](https://attack.mitre.org/groups/G1031).
+      At present available evidence strongly suggests these are distinct activities
+      with different behavioral profiles.(Citation: Cadet Blizzard emerges as novel
+      threat actor)(Citation: Palo Alto Unit 42 OutSteel SaintBot February 2022 )'
     link: https://attack.mitre.org/groups/G1003
     name: '[Enterprise] Ember Bear'
     alias:
       - Bleeding Bear
-      - Lorec Bear
-      - Lorec53
-      - Saint Bear
+      - Cadet Blizzard
+      - DEV-0586
+      - Frozenvista
       - UAC-0056
       - UNC2589
     tide.vocab.stages: att&ck
@@ -1102,6 +1144,19 @@ keys:
     link: https://attack.mitre.org/groups/G0126
     name: '[Enterprise] Higaisa'
     tide.vocab.stages: att&ck
+  - id: G1032
+    description: '[INC Ransom](https://attack.mitre.org/groups/G1032) is a ransomware
+      and data extortion threat group associated with the deployment of [INC Ransomware](https://attack.mitre.org/software/S1139)
+      that has been active since at least July 2023. [INC Ransom](https://attack.mitre.org/groups/G1032)  has
+      targeted organizations worldwide most commonly in the industrial, healthcare,
+      and education sectors in the US and Europe.(Citation: Bleeping Computer INC
+      Ransomware March 2024)(Citation: Cybereason INC Ransomware November 2023)(Citation:
+      Secureworks GOLD IONIC April 2024)(Citation: SentinelOne INC Ransomware)'
+    link: https://attack.mitre.org/groups/G1032
+    name: '[Enterprise] INC Ransom'
+    alias:
+      - GOLD IONIC
+    tide.vocab.stages: att&ck
   - id: G0100
     description: '[Inception](https://attack.mitre.org/groups/G0100) is a cyber espionage
       group active since at least 2014. The group has targeted multiple industries
@@ -1139,6 +1194,7 @@ keys:
       - DEV-0243
       - Evil Corp
       - Manatee Tempest
+      - UNC2165
     tide.vocab.stages: att&ck
   - id: G0004
     description: '[Ke3chang](https://attack.mitre.org/groups/G0004) is a threat group
@@ -1165,12 +1221,16 @@ keys:
       cyber espionage group that has been active since at least 2012. The group initially
       focused on targeting South Korean government entities, think tanks, and individuals
       identified as experts in various fields, and expanded its operations to include
-      the United States, Russia, Europe, and the UN. [Kimsuky](https://attack.mitre.org/groups/G0094)
+      the UN and the government, education, business services, and manufacturing sectors
+      in the United States, Japan, Russia, and Europe. [Kimsuky](https://attack.mitre.org/groups/G0094)
       has focused its intelligence collection activities on foreign policy and national
-      security issues related to the Korean peninsula, nuclear policy, and sanctions.(Citation:
-      EST Kimsuky April 2019)(Citation: BRI Kimsuky April 2019)(Citation: Cybereason
-      Kimsuky November 2020)(Citation: Malwarebytes Kimsuky June 2021)(Citation: CISA
-      AA20-301A Kimsuky)
+      security issues related to the Korean peninsula, nuclear policy, and sanctions.
+      [Kimsuky](https://attack.mitre.org/groups/G0094) operations have overlapped
+      with those of other North Korean cyber espionage actors likely as a result of
+      ad hoc collaborations or other limited resource sharing.(Citation: EST Kimsuky
+      April 2019)(Citation: Cybereason Kimsuky November 2020)(Citation: Malwarebytes
+      Kimsuky June 2021)(Citation: CISA AA20-301A Kimsuky)(Citation: Mandiant APT43
+      March 2024)(Citation: Proofpoint TA427 April 2024)
 
 
       [Kimsuky](https://attack.mitre.org/groups/G0094) was assessed to be responsible
@@ -1187,8 +1247,10 @@ keys:
     link: https://attack.mitre.org/groups/G0094
     name: '[Enterprise] Kimsuky'
     alias:
+      - APT43
       - Black Banshee
       - Emerald Sleet
+      - TA427
       - THALLIUM
       - Velvet Chollima
     tide.vocab.stages: att&ck
@@ -1391,6 +1453,20 @@ keys:
       - Gaza Cybergang
       - Operation Molerats
     tide.vocab.stages: att&ck
+  - id: G1036
+    description: '[Moonstone Sleet](https://attack.mitre.org/groups/G1036) is a North
+      Korean-linked threat actor executing both financially motivated attacks and
+      espionage operations. The group previously overlapped significantly with another
+      North Korean-linked entity, [Lazarus Group](https://attack.mitre.org/groups/G0032),
+      but has differentiated its tradecraft since 2023. [Moonstone Sleet](https://attack.mitre.org/groups/G1036)
+      is notable for creating fake companies and personas to interact with victim
+      entities, as well as developing unique malware such as a variant delivered via
+      a fully functioning game.(Citation: Microsoft Moonstone Sleet 2024)'
+    link: https://attack.mitre.org/groups/G1036
+    name: '[Enterprise] Moonstone Sleet'
+    alias:
+      - Storm-1789
+    tide.vocab.stages: att&ck
   - id: G1009
     description: "[Moses Staff](https://attack.mitre.org/groups/G1009) is a suspected\
       \ Iranian threat group that has primarily targeted Israeli companies since at\
@@ -1540,6 +1616,7 @@ keys:
       - Hazel Sandstorm
       - Helix Kitten
       - IRN2
+      - ITG13
     tide.vocab.stages: att&ck
   - id: G0071
     description: '[Orangeworm](https://attack.mitre.org/groups/G0071) is a group that
@@ -1615,6 +1692,18 @@ keys:
     link: https://attack.mitre.org/groups/G0011
     name: '[Enterprise] PittyTiger'
     tide.vocab.stages: att&ck
+  - id: G1040
+    description: '[Play](https://attack.mitre.org/groups/G1040) is a ransomware group
+      that has been active since at least 2022 deploying  [Playcrypt](https://attack.mitre.org/software/S1162)
+      ransomware against the business, government, critical infrastructure, healthcare,
+      and media sectors in North America, South America, and Europe. [Play](https://attack.mitre.org/groups/G1040)
+      actors employ a double-extortion model, encrypting systems after exfiltrating
+      data, and are presumed by security researchers to operate as a closed group.(Citation:
+      CISA Play Ransomware Advisory December 2023)(Citation: Trend Micro Ransomware
+      Spotlight Play July 2023)'
+    link: https://attack.mitre.org/groups/G1040
+    name: '[Enterprise] Play'
+    tide.vocab.stages: att&ck
   - id: G0033
     description: '[Poseidon Group](https://attack.mitre.org/groups/G0033) is a Portuguese-speaking
       threat group that has been active since at least 2005. The group has a history
@@ -1651,6 +1740,20 @@ keys:
     link: https://attack.mitre.org/groups/G0075
     name: '[Enterprise] Rancor'
     tide.vocab.stages: att&ck
+  - id: G1039
+    description: '[RedCurl](https://attack.mitre.org/groups/G1039) is a threat actor
+      active since 2018 notable for corporate espionage targeting a variety of locations,
+      including Ukraine, Canada and the United Kingdom, and a variety of industries,
+      including but not limited to travel agencies, insurance companies, and banks.(Citation:
+      group-ib_redcurl1) [RedCurl](https://attack.mitre.org/groups/G1039) is allegedly
+      a Russian-speaking threat actor.(Citation: group-ib_redcurl1)(Citation: group-ib_redcurl2)
+      The group’s operations typically start with spearphishing emails to gain initial
+      access, then the group executes discovery and collection commands and scripts
+      to find corporate data. The group concludes operations by exfiltrating files
+      to the C2 servers. '
+    link: https://attack.mitre.org/groups/G1039
+    name: '[Enterprise] RedCurl'
+    tide.vocab.stages: att&ck
   - id: G0106
     description: '[Rocke](https://attack.mitre.org/groups/G0106) is an alleged Chinese-speaking
       adversary whose primary objective appeared to be cryptojacking, or stealing
@@ -1662,6 +1765,27 @@ keys:
       Talos Rocke August 2018)'
     link: https://attack.mitre.org/groups/G0106
     name: '[Enterprise] Rocke'
+    tide.vocab.stages: att&ck
+  - id: G1031
+    description: '[Saint Bear](https://attack.mitre.org/groups/G1031) is a Russian-nexus
+      threat actor active since early 2021, primarily targeting entities in Ukraine
+      and Georgia. The group is notable for a specific remote access tool, [Saint
+      Bot](https://attack.mitre.org/software/S1018), and information stealer, [OutSteel](https://attack.mitre.org/software/S1017)
+      in campaigns. [Saint Bear](https://attack.mitre.org/groups/G1031) typically
+      relies on phishing or web staging of malicious documents and related file types
+      for initial access, spoofing government or related entities.(Citation: Palo
+      Alto Unit 42 OutSteel SaintBot February 2022 )(Citation: Cadet Blizzard emerges
+      as novel threat actor) [Saint Bear](https://attack.mitre.org/groups/G1031) has
+      previously been confused with [Ember Bear](https://attack.mitre.org/groups/G1003)
+      operations, but analysis of behaviors, tools, and targeting indicates these
+      are distinct clusters.'
+    link: https://attack.mitre.org/groups/G1031
+    name: '[Enterprise] Saint Bear'
+    alias:
+      - Lorec53
+      - Storm-0587
+      - TA471
+      - UAC-0056
     tide.vocab.stages: att&ck
   - id: G0034
     description: '[Sandworm Team](https://attack.mitre.org/groups/G0034) is a destructive
@@ -1688,6 +1812,7 @@ keys:
     link: https://attack.mitre.org/groups/G0034
     name: '[Enterprise] Sandworm Team'
     alias:
+      - APT44
       - BlackEnergy (Group)
       - ELECTRUM
       - FROZENBARENTS
@@ -1799,6 +1924,25 @@ keys:
     link: https://attack.mitre.org/groups/G0054
     name: '[Enterprise] Sowbug'
     tide.vocab.stages: att&ck
+  - id: G1033
+    description: '[Star Blizzard](https://attack.mitre.org/groups/G1033) is a cyber
+      espionage and influence group originating in Russia that has been active since
+      at least 2019. [Star Blizzard](https://attack.mitre.org/groups/G1033) campaigns
+      align closely with Russian state interests and have included persistent phishing
+      and credential theft against academic, defense, government, NGO, and think tank
+      organizations in NATO countries, particularly the US and the UK.(Citation: Microsoft
+      Star Blizzard August 2022)(Citation: CISA Star Blizzard Advisory December 2023)(Citation:
+      StarBlizzard)(Citation: Google TAG COLDRIVER January 2024)
+
+      '
+    link: https://attack.mitre.org/groups/G1033
+    name: '[Enterprise] Star Blizzard'
+    alias:
+      - COLDRIVER
+      - Callisto Group
+      - SEABORGIUM
+      - TA446
+    tide.vocab.stages: att&ck
   - id: G0038
     description: '[Stealth Falcon](https://attack.mitre.org/groups/G0038) is a threat
       group that has conducted targeted spyware attacks against Emirati journalists,
@@ -1869,6 +2013,24 @@ keys:
     alias:
       - GOLD CABIN
       - Shathak
+    tide.vocab.stages: att&ck
+  - id: G1037
+    description: '[TA577](https://attack.mitre.org/groups/G1037) is an initial access
+      broker (IAB) that has distributed [QakBot](https://attack.mitre.org/software/S0650)
+      and [Pikabot](https://attack.mitre.org/software/S1145), and was among the first
+      observed groups distributing [Latrodectus](https://attack.mitre.org/software/S1160)
+      in 2023.(Citation: Latrodectus APR 2024)'
+    link: https://attack.mitre.org/groups/G1037
+    name: '[Enterprise] TA577'
+    tide.vocab.stages: att&ck
+  - id: G1038
+    description: '[TA578](https://attack.mitre.org/groups/G1038) is a threat actor
+      that has used contact forms and email to initiate communications with victims
+      and to distribute malware including [Latrodectus](https://attack.mitre.org/software/S1160),
+      [IcedID](https://attack.mitre.org/software/S0483), and [Bumblebee](https://attack.mitre.org/software/S1039).(Citation:
+      Latrodectus APR 2024)(Citation: Bitsight Latrodectus June 2024)'
+    link: https://attack.mitre.org/groups/G1038
+    name: '[Enterprise] TA578'
     tide.vocab.stages: att&ck
   - id: G0088
     description: '[TEMP.Veles](https://attack.mitre.org/groups/G0088) is a Russia-based
@@ -2034,17 +2196,25 @@ keys:
   - id: G1017
     description: '[Volt Typhoon](https://attack.mitre.org/groups/G1017) is a People''s
       Republic of China (PRC) state-sponsored actor that has been active since at
-      least 2021. [Volt Typhoon](https://attack.mitre.org/groups/G1017) typically
-      focuses on espionage and information gathering and has targeted critical infrastructure
-      organizations in the US including Guam. [Volt Typhoon](https://attack.mitre.org/groups/G1017)
+      least 2021 primarily targeting critical infrastructure organizations in the
+      US and its territories including Guam. [Volt Typhoon](https://attack.mitre.org/groups/G1017)''s
+      targeting and pattern of behavior have been assessed as pre-positioning to enable
+      lateral movement to operational technology (OT) assets for potential destructive
+      or disruptive attacks. [Volt Typhoon](https://attack.mitre.org/groups/G1017)
       has emphasized stealth in operations using web shells, living-off-the-land (LOTL)
-      binaries, hands on keyboard activities, and stolen credentials.(Citation: Microsoft
-      Volt Typhoon May 2023)(Citation: Joint Cybersecurity Advisory Volt Typhoon June
-      2023)(Citation: Secureworks BRONZE SILHOUETTE May 2023)'
+      binaries, hands on keyboard activities, and stolen credentials.(Citation: CISA
+      AA24-038A PRC Critical Infrastructure February 2024)(Citation: Microsoft Volt
+      Typhoon May 2023)(Citation: Joint Cybersecurity Advisory Volt Typhoon June 2023)(Citation:
+      Secureworks BRONZE SILHOUETTE May 2023)'
     link: https://attack.mitre.org/groups/G1017
     name: '[Enterprise] Volt Typhoon'
     alias:
       - BRONZE SILHOUETTE
+      - DEV-0391
+      - Insidious Taurus
+      - UNC3236
+      - Vanguard Panda
+      - Voltzite
     tide.vocab.stages: att&ck
   - id: G0090
     description: '[WIRTE](https://attack.mitre.org/groups/G0090) is a threat group
@@ -2100,6 +2270,21 @@ keys:
     name: '[Enterprise] Winnti Group'
     alias:
       - Blackfly
+    tide.vocab.stages: att&ck
+  - id: G1035
+    description: 'Winter Vivern is a group linked to Russian and Belorussian interests
+      active since at least 2020 targeting various European government and NGO entities,
+      along with sporadic targeting of Indian and US victims. The group leverages
+      a combination of document-based phishing activity and server-side exploitation
+      for initial access, leveraging adversary-controlled and -created infrastructure
+      for follow-on command and control.(Citation: DomainTools WinterVivern 2021)(Citation:
+      SentinelOne WinterVivern 2023)(Citation: CERT-UA WinterVivern 2023)(Citation:
+      ESET WinterVivern 2023)(Citation: Proofpoint WinterVivern 2023)'
+    link: https://attack.mitre.org/groups/G1035
+    name: '[Enterprise] Winter Vivern'
+    alias:
+      - TA473
+      - UAC-0114
     tide.vocab.stages: att&ck
   - id: G0102
     description: '[Wizard Spider](https://attack.mitre.org/groups/G0102) is a Russia-based
@@ -2401,6 +2586,7 @@ keys:
       - Hazel Sandstorm
       - Helix Kitten
       - IRN2
+      - ITG13
     tide.vocab.stages: att&ck
   - id: G0034
     description: '[Sandworm Team](https://attack.mitre.org/groups/G0034) is a destructive
@@ -2427,6 +2613,7 @@ keys:
     link: https://attack.mitre.org/groups/G0034
     name: '[ICS] Sandworm Team'
     alias:
+      - APT44
       - BlackEnergy (Group)
       - ELECTRUM
       - FROZENBARENTS
@@ -2642,6 +2829,7 @@ keys:
     link: https://attack.mitre.org/groups/G0034
     name: '[Mobile] Sandworm Team'
     alias:
+      - APT44
       - BlackEnergy (Group)
       - ELECTRUM
       - FROZENBARENTS
@@ -2699,6 +2887,18 @@ keys:
       Unit Cover Designator (MUCD)[1] of a People''s Liberation Army advanced persistent
       threat unit that has been alleged to be a source of Chinese computer hacking
       attacks'
+    alias:
+      - COMMENT PANDA
+      - PLA Unit 61398
+      - Comment Crew
+      - Byzantine Candor
+      - Group 3
+      - TG-8223
+      - Comment Group
+      - Brown Fox
+      - GIF89a
+      - ShadyRAT
+      - G0006
     tide.vocab.stages: misp
   - id: 0b06fb39-ed3d-4868-ac42-12fff6df2c80
     name: Nitro
@@ -2711,16 +2911,22 @@ keys:
       of our investigations, we were also able to identify and contact one of the
       attackers to try and gain insights into the motivations behind these attacks.''
       Palo Alto Networks reported on continued activity by the attackers in 2014. '
+    alias:
+      - Covert Grove
     tide.vocab.stages: misp
   - id: 9e71024e-817f-45b0-92a0-d886c30bc929
     name: Dust Storm
     description: Threat actors behind the Operation Dust Storm have been active since
       at least 2010, the hackers targeted several organizations in Japan, South Korea,
       the US, Europe, and other Asian countries.
+    alias:
+      - G0031
     tide.vocab.stages: misp
   - id: ba8973b2-fd97-4aa7-9307-ea4838d96428
     name: WET PANDA
     description: null
+    alias:
+      - Red Chimera
     tide.vocab.stages: misp
   - id: 41c15f08-a646-49f7-a644-1bebbf7a4dcd
     name: FOXY PANDA
@@ -2745,6 +2951,8 @@ keys:
   - id: 8a8f39df-74b3-4946-ab64-f84968bababe
     name: DIZZY PANDA
     description: null
+    alias:
+      - LadyBoyle
     tide.vocab.stages: misp
   - id: 6714de29-4dd8-463c-99a3-77c9e80fa47d
     name: Grayling
@@ -2763,6 +2971,15 @@ keys:
       unit since2012, under the codename PUTTER PANDA, and has documented activity
       dating back to 2007. The report identifies Chen Ping, aka cpyy, and the primary
       location of Unit 61486.'''
+    alias:
+      - PLA Unit 61486
+      - PUTTER PANDA
+      - MSUpdater
+      - 4HCrew
+      - SULPHUR
+      - SearchFire
+      - TG-6952
+      - G0024
     tide.vocab.stages: misp
   - id: d144c83e-2302-4947-9e24-856fbf7949ae
     name: APT3
@@ -2772,6 +2989,16 @@ keys:
       the group attacked organizations in the US as well as other targets. However,
       Buckeyes focus appears to have changed as of June 2015, when the group began
       compromising political entities in Hong Kong.'''
+    alias:
+      - GOTHIC PANDA
+      - TG-0110
+      - Group 6
+      - UPS
+      - Buckeye
+      - Boyusec
+      - BORON
+      - BRONZE MAYFAIR
+      - Red Sylvan
     tide.vocab.stages: misp
   - id: b8c8b96d-61e6-47b1-8e38-fd8ad5d9854d
     name: DarkHotel
@@ -2782,11 +3009,39 @@ keys:
       spreading tactics. Moreover, this crews most unusual characteristic is that
       for several years the Darkhotel APT has maintained a capability to use hotel
       networks to follow and hit selected targets as they travel around the world.'''
+    alias:
+      - DUBNIUM
+      - Fallout Team
+      - Karba
+      - Luder
+      - Nemim
+      - Nemin
+      - Tapaoux
+      - Pioneer
+      - Shadow Crane
+      - APT-C-06
+      - SIG25
+      - TUNGSTEN BRIDGE
+      - T-APT-02
+      - G0012
+      - ATK52
+      - Zigzag Hail
     tide.vocab.stages: misp
   - id: 48146604-6693-4db1-bd94-159744726514
     name: APT12
     description: A group of China-based attackers, who conducted a number of spear
       phishing attacks in 2013.
+    alias:
+      - NUMBERED PANDA
+      - TG-2754
+      - BeeBus
+      - Group 22
+      - DynCalc
+      - Calc Team
+      - DNSCalc
+      - Crimson Iron
+      - IXESHE
+      - BRONZE GLOBE
     tide.vocab.stages: misp
   - id: 1f73e14f-b882-4032-a565-26dc653b0daf
     name: APT16
@@ -2799,6 +3054,9 @@ keys:
       successful exploitation of both vulnerabilities led to the delivery of either
       a downloader that we refer to as IRONHALO, or a backdoor that we refer to as
       ELMER.
+    alias:
+      - SVCMONDR
+      - G0023
     tide.vocab.stages: misp
   - id: 99e30d89-9361-4b73-a999-9e5ff9320bcb
     name: APT17
@@ -2807,6 +3065,18 @@ keys:
       conducting network intrusions against U.S. government entities, the defense
       industry, law firms, information technology companies, mining companies, and
       non-government organizations.'''
+    alias:
+      - Group 8
+      - AURORA PANDA
+      - Hidden Lynx
+      - Tailgater Team
+      - Dogfish
+      - BRONZE KEYSTONE
+      - G0025
+      - Group 72
+      - G0001
+      - Axiom
+      - HELIUM
     tide.vocab.stages: misp
   - id: 9a683d9c-8f7d-43df-bba2-ad0ca71e277c
     name: APT18
@@ -2816,10 +3086,32 @@ keys:
       group is known to leverage recently released exploits very shortly after those
       exploits are available, such as in the case of HackingTeams Flash zero - day
       exploit.'''
+    alias:
+      - DYNAMITE PANDA
+      - TG-0416
+      - SCANDIUM
+      - PLA Navy
+      - Wekby
+      - G0026
     tide.vocab.stages: misp
   - id: 066d25c1-71bd-4bd4-8ca7-edbba00063f4
     name: APT19
     description: Adversary group targeting financial, technology, non-profit organisations.
+    alias:
+      - DEEP PANDA
+      - Codoso
+      - WebMasters
+      - KungFu Kittens
+      - Black Vine
+      - TEMP.Avengers
+      - Group 13
+      - PinkPanther
+      - Shell Crew
+      - BRONZE FIRESTONE
+      - G0009
+      - G0073
+      - Pupa
+      - Sunshop Group
     tide.vocab.stages: misp
   - id: 2f1fd017-9df6-4759-91fb-e7039609b5ff
     name: Naikon
@@ -2827,17 +3119,39 @@ keys:
       is mostly active in countries such as the Philippines, Malaysia, Cambodia, Indonesia,
       Vietnam, Myanmar, Singapore, and Nepal, hitting a variety of targets in a very
       opportunistic way.'''
+    alias:
+      - PLA Unit 78020
+      - OVERRIDE PANDA
+      - Camerashy
+      - BRONZE GENEVA
+      - G0019
+      - Naikon
+      - BRONZE STERLING
+      - G0013
     tide.vocab.stages: misp
   - id: d3881afe-f781-4c53-9f68-33487a119a59
     name: APT30
     description: APT30 is a threat group suspected to be associated with the Chinese
       government. While Naikon shares some characteristics with APT30, the two groups
       do not appear to be exact matches
+    alias:
+      - G0013
     tide.vocab.stages: misp
   - id: 32fafa69-fe3c-49db-afd4-aac2664bcf0d
     name: LOTUS PANDA
     description: Lotus Blossom is a threat group that has targeted government and
       military organizations in Southeast Asia.
+    alias:
+      - Spring Dragon
+      - ST Group
+      - DRAGONFISH
+      - BRONZE ELGIN
+      - ATK1
+      - G0030
+      - Red Salamander
+      - Lotus BLossom
+      - Billbug
+      - Lotus Blossom
     tide.vocab.stages: misp
   - id: 0286e80e-b0ed-464f-ad62-beec8536d0cb
     name: HURRICANE PANDA
@@ -2864,6 +3178,21 @@ keys:
     name: APT27
     description: A China-based actor that targets foreign embassies to collect data
       on government, defence, and technology sectors.
+    alias:
+      - GreedyTaotie
+      - TG-3390
+      - EMISSARY PANDA
+      - TEMP.Hippo
+      - Red Phoenix
+      - Budworm
+      - Group 35
+      - ZipToken
+      - Iron Tiger
+      - BRONZE UNION
+      - Lucky Mouse
+      - G0027
+      - Iron Taurus
+      - Earth Smilodon
     tide.vocab.stages: misp
   - id: 56b37b05-72e7-4a89-ba8a-61ce45269a8c
     name: APT10
@@ -2871,6 +3200,21 @@ keys:
       Individual members of menuPass are known to have acted in association with the
       Chinese Ministry of State Security's (MSS) Tianjin State Security Bureau and
       worked for the Huaying Haitai Science and Technology Development Company.
+    alias:
+      - STONE PANDA
+      - Menupass Team
+      - happyyongzi
+      - POTASSIUM
+      - Red Apollo
+      - CVNX
+      - HOGFISH
+      - Cloud Hopper
+      - BRONZE RIVERSIDE
+      - ATK41
+      - G0045
+      - Granite Taurus
+      - TA429
+      - Cicada
     tide.vocab.stages: misp
   - id: af482dde-9e47-48d5-9cb2-cf8f6d6303d3
     name: Hellsing
@@ -2881,11 +3225,29 @@ keys:
   - id: b3714d59-b61e-4713-903a-9b4f04ae7f3d
     name: Night Dragon
     description: null
+    alias:
+      - G0014
     tide.vocab.stages: misp
   - id: 3501fbf2-098f-47e7-be6a-6b0ff5742ce8
     name: APT15
     description: This threat actor uses phishing techniques to compromise the networks
       of foreign ministries of European countries for espionage purposes.
+    alias:
+      - VIXEN PANDA
+      - Ke3Chang
+      - Playful Dragon
+      - Metushy
+      - Lurid
+      - Social Network Team
+      - Royal APT
+      - BRONZE PALACE
+      - BRONZE DAVENPORT
+      - BRONZE IDLEWOOD
+      - NICKEL
+      - G0004
+      - Red Vulture
+      - Nylon Typhoon
+      - Mirage
     tide.vocab.stages: misp
   - id: c82c904f-b3b4-40a2-bf0d-008912953104
     name: APT14
@@ -2899,10 +3261,18 @@ keys:
       \ \nNot surprisingly, embassies and diplomatic missions in the region, foreign\
       \ intelligence services, and foreign governments with space programs were also\
       \ targeted."
+    alias:
+      - ANCHOR PANDA
+      - QAZTeam
+      - ALUMINUM
     tide.vocab.stages: misp
   - id: b80f4788-ccb2-466d-ae16-b397159d907e
     name: APT21
     description: null
+    alias:
+      - HAMMER PANDA
+      - TEMP.Zhenbao
+      - NetTraveler
     tide.vocab.stages: misp
   - id: 32c534b9-abec-4823-b223-a810f897b47b
     name: DAGGER PANDA
@@ -2911,23 +3281,44 @@ keys:
       targets government institutions, military contractors, maritime and shipbuilding
       groups, telecommunications operators, and others, primarily in Japan and South
       Korea.
+    alias:
+      - IceFog
+      - Trident
+      - RedFoxtrot
+      - Red Wendigo
+      - PLA Unit 69010
     tide.vocab.stages: misp
   - id: 4d37813c-b8e9-4e58-a758-03168d8aa189
     name: APT24
     description: The Pitty Tiger group has been active since at least 2011. They have
       been seen using HeartBleed vulnerability in order to directly get valid credentials
+    alias:
+      - PITTY PANDA
+      - G0011
+      - Temp.Pittytiger
     tide.vocab.stages: misp
   - id: 1fb177c1-472a-4147-b7c4-b5269b11703d
     name: Roaming Tiger
     description: null
+    alias:
+      - BRONZE WOODLAND
+      - Rotten Tomato
     tide.vocab.stages: misp
   - id: da754aeb-a86d-4874-b388-d1d2028a56be
     name: Beijing Group
     description: null
+    alias:
+      - SNEAKY PANDA
+      - Elderwood
+      - Elderwood Gang
+      - SIG22
+      - G0066
     tide.vocab.stages: misp
   - id: c92d7d31-cfd9-4309-b6c4-b7eb1e85fa7e
     name: RADIO PANDA
     description: null
+    alias:
+      - Shrouded Crossbow
     tide.vocab.stages: misp
   - id: f33fd440-93ee-41e5-974a-be9343e18cdf
     name: APT.3102
@@ -2936,6 +3327,9 @@ keys:
   - id: 2fb07fa4-0d7f-43c7-8ff4-b28404313fe7
     name: SAMURAI PANDA
     description: null
+    alias:
+      - PLA Navy
+      - Wisp Team
     tide.vocab.stages: misp
   - id: b56ecbda-6b2a-4aa9-b592-d9a0bc810ec1
     name: IMPERSONATING PANDA
@@ -2958,6 +3352,10 @@ keys:
       their intended visitors are likely to frequent. Over the summer they compromised
       several sites, including a well-known Uyghur website written in that native
       language.'
+    alias:
+      - VIOLIN PANDA
+      - TH3Bug
+      - Crawling Taurus
     tide.vocab.stages: misp
   - id: 1514546d-f6ea-4af3-bbea-24d6fd9e6761
     name: TOXIC PANDA
@@ -2971,6 +3369,12 @@ keys:
       available RATs such as PoisonIvy, as well as some non-public backdoors. This
       threat actor targets prodemocratic activists and organizations in Hong Kong,
       European and international financial institutions, and a U.S.-based think tank.
+    alias:
+      - Admin338
+      - Team338
+      - MAGNESIUM
+      - admin@338
+      - G0018
     tide.vocab.stages: misp
   - id: 7f16d1f5-04ee-4d99-abf0-87e1f23f9fee
     name: APT23
@@ -2980,11 +3384,26 @@ keys:
       their sights on the Taiwanese government as well as a number of companies in
       the heavy industry. The same campaign has also targeted key Philippine military
       agencies.'''
+    alias:
+      - PIRATE PANDA
+      - KeyBoy
+      - Tropic Trooper
+      - BRONZE HOBART
+      - G0081
+      - Red Orthrus
+      - Earth Centaur
     tide.vocab.stages: misp
   - id: ba724df5-9aa0-45ca-8e0e-7101c208ae48
     name: Flying Kitten
     description: 'Activity: defense and aerospace sectors, also interested in targeting
       entities in the oil/gas industry.'
+    alias:
+      - SaffronRose
+      - Saffron Rose
+      - AjaxSecurityTeam
+      - Ajax Security Team
+      - Group 26
+      - Sayad
     tide.vocab.stages: misp
   - id: 11e17436-6ede-4733-8547-4ce0254ea19e
     name: Cutting Kitten
@@ -2992,18 +3411,39 @@ keys:
       against U.S in 2012–2013. Three individuals associated with the group—believed
       to be have been working on behalf of Iran’s Islamic Revolutionary Guard Corps—were
       indicted by the Justice Department in 2016.
+    alias:
+      - ITsecTeam
     tide.vocab.stages: misp
   - id: f98bac6b-12fd-4cad-be84-c84666932232
     name: Charming Kitten
     description: Charming Kitten (aka Parastoo, aka Newscaster) is an group with a
       suspected nexus to Iran that targets organizations involved in government, defense
       technology, military, and diplomacy sectors.
+    alias:
+      - Newscaster
+      - Parastoo
+      - iKittens
+      - Group 83
+      - NewsBeef
+      - G0058
+      - CharmingCypress
     tide.vocab.stages: misp
   - id: 4f69ec6d-cb6b-42af-b8e2-920a2aa4be10
     name: APT33
     description: Our analysis reveals that APT33 is a capable group that has carried
       out cyber espionage operations since at least 2013. We assess APT33 works at
       the behest of the Iranian government.
+    alias:
+      - APT 33
+      - Elfin
+      - MAGNALLIUM
+      - Refined Kitten
+      - HOLMIUM
+      - COBALT TRINITY
+      - G0064
+      - ATK35
+      - Peach Sandstorm
+      - TA451
     tide.vocab.stages: misp
   - id: 2e77511d-f72f-409e-9b64-e2a15efe9bf4
     name: Magic Kitten
@@ -3011,6 +3451,9 @@ keys:
       cyber attackers based in Iran, who carried on several campaigns in 2013, including
       a series of attacks targeting political dissidents and those supporting Iranian
       political opposition.
+    alias:
+      - Group 42
+      - VOYEUR
     tide.vocab.stages: misp
   - id: f873db71-3d53-41d5-b141-530675ade27a
     name: Rocket Kitten
@@ -3018,6 +3461,12 @@ keys:
       embassies of various target countries, notable Iran researchers, human rights
       activists, media and journalists, academic institutions and various scholars,
       including scientists in the fields of physics and nuclear sciences.
+    alias:
+      - TEMP.Beanie
+      - Operation Woolen Goldfish
+      - Operation Woolen-Goldfish
+      - Thamar Reservoir
+      - Timberworm
     tide.vocab.stages: misp
   - id: 86724806-7ec9-4a48-a0a7-ecbde3bf4810
     name: Cleaver
@@ -3027,6 +3476,14 @@ keys:
       institutions, and energy sector companies. This threat actor targets entities
       in the government, energy, and technology sectors that are located in or do
       business with Saudi Arabia.
+    alias:
+      - Operation Cleaver
+      - Op Cleaver
+      - Tarh Andishan
+      - Alibaba
+      - TG-2889
+      - Cobalt Gypsy
+      - G0003
     tide.vocab.stages: misp
   - id: 1de1a64e-ea14-4e79-9e41-6958bdb6c0ff
     name: Sands Casino
@@ -3040,10 +3497,14 @@ keys:
       however, the group did develop a RAT that it refers to as Fallaga RAT, but which
       appears to simply be a fork of the njRAT malware popular amongst hackers in
       the Middle East/North Africa region.
+    alias:
+      - FallagaTeam
     tide.vocab.stages: misp
   - id: 7f99ba32-421c-4905-9deb-006e8eda40c1
     name: Viking Jackal
     description: null
+    alias:
+      - Vikingdom
     tide.vocab.stages: misp
   - id: 5b4ee3ea-eee3-4c8e-8323-85ae32658754
     name: APT28
@@ -3052,6 +3513,34 @@ keys:
       Likely operating since 2007, the group is known to target government, military,
       and security organizations. It has been characterized as an advanced persistent
       threat.
+    alias:
+      - Pawn Storm
+      - FANCY BEAR
+      - Sednit
+      - SNAKEMACKEREL
+      - Tsar Team
+      - TG-4127
+      - STRONTIUM
+      - Swallowtail
+      - IRON TWILIGHT
+      - Group 74
+      - SIG40
+      - Grizzly Steppe
+      - G0007
+      - ATK5
+      - Fighting Ursa
+      - ITG05
+      - Blue Athena
+      - TA422
+      - T-APT-12
+      - APT-C-20
+      - UAC-0028
+      - FROZENLAKE
+      - Sofacy
+      - Forest Blizzard
+      - BlueDelta
+      - Fancy Bear
+      - GruesomeLarch
     tide.vocab.stages: misp
   - id: b2056ff0-00b9-482e-b11c-c771daa5f28a
     name: APT29
@@ -3084,6 +3573,24 @@ keys:
       includes all of the Dukes tool sets, including MiniDuke, CosmicDuke, OnionDuke,
       CozyDuke, SeaDuke, CloudDuke (aka MiniDionis), and HammerDuke (aka Hammertoss).
       '''
+    alias:
+      - Group 100
+      - COZY BEAR
+      - The Dukes
+      - Minidionis
+      - SeaDuke
+      - YTTRIUM
+      - IRON HEMLOCK
+      - Grizzly Steppe
+      - G0016
+      - ATK7
+      - Cloaked Ursa
+      - TA421
+      - Blue Kitsune
+      - ITG11
+      - BlueBravo
+      - Nobelium
+      - UAC-0029
     tide.vocab.stages: misp
   - id: fa80877c-f509-4daf-8b62-20aba1635f68
     name: Turla
@@ -3109,10 +3616,54 @@ keys:
       out the attacks and Symantecs Gavin O’ Gorman told the Guardian a number of
       the hackers appeared to be using Russian names and language in their notes for
       their malicious code. Cyrillic was also seen in use.'''
+    alias:
+      - Snake
+      - VENOMOUS Bear
+      - Group 88
+      - Waterbug
+      - WRAITH
+      - Uroburos
+      - Pfinet
+      - TAG_0530
+      - KRYPTON
+      - Hippo Team
+      - Pacifier APT
+      - Popeye
+      - SIG23
+      - IRON HUNTER
+      - MAKERSMARK
+      - ATK13
+      - G0010
+      - ITG12
+      - Blue Python
+      - SUMMIT
+      - UNC4210
+      - Secret Blizzard
+      - UAC-0144
+      - UAC-0024
+      - UAC-0003
     tide.vocab.stages: misp
   - id: 64d6559c-6d5c-4585-bbf9-c17868f763ee
     name: ENERGETIC BEAR
     description: A Russian group that collects intelligence on the energy industry.
+    alias:
+      - BERSERK BEAR
+      - ALLANITE
+      - CASTLE
+      - DYMALLOY
+      - TG-4192
+      - Dragonfly
+      - Crouching Yeti
+      - Group 24
+      - Havex
+      - Koala Team
+      - IRON LIBERTY
+      - G0035
+      - ATK6
+      - ITG15
+      - BROMINE
+      - Blue Kraken
+      - Ghost Blizzard
     tide.vocab.stages: misp
   - id: f512de42-f76b-40d2-9923-59e7dbdfec35
     name: Sandworm
@@ -3123,11 +3674,39 @@ keys:
       a distributed denial of service prior to the Russian invasion of Georgia. Believed
       to be responsible for the 2008 DDoS attacks in Georgia and the 2015 Ukraine
       power grid outage
+    alias:
+      - Quedagh
+      - VOODOO BEAR
+      - TEMP.Noble
+      - IRON VIKING
+      - G0034
+      - ELECTRUM
+      - TeleBots
+      - IRIDIUM
+      - Blue Echidna
+      - FROZENBARENTS
+      - UAC-0113
+      - Seashell Blizzard
+      - UAC-0082
+      - APT44
     tide.vocab.stages: misp
   - id: 00220228-a5a4-4032-a30d-826bb55aa3fb
     name: FIN7
     description: Groups targeting financial organizations or people with significant
       financial assets.
+    alias:
+      - CARBON SPIDER
+      - GOLD NIAGARA
+      - Calcium
+      - ATK32
+      - G0046
+      - G0008
+      - Coreid
+      - Carbanak
+      - Sangria Tempest
+      - ELBRUS
+      - Carbon Spider
+      - JokerStash
     tide.vocab.stages: misp
   - id: 82c1c7fa-c67b-4be6-9be8-8aa400ef2445
     name: TeamSpy Crew
@@ -3149,6 +3728,11 @@ keys:
       and began looking into the campaign. They quickly discovered that some of the
       infrastructure being used in the attack had been in use for some time and that
       the target they were investigating was by no means the only one.'
+    alias:
+      - TeamSpy
+      - Team Bear
+      - Anger Bear
+      - IRON LYRIC
     tide.vocab.stages: misp
   - id: b737c51f-b579-49d5-a907-743b2e6d03cb
     name: BuhTrap
@@ -3180,6 +3764,9 @@ keys:
       and pharmaceutical companies, since at least 2013. FIN4 is unique in that they
       do not infect victims with typical persistent malware, but rather they focus
       on capturing credentials authorized to access email and other non-public correspondence.
+    alias:
+      - FIN4
+      - G0085
     tide.vocab.stages: misp
   - id: 85b40169-3d1c-491b-9fbf-877ed57f32e0
     name: Boulder Bear
@@ -3203,6 +3790,15 @@ keys:
       watering hole attacks, and supply chain attacks for initial access. They have
       been known to exploit vulnerabilities and use malware such as Infostealer and
       TigerRAT.
+    alias:
+      - OperationTroy
+      - Guardian of Peace
+      - GOP
+      - WHOis Team
+      - Andariel
+      - 'Subgroup: Andariel'
+      - Onyx Sleet
+      - PLUTONIUM
     tide.vocab.stages: misp
   - id: 68391641-859f-4a9a-9a1e-3e5cf71ec376
     name: Lazarus Group
@@ -3213,6 +3809,46 @@ keys:
       Tools and capabilities used by HIDDEN COBRA actors include DDoS botnets, keyloggers,
       remote access tools (RATs), and wiper malware. Variants of malware and tools
       used by HIDDEN COBRA actors include Destover, Duuzer, and Hangman.
+    alias:
+      - Operation DarkSeoul
+      - Dark Seoul
+      - Hidden Cobra
+      - Hastati Group
+      - Andariel
+      - Unit 121
+      - Bureau 121
+      - NewRomanic Cyber Army Team
+      - Bluenoroff
+      - 'Subgroup: Bluenoroff'
+      - Group 77
+      - Labyrinth Chollima
+      - Operation Troy
+      - Operation GhostSecret
+      - Operation AppleJeus
+      - APT38
+      - APT 38
+      - Stardust Chollima
+      - Whois Hacking Team
+      - Zinc
+      - Appleworm
+      - Nickel Academy
+      - APT-C-26
+      - NICKEL GLADSTONE
+      - COVELLITE
+      - ATK3
+      - G0032
+      - ATK117
+      - G0082
+      - Citrine Sleet
+      - DEV-0139
+      - DEV-1222
+      - Diamond Sleet
+      - ZINC
+      - Sapphire Sleet
+      - COPERNICIUM
+      - TA404
+      - Lazarus group
+      - BeagleBoyz
     tide.vocab.stages: misp
   - id: e2b87f81-a6a1-4524-b03f-193c3191d239
     name: VICEROY TIGER
@@ -3230,14 +3866,25 @@ keys:
       new attack activity, confirmed and exposed the gang’s targeted attacks against
       Pakistan, and analyzed in detail. The unique EHDevel malicious code framework
       used by the organization.
+    alias:
+      - OPERATION HANGOVER
+      - Donot Team
+      - APT-C-35
+      - SectorE02
+      - Orange Kala
     tide.vocab.stages: misp
   - id: dd9806a9-a600-48f8-81fb-07f0f1b7690d
     name: PIZZO SPIDER
     description: null
+    alias:
+      - DD4BC
+      - Ambiorx
     tide.vocab.stages: misp
   - id: 59d63dd6-f46f-4334-ad15-30d2e1ee0623
     name: Corsair Jackal
     description: null
+    alias:
+      - TunisianCyberArmy
     tide.vocab.stages: misp
   - id: 3b8e7462-c83f-4e7d-9511-2fe430d80aab
     name: SNOWGLOBE
@@ -3247,6 +3894,10 @@ keys:
       Animal Farm. Over the past few years, Animal Farm has targeted a wide range
       of global organizations. The group has been active since at least 2009 and there
       are signs that earlier malware versions  were developed as far back as 2007.
+    alias:
+      - Animal Farm
+      - Snowglobe
+      - ATK8
     tide.vocab.stages: misp
   - id: 4265d44e-8372-4ed0-b428-b331a5443d7d
     name: Deadeye Jackal
@@ -3261,17 +3912,35 @@ keys:
       networks to openly launch cyber attacks on its enemies*. The precise nature
       of SEA's relationship with the Syrian government has changed over time and is
       unclear
+    alias:
+      - SyrianElectronicArmy
+      - SEA
     tide.vocab.stages: misp
   - id: acbb5cad-ffe7-4b0e-a57a-2dbc916e8905
     name: Operation C-Major
     description: Group targeting Indian Army or related assets in India, as well as
       activists and civil society in Pakistan. Attribution to a Pakistani connection
       has been made by TrendMicro and others.
+    alias:
+      - C-Major
+      - Transparent Tribe
+      - Mythic Leopard
+      - ProjectM
+      - APT36
+      - APT 36
+      - TMP.Lapis
+      - Green Havildar
+      - COPPER FIELDSTONE
+      - Earth Karkaddan
+      - Storm-0156
     tide.vocab.stages: misp
   - id: dab75e38-6969-4e78-9304-dc269c3cbcf0
     name: Stealth Falcon
     description: 'This threat actor targets civil society groups and Emirati journalists,
       activists, and dissidents. '
+    alias:
+      - FruityArmor
+      - G0038
     tide.vocab.stages: misp
   - id: 12ab5c28-5f38-4a2f-bd40-40e9c500f4ac
     name: HummingBad
@@ -3287,6 +3956,18 @@ keys:
       and economic targets using a custom set of attack tools. Its victims are all
       involved with China’s foreign relations in some way, and are generally caught
       through spear-phishing or watering hole attacks.
+    alias:
+      - Chinastrats
+      - Patchwork
+      - Monsoon
+      - Sarit
+      - Dropping Elephant
+      - APT-C-09
+      - ZINC EMERSON
+      - ATK11
+      - G0040
+      - Orange Athos
+      - Thirsty Gemini
     tide.vocab.stages: misp
   - id: 0da10682-85c6-4c0b-bace-ba1f7adfb63e
     name: Scarlet Mimic
@@ -3315,6 +3996,9 @@ keys:
       in Russia and India, who are responsible for tracking activist and terrorist
       activities. While we do not know the precise target of each of the Scarlet Mimic
       attacks, many of them align to the patterns described above.'
+    alias:
+      - G0029
+      - Golfing Taurus
     tide.vocab.stages: misp
   - id: 5fc09923-fcff-4e81-9cae-4518ef31cf4d
     name: Poseidon Group
@@ -3322,6 +4006,8 @@ keys:
       active since at least 2005. The group has a history of using information exfiltrated
       from victims to blackmail victim companies into contracting the Poseidon Group
       as a security firm.
+    alias:
+      - G0033
     tide.vocab.stages: misp
   - id: a9b44750-992c-4743-8922-129880d277ea
     name: DragonOK
@@ -3330,6 +4016,12 @@ keys:
       thought to have a direct or indirect relationship with the threat group Moafee.
       2223 It is known to use a variety of malware, including Sysget/HelloBridge,
       PlugX, PoisonIvy, FormerFirstRat, NFlog, and NewCT.
+    alias:
+      - Moafee
+      - BRONZE OVERBROOK
+      - G0017
+      - G0002
+      - Shallow Taurus
     tide.vocab.stages: misp
   - id: f3179cfb-9c86-4980-bd6b-e4fa74adaaa7
     name: ProjectSauron
@@ -3347,6 +4039,11 @@ keys:
       almost all key entities it could possibly reach within the target area.  The
       name, ProjectSauron reflects the fact that the code authors refer to ‘Sauron’
       in the Lua scripts.
+    alias:
+      - Strider
+      - Sauron
+      - Project Sauron
+      - G0041
     tide.vocab.stages: misp
   - id: 4b79d1f6-8333-44b6-ac32-d1ea7e47e77f
     name: TA530
@@ -3357,16 +4054,33 @@ keys:
     name: GCMAN
     description: GCMAN is a threat group that focuses on targeting banks for the purpose
       of transferring money to e-currency services.
+    alias:
+      - G0036
     tide.vocab.stages: misp
   - id: 5abb12e7-5066-4f84-a109-49a037205c76
     name: APT22
     description: Suckfly is a China-based threat group that has been active since
       at least 2014
+    alias:
+      - G0039
+      - Suckfly
+      - BRONZE OLIVE
+      - Group 46
     tide.vocab.stages: misp
   - id: 647894f6-1723-4cba-aba4-0ef0966d5302
     name: FIN6
     description: FIN is a group targeting financial assets including assets able to
       do financial transaction including PoS.
+    alias:
+      - SKELETON SPIDER
+      - ITG08
+      - MageCart Group 6
+      - White Giant
+      - GOLD FRANKLIN
+      - ATK88
+      - G0037
+      - Camouflage Tempest
+      - TA4557
     tide.vocab.stages: misp
   - id: 815cbe98-e157-4078-9caa-c5a25dd64731
     name: Libyan Scorpions
@@ -3378,6 +4092,9 @@ keys:
   - id: 43ec65d1-a334-4c44-9a44-0fd21f27249d
     name: TeamXRat
     description: null
+    alias:
+      - CorporacaoXRat
+      - CorporationXRat
     tide.vocab.stages: misp
   - id: 42be2a84-5a5c-4c6d-9864-3f09d75bb0ba
     name: OilRig
@@ -3416,6 +4133,21 @@ keys:
       \ to Iranian operations, timing and alignment with the national interests of\
       \ Iran also lead FireEye to assess that APT34 acts on behalf of the Iranian\
       \ government."
+    alias:
+      - Twisted Kitten
+      - Cobalt Gypsy
+      - Crambus
+      - Helix Kitten
+      - APT 34
+      - APT34
+      - IRN2
+      - ATK40
+      - G0049
+      - Evasive Serpens
+      - Hazel Sandstorm
+      - EUROPIUM
+      - TA452
+      - Earth Simnavaz
     tide.vocab.stages: misp
   - id: cf421ce6-ddfe-419a-bc65-6a9fc953232a
     name: Volatile Cedar
@@ -3424,6 +4156,9 @@ keys:
       worldwide. This campaign, led by a persistent attacker group, has successfully
       penetrated a large number of targets using various attack techniques, and specifically,
       a custom-made malware implant codenamed Explosive.
+    alias:
+      - Lebanese Cedar
+      - DeftTorero
     tide.vocab.stages: misp
   - id: 3d5192f2-f235-46fd-aa68-dd00cc17d632
     name: Dancing Salome
@@ -3450,6 +4185,16 @@ keys:
       U.S. and UK governments. Further research revealed a connection between these
       attacks and members of the so-called “Gaza Hackers Team.” We refer to this campaign
       as “Molerats.”
+    alias:
+      - Gaza Hackers Team
+      - Gaza cybergang
+      - Gaza Cybergang
+      - Operation Molerats
+      - Extreme Jackal
+      - Moonlight
+      - ALUMINUM SARATOGA
+      - G0021
+      - BLACKSTEM
     tide.vocab.stages: misp
   - id: 43894e2a-174e-4931-94a8-2296afe8f650
     name: PROMETHIUM
@@ -3460,6 +4205,9 @@ keys:
       including WinUtils, TrueCrypt, WinRAR, or SanDisk. In each of the campaigns,
       Truvasys malware evolved with additional features—this shows a close relationship
       between the activity groups behind the campaigns and the developers of the malware.
+    alias:
+      - StrongPity
+      - G0056
     tide.vocab.stages: misp
   - id: ada08ea8-4517-4eea-aff1-3ad69e5466bb
     name: NEODYMIUM
@@ -3468,6 +4216,8 @@ keys:
       FinFisher, a government-grade commercial surveillance package. Data about Wingbird
       activity indicate that it is typically used to attack individual computers instead
       of networks.
+    alias:
+      - G0055
     tide.vocab.stages: misp
   - id: fe344665-d153-4d31-a32a-1509efde1ca7
     name: Packrat
@@ -3528,6 +4278,9 @@ keys:
       carries out distributed denial-of-service (DDoS) attacks and defacements against
       the sites of news organizations and governments perceived to be critical of
       Turkey’s policies or leadership, and purports to act in defense of Islam
+    alias:
+      - Lion Soldiers Team
+      - Phantom Turk
     tide.vocab.stages: misp
   - id: ab1771de-25bb-4688-b132-eabb5d6452a1
     name: Ayyıldız Tim
@@ -3535,6 +4288,8 @@ keys:
       in 2002. It performs defacements and DDoS attacks against the websites of governments
       that it considers to be repressing Muslim minorities or engaged in Islamophobic
       policies.
+    alias:
+      - Crescent and Star
     tide.vocab.stages: misp
   - id: 7ae74dc6-ded3-4873-a803-abb4160d10c0
     name: TurkHackTeam
@@ -3543,6 +4298,8 @@ keys:
       forum, the group has carried out almost 30 highly publicized hacking campaigns
       targeting foreign government and commercial websites, including websites of
       international corporations. '
+    alias:
+      - Turk Hack Team
     tide.vocab.stages: misp
   - id: 7036fb3d-86b7-4d9c-bc66-1e1ead8b7840
     name: Equation Group
@@ -3550,6 +4307,10 @@ keys:
       by its discoverers at Kaspersky Labs as one of the most sophisticated cyber
       attack groups in the world, operating alongside but always from a position of
       superiority with the creators of Stuxnet and Flame
+    alias:
+      - Tilded Team
+      - EQGRP
+      - G0020
     tide.vocab.stages: misp
   - id: 47204403-34c9-4d25-a006-296a0939d1a2
     name: Greenbug
@@ -3566,6 +4327,20 @@ keys:
       on off-the-shelf tools. Our new research shows the Gamaredon Group have made
       a shift to custom-developed malware. We believe this shift indicates the Gamaredon
       Group have improved their technical capabilities.
+    alias:
+      - ACTINIUM
+      - DEV-0157
+      - Blue Otso
+      - BlueAlpha
+      - G0047
+      - IRON TILDEN
+      - PRIMITIVE BEAR
+      - Shuckworm
+      - Trident Ursa
+      - UAC-0010
+      - Winterflounder
+      - Aqua Blizzard
+      - Actinium
     tide.vocab.stages: misp
   - id: 1671be1b-c844-48f5-84c8-54ac4fe4d71e
     name: Infy
@@ -3589,6 +4364,10 @@ keys:
       through the Infy agent slowed, but did not end. The trends witnessed in reports
       from recipients are reinforced through telemetry provided by design failures
       in more recent versions of the Infy malware.'
+    alias:
+      - Operation Mermaid
+      - Prince of Persia
+      - Foudre
     tide.vocab.stages: misp
   - id: 80f9184d-1df3-4ad0-a452-cdb90fe57216
     name: Sima
@@ -3620,6 +4399,9 @@ keys:
   - id: a250af72-f66c-4d02-9f36-ab764ce9fe85
     name: Blue Termite
     description: Blue Termite is a group of suspected Chinese origin active in Japan.
+    alias:
+      - Cloudy Omega
+      - Emdivi
     tide.vocab.stages: misp
   - id: 8ed5e3f0-ed30-4eb8-bbee-4e221bd76d73
     name: Groundbait
@@ -3642,6 +4424,11 @@ keys:
       and financial, telecommunications, energy, aerospace, information technology,
       and natural resource  industries for espionage purposes. Some of the tools used
       by this threat actor were released by Wikileaks under the name "Vault 7."
+    alias:
+      - Lamberts
+      - the Lamberts
+      - APT-C-39
+      - PLATINUM TERMINAL
     tide.vocab.stages: misp
   - id: fbd279ab-c095-48dc-ba48-4bece3dd5b0f
     name: Callisto
@@ -3650,6 +4437,17 @@ keys:
       in Europe and the South Caucasus. Their primary interest appears to be gathering
       intelligence related to foreign and security policy in the Eastern Europe and
       South Caucasus regions.
+    alias:
+      - COLDRIVER
+      - SEABORGIUM
+      - TA446
+      - GOSSAMER BEAR
+      - BlueCharlie
+      - Star Blizzard
+      - TAG-53
+      - IRON FRONTIER
+      - UNC4057
+      - Blue Callisto
     tide.vocab.stages: misp
   - id: aa29ae56-e54b-47a2-ad16-d3ab0242d5d7
     name: APT32
@@ -3659,6 +4457,23 @@ keys:
       FireEye assesses that APT32 leverages a unique suite of fully-featured malware,
       in conjunction with commercially-available tools, to conduct targeted operations
       that are aligned with Vietnamese state interests.
+    alias:
+      - OceanLotus Group
+      - Ocean Lotus
+      - OceanLotus
+      - Cobalt Kitty
+      - APT-C-00
+      - SeaLotus
+      - Sea Lotus
+      - APT-32
+      - APT 32
+      - Ocean Buffalo
+      - POND LOACH
+      - TIN WOODLAWN
+      - BISMUTH
+      - ATK17
+      - G0050
+      - Canvas Cyclone
     tide.vocab.stages: misp
   - id: acbfd9e4-f78c-4ae0-9b52-c35ed679e546
     name: SilverTerrier
@@ -3686,6 +4501,10 @@ keys:
       \ on high-level corporate information. Butterfly may be selling this information\
       \ to the highest bidder or may be operating as hackers for hire. Stolen information\
       \ could also be used for insider-trading purposes."
+    alias:
+      - Butterfly
+      - Morpho
+      - Sphinx Moth
     tide.vocab.stages: misp
   - id: 1fc5671f-5757-43bf-8d6d-a9a93b03713a
     name: PLATINUM
@@ -3702,6 +4521,10 @@ keys:
       providers in South and Southeast Asia. The group’s persistent use of spear phishing
       tactics (phishing attempts aimed at specific individuals) and access to previously
       undiscovered zero-day exploits have made it a highly resilient threat.'
+    alias:
+      - TwoForOne
+      - G0068
+      - ATK33
     tide.vocab.stages: misp
   - id: 2c8994ba-367c-46f6-bfb0-390c8760dd9e
     name: RASPITE
@@ -3717,12 +4540,18 @@ keys:
       The group then deploys install scripts for a malicious service to beacon back
       to RASPITE-controlled infrastructure, allowing the adversary to remotely access
       the victim machine.
+    alias:
+      - LeafMiner
+      - Raspite
     tide.vocab.stages: misp
   - id: a78ae9fe-71cd-4563-9213-7b6260bd9a73
     name: FIN8
     description: FIN8 is a financially motivated group targeting the retail, hospitality
       and entertainment industries. The actor had previously conducted several tailored
       spearphishing campaigns using the downloader PUNCHBUGGY and POS malware PUNCHTRACK.
+    alias:
+      - ATK113
+      - G0061
     tide.vocab.stages: misp
   - id: 827c17e0-c3f5-4ad1-a4f4-30a40ed0a2d3
     name: El Machete
@@ -3732,6 +4561,11 @@ keys:
       moved to new C2 infrastructure, based largely around dynamic DNS domains, in
       addition to making minimal changes to the malware in order to evade signature-based
       detection.
+    alias:
+      - Machete
+      - machete-apt
+      - APT-C-43
+      - G0095
     tide.vocab.stages: misp
   - id: 01967480-c49b-4d4a-a7fa-aef0eaf535fe
     name: Cobalt
@@ -3739,10 +4573,19 @@ keys:
       that saw machines across Europe, CIS countries (including Russia), and Malaysia
       being raided simultaneously, in the span of a few hours. The group has been
       active since June 2016, and their latest attacks happened in July and August.
+    alias:
+      - Cobalt Group
+      - Cobalt Gang
+      - GOLD KINGSWOOD
+      - COBALT SPIDER
+      - G0080
+      - Mule Libra
     tide.vocab.stages: misp
   - id: c6472ae1-c6ad-4cf1-8d6e-8c94b94fe314
     name: TA459
     description: null
+    alias:
+      - G0062
     tide.vocab.stages: misp
   - id: 4d9f68ba-cb2b-40bf-ba4b-6a5a9f2e1cf8
     name: Cyber Berkut
@@ -3755,6 +4598,16 @@ keys:
       organizations in Asia and Eastern Europe. The group has been observed using
       various malware, including the Bisonal RAT and ShadowPad. They employ spear-phishing
       emails with malicious attachments as their preferred method of distribution.
+    alias:
+      - CactusPete
+      - KARMA PANDA
+      - BRONZE HUNTLEY
+      - COPPER
+      - Red Beifang
+      - G0131
+      - PLA Unit 65017
+      - Earth Akhlut
+      - TAG-74
     tide.vocab.stages: misp
   - id: fb745fe1-5478-4d47-ad3d-7389fa4a6f77
     name: Danti
@@ -3779,6 +4632,13 @@ keys:
       \ company. The group used malware with keylogging capabilities to monitor the\
       \ computer of an executive who manages the company’s relationships with other\
       \ telecommunications companies"
+    alias:
+      - KEYHOLE PANDA
+      - MANGANESE
+      - BRONZE FLEETWOOD
+      - TEMP.Bottle
+      - Mulberry Typhoon
+      - Poisoned Flight
     tide.vocab.stages: misp
   - id: add6554a-815a-4ac3-9b22-9337b9661ab8
     name: Tick
@@ -3790,10 +4650,23 @@ keys:
       purposes.  The attacks appear to be centered on political, media, and engineering
       sectors. STALKER PANDA has been observed conducting targeted attacks against
       Japan, Taiwan, Hong Kong, and the United States.
+    alias:
+      - Nian
+      - BRONZE BUTLER
+      - REDBALDKNIGHT
+      - STALKER PANDA
+      - G0060
+      - Stalker Taurus
+      - PLA Unit 61419
     tide.vocab.stages: misp
   - id: c097471c-2405-4393-b6d7-afbcb5f0cd11
     name: APT26
     description: null
+    alias:
+      - JerseyMikes
+      - TURBINE PANDA
+      - BRONZE EXPRESS
+      - TECHNETIUM
     tide.vocab.stages: misp
   - id: 67adfa07-869f-4052-9d56-b88a51489902
     name: SABRE PANDA
@@ -3818,10 +4691,16 @@ keys:
   - id: 999f3008-2b2f-467d-ab4d-c5a2fd80b344
     name: Mofang
     description: null
+    alias:
+      - Superman
+      - BRONZE WALKER
     tide.vocab.stages: misp
   - id: 8cca9a1d-66e4-4bc4-ad49-95f759f4c1ae
     name: CopyKittens
     description: null
+    alias:
+      - Slayer Kitten
+      - G0052
     tide.vocab.stages: misp
   - id: 9035bfbf-a73f-4948-9df2-bd893e9cafef
     name: EvilPost
@@ -3854,11 +4733,28 @@ keys:
   - id: 8e28dbee-4e9e-4491-9a6c-ee9c9ec4b28b
     name: APT4
     description: null
+    alias:
+      - PLA Navy
+      - MAVERICK PANDA
+      - BRONZE EDISON
+      - SODIUM
+      - Salmon Typhoon
     tide.vocab.stages: misp
   - id: bcaaad6f-0597-4b89-b69b-84a6be2b7bc3
     name: Kimsuky
     description: This threat actor targets South Korean think tanks, industry, nuclear
       power operators, and the Ministry of Unification for espionage purposes.
+    alias:
+      - Velvet Chollima
+      - Black Banshee
+      - Thallium
+      - Operation Stolen Pencil
+      - G0086
+      - APT43
+      - Emerald Sleet
+      - THALLIUM
+      - Springtail
+      - Sparkling Pisces
     tide.vocab.stages: misp
   - id: 7b6ba207-94de-4f94-bc7f-52cd0dafade5
     name: Snake Wine
@@ -3889,6 +4785,10 @@ keys:
       \ toolset used by the attackers. This includes an extremely sophisticated malware,\
       \ a rootkit, a bootkit, 32-and 64-bit Windows versions, Mac OS X and Linux versions\
       \ and possibly versions for Android and iPad/iPhone (Apple iOS)."
+    alias:
+      - The Mask
+      - Mask
+      - Ugly Face
     tide.vocab.stages: misp
   - id: b07cf296-7ab9-4b85-a07e-421607c212b0
     name: GIBBERISH PANDA
@@ -3902,6 +4802,8 @@ keys:
   - id: d56c99fa-4710-472c-81a6-41b7a84ea4be
     name: Clever Kitten
     description: null
+    alias:
+      - Group 41
     tide.vocab.stages: misp
   - id: e85ab78c-5e86-403c-b444-9cdcc167fb77
     name: ANDROMEDA SPIDER
@@ -3910,6 +4812,12 @@ keys:
   - id: 76f6ad4e-2ff3-4ccb-b81d-18162f290af0
     name: Cyber Caliphate Army
     description: null
+    alias:
+      - Islamic State Hacking Division
+      - CCA
+      - United Cyber Caliphate
+      - UUC
+      - CyberCaliphate
     tide.vocab.stages: misp
   - id: 430ba885-cd24-492e-804c-815176ed9b1e
     name: MAGNETIC SPIDER
@@ -3922,6 +4830,8 @@ keys:
   - id: 22c2b363-5d8f-4b04-96db-1b6cf4d7e8db
     name: Cyber fighters of Izz Ad-Din Al Qassam
     description: null
+    alias:
+      - Fraternal Jackal
     tide.vocab.stages: misp
   - id: 1a2592a3-eab7-417c-bf2d-9c0558c2b3e7
     name: APT6
@@ -3945,6 +4855,8 @@ keys:
       “Given the nature of malware payload involved and the duration of this compromise
       being unnoticed – the scope of lateral movement inside the compromised network
       is very high possibly exposing all the critical systems,”Deepen said.'
+    alias:
+      - 1.php Group
     tide.vocab.stages: misp
   - id: 0cfff0f4-868c-40a1-b9b4-0d153c0b33b6
     name: AridViper
@@ -3957,6 +4869,12 @@ keys:
       as legitimate services. AridViper's activities are characterized by a blend
       of technical sophistication and psychological manipulation, aiming to exfiltrate
       sensitive data from compromised systems.
+    alias:
+      - Desert Falcon
+      - Arid Viper
+      - APT-C-23
+      - Bearded Barbie
+      - Two-tailed Scorpion
     tide.vocab.stages: misp
   - id: 445c7b62-028b-455e-9d65-74899b7006a4
     name: DEXTOROUS SPIDER
@@ -3965,6 +4883,8 @@ keys:
   - id: e9a6cbd7-ca27-4894-ae20-9d11c06fdc02
     name: Unit 8200
     description: null
+    alias:
+      - Duqu Group
     tide.vocab.stages: misp
   - id: dc6c6cbc-9dc6-4ace-a2d2-fadefe45cce6
     name: White Bear
@@ -3998,6 +4918,8 @@ keys:
       dropper, lack Firefox extension installer payloads, and contain several new
       components signed with a new code signing digital certificate, unlike WhiteAtlas
       incidents and modules.'
+    alias:
+      - Skipper Turla
     tide.vocab.stages: misp
   - id: 43992f81-fd29-4228-94e0-c3aa3e65aab7
     name: PALE PANDA
@@ -4014,6 +4936,8 @@ keys:
       focused on foreign policy institutions and diplomatic targets. Sowbug has been
       seen mounting classic espionage attacks by stealing documents from the organizations
       it infiltrates. '
+    alias:
+      - G0054
     tide.vocab.stages: misp
   - id: a29af069-03c3-4534-b78b-7d1a77ea085b
     name: MuddyWater
@@ -4023,6 +4947,18 @@ keys:
       by the use of a slowly evolving PowerShell-based first stage backdoor we call
       “POWERSTATS”. Despite broad scrutiny and reports on MuddyWater attacks, the
       activity continues with only incremental changes to the tools and techniques.
+    alias:
+      - TEMP.Zagros
+      - Static Kitten
+      - Seedworm
+      - MERCURY
+      - COBALT ULSTER
+      - G0069
+      - ATK51
+      - Boggy Serpens
+      - Mango Sandstorm
+      - TA450
+      - Earth Vetala
     tide.vocab.stages: misp
   - id: 7d78ec00-dfdc-4a80-a4da-63f1ae63bd7f
     name: MoneyTaker
@@ -4042,6 +4978,8 @@ keys:
       gigabytes of exfiltrated data, in 21+ countries, across thousands of victims.
       Stolen data includes enterprise intellectual property and personally identifiable
       information.
+    alias:
+      - G0070
     tide.vocab.stages: misp
   - id: 8c21ce09-33c3-412c-bb55-323765e89a60
     name: Nexus Zeta
@@ -4059,6 +4997,23 @@ keys:
       its targeting beyond the Korean peninsula to include Japan, Vietnam and the
       Middle East, and to a wider range of industry verticals, including chemicals,
       electronics, manufacturing, aerospace, automotive and healthcare entities
+    alias:
+      - APT 37
+      - Group 123
+      - Group123
+      - InkySquid
+      - Operation Daybreak
+      - Operation Erebus
+      - Reaper Group
+      - Reaper
+      - Red Eyes
+      - Ricochet Chollima
+      - ScarCruft
+      - Venus 121
+      - ATK4
+      - G0067
+      - Moldy Pisces
+      - APT-C-28
     tide.vocab.stages: misp
   - id: 5b4b6980-3bc7-11e8-84d6-879aaac37dd9
     name: APT40
@@ -4066,6 +5021,21 @@ keys:
       targets in defense and government. Active since at least 2014, this actor has
       long-standing interest in maritime industries, naval defense contractors, and
       associated research institutions in the United States and Western Europe.
+    alias:
+      - TEMP.Periscope
+      - TEMP.Jumper
+      - Leviathan
+      - BRONZE MOHAWK
+      - GADOLINIUM
+      - KRYPTONITE PANDA
+      - G0065
+      - ATK29
+      - TA423
+      - Red Ladon
+      - ITG09
+      - MUDCARP
+      - ISLANDDREAMS
+      - Gingham Typhoon
     tide.vocab.stages: misp
   - id: b8967b3c-3bc9-11e8-8701-8b1ead8c099e
     name: APT35
@@ -4076,6 +5046,15 @@ keys:
       military, diplomatic and government personnel, organizations in the media, energy
       and defense industrial base (DIB), and engineering, business services and telecommunications
       sectors.
+    alias:
+      - Newscaster Team
+      - Magic Hound
+      - G0059
+      - Phosphorus
+      - Mint Sandstorm
+      - TunnelVision
+      - COBALT MIRAGE
+      - Agent Serpens
     tide.vocab.stages: misp
   - id: 35d71626-4794-11e8-b74d-bbcbe48fee3c
     name: Orangeworm
@@ -4110,6 +5089,9 @@ keys:
 
       ALLANITE conducts malware-less operations primarily leveraging legitimate and
       available tools in the Windows operating system.'
+    alias:
+      - Palmetto Fusion
+      - Allanite
     tide.vocab.stages: misp
   - id: a0082cfa-32e2-42b8-92d8-5c7a7409dcf1
     name: CHRYSENE
@@ -4119,6 +5101,9 @@ keys:
       production, primarily in the Gulf region, for espionage purposes. According
       to one cybersecurity company, the threat actor “compromises a target machine
       and passes it off to another threat actor for further exploitation.”'
+    alias:
+      - OilRig
+      - Greenbug
     tide.vocab.stages: misp
   - id: 4defbf2e-4f73-11e8-807f-578d61da7568
     name: ZooPark
@@ -4134,6 +5119,12 @@ keys:
       appears to be new addition to these attackers’ toolkit.  Countries Unit 42 has
       identified as targeted by Rancor with these malware families include, but are
       not limited to Singapore and Cambodia.
+    alias:
+      - Rancor group
+      - Rancor
+      - Rancor Group
+      - G0075
+      - Rancor Taurus
     tide.vocab.stages: misp
   - id: a3cc5105-3bc6-498b-8d53-981e12d86909
     name: The Big Bang
@@ -4155,6 +5146,12 @@ keys:
       by 360 and Tuisec, in which they found interesting connections to a larger group
       of attackers Unit 42 researchers have been tracking, which we are calling Gorgon
       Group.
+    alias:
+      - Gorgon Group
+      - Subaat
+      - ATK92
+      - G0078
+      - Pasty Gemini
     tide.vocab.stages: misp
   - id: ce2c2dfd-2445-4fbc-a747-9e7092e383f9
     name: DarkHydrus
@@ -4167,6 +5164,10 @@ keys:
       group as it involved spear-phishing emails sent to targeted organizations with
       password protected RAR archive attachments that contained malicious Excel Web
       Query files (.iqy).
+    alias:
+      - LazyMeerkat
+      - G0079
+      - Obscure Serpens
     tide.vocab.stages: misp
   - id: 71a3b962-9a36-11e8-88f8-b31d20c6fa2a
     name: RedAlpha
@@ -4176,6 +5177,9 @@ keys:
       targeting, and diverse malicious tooling. We discovered this activity as the
       result of pivoting off of a new malware sample observed targeting the Tibetan
       community based in India.
+    alias:
+      - DeepCliff
+      - Red Dev 3
     tide.vocab.stages: misp
   - id: 3f3ff6de-a6a7-11e8-92b4-3743eb1c7762
     name: TempTick
@@ -4221,6 +5225,13 @@ keys:
     description: This threat actor uses spear-phishing techniques to target private-sector
       energy, defense, aerospace, research, and media organizations and embassies
       in Africa, Europe, and the Middle East, for the purpose of espionage.
+    alias:
+      - Clean Ursa
+      - Cloud Atlas
+      - OXYGEN
+      - G0100
+      - ATK116
+      - Blue Odin
     tide.vocab.stages: misp
   - id: 36ee04f4-a9df-11e8-b92b-d7ddfd3a8896
     name: HenBox
@@ -4246,12 +5257,28 @@ keys:
       observed activity uses a series of redirections and fileless, malicious implementations
       of legitimate tools to gain access to the targeted systems. Additionally, MUSTANG
       PANDA actors reused previously-observed legitimate domains to host files.'
+    alias:
+      - BRONZE PRESIDENT
+      - HoneyMyte
+      - Red Lich
+      - TEMP.HEX
+      - BASIN
+      - Earth Preta
+      - TA416
+      - Stately Taurus
+      - LuminousMoth
+      - Polaris
+      - TANTALUM
+      - Twill Typhoon
     tide.vocab.stages: misp
   - id: 98be4300-a9ef-11e8-9a95-bb9221083cfc
     name: Thrip
     description: This threat actor targets organizations in the satellite communications,
       telecommunications, geospatial-imaging, and defense sectors in the United States
       and Southeast Asia for espionage purposes.
+    alias:
+      - G0076
+      - ATK78
     tide.vocab.stages: misp
   - id: f82b352e-a9f8-11e8-8be8-fbcf6eddd58c
     name: ' Stealth Mango and Tangelo '
@@ -4294,6 +5321,8 @@ keys:
       The researchers say that PowerPool developers did not use the binary version
       of the exploit, deciding instead to make some subtle changes to the source code
       before recompiling it.'
+    alias:
+      - IAmTheKing
     tide.vocab.stages: misp
   - id: dc3edacc-bb24-11e8-81fb-8c16458922a7
     name: Bahamut
@@ -4307,6 +5336,8 @@ keys:
     description: Iron group has developed multiple types of malware (backdoors, crypto-miners,
       and ransomware) for Windows, Linux and Android platforms. They have used their
       malware to successfully infect, at least, a few thousand victims.
+    alias:
+      - Iron Cyber Group
     tide.vocab.stages: misp
   - id: 75ae52b2-bca3-11e8-af90-a78f33eee6c1
     name: Operation BugDrop
@@ -4334,6 +5365,9 @@ keys:
       along with surrounding voice recordings. Researchers with CheckPoint discovered
       the attack and named it Domestic Kitten. The targets are Kurdish and Turkish
       natives, and ISIS supporters, all Iranian citizens.
+    alias:
+      - Bouncing Golf
+      - APT-C-50
     tide.vocab.stages: misp
   - id: e38d32a2-c708-11e8-8785-472c4cfccd85
     name: FASTCash
@@ -4360,6 +5394,8 @@ keys:
       mining script rather than the normal Apple phishing page. When users are redirected
       to these pages, they will be shown a blank page in the browser, but their CPU
       utilization will jump to 90% or higher.'
+    alias:
+      - Roaming Mantis Group
     tide.vocab.stages: misp
   - id: d52ca4c4-d214-11e8-8d29-c3e7cb78acce
     name: GreyEnergy
@@ -4376,6 +5412,11 @@ keys:
       software, and Microsoft products. The Shadow Brokers originally attributed the
       leaks to the Equation Group threat actor, who have been tied to the NSA's Tailored
       Access Operations unit.
+    alias:
+      - The ShadowBrokers
+      - TSB
+      - Shadow Brokers
+      - ShadowBrokers
     tide.vocab.stages: misp
   - id: c2d5a052-dc30-11e8-9643-d76f3b9c94fa
     name: EvilTraffic
@@ -4383,6 +5424,8 @@ keys:
       dubbed EvilTraffic leveraging tens of thousands compromised websites. Crooks
       exploited some CMS vulnerabilities to upload and execute arbitrary PHP pages
       used to generate revenues via advertising.
+    alias:
+      - Operation EvilTraffic
     tide.vocab.stages: misp
   - id: dce617eb-a3b6-4a9a-bd76-575c424f9761
     name: HookAds
@@ -4439,6 +5482,8 @@ keys:
       malicious documents to attempt to trick users into opening malicious websites
       that are disguised as "help wanted" sites for job seekers. Additionally, we
       will describe the malicious DNS redirection and the timeline of the events.'
+    alias:
+      - COBALT EDGEWATER
     tide.vocab.stages: misp
   - id: db7fd7dd-28f7-4e8d-a807-8405e4b0f4e2
     name: DarkVishnya
@@ -4471,12 +5516,20 @@ keys:
     description: From November 2017 to October 2018, we attributed 14 campaigns to
       the GC threat actors that used a specific MaaS provider (hereinafter “the Provider”)
       offered by a known individual (hereinafter “the Provider Operator”).
+    alias:
+      - Golden Chickens
+      - Golden Chickens01
+      - Golden Chickens 01
     tide.vocab.stages: misp
   - id: 6d50a8a2-fdf5-11e8-9db3-833f231caac8
     name: GC02
     description: From November 2017 to October 2018, we attributed 14 campaigns to
       the GC threat actors that used a specific MaaS provider (hereinafter “the Provider”)
       offered by a known individual (hereinafter “the Provider Operator”).
+    alias:
+      - Golden Chickens
+      - Golden Chickens02
+      - Golden Chickens 02
     tide.vocab.stages: misp
   - id: b06c3af1-0243-4428-88da-b3451c345e1e
     name: Operation Sharpshooter
@@ -4502,6 +5555,17 @@ keys:
       trojan and Locky ransomware, delivered through malicious email campaigns via
       Necurs botnet. Other malware associated with TA505 include Philadelphia and
       GlobeImposter ransomware families.
+    alias:
+      - SectorJ04
+      - SectorJ04 Group
+      - GRACEFUL SPIDER
+      - GOLD TAHOE
+      - Dudear
+      - G0092
+      - ATK103
+      - Hive0065
+      - CHIMBORAZO
+      - Spandex Tempest
     tide.vocab.stages: misp
   - id: 3cf6dbb5-bf9e-47d4-a8d5-b6d76f5a791f
     name: GRIM SPIDER
@@ -4523,6 +5587,8 @@ keys:
       total current value of $3,701,893.98 USD.
 
       Grim Spider is reportedly associated with Lunar Spider and Wizard Spider.'
+    alias:
+      - GOLD ULRICK
     tide.vocab.stages: misp
   - id: bdf4fe4f-af8a-495f-a719-cf175cecda1f
     name: WIZARD SPIDER
@@ -4544,6 +5610,17 @@ keys:
       for WIZARD SPIDER, a criminal enterprise of which GRIM SPIDER appears to be
       a cell. The WIZARD SPIDER threat group, known as the Russia-based operator of
       the TrickBot banking malware, had focused primarily on wire fraud in the past.'
+    alias:
+      - TEMP.MixMaster
+      - GOLD BLACKBURN
+      - FIN12
+      - Periwinkle Tempest
+      - DEV-0193
+      - Storm-0193
+      - Trickbot LLC
+      - UNC2053
+      - Pistachio Tempest
+      - DEV-0237
     tide.vocab.stages: misp
   - id: c93281be-f6cd-4cd0-a5a3-defde9d77d8b
     name: MUMMY SPIDER
@@ -4565,6 +5642,9 @@ keys:
       \ Dridex and Qakbot.\n MUMMY SPIDER advertised Emotet on underground forums\
       \ until 2015, at which time it became private. Therefore, it is highly likely\
       \ that Emotet is operate"
+    alias:
+      - TA542
+      - GOLD CRESTWOOD
     tide.vocab.stages: misp
   - id: d8e1762a-0063-48c2-9ea1-8d176d14b70f
     name: STARDUST CHOLLIMA
@@ -4579,6 +5659,9 @@ keys:
       DNS subdomain hijacking, certificate spoofing, and covert tunneled command and
       control traffic in combination with complex and convincing lure documents and
       custom implants.
+    alias:
+      - Nahr Elbard
+      - Nahr el bared
     tide.vocab.stages: misp
   - id: 0d5e17fd-7a71-47fd-b4bc-867cdb833726
     name: Silence group
@@ -4599,6 +5682,9 @@ keys:
       and Asia). Furthermore, Silence used Russian words typed on an English keyboard
       layout for the commands of the employed backdoor. The hackers also used Russian-language
       web hosting services.'
+    alias:
+      - Silence
+      - WHISPER SPIDER
     tide.vocab.stages: misp
   - id: c2c64bd3-a325-446f-91a8-b4c0f173a30b
     name: APT39
@@ -4611,6 +5697,14 @@ keys:
       in the Middle East. APT39 has prioritized the telecommunications sector, with
       additional targeting of the travel industry and IT firms that support it and
       the high-tech industry.
+    alias:
+      - Chafer
+      - REMIX KITTEN
+      - COBALT HICKMAN
+      - G0087
+      - Radio Serpens
+      - TA454
+      - ITG07
     tide.vocab.stages: misp
   - id: 27c97181-b8e9-43e1-93c0-f953cac45326
     name: Siesta
@@ -4644,6 +5738,8 @@ keys:
       the end of November 2018 when the U.S. DoJ released an indictment for Iran-based
       individuals Faramarz Shahi Savandi and Mohammad Mehdi Shah Mansouri, alleged
       members of the group.
+    alias:
+      - GOLD LOWELL
     tide.vocab.stages: misp
   - id: 80f07c15-cad3-44a2-a8a4-dd14490b5117
     name: PINCHY SPIDER
@@ -4708,6 +5804,8 @@ keys:
       of a flourishing relationship between these two actors.
 
       Lunar Spider is reportedly associated withGrim Spider and Wizard Spider.'
+    alias:
+      - GOLD SWATHMORE
     tide.vocab.stages: misp
   - id: ec3fda76-8c1c-4019-8109-3f92e6b15633
     name: RATPAK SPIDER
@@ -4727,6 +5825,8 @@ keys:
       coming from South America carried out continuous targeted attacks against Colombian
       government institutions as well as important corporations in financial sector,
       petroleum industry, professional manufacturing, etc.
+    alias:
+      - Blind Eagle
     tide.vocab.stages: misp
   - id: 29cfe970-5446-4cfc-a2da-00e9f49e02ba
     name: IRIDIUM
@@ -4764,6 +5864,10 @@ keys:
       group launched long-term at tacks against organizations in the Syrian region
       using Android and Windows malwares. Its objective is the theft of sensitive
       information.
+    alias:
+      - GoldMouse
+      - Golden RAT
+      - ATK80
     tide.vocab.stages: misp
   - id: 401c30c7-4317-458a-9b0a-379a44d63457
     name: Operation ShadowHammer
@@ -4802,6 +5906,12 @@ keys:
       this system, work together to establish an accepted global norm that this system
       and the organizations that control it are off-limits, and cooperate in pursuing
       those actors who act irresponsibly by targeting this system.
+    alias:
+      - COSMIC WOLF
+      - Marbled Dust
+      - SILICON
+      - Teal Kurma
+      - UNC1326
     tide.vocab.stages: misp
   - id: 5059b44d-2753-4977-b987-4922f09afe6b
     name: Silent Librarian
@@ -4815,6 +5925,12 @@ keys:
       this same threat group since late-2017, designating them Silent Librarian. Since
       discovery, we have been working with the FBI, ISAC partners, and other international
       law enforcement agencies to help understand and mitigate these attacks.
+    alias:
+      - COBALT DICKENS
+      - Mabna Institute
+      - TA407
+      - TA4900
+      - Yellow Nabu
     tide.vocab.stages: misp
   - id: 6bf7e6b6-5917-45a6-9567-f0baba79768c
     name: APT31
@@ -4827,6 +5943,14 @@ keys:
       support additional intrusions against high-profile assets. In 2018, CrowdStrike
       observed this adversary using spear-phishing, URL “web bugs” and scheduled tasks
       to automate credential harvesting.
+    alias:
+      - ZIRCONIUM
+      - JUDGMENT PANDA
+      - BRONZE VINEWOOD
+      - Red keres
+      - Violet Typhoon
+      - TA412
+      - Zirconium
     tide.vocab.stages: misp
   - id: 8b62b20a-5b1c-48af-8424-e8220cd2fbd7
     name: Blackgear
@@ -4842,6 +5966,10 @@ keys:
       first, the fake documents that are used as part of its infection routines are
       now in Japanese. Secondly, it is now using blogging sites and microblogging
       services based in Japan for its C&C activity.'
+    alias:
+      - Topgear
+      - Comnie
+      - BLACKGEAR
     tide.vocab.stages: misp
   - id: 8fbd195f-5e03-4e85-8ca5-4f1dff300bec
     name: BlackOasis
@@ -4851,6 +5979,8 @@ keys:
       correspondents, and think tanks. A group known by Microsoft as NEODYMIUM is
       reportedly associated closely with BlackOasis operations, but evidence that
       the group names are aliases has not been identified.
+    alias:
+      - G0063
     tide.vocab.stages: misp
   - id: 320c42f7-eab7-4ef9-b09a-74396caa6c3e
     name: BlackTech
@@ -4875,6 +6005,16 @@ keys:
       which the attackers will enable the router’s VPN feature then register a machine
       as virtual server. This virtual server will be used either as a C&C server or
       an HTTP server that delivers PLEAD malware to their targets.'
+    alias:
+      - CIRCUIT PANDA
+      - Temp.Overboard
+      - HUAPI
+      - Palmerworm
+      - G0098
+      - T-APT-03
+      - Manga Taurus
+      - Red Djinn
+      - Earth Hundun
     tide.vocab.stages: misp
   - id: 44dc2f9c-8c28-11e9-9b9a-7fdced8cbf70
     name: FIN5
@@ -4882,6 +6022,8 @@ keys:
       identifiable information and payment card information. The group has been active
       since at least 2008 and has targeted the restaurant, gaming, and hotel industries.
       The group is made up of actors who likely speak Russian.
+    alias:
+      - G0053
     tide.vocab.stages: misp
   - id: 13289552-596e-4592-9c81-eeb4db6baf3c
     name: FIN1
@@ -4909,6 +6051,8 @@ keys:
       Based on near parallel TTPs used by the attacker(s) across these targeted intrusions,
       we believe these clusters of activity are linked to a single, previously unobserved
       actor or group that we have dubbed FIN10.
+    alias:
+      - G0051
     tide.vocab.stages: misp
   - id: cacf2ffc-8c49-11e9-895e-7f5bf9c2ff6d
     name: GhostNet
@@ -4933,6 +6077,8 @@ keys:
       might be the explanation; they called ONI Asia who called us. (Until May 2008,
       the first author was employed on a studentship funded by the OpenNet Initiative
       and the second author was a principal investigator for ONI.)'
+    alias:
+      - Snooping Dragon
     tide.vocab.stages: misp
   - id: 7803b380-8c4c-11e9-90a1-f3880ab3aaa0
     name: GozNym
@@ -4964,6 +6110,8 @@ keys:
       actor Group5, because it targets Syrian opposition after regime-linked malware
       groups, the Syrian Electronic Army, ISIS (also known as the Islamic State or
       ISIL), and a group linked to Lebanon did the same in the past'
+    alias:
+      - G0043
     tide.vocab.stages: misp
   - id: 2d82a18e-8c53-11e9-b0ec-536b62fa3d86
     name: Honeybee
@@ -4980,6 +6128,8 @@ keys:
 
       The Advanced Threat Research team also observed a heavy concentration of the
       implant in Vietnam from January 15–17.'
+    alias:
+      - G0072
     tide.vocab.stages: misp
   - id: e502802e-8d0a-11e9-bd72-9f046529b3fd
     name: Lucky Cat
@@ -5013,6 +6163,9 @@ keys:
       minimum amount of work necessary for the maximum gain. They do not use zero
       day exploits or complicated threats, instead they rely on effective social engineering
       and lax security measures on the part of the victims.'
+    alias:
+      - TA413
+      - White Dev 9
     tide.vocab.stages: misp
   - id: 88100602-8e8b-11e9-bb7c-1bf20b58e305
     name: RTM
@@ -5030,6 +6183,8 @@ keys:
       back to late 2015. The group also makes use of several different modules that
       they deploy where appropriate to their targets. They are interested in users
       of remote banking systems (RBS), mainly in Russia and neighboring countries.'
+    alias:
+      - G0048
     tide.vocab.stages: misp
   - id: ef800f1c-8e90-11e9-972c-53e01614f101
     name: Shadow Network
@@ -5099,12 +6254,19 @@ keys:
       more widely distributed compared with those tied to other targeted campaigns,
       the attackers could quickly assess their targets and distinguish these from
       inadvertently compromised computers and honeypots.'
+    alias:
+      - G0015
+      - Earth Aughisky
     tide.vocab.stages: misp
   - id: 90abfc42-91c6-11e9-89b1-af58de8f7ec2
     name: TEMP.Veles
     description: TEMP.Veles is a Russia-based threat group that has targeted critical
       infrastructure. The group has been observed utilizing TRITON, a malware framework
       designed to manipulate industrial safety systems.
+    alias:
+      - Xenotime
+      - G0088
+      - ATK91
     tide.vocab.stages: misp
   - id: cbbbfc82-9294-11e9-8e19-2bc14137b25b
     name: WindShift
@@ -5116,6 +6278,8 @@ keys:
       indicators, Unit 42 was able to identify and correlate additional attacker activity
       and can now provide specific details on a targeted WINDSHIFT attack as it unfolded
       at a Middle Eastern government agency.
+    alias:
+      - Windy Phoenix
     tide.vocab.stages: misp
   - id: f50a5f64-9296-11e9-9b46-a331d01a008d
     name: '[Unnamed group]'
@@ -5264,6 +6428,8 @@ keys:
       In late July, we became aware that the same actor was engaged in another similar
       campaign. Through our investigation into this new campaign, we were able to
       uncover more details about the actor.'
+    alias:
+      - Aged Libra
     tide.vocab.stages: misp
   - id: 9f133738-935f-11e9-aa5e-bbf8d91abb46
     name: '[Vault 7/8]'
@@ -5370,6 +6536,9 @@ keys:
       internally as TA428. Researchers believe that this activity has an operational
       and tactical resemblance to the Maudi Surveillance Operation which was previously
       reported in 2013.
+    alias:
+      - Colourful Panda
+      - BRONZE DUDLEY
     tide.vocab.stages: misp
   - id: e1b95185-8db6-4f3c-9ffd-1749087d934a
     name: LYCEUM
@@ -5379,12 +6548,41 @@ keys:
       techniques and has been linked to other Iranian threat groups such as APT34.
       They have developed and deployed malware families like Shark and Milan, and
       have been observed using DNS tunneling and HTTPfor command and control communication.
+    alias:
+      - COBALT LYCEUM
+      - HEXANE
+      - UNC1530
+      - Spirlin
+      - MYSTICDOME
+      - siamesekitten
+      - Chrono Kitten
+      - Storm-0133
     tide.vocab.stages: misp
   - id: 9c124874-042d-48cd-b72b-ccdc51ecbbd6
     name: APT41
     description: APT41 is a prolific cyber threat group that carries out Chinese state-sponsored
       espionage activity in addition to financially motivated activity potentially
       outside of state control.
+    alias:
+      - G0096
+      - TA415
+      - Blackfly
+      - Grayfly
+      - LEAD
+      - BARIUM
+      - WICKED SPIDER
+      - WICKED PANDA
+      - BRONZE ATLAS
+      - BRONZE EXPORT
+      - Red Kelpie
+      - G0044
+      - Earth Baku
+      - Amoeba
+      - HOODOO
+      - Brass Typhoon
+      - Winnti
+      - Double Dragon
+      - TG-2633
     tide.vocab.stages: misp
   - id: 5f108484-db7f-11e9-aaa4-fb0176425734
     name: Tortoiseshell
@@ -5397,6 +6595,13 @@ keys:
       July 2018. Symantec has identified a total of 11 organizations hit by the group,
       the majority of which are based in Saudi Arabia. In at least two organizations,
       evidence suggests that the attackers gained domain admin-level access.'
+    alias:
+      - IMPERIAL KITTEN
+      - Yellow Liderc
+      - Imperial Kitten
+      - TA456
+      - DUSTYCAVE
+      - Crimson Sandstorm
     tide.vocab.stages: misp
   - id: 7aa99279-4255-4d26-bb95-12e7156555a0
     name: POISON CARP
@@ -5407,6 +6612,10 @@ keys:
       on iOS and Android devices, and in some cases to OAuth phishing pages. This
       campaign was carried out by what appears to be a single operator that we call
       POISON CARP.
+    alias:
+      - Evil Eye
+      - Red Dev 16
+      - Earth Empusa
     tide.vocab.stages: misp
   - id: 5cd95926-0098-435e-892d-9c9f61763ad7
     name: TA410
@@ -5449,6 +6658,8 @@ keys:
       goal of the group is to steal confidential data, the main victims are government
       agencies from Brazil, India, Kazakhstan, Russia, Thailand, Turkey. Our data
       suggest that the group has Asian roots. Description translated from Russian.
+    alias:
+      - BRONZE MEDLEY
     tide.vocab.stages: misp
   - id: 39925aa0-c7bf-4b9b-97d6-7d600329453d
     name: TA2101
@@ -5466,6 +6677,13 @@ keys:
       the Italian Revenue Agency. We have also recently observed the actor targeting
       organizations in the United States using the IcedID banking Trojan while impersonating
       the United States Postal Service (USPS).
+    alias:
+      - Maze Team
+      - TWISTED SPIDER
+      - GOLD VILLAGE
+      - Storm-0216
+      - DEV-0216
+      - UNC2198
     tide.vocab.stages: misp
   - id: feb0cfef-0472-4108-83d7-1a322d8ab86b
     name: APT-C-34
@@ -5479,6 +6697,8 @@ keys:
       with considerable resources, and one who had the ability to develop their private
       hacking tools, buy expensive spyware off the surveillance market, and even invest
       in radio communications interception hardware.
+    alias:
+      - Golden Falcon
     tide.vocab.stages: misp
   - id: 69e11692-691e-4bfb-9557-4e2a271684ed
     name: luoxk
@@ -5492,6 +6712,11 @@ keys:
       an Indian company. To spread the malware, they use unique implementations to
       leverage the exploits of known vulnerabilities (such as CVE-2017-11882) and
       later deploy a Powershell payload in the final stages.
+    alias:
+      - SideWinder
+      - Rattlesnake
+      - APT-C-17
+      - T-APT-04
     tide.vocab.stages: misp
   - id: c432d032-ce2b-4eb8-ba87-312b2a43fb7a
     name: Operation Wocao
@@ -5516,6 +6741,8 @@ keys:
       have not seen newcampaigns using Taidoor malware since 2014, we believe the
       Budminer group has changedtactics to avoid detection after being outed publicly
       in security white papers and blogs over thepast few years.
+    alias:
+      - Budminer cyberespionage group
     tide.vocab.stages: misp
   - id: 947a450a-df6c-4c2e-807b-0da8ecea1d26
     name: Attor
@@ -5531,6 +6758,10 @@ keys:
       samples have been collected from the group, including more than 60 malicious
       plugins specifically for lateral movement; more than 40 C2 domain names and
       IPs related to the organization have also been discovered.
+    alias:
+      - Sapphire Mushroom
+      - Blue Mushroom
+      - NuclearCrisis
     tide.vocab.stages: misp
   - id: 87af83a4-ced4-4e7c-96a6-86612dc095b1
     name: InvisiMole
@@ -5545,6 +6776,9 @@ keys:
       documents to deliver the PowerShell Empire post-exploitation framework. ANTHROPOID
       SPIDER likely enabled a breach that allegedly involved fraudulent transfers
       over the SWIFT network.
+    alias:
+      - Empire Monkey
+      - CobaltGoblin
     tide.vocab.stages: misp
   - id: 2d2f3b53-c544-4823-a65f-da53ff8f594e
     name: CLOCKWORK SPIDER
@@ -5563,6 +6797,8 @@ keys:
       with the largest known ransomware demand being 250 BTC. Other demands were not
       nearly as high, suggesting that the group conducts network reconnaissance to
       determine the value of the victim organization.
+    alias:
+      - GOLD HERON
     tide.vocab.stages: misp
   - id: 168a9e38-70e3-4542-b78f-afa2414436bb
     name: MONTY SPIDER
@@ -5574,6 +6810,9 @@ keys:
     description: NARWHAL SPIDER’s operation of Cutwail v2 was limited to country-specific
       spam campaigns, although late in 2019 there appeared to be an effort to expand
       by bringing in INDRIK SPIDER as a customer.
+    alias:
+      - GOLD ESSEX
+      - TA544
     tide.vocab.stages: misp
   - id: c042c592-25f6-4887-8a1b-6b8e3bfdcf0c
     name: NOCTURNAL SPIDER
@@ -5599,6 +6838,9 @@ keys:
       only to trusted affiliates. This preference can be seen in the fact that adversaries
       observed using the tools include the targeted criminal adversary COBALT SPIDER
       and BGH adversaries WIZARD SPIDER and PINCHY SPIDER.
+    alias:
+      - badbullzvenom
+      - badbullz
     tide.vocab.stages: misp
   - id: f628b544-48b6-44e2-b794-950713353cf1
     name: Operation Shadow Force
@@ -5624,6 +6866,9 @@ keys:
       malware and Twitter accounts to store C2 server urls. On 2018, an actor named
       DarkUniverse, which was active between 2009 to 2017, was attributed to this
       ItaDuke by Kaspersky.
+    alias:
+      - DarkUniverse
+      - SIG27
     tide.vocab.stages: misp
   - id: 169187c5-9fbe-42df-ae92-6e35846db021
     name: Nazar
@@ -5636,6 +6881,8 @@ keys:
       toolkit where a main dropper silently registers multiple DLLs as OLE controls
       in the Windows registry. Functionality includes keylogging, sound and screen
       grabbing, as well as traffic capture using the MicroOlap Packet Sniffer library.'
+    alias:
+      - SIG37
     tide.vocab.stages: misp
   - id: a9df6cb7-74ff-482f-b23b-ac40e975a31a
     name: Higaisa
@@ -5664,6 +6911,10 @@ keys:
       CTU researchers have observed the group using strategic web compromises to deliver
       malware. CTU researchers’ discovery of new C2 domains in 2019 suggest the group
       is still actively performing operations.
+    alias:
+      - APT-C-38 (QiAnXin)
+      - SABER LION
+      - TG-2884 (SCWX CTU)
     tide.vocab.stages: misp
   - id: d1c25b0e-e4c5-4b7c-b790-2e185cb2f07e
     name: COBALT KATANA
@@ -5682,6 +6933,11 @@ keys:
       use of DNS hijacking, implementation of DNS-based C2 channels in malware and
       web shell security mechanisms suggest connections to COBALT GYPSY and COBALT
       EDGEWATER.
+    alias:
+      - Hive0081 (IBM)
+      - SectorD01 (NHSC)
+      - xHunt campaign (Palo Alto)
+      - Hunter Serpens
     tide.vocab.stages: misp
   - id: 3cbc52d5-fe4d-4d7a-a5e9-641b7c073d62
     name: Dark Basin
@@ -5707,6 +6963,10 @@ keys:
       providers over the world, mostly South-East Asia, Europe and Africa. To compromise
       targeted networks, GALLIUM target unpatched internet-facing services using publicly
       available exploits and have been known to target vulnerabilities in WildFly/JBoss.
+    alias:
+      - Red Dev 4
+      - Alloy Taurus
+      - Granite Typhoon
     tide.vocab.stages: misp
   - id: b6f3150f-2240-4c57-9dda-5144c5077058
     name: Evilnum
@@ -5718,6 +6978,12 @@ keys:
       toolset and infrastructure have evolved and now consist of a mix of custom,
       homemade malware combined with tools purchased from Golden Chickens, a Malware-as-a-Service
       (MaaS) provider whose infamous customers include FIN6 and Cobalt Group.
+    alias:
+      - DeathStalker
+      - TA4563
+      - EvilNum
+      - Jointworm
+      - KNOCKOUT SPIDER
     tide.vocab.stages: misp
   - id: bfb0bc20-5bdf-47ff-b07f-dbd9a3cb9772
     name: Fox Kitten
@@ -5728,6 +6994,12 @@ keys:
       government. According to DRAGOS, they also targeted ICS-related entities using
       known VPN vulnerabilities. They are widely known to use open source penetration
       testing tools for reconnaissance and to establish encrypted communications.
+    alias:
+      - PIONEER KITTEN
+      - PARISITE
+      - UNC757
+      - Lemon Sandstorm
+      - RUBIDIUM
     tide.vocab.stages: misp
   - id: b205584e-db93-433a-b97a-7f2e19d8c188
     name: XDSpy
@@ -5746,6 +7018,8 @@ keys:
       Evil Corp operations.  Responsible for stealing over $100M from businesses and
       consumers.  The Evil Corp organization is known for utilizing custom strains
       of malware such as JabberZeus, Bugat and Dridex to steal banking credentials.
+    alias:
+      - GOLD DRAKE
     tide.vocab.stages: misp
   - id: 6cc574c0-3dfa-459c-933a-4c63490c4e93
     name: TRACER KITTEN
@@ -5783,6 +7057,9 @@ keys:
       code signing certificates, and private or semi-private malware. Outsourcing
       work to these criminal service providers likely enables FIN11 to increase the
       scale and sophistication of their operations.
+    alias:
+      - TEMP.Warlock
+      - UNC902
     tide.vocab.stages: misp
   - id: 3c2bb7d7-a085-4594-adc7-4a20cf724abb
     name: UNC1878
@@ -5819,6 +7096,12 @@ keys:
       ATT&CK team — with the assistance of contributors — has been mapping techniques
       used by the actor group, referred to as UNC2452/Dark Halo by FireEye and Volexity
       respectively, as well as SUNBURST and TEARDROP malware.
+    alias:
+      - DarkHalo
+      - StellarParticle
+      - NOBELIUM
+      - Solar Phoenix
+      - Midnight Blizzard
     tide.vocab.stages: misp
   - id: 27de6a09-844b-4dcb-9ff9-7292aad826ba
     name: TeamTNT
@@ -5837,6 +7120,8 @@ keys:
       stands out with their social media presence and penchant for self-promotion.
       Tweets from the TeamTNT’s account are in both English and German although it
       is unknown if they are located in Germany.'
+    alias:
+      - Adept Libra
     tide.vocab.stages: misp
   - id: 4f05d6c1-3fc1-4567-91cd-dd4637cc38b5
     name: HAFNIUM
@@ -5855,6 +7140,12 @@ keys:
       customer accounts, this reconnaissance activity helps the adversary identify
       more details about their targets’ environments. HAFNIUM operates primarily from
       leased virtual private servers (VPS) in the United States.
+    alias:
+      - ATK233
+      - G0125
+      - Operation Exchange Marauder
+      - Red Dev 13
+      - Silk Typhoon
     tide.vocab.stages: misp
   - id: 986fcc3f-5f36-4975-bf5f-c42524466bbd
     name: RedEcho
@@ -5867,6 +7158,13 @@ keys:
     description: Ghostwriter is referred as an 'activity set', with various incidents
       tied together by overlapping behavioral characteristics and personas, rather
       than as an actor or group in itself.
+    alias:
+      - UNC1151
+      - TA445
+      - PUSHCHA
+      - Storm-0257
+      - DEV-0257
+      - UAC-0057
     tide.vocab.stages: misp
   - id: eaeae8e9-cc4b-4be8-82fd-8edc65ff9a5e
     name: Yanbian Gang
@@ -5886,6 +7184,8 @@ keys:
   - id: 08f4bfa6-8326-42b5-a9e2-d6e1c360a160
     name: MALLARD SPIDER
     description: Crowdstrike tarcks the operators behind the Qbot as MALLARD SPIDER
+    alias:
+      - GOLD LAGOON
     tide.vocab.stages: misp
   - id: 090d0553-cdcf-4f4e-ae3b-b5d751acaf5d
     name: RIDDLE SPIDER
@@ -5903,6 +7203,8 @@ keys:
       as an initial access vector (IAV) during some intrusions. Since July 2020, the
       group has also used GOLD SWATHMORE's IcedID (Bokbot) malware as an IAV in some
       intrusions.
+    alias:
+      - SPRITE SPIDER
     tide.vocab.stages: misp
   - id: f65103ad-f051-47c3-b90e-c77239a4d65c
     name: SOLAR SPIDER
@@ -5996,6 +7298,8 @@ keys:
       to apply additional pressure to victims. As of January 2021, CTU researchers
       had found no Pysa advertisements on underground forums, which likely indicates
       that it is not operated as ransomware as a service (RaaS).
+    alias:
+      - CYBORG SPIDER
     tide.vocab.stages: misp
   - id: 36e8c848-4d20-47ea-9fc2-31aa17bf82d1
     name: GOLD CABIN
@@ -6007,6 +7311,12 @@ keys:
       using intermediary malware like Valak. GOLD CABIN infrastructure relies on artificial
       appearing and frequently changing URLs created with a domain generation algorithm
       (DGA). The URLs host a PHP object that returns the malware as a DLL file.
+    alias:
+      - Shakthak
+      - TA551
+      - ATK236
+      - G0127
+      - Monster Libra
     tide.vocab.stages: misp
   - id: eadc8c5c-a97d-454e-8e67-475ac60749bf
     name: GOLD FAIRFAX
@@ -6164,6 +7474,10 @@ keys:
     description: An APT group that we are calling BackdoorDiplomacy, due to the main
       vertical of its victims, has been targeting Ministries of Foreign Affairs and
       telecommunication companies in Africa and the Middle East since at least 2017.
+    alias:
+      - BackDip
+      - CloudComputating
+      - Quarian
     tide.vocab.stages: misp
   - id: 2dd31182-bae1-48ed-8bb3-805a3df89783
     name: Gelsemium
@@ -6174,16 +7488,24 @@ keys:
       to the family Gelsemiaceae, Gelsemium elegans is the species that contains toxic
       compounds like Gelsemine, Gelsenicine and Gelsevirine, which ESET choses as
       names for the three components of this malware family.
+    alias:
+      - 狼毒草
     tide.vocab.stages: misp
   - id: e7aff414-fc21-43eb-ad5d-9a46e07be9f5
     name: BelialDemon
     description: Mentioned as operator of TriumphLoader and Matanbuchus
+    alias:
+      - Matanbuchus
     tide.vocab.stages: misp
   - id: da581c60-7c3d-4de6-b54c-cafea1c58389
     name: Common Raven
     description: Threat actor Common Raven has been actively targeting financial sector
       institutions, compromising their SWIFT payment infrastructure to send out fraudulent
       payments.
+    alias:
+      - OPERA1ER
+      - NXSMS
+      - DESKTOP-GROUP
     tide.vocab.stages: misp
   - id: 60fa684d-c738-4b77-98fb-3f6605e2bb82
     name: FIN13
@@ -6197,6 +7519,9 @@ keys:
       relying heavily on attack frameworks such as Cobalt Strike, the majority of
       FIN13 intrusions involve heavy use of custom passive backdoors and tools to
       lurk in environments for the long haul.
+    alias:
+      - TG2003
+      - Elephant Beetle
     tide.vocab.stages: misp
   - id: f6d02ac3-3447-4892-b844-1ef31839e04f
     name: SideCopy
@@ -6256,6 +7581,8 @@ keys:
       While initial versions of sLoad appeared in May 2018, we began tracking the
       campaigns from this actor (internally named TA554) since at least the beginning
       of 2017.'
+    alias:
+      - TH-163
     tide.vocab.stages: misp
   - id: d0d26dae-195f-4503-a6a9-ebb1ec0e07f9
     name: TA555
@@ -6288,6 +7615,10 @@ keys:
     description: Cybereason Nocturnus describes Moses Staff as an Iranian hacker group,
       first spotted in October 2021. Their motivation appears to be to harm Israeli
       companies by leaking sensitive, stolen data.
+    alias:
+      - Moses Staff
+      - Marigold Sandstorm
+      - DEV-0500
     tide.vocab.stages: misp
   - id: 8045fc09-13d6-4f90-b239-ed5060b9297b
     name: Avivore
@@ -6301,12 +7632,23 @@ keys:
       campaigns, as the first Bitter versions, for Android released in 2014 were based
       on the AndroRAT framework. Over time, they switched to a custom version that
       has been known as BitterRAT ever since.
+    alias:
+      - Bitter
+      - T-APT-17
+      - APT-C-08
+      - Orange Yali
+      - TA397
     tide.vocab.stages: misp
   - id: d9e5be22-1a04-4956-af6c-37af02330980
     name: LAPSUS
     description: An actor group conducting large-scale social engineering and extortion
       campaign against multiple organizations with some seeing evidence of destructive
       elements.
+    alias:
+      - LAPSUS$
+      - DEV-0537
+      - SLIPPY SPIDER
+      - Strawberry Tempest
     tide.vocab.stages: misp
   - id: ef59014b-79bb-408f-97f1-3c585a240ca7
     name: Scarab
@@ -6333,6 +7675,20 @@ keys:
     name: SaintBear
     description: A group targeting UA state organizations using the GraphSteel and
       GrimPlant malware.
+    alias:
+      - UNC2589
+      - TA471
+      - UAC-0056
+      - Nascent Ursa
+      - Nodaria
+      - FROZENVISTA
+      - Storm-0587
+      - DEV-0587
+      - Saint Bear
+      - Lorec53
+      - EMBER BEAR
+      - Lorec Bear
+      - Bleeding Bear
     tide.vocab.stages: misp
   - id: bee8b09c-07e5-4c12-94d6-266ebcb1ec24
     name: UNC3524
@@ -6352,6 +7708,8 @@ keys:
       have continued, including the Ministry of Foreign Affairs. Over the past week,
       TAG identified additional compromises impacting multiple Russian defense contractors
       and manufacturers and a Russian logistics company.
+    alias:
+      - UNC3742
     tide.vocab.stages: misp
   - id: bfe66711-32dc-4c1f-b78b-9b2f9e4c1525
     name: Red Menshen
@@ -6370,6 +7728,9 @@ keys:
       weekends), with most communication taking place between 01:00 and 10:00 UTC.131
       This pattern suggests a consistent 8 to 9-hour activity window for the threat
       actor, with realistic probability of it aligning to local working hours.
+    alias:
+      - Red Dev 18
+      - Earth Bluecrow
     tide.vocab.stages: misp
   - id: 54ae5c75-8aab-41a8-971a-03d53db9b35c
     name: Cosmic Lynx
@@ -6403,6 +7764,8 @@ keys:
       to deliver the payload, namely BUMBLEEBEE and BAZARLOADER, further evading detection
       mechanisms. This level of human-interaction is rather unusual for cyber crime
       groups focused on mass scale operations.
+    alias:
+      - DEV-0413
     tide.vocab.stages: misp
   - id: d1a8626a-06a5-4ecc-9519-e17fc6724f15
     name: TA578
@@ -6430,17 +7793,26 @@ keys:
       December 2020 against high-profile entities in Europe and Asia. There is still
       little information about this actor, but its main distinctive signs are two
       formerly unknown tools that Kaspersky call ‘Samurai backdoor’ and ‘Ninja Trojan’.
+    alias:
+      - Websiic
     tide.vocab.stages: misp
   - id: 3c5129ea-8f18-4bcf-a33b-b5aab0720494
     name: POLONIUM
     description: Microsoft successfully detected and disabled attack activity abusing
       OneDrive by a previously undocumented Lebanon-based activity group Microsoft
       Threat Intelligence Center (MSTIC) tracks as POLONIUM.
+    alias:
+      - Plaid Rain
+      - UNC4453
+      - GREATRIFT
     tide.vocab.stages: misp
   - id: e665ac2f-87b4-4c2e-bef7-78bf0a8af87b
     name: Predatory Sparrow
     description: A self-proclaimed hacktivist group that carried out attacks against
       Iranian railway systems and against Iranian steel plants.
+    alias:
+      - Indra
+      - Gonjeshke Darande
     tide.vocab.stages: misp
   - id: a5f64c1a-c829-4855-903d-e0ff2098b2d7
     name: DEV-0586
@@ -6449,6 +7821,9 @@ keys:
       that the malware (WhisperGate), which is designed to look like ransomware but
       lacking a ransom recovery mechanism, is intended to be destructive and designed
       to render targeted devices inoperable rather than to obtain a ransom.
+    alias:
+      - Ruinous Ursa
+      - Cadet Blizzard
     tide.vocab.stages: misp
   - id: bc6f3b91-5a28-46df-9778-179218c809fe
     name: Kinsing
@@ -6456,6 +7831,8 @@ keys:
       published samples of alleged stolen data from companies on their site on Tor.
       It is unclear if they conducted the attacks themselves, or if they bought leaked
       databases from third parties.
+    alias:
+      - Money Libra
     tide.vocab.stages: misp
   - id: 9d82077b-7e95-4b22-8762-3224797ff5f0
     name: Earth Berberoka
@@ -6466,6 +7843,8 @@ keys:
       from using tried-and-tested malware families that have been upgraded, such as
       PlugX and Gh0st RAT, Earth Berberoka has also developed a brand-new complex,
       multistage malware family, which has been dubbed PuppetLoader.
+    alias:
+      - GamblingPuppet
     tide.vocab.stages: misp
   - id: 39150b30-61af-4d9c-9682-1595e145f3c1
     name: Earth Lusca
@@ -6476,6 +7855,18 @@ keys:
       to operate separately from Winnti. Earth Lusca has also been observed targeting
       cryptocurrency payment platforms and cryptocurrency exchanges in what are likely
       financially motivated attacks.
+    alias:
+      - CHROMIUM
+      - ControlX
+      - TAG-22
+      - FISHMONGER
+      - BRONZE UNIVERSITY
+      - AQUATIC PANDA
+      - Red Dev 10
+      - RedHotel
+      - Charcoal Typhoon
+      - BountyGlad
+      - Red Scylla
     tide.vocab.stages: misp
   - id: c96e1329-cf7e-44ac-a3db-9e251dc98ec5
     name: Earth Wendigo
@@ -6499,6 +7890,8 @@ keys:
       private enterprises across Southeast Asia. CTU researchers assess with moderate
       confidence that BRONZE EDGEWOOD operates on behalf the Chinese government and
       has a remit that covers political espionage.
+    alias:
+      - Red Hariasa
     tide.vocab.stages: misp
   - id: 7e6d82a4-3b7d-4c24-a2c5-e211ce6eafc5
     name: APT9
@@ -6512,6 +7905,10 @@ keys:
       a trusted relationship between the two companies. APT9 use a wide range of backdoors,
       including publicly available backdoors, as well as backdoors that are believed
       to be custom, but are used by multiple APT groups.
+    alias:
+      - NIGHTSHADE PANDA
+      - Red Pegasus
+      - Group 27
     tide.vocab.stages: misp
   - id: 8b77424e-18bc-4ea7-baa4-d87441978e20
     name: BRONZE SPRING
@@ -6527,6 +7924,8 @@ keys:
       \ and individuals in the U.S. and abroad since 2009, and that exfiltrated data\
       \ would be passed to the Chinese Ministry of State Security or sold for financial\
       \ gain."
+    alias:
+      - UNC302
     tide.vocab.stages: misp
   - id: 737c0207-1a1a-4480-86e7-b6a5066e1ee5
     name: BRONZE STARLIGHT
@@ -6541,6 +7940,11 @@ keys:
       \ It is plausible that BRONZE STARLIGHT deploys ransomware as a smokescreen\
       \ rather than for financial gain, with the underlying motivation of stealing\
       \ intellectual property theft or conducting espionage."
+    alias:
+      - SLIME34
+      - DEV-0401
+      - Cinnamon Tempest
+      - Emperor Dragonfly
     tide.vocab.stages: misp
   - id: 62710572-e416-419d-bb1f-81ffc1ddc976
     name: BRONZE HIGHLAND
@@ -6551,6 +7955,9 @@ keys:
       researchers assess with moderate confidence that BRONZE HIGHLAND operates on
       behalf of China and has a remit covering espionage against domestic human rights
       and pro-democracy advocates and nations neighbouring China
+    alias:
+      - Evasive Panda
+      - ' Daggerfly'
     tide.vocab.stages: misp
   - id: 3f04dbbc-69bc-409b-82a1-6135f0b6a41c
     name: BRONZE SPIRAL
@@ -6624,6 +8031,8 @@ keys:
       \ carried out by the same anonymous group, dating back to at least 2016. Over\
       \ the years, these operations targeted different sectors in multiple countries,\
       \ such as Ukraine, Russia, and Belarus."
+    alias:
+      - SixLittleMonkeys
     tide.vocab.stages: misp
   - id: c73c8a76-1e44-44d6-b955-79f3a73582a1
     name: Red Nue
@@ -6634,6 +8043,8 @@ keys:
       known as WinDealer since at least 2019, when it deployed it to targets as part
       of a watering hole campaign on a Chinese news website for the Chinese diaspora
       community. Parts of Asia feature heavily in Red Nue's victimology.
+    alias:
+      - LuoYu
     tide.vocab.stages: misp
   - id: 1bfd16ae-fd98-4a96-9397-d1651548bda2
     name: Pickaxe
@@ -6650,6 +8061,8 @@ keys:
       numbers likely to be between 30-45 million victims. The victims are found across
       the globe, with high concentrations in Thailand, Vietnam, Egypt, Indonesia,
       and Turkey.
+    alias:
+      - Prying Libra
     tide.vocab.stages: misp
   - id: 4b4b4717-d31e-4be6-a3ba-b13edb42decd
     name: Watchdog
@@ -6659,6 +8072,8 @@ keys:
       custom build Go Scripts as well as repurposed cryptojacking scripts from other
       groups including TeamTNT. They are currently considered to be an opportunistic
       threat group that targets exposed cloud instances and applications.
+    alias:
+      - Thief Libra
     tide.vocab.stages: misp
   - id: 7831d56e-5913-44ca-8835-f42017aeb0cd
     name: Returned Libra
@@ -6669,6 +8084,8 @@ keys:
       to have originated from a GitHub fork of the Rocke group's software. Returned
       Libra has elevated its mining operations with the use of cloud service platform
       credential scrapping.
+    alias:
+      - 8220 Mining Group
     tide.vocab.stages: misp
   - id: a3831248-5e2f-492d-8bb6-5e82c2f6481d
     name: TianWu
@@ -6683,6 +8100,9 @@ keys:
     description: Goblin Panda is one of a handful of elite Chinese advanced persistent
       threat (APT) groups. Most Chinese APTs target the United States and NATO, but
       Goblin Panda focuses primarily on Southeast Asia.
+    alias:
+      - Conimes
+      - Cycldek
     tide.vocab.stages: misp
   - id: e1e70539-8916-45c2-9b01-891c1c5bd8a1
     name: TA558
@@ -6725,6 +8145,8 @@ keys:
       \ any path of least resistance they can utilize. For instance, they sometimes\
       \ discover unpatched systems and use disclosed vulnerabilities to gain initial\
       \ access or elevate privileges."
+    alias:
+      - Wine Tempest
     tide.vocab.stages: misp
   - id: 50d61877-bfc7-4c65-980e-c0589b5561fa
     name: Red Dev 17
@@ -6759,6 +8181,8 @@ keys:
       infect additional targets. Attacks attributable to Aoqin Dragon typically drop
       one of two backdoors, Mongall and a modified version of the open source Heyoka
       project.
+    alias:
+      - UNC94
     tide.vocab.stages: misp
   - id: 1bb64526-cc51-475a-b6bc-af30df9f2fb6
     name: DangerousSavanna
@@ -6785,6 +8209,8 @@ keys:
     description: Hezb is a group deploying cryptominers when new exploit are available
       for public facing vulnerabilities. The name is after the miner process they
       deploy.
+    alias:
+      - Mimo
     tide.vocab.stages: misp
   - id: e62937d0-dec6-4c39-a836-e43b1d138df4
     name: NoName057(16)
@@ -6793,6 +8219,11 @@ keys:
       transportation authorities, financial institutions, and more in Ukraine and
       neighboring countries supporting Ukraine, like Ukraine itself, Estonia, Lithuania,
       Norway, and Poland.
+    alias:
+      - NoName057
+      - NoName05716
+      - 05716nnm
+      - Nnm05716
     tide.vocab.stages: misp
   - id: ecf4d7cb-9bf7-4d9d-8450-c99e885b9aac
     name: BITWISE SPIDER
@@ -6814,6 +8245,8 @@ keys:
   - id: 6a83b2bf-0c51-4c9b-89b0-35df7cab1dd5
     name: APT-C-60
     description: APT-C-60
+    alias:
+      - APT-Q-12
     tide.vocab.stages: misp
   - id: ba9e1ed2-e142-48d0-a593-f73ac6d59ccd
     name: RomCom
@@ -6823,6 +8256,9 @@ keys:
       personnel, government agencies, and political leaders. The ROMCOM backdoor is
       capable of stealing sensitive information and deploying other malware, showcasing
       the group's adaptability and growing sophistication.
+    alias:
+      - Storm-0978
+      - UAT-5647
     tide.vocab.stages: misp
   - id: 8134c96d-d6ed-49cc-99d6-fe74c0636387
     name: GOLD PRELUDE
@@ -6835,6 +8271,9 @@ keys:
       update page. These pages, which are customized to the specific visiting browser
       software, download the JavaScript-based SocGholish payload frequently embedded
       within a compressed archive.
+    alias:
+      - TA569
+      - UNC1543
     tide.vocab.stages: misp
   - id: 906e2091-cc32-499e-a799-2b9b15e45042
     name: BazarCall
@@ -6845,12 +8284,17 @@ keys:
       users must dial the number. And when they do, the users are connected with actual
       humans on the other end of the line, who then provide step-by-step instructions
       for installing malware into their devices.
+    alias:
+      - BazzarCall
+      - BazaCall
     tide.vocab.stages: misp
   - id: 171d0590-be92-443f-addb-af5dc2a8034d
     name: Evasive Panda
     description: Evasive Panda is an APT group that has been active since at least
       2012, conducting cyberespionage targeting individuals, government institutions
       and organizations.
+    alias:
+      - BRONZE HIGHLAND
     tide.vocab.stages: misp
   - id: ba57c28a-47d0-46ba-a933-9aed69f7b84f
     name: Malteiro
@@ -6860,11 +8304,16 @@ keys:
   - id: 66a0a3ad-5b07-4876-baee-cf44000f7470
     name: Moskalvzapoe
     description: null
+    alias:
+      - MAN1
+      - TA511
     tide.vocab.stages: misp
   - id: 82a808ad-3f2f-43c0-bd15-848a6e27da95
     name: TA570
     description: One of the most active Qbot malware affiliates, Proofpoint has tracked
       the large cybercrime threat actor TA570 since 2018.
+    alias:
+      - DEV-0450
     tide.vocab.stages: misp
   - id: fbb04514-f71d-4a95-a1af-727d21ef12a2
     name: TA575
@@ -6879,6 +8328,8 @@ keys:
       since mid-2020. This actor conducts broad targeting across various industries
       and geographies, and Proofpoint has observed TA577 deliver payloads including
       Qbot, IcedID, SystemBC, SmokeLoader, Ursnif, and Cobalt Strike.
+    alias:
+      - Hive0118
     tide.vocab.stages: misp
   - id: 9687a6a9-0a66-4373-b546-60553857a442
     name: TA2536
@@ -6911,6 +8362,9 @@ keys:
     description: Iranian state-sponsored cyber espionage group tasked with conducting
       information collection and surveillance operations against individuals and organizations
       of strategic interest to the Iranian government.
+    alias:
+      - UNC788
+      - CALANQUE
     tide.vocab.stages: misp
   - id: c1d44f44-425e-48fd-b78b-84b988da8bc3
     name: TA453
@@ -6926,6 +8380,8 @@ keys:
       purpose of data theft. They gave the group the name ChamelGang (from the word
       "chameleon"), because the group disguised its malware and network infrastructure
       under legitimate services of Microsoft, TrendMicro, McAfee, IBM, and Google.
+    alias:
+      - CamoFei
     tide.vocab.stages: misp
   - id: 035fbd5c-e4a1-4c7b-80fb-f5a89a361aed
     name: Karakurt
@@ -6937,6 +8393,8 @@ keys:
       ransom. Known ransom demands have ranged from $25,000 to $13,000,000 in Bitcoin,
       with payment deadlines typically set to expire within a week of first contact
       with the victim.
+    alias:
+      - Karakurt Lair
     tide.vocab.stages: misp
   - id: 7b90319a-9f7b-466d-9f90-7fcc270ed505
     name: DEV-0270
@@ -6945,6 +8403,9 @@ keys:
       a sub-group of Iranian actor PHOSPHORUS. Microsoft assesses with moderate confidence
       that DEV-0270 conducts malicious network operations, including widespread vulnerability
       scanning, on behalf of the government of Iran.
+    alias:
+      - Nemesis Kitten
+      - Storm-0270
     tide.vocab.stages: misp
   - id: eb0b100c-8a4e-4859-b6f8-eebd66c3d20c
     name: Prophet Spider
@@ -6953,6 +8414,9 @@ keys:
       which commonly involves leveraging a variety of publicly disclosed vulnerabilities.
       The adversary has likely functioned as an access broker — handing off access
       to a third party to deploy ransomware — in multiple instances.
+    alias:
+      - GOLD MELODY
+      - UNC961
     tide.vocab.stages: misp
   - id: a3c22f46-5135-4b39-a33f-92906ac12c31
     name: TA866
@@ -7003,6 +8467,9 @@ keys:
     description: Hagga is believed to have been using Agent Tesla, 2021’s sixth most
       prevalent malware, to steal sensitive information from his victims since the
       latter part of 2021.
+    alias:
+      - Aggah
+      - TH-157
     tide.vocab.stages: misp
   - id: f02679fa-5e85-4050-8eb5-c2677d93306f
     name: Volt Typhoon
@@ -7017,6 +8484,14 @@ keys:
       of U.S. government and defense organizations for intelligence gain aligns with
       PRC requirements, and the tradecraft observed in these engagements overlap with
       other state-sponsored Chinese threat groups.'
+    alias:
+      - BRONZE SILHOUETTE
+      - VANGUARD PANDA
+      - UNC3236
+      - Insidious Taurus
+      - VOLTZITE
+      - Dev-0391
+      - Storm-0391
     tide.vocab.stages: misp
   - id: c95520c1-0a27-42aa-9853-bf5f0f3bc074
     name: SmugX
@@ -7084,6 +8559,10 @@ keys:
       motivated group known to gain initial access using email-based initial infection
       vectors and then hand off access to compromised networks to other threat actors.
       These handoffs frequently lead to ransomware deployment.
+    alias:
+      - DEV-0324
+      - Sagrid
+      - TA543
     tide.vocab.stages: misp
   - id: fde2d0f9-ed23-4cdc-96d3-f0a01f804707
     name: Scattered Canary
@@ -7110,6 +8589,17 @@ keys:
     description: Scattered Spider, a highly active hacking group, has made headlines
       by targeting more than 130 organizations, with the number of victims steadily
       increasing.
+    alias:
+      - UNC3944
+      - Muddled Libra
+      - Oktapus
+      - Scattered Swine
+      - Scatter Swine
+      - Octo Tempest
+      - 0ktapus
+      - Storm-0971
+      - DEV-0971
+      - Starfraud
     tide.vocab.stages: misp
   - id: 32eebd31-5e0f-4fb9-b478-26ff4e48aaf4
     name: AtlasCross
@@ -7134,6 +8624,8 @@ keys:
     description: Void Rabisu is an intrusion set associated with both financially
       motivated ransomware attacks and targeted campaigns on Ukraine and countries
       supporting Ukraine.
+    alias:
+      - Tropical Scorpius
     tide.vocab.stages: misp
   - id: 9ee446fd-b0cd-4662-9cd1-a60b429192db
     name: Camaro Dragon
@@ -7175,6 +8667,9 @@ keys:
       in Japan and Taiwan. Although it shows no clear ties to the Chinese government,
       Xiaoqiying is staunchly pro-China and vows to target NATO countries as well
       as any country or region that is deemed hostile to China.
+    alias:
+      - Genesis Day
+      - Teng Snake
     tide.vocab.stages: misp
   - id: b7497d28-02de-4722-8b97-1fc53e1d1b68
     name: Winter Vivern
@@ -7182,6 +8677,11 @@ keys:
       in 2021. It is thought to have been active since at least 2020 and it targets
       governments in Europe and Central Asia. To compromise its targets, the group
       uses malicious documents, phishing websites, and a custom PowerShell backdoor.
+    alias:
+      - UAC-0114
+      - TA473
+      - TAG-70
+      - TA-473
     tide.vocab.stages: misp
   - id: 8c08dbe7-3ed0-4d7d-b315-22d8774a5bd9
     name: UNC3886
@@ -7199,6 +8699,8 @@ keys:
       in Taiwan, Thailand, the Philippines, and Fiji, and using “stack rumbling” via
       Image File Execution Options (IFEO), a new denial-of-service (DoS) technique
       to disable security software.
+    alias:
+      - SnakeCharmer
     tide.vocab.stages: misp
   - id: 4f1c43a4-3788-4035-a99c-e510f89edd0f
     name: Redfly
@@ -7259,6 +8761,9 @@ keys:
       group is launching cyberattacks by exploiting a vulnerability in the Data Center
       and Server editions of Confluence. Those are versions of the application that
       companies run on-premises.
+    alias:
+      - Oro0lxy
+      - DarkShadow
     tide.vocab.stages: misp
   - id: f3fd4397-19e4-47e0-b1bc-f792690e3bd0
     name: SparklingGoblin
@@ -7289,6 +8794,9 @@ keys:
       Union health care agency and the World Intellectual Property Organization. Successful
       compromises also included Embassies of European countries including Azerbaijan
       and Turkmenistan.'
+    alias:
+      - Salted Earth
+      - Sturgeon Fisher
     tide.vocab.stages: misp
   - id: 5d22315b-55ef-4d8a-86aa-00ba38057641
     name: Metador
@@ -7316,6 +8824,8 @@ keys:
       and Twitter/X profiles. Their operations are heavily inclined towards exploiting
       GDPR penalties as a method of extortion, threatening victims with potential
       legal repercussions in case of data leaks.
+    alias:
+      - Ransomed.vc
     tide.vocab.stages: misp
   - id: ce793b99-0cf2-4148-831c-ea5f6a9e0a76
     name: Carderbee
@@ -7348,6 +8858,8 @@ keys:
       details of the next stage imply the use of spear phishing or similar methods.
       The victims navigated to a URL pointing to a ZIP archive hosted on a malicious
       web server.
+    alias:
+      - Bad Magic
     tide.vocab.stages: misp
   - id: 202f5481-7bae-4a0b-b117-0642ea1dbe65
     name: Witchetty
@@ -7357,11 +8869,15 @@ keys:
       by the use of two pieces of malware, a first-stage backdoor known as X4 and
       a second-stage payload known as LookBack. ESET reported that the group had targeted
       governments, diplomatic missions, charities, and industrial/manufacturing organizations.
+    alias:
+      - LookingFrog
     tide.vocab.stages: misp
   - id: e1941666-dcde-4f31-8a56-8041ac82bb99
     name: NB65
     description: Network Battalion 65 is an hactivist group with ties to Anonymous,
       known for attacking Russian companies and performing hack-and-leak operations.
+    alias:
+      - Network Battalion 65
     tide.vocab.stages: misp
   - id: 79e826b0-b051-4a61-b38c-496021b3afdb
     name: IndigoZebra
@@ -7377,6 +8893,8 @@ keys:
       They primarily focused on counterterrorism efforts and monitoring online activities
       associated with terrorism. They gained prominence following the 2015 Charlie
       Hebdo shooting in Paris and the rise of ISIS.
+    alias:
+      - Ghost Security
     tide.vocab.stages: misp
   - id: ae2b897d-f285-4d03-9bab-0ff59d6657a7
     name: OilAlpha
@@ -7429,6 +8947,9 @@ keys:
       threat actor’s campaigns attempt to convince high-profile North American and
       European government officials as well as CEOs of prominent companies and celebrities
       into participating in recorded phone calls or video chats.
+    alias:
+      - Vovan
+      - Lexus
     tide.vocab.stages: misp
   - id: aa74d1f3-b294-405b-bb18-3ac1c13560a1
     name: BadRory
@@ -7462,6 +8983,8 @@ keys:
       infrastructures. Compromised devices also included OT devices, besides your
       typical computers, servers, and mobile devices. In typical Prodaft fashion,
       the company also gained access to one of the group's C&C server backend panels.
+    alias:
+      - Nomadic Octopus
     tide.vocab.stages: misp
   - id: f4b81cb7-0492-414f-8bf4-cc806cbff1a9
     name: KromSec
@@ -7546,6 +9069,10 @@ keys:
       platforms, intended to gain access to these start-up and high-tech companies.
       TraderTraitor may be the work of operators previously responsible for APT38
       activity.
+    alias:
+      - Jade Sleet
+      - UNC4899
+      - Pukchong
     tide.vocab.stages: misp
   - id: 167bd5f9-fa61-4a4e-91bc-3ca0d17294b2
     name: TheDarkOverlord
@@ -7563,6 +9090,8 @@ keys:
       BLOODHOUND and KERBEROAST. UNC2565's motivations are currently unknown but overlaps
       with activity that has led to SODINOKIBI ransomware. This suggests that the
       threat group may be financially motivated.
+    alias:
+      - Hive0127
     tide.vocab.stages: misp
   - id: e89ebfcb-e7a3-4b2d-b0d7-399bb4904e27
     name: Desorden Group
@@ -7602,6 +9131,8 @@ keys:
       called LightSpy, and related infrastructure, reveal a low-to-mid capable actor.
       However, the iOS implant is a modular and exhaustively functional iOS surveillance
       framework.
+    alias:
+      - Operation Poisoned News
     tide.vocab.stages: misp
   - id: 83764206-8012-47c6-9c7a-dc04c99559e7
     name: Xcatze
@@ -7663,6 +9194,8 @@ keys:
       vulnerabilities in software such as SysAid and PaperCut to gain unauthorized
       access to systems. Lace Tempest is known for deploying the Clop ransomware and
       exfiltrating data from compromised networks.
+    alias:
+      - Lace Tempest
     tide.vocab.stages: misp
   - id: 7ba756f0-0753-4da9-b00d-8cf35ba84e57
     name: WeRedEvils
@@ -7689,6 +9222,8 @@ keys:
       access Trojan to gain unauthorized access to victims' devices. The group disguises
       their malware as legitimate mobile apps, tricking users into installing them
       and granting the hackers access to their personal data.
+    alias:
+      - APT-Q-58
     tide.vocab.stages: misp
   - id: 7f24740c-9370-4968-a92e-667ef2591abe
     name: Water Labbu
@@ -7731,6 +9266,9 @@ keys:
       and website defacements. They coordinate their operations with other hacktivist
       groups and have connections to APT28, a cyber espionage group sponsored by the
       GRU.
+    alias:
+      - UAC-0100
+      - UAC-0106
     tide.vocab.stages: misp
   - id: 3689f0e2-6c39-4864-ae0b-cc03e4cb695a
     name: Zarya
@@ -7740,6 +9278,8 @@ keys:
       in Denial-of-Service attacks, website defacement campaigns, and data leaks.
       Zarya targets government agencies, service providers, critical infrastructure,
       and civil service employees, both domestically and internationally.
+    alias:
+      - UAC-0109
     tide.vocab.stages: misp
   - id: b9128c29-8941-48a8-a5be-8076dde03a08
     name: DarkCasino
@@ -7767,6 +9307,9 @@ keys:
       Unit has taken legal action and seized 41 domains used by Bohrium to disrupt
       their activities. The group has shown a particular interest in sectors such
       as technology, transportation, government, and education.
+    alias:
+      - Smoke Sandstorm
+      - BOHRIUM
     tide.vocab.stages: misp
   - id: 615311f0-58d4-4d1d-ac86-6ba86d119317
     name: KAX17
@@ -7785,6 +9328,8 @@ keys:
       campaigns, utilizing malware such as LODEINFO and MirrorStealer to steal credentials
       and exfiltrate sensitive data. While there is speculation about their connection
       to APT10, ESET currently track them as a separate entity.
+    alias:
+      - Earth Kasha
     tide.vocab.stages: misp
   - id: fcb18ca2-ea45-4f5c-a827-ed8b6b697a08
     name: VulzSecTeam
@@ -7793,6 +9338,8 @@ keys:
       in retaliation for issues such as police brutality and the treatment of Indian
       Muslims. The group has been involved in campaigns like OpIndia2.0, where they
       planned to launch DDoS attacks on Indian government websites.
+    alias:
+      - VulzSec
     tide.vocab.stages: misp
   - id: 2ce00149-9a25-4dea-8dd5-59bdb68d11a1
     name: Chernovite
@@ -7812,6 +9359,8 @@ keys:
       sophisticated tactics to avoid detection. They utilize compromised websites
       as file servers and command and control servers, and have been known to use
       attack tools like NiceRender for phishing purposes.
+    alias:
+      - Actor210426
     tide.vocab.stages: misp
   - id: 6f6b187b-971b-4df9-a7ef-9b3fd7e092f7
     name: DriftingCloud
@@ -7877,6 +9426,8 @@ keys:
       at high priority targets, with SKIPJACK being the most widely deployed. UNC4841
       primarily targeted government and technology organizations, but they have also
       been observed targeting other verticals.
+    alias:
+      - SLIME57
     tide.vocab.stages: misp
   - id: 5d0aee14-f18a-44da-a44d-28d950f06b9c
     name: CL-STA-0043
@@ -7886,6 +9437,8 @@ keys:
       and Microsoft Exchange servers to infiltrate target networks. They engage in
       reconnaissance, locate vital assets, and have been observed using native Windows
       tools for privilege escalation.
+    alias:
+      - TGR-STA-0043
     tide.vocab.stages: misp
   - id: 8345dd24-7884-48e3-b231-4791d31afe3d
     name: DEV-0928
@@ -7943,6 +9496,8 @@ keys:
       versions for Windows. The group has been active since 2018 and has targeted
       various sectors, including healthcare and manufacturing. They have also developed
       other malware strains such as PyXie RAT, Vatet loader, and Defray ransomware.
+    alias:
+      - Hive0091
     tide.vocab.stages: misp
   - id: a413c605-0e0a-41ca-bae2-5623908fda3a
     name: PerSwaysion
@@ -7959,6 +9514,8 @@ keys:
       various malware, including Deed RAT and ShadowPad. The group uses a combination
       of publicly available tools and their own protocols to communicate with their
       command-and-control servers.
+    alias:
+      - Space Pirates
     tide.vocab.stages: misp
   - id: 43236d8e-27ee-40f1-ad15-a2ad23738a76
     name: N4ughtysecTU
@@ -7982,6 +9539,9 @@ keys:
       which operates filelessly and socketlessly on compromised Windows servers. The
       group's activities have been linked to the exploitation of vulnerabilities in
       Zoho ManageEngine ADSelfService Plus and ServiceDesk Plus.
+    alias:
+      - DEV-0322
+      - Circle Typhoon
     tide.vocab.stages: misp
   - id: ad8b73df-c526-4a32-b52f-c7c3c4c058d2
     name: OldGremlin
@@ -8064,6 +9624,9 @@ keys:
       through networks. They have also been observed targeting other industries, such
       as financial and professional consulting, and have been linked to other threat
       actors, including MustangPanada and RedDelta.
+    alias:
+      - UNC1945
+      - CL-CRI-0025
     tide.vocab.stages: misp
   - id: 99d188cf-31e5-440d-a114-297cb2242d73
     name: Red-Lili
@@ -8190,6 +9753,8 @@ keys:
       and has forged relationships with other threat actors. DEV-0569 has targeted
       various sectors, including healthcare, communications, manufacturing, and education
       in the United States and Brazil.
+    alias:
+      - Storm-0569
     tide.vocab.stages: misp
   - id: d869486a-ec70-4a74-897e-31aa7b3df48d
     name: UAC-0118
@@ -8200,6 +9765,9 @@ keys:
       wiper rather than for financial gain. While there is no direct evidence linking
       FRwL to the Russian Main Intelligence Directorate, it is possible that they
       coordinate activities with state-aligned hacktivist groups.
+    alias:
+      - FRwL
+      - FromRussiaWithLove
     tide.vocab.stages: misp
   - id: e3ff56b6-2663-46bd-9e5c-017a350896d9
     name: UAC-0050
@@ -8348,6 +9916,8 @@ keys:
       of attack is password spraying, and they have been observed using tools like
       o365spray. They have a specific focus on US and Israeli targets and are likely
       operating in support of Iranian interests.
+    alias:
+      - DEV-0343
     tide.vocab.stages: misp
   - id: 179deaab-12d2-4371-b499-51b925546a22
     name: Threatsec
@@ -8391,6 +9961,9 @@ keys:
       compromise credentials of users on any new system that was breached, and use
       these credentials to log into additional systems via RDP. Volexity observed
       the attacker obtaining credentials in a variety of ways.
+    alias:
+      - UNC5221
+      - Red Dev 61
     tide.vocab.stages: misp
   - id: 6c706d8b-95a4-428d-9de5-b68b29b1893c
     name: TAG-28
@@ -8409,6 +9982,9 @@ keys:
       software to remain undetected. They exploit vulnerabilities in public-facing
       servers, use living-off-the-land techniques, and deploy a VPN connection to
       maintain persistence and move laterally within compromised networks.
+    alias:
+      - Ethereal Panda
+      - Storm-0919
     tide.vocab.stages: misp
   - id: a9f894c6-70ab-4174-b470-5999fe93d4f3
     name: Cyber Partisans
@@ -8429,6 +10005,8 @@ keys:
       The group primarily impacts individuals with Spanish surnames and conducts reconnaissance
       to obtain employee data. They masquerade as companies in South America and use
       Hotmail or Gmail email addresses.
+    alias:
+      - TA2721
     tide.vocab.stages: misp
   - id: bbb389f2-344f-4ca8-a9c9-902061f88deb
     name: Cotton Sandstorm
@@ -8437,6 +10015,11 @@ keys:
       magazine Charlie Hebdo, where they obtained and leaked personal information
       of over 200,000 customers. The group has been linked to the Iranian government
       and has been sanctioned by the US Treasury
+    alias:
+      - Emennet Pasargad
+      - Holy Souls
+      - MARNANBRIDGE
+      - NEPTUNIUM
     tide.vocab.stages: misp
   - id: 46e26e5c-ad74-45aa-a654-1afef67f4566
     name: Blackwood
@@ -8457,6 +10040,9 @@ keys:
       malware called Subzero, which has capabilities such as keylogging, capturing
       screenshots, data exfiltration, and running remote shells. They have also been
       associated with the Austrian spyware distributor DSIRF.
+    alias:
+      - KNOTWEED
+      - DSIRF
     tide.vocab.stages: misp
   - id: 46104ded-49f5-4440-bd25-e05c1126f0ba
     name: Blue Tsunami
@@ -8467,6 +10053,8 @@ keys:
       fake jobs, and fake companies to gather human intelligence for their clients.
       LinkedIn and Microsoft recently took down numerous fake accounts and company
       pages linked to Blue Tsunami.
+    alias:
+      - Black Cube
     tide.vocab.stages: misp
   - id: a4004712-f74b-4c8c-b1fb-bb7229bc2da1
     name: Cuboid Sandstorm
@@ -8476,12 +10064,17 @@ keys:
       in Israel. The group also utilized custom implants, including a remote access
       Trojan disguised as RuntimeBroker.exe or svchost.exe, to establish persistence
       on victim hosts.
+    alias:
+      - DEV-0228
     tide.vocab.stages: misp
   - id: ef0d776a-51de-4965-ba1c-69ed256e0e5d
     name: Pearl Sleet
     description: Pearl Sleet is a nation state activity group based in North Korea
       that has been active since at least 2012. They primarily target defectors from
       North Korea, media organizations in carrying out their cyber espionage activities.
+    alias:
+      - DEV-0215
+      - LAWRENCIUM
     tide.vocab.stages: misp
   - id: fa76ce6a-f434-4d4a-817f-c4bd0a3f803c
     name: Carmine Tsunami
@@ -8494,6 +10087,9 @@ keys:
       in various regions. They utilize domain registrars and inexpensive cloud hosting
       providers, often using single domains per IP address and deploying free Let's
       Encrypt SSL certificates.
+    alias:
+      - DEV-0196
+      - QuaDream
     tide.vocab.stages: misp
   - id: 3ce9610b-2435-4c41-80d1-3f95a5ff2984
     name: Mustard Tempest
@@ -8505,6 +10101,9 @@ keys:
       Strike payloads. Mustard Tempest has been associated with the cybercrime syndicate
       Mustard Tempest, also known as EvilCorp, and has been involved in ransomware
       attacks using payloads such as WastedLocker, PhoenixLocker, and Macaw.
+    alias:
+      - DEV-0206
+      - Purple Vallhund
     tide.vocab.stages: misp
   - id: 7db46444-2d27-4922-8a21-98f8509476dc
     name: UNC4990
@@ -8524,6 +10123,9 @@ keys:
       third-party signed drivers to gain access to the Windows kernel. They have also
       been linked to other spyware vendors and have been associated with extensive
       abuses of their surveillance tools.
+    alias:
+      - SOURGUM
+      - Candiru
     tide.vocab.stages: misp
   - id: dc1d0202-8976-4d15-810d-4af0feff6af9
     name: Storm-0867
@@ -8534,6 +10136,8 @@ keys:
       communication between users and legitimate services, allowing them to steal
       passwords, hijack sign-in sessions, bypass multifactor authentication, and modify
       authentication methods.
+    alias:
+      - DEV-0867
     tide.vocab.stages: misp
   - id: 209b1452-7062-46f8-9037-3be5f7eda54f
     name: Velvet Tempest
@@ -8544,12 +10148,16 @@ keys:
       access and utilizes tools like Cobalt Strike Beacons and PsExec for lateral
       movement and payload staging. They exfiltrate stolen data using a tool called
       StealBit and frequently disable unprotected antivirus products.
+    alias:
+      - DEV-0504
     tide.vocab.stages: misp
   - id: 9c0f0db1-b773-42ff-a6f7-d4b6c1d28ca4
     name: Sunglow Blizzard
     description: DEV-0665 is a threat actor associated with the HermeticWiper attacks.
       Their objective is to disrupt, degrade, and destroy specific resources within
       a targeted country.
+    alias:
+      - DEV-0665
     tide.vocab.stages: misp
   - id: c4132d43-2405-43ca-9940-a6f78e007861
     name: Vanilla Tempest
@@ -8559,6 +10167,9 @@ keys:
       has used multiple ransomware families and has been known to utilize PowerShell
       scripts for their attacks. There are similarities between Vice Society and the
       Rhysida ransomware group, suggesting a potential connection or rebranding.
+    alias:
+      - DEV-0832
+      - Vice Society
     tide.vocab.stages: misp
   - id: b80be7a7-6d06-4da7-8ae0-302a198e7c73
     name: Lilac Typhoon
@@ -8568,6 +10179,8 @@ keys:
       cryptojacking campaigns and is included in commercial exploit frameworks. Lilac
       Typhoon has also been involved in deploying various payloads such as Cobalt
       Strike, web shells, botnets, coin miners, and ransomware.
+    alias:
+      - DEV-0234
     tide.vocab.stages: misp
   - id: 03ff54cf-f7d4-4606-a531-2ca6d4fa6a54
     name: Ruby Sleet
@@ -8576,6 +10189,8 @@ keys:
       devices, and conducting cyberattacks alongside other North Korean threat actors.
       They have also targeted companies involved in COVID-19 research and vaccine
       development.
+    alias:
+      - CERIUM
     tide.vocab.stages: misp
   - id: 37f012df-54d8-4b3d-a288-af47240430ea
     name: Raspberry Typhoon
@@ -8587,6 +10202,8 @@ keys:
       or infrastructure, Raspberry Typhoon typically conducts intelligence collection
       and malware execution. In many countries, targets vary from defense and intelligence-related
       ministries to economic and trade-related ministries
+    alias:
+      - RADIUM
     tide.vocab.stages: misp
   - id: dd012c50-4f4f-4485-ac52-294a341f03e5
     name: Phlox Tempest
@@ -8597,6 +10214,8 @@ keys:
       aim to profit from clicks generated by malicious browser extensions or node-WebKit
       installed on the victim's device. Microsoft and other cybersecurity organizations
       have issued warnings about this ongoing and prevalent campaign.
+    alias:
+      - DEV-0796
     tide.vocab.stages: misp
   - id: 5f485e47-18ad-4302-85a1-0a390fe90dc1
     name: Storm-1295
@@ -8606,12 +10225,16 @@ keys:
       capability allows Storm-1295 to offer their services to other attackers. Active
       since mid-2022, Storm-1295 is tracked by Microsoft and is known for their involvement
       in the Greatness PhaaS platform.
+    alias:
+      - DEV-1295
     tide.vocab.stages: misp
   - id: 17fb8267-44a3-405b-b6b9-ba7fdeb56693
     name: Storm-1167
     description: Storm-1167 is a threat actor tracked by Microsoft, known for their
       use of an AiTM phishing kit. They were responsible for launching an attack that
       led to Business Email Compromise activity.
+    alias:
+      - DEV-1167
     tide.vocab.stages: misp
   - id: 5f71a9ea-511d-4fdd-9807-271ef613f488
     name: Opal Sleet
@@ -8621,6 +10244,10 @@ keys:
       business organizations, and the cryptocurrency industry. They have exploited
       vulnerabilities such as CVE-2023-38831 and have used malware like KonniRAT to
       gain control of victim hosts and steal important information.
+    alias:
+      - OSMIUM
+      - Konni
+      - Vedalia
     tide.vocab.stages: misp
   - id: 5ec7a98e-9725-4f87-8a6e-91e2b4ba04ac
     name: Storm-1044
@@ -8631,6 +10258,8 @@ keys:
       passing control to Twisted Spider. Twisted Spider then compromises the endpoints
       by introducing the CACTUS ransomware. Microsoft has detected ongoing malvertising
       attacks involving Storm-1044, leading to the deployment of CACTUS ransomware.
+    alias:
+      - DEV-1044
     tide.vocab.stages: misp
   - id: 0876c327-c82a-45f7-82fa-267c312ceb05
     name: Pink Sandstorm
@@ -8641,6 +10270,14 @@ keys:
       and has been observed using various tools and techniques to bypass security
       measures. They aim to steal sensitive information, including PII and intellectual
       property, and inflict damage by wiping endpoints.
+    alias:
+      - AMERICIUM
+      - BlackShadow
+      - DEV-0022
+      - Agrius
+      - Agonizing Serpens
+      - UNC2428
+      - Black Shadow
     tide.vocab.stages: misp
   - id: 2cc32087-f242-4091-8634-4554635b7a58
     name: Storm-1084
@@ -8651,6 +10288,8 @@ keys:
       They have been observed using tools such as Rport, Ligolo, and a customized
       PowerShell backdoor. The extent of their autonomy or collaboration with other
       Iranian threat actors is currently unclear.
+    alias:
+      - DEV-1084
     tide.vocab.stages: misp
   - id: b05a2a56-08dc-4827-9aef-aaade91016a4
     name: Storm-1099
@@ -8685,12 +10324,16 @@ keys:
       evasion. Their tool has been used in high-volume phishing campaigns by multiple
       actors, including DEV-0928, and is sold for $300 with VIP licenses available
       for $1,000.
+    alias:
+      - DEV-1101
     tide.vocab.stages: misp
   - id: 874860fe-5aee-4c94-aee1-2166c225c41e
     name: Storm-0381
     description: Storm-0381 is a threat actor identified by Microsoft as a Russian
       cybercrime group. They are known for their use of malvertising to deploy Magniber,
       a type of ransomware.
+    alias:
+      - DEV-0381
     tide.vocab.stages: misp
   - id: 47945864-c233-46e7-8b96-b427b97b0ebf
     name: Storm-0530
@@ -8700,6 +10343,9 @@ keys:
       "double extortion" tactics, encrypting data and threatening to publish it if
       the ransom is not paid. There are connections between H0lyGh0st and the PLUTONIUM
       APT group, indicating a possible affiliation.
+    alias:
+      - DEV-0530
+      - H0lyGh0st
     tide.vocab.stages: misp
   - id: 760b350c-522e-432d-80c5-7aab0eaf8873
     name: Storm-0539
@@ -8729,6 +10375,10 @@ keys:
       (WMI). Microsoft's Defender for Endpoint successfully blocked a large-scale
       hacking campaign carried out by Storm-1567, highlighting the effectiveness of
       their security solution.
+    alias:
+      - Akira
+      - PUNK SPIDER
+      - GOLD SAHARA
     tide.vocab.stages: misp
   - id: 3e595289-05b8-43fc-bd88-f8650436447f
     name: Storm-0829
@@ -8737,6 +10387,9 @@ keys:
       such as Karakurt, Lapsus$, and Yanluowang. Nwgen has been observed carrying
       out attacks and deploying ransomware, encrypting files and demanding a ransom
       of $150,000 in Monero cryptocurrency for the decryption software.
+    alias:
+      - DEV-0829
+      - Nwgen Team
     tide.vocab.stages: misp
   - id: eb7b5ed7-cf9d-4c72-8f89-a2ee070b89b6
     name: Storm-1674
@@ -8796,6 +10449,8 @@ keys:
       and uses themes related to the government to gain remote access to target computers.
       Their objectives include information gathering, installing follow-on malware,
       and engaging in business email compromise activities.
+    alias:
+      - Balikbayan Foxes
     tide.vocab.stages: misp
   - id: 33bfb09d-c6f4-4403-b434-1d4d4733ec52
     name: TA2719
@@ -8816,18 +10471,22 @@ keys:
       spyware company called Candiru, suggesting they may utilize multiple spyware
       technologies. There are similarities in the infrastructure and tactics used
       by Karkadann in their campaigns.
+    alias:
+      - Piwiks
     tide.vocab.stages: misp
   - id: 2f854548-1af0-4f55-acab-4f85ce9f162c
-    name: Tomiris
-    description: Tomiris is a threat actor that has been active since at least 2019.
-      They primarily target government and diplomatic entities in the Commonwealth
-      of Independent States region, with occasional victims in other regions being
-      foreign representations of CIS countries. Tomiris uses a wide variety of malware
-      implants, including downloaders, backdoors, and file stealers, developed in
-      different programming languages. They employ various attack vectors such as
-      spear-phishing, DNS hijacking, and exploitation of vulnerabilities. There are
-      potential ties between Tomiris and Turla, but they are considered separate threat
-      actors with distinct targeting and tradecraft by Kaspersky.
+    name: Storm-0473
+    description: Storm-0473 (Tomiris) is a threat actor that has been active since
+      at least 2019. They primarily target government and diplomatic entities in the
+      Commonwealth of Independent States region, with occasional victims in other
+      regions being foreign representations of CIS countries. Tomiris uses a wide
+      variety of malware implants, including downloaders, backdoors, and file stealers,
+      developed in different programming languages. They employ various attack vectors
+      such as spear-phishing, DNS hijacking, and exploitation of vulnerabilities.
+      There are potential ties between Tomiris and Turla, but they are considered
+      separate threat actors with distinct targeting and tradecraft by Kaspersky.
+    alias:
+      - UNC2849
     tide.vocab.stages: misp
   - id: 07791d89-64b6-46df-9f67-ccde8c2cbb20
     name: ShaggyPanther
@@ -8845,6 +10504,8 @@ keys:
       of choice is AresRAT, which they deliver through platforms like Heroku and Dropbox.
       Recently, they have shifted their focus to government and diplomatic entities
       in Turkey, Pakistan, Bangladesh, Ukraine, and China.
+    alias:
+      - Outrider Tiger
     tide.vocab.stages: misp
   - id: 083acee6-6969-4c74-80c2-5d442936aa97
     name: RevengeHotels
@@ -8864,6 +10525,11 @@ keys:
       actor demonstrates a high level of sophistication and uses various anti-forensic
       and anti-analysis techniques to evade detection. They have been active for a
       significant period of time and continue to pose a threat to their targets.
+    alias:
+      - FamousSparrow
+      - UNC2286
+      - Salt Typhoon
+      - RedMike
     tide.vocab.stages: misp
   - id: 220001c6-c976-4cad-a356-4d8c2dd2b1c1
     name: Operation Triangulation
@@ -8932,6 +10598,9 @@ keys:
       APT group, but conclusive proof of their nationality is lacking. They have been
       observed using various malware delivery methods and techniques, such as the
       use of Winword.exe for DLL Hijacking.
+    alias:
+      - Operation RestyLink
+      - Enelink
     tide.vocab.stages: misp
   - id: 4e137d53-b9cf-4b9a-88c2-f29dd27ac302
     name: Urpage
@@ -8953,6 +10622,9 @@ keys:
       been observed using phishing emails to spread their malware. The group is believed
       to be Russian-speaking and has continuously improved their malicious codes over
       the years.
+    alias:
+      - Retefe Gang
+      - Retefe Group
     tide.vocab.stages: misp
   - id: 1697dace-fe21-452c-acee-bef62fc5e386
     name: TA2725
@@ -8991,6 +10663,9 @@ keys:
       September 2022 disruptive attacks targeting Albanian government infrastructure
       and the use of the HomelandJustice persona to leak stolen data, BANISHED KITTEN
       has likely targeted dissidents using the AllinOneNeo malware family.
+    alias:
+      - DUNE
+      - Storm-0842
     tide.vocab.stages: misp
   - id: c74f78d1-3728-4bb9-b84f-0e46d2e870b2
     name: ProCC
@@ -9039,6 +10714,8 @@ keys:
       sensitive documents to support their cause. Cyber Anarchy Squad has been active
       for at least four years, evolving from cyber-bullying to more sophisticated
       hacking activities.
+    alias:
+      - Cyber Anarchy Squad
     tide.vocab.stages: misp
   - id: 74268518-8dd9-4223-9f7f-54421463cdb3
     name: GoldFactory
@@ -9117,6 +10794,9 @@ keys:
       and evade detection within targeted networks. The group has been active since
       at least 2018 and has been linked to multiple incidents involving data theft
       and espionage.
+    alias:
+      - RedCurl
+      - Red Wolf
     tide.vocab.stages: misp
   - id: 8cfc9653-51bc-40f1-a267-78a1b8c763f6
     name: Earth Krahang
@@ -9171,6 +10851,8 @@ keys:
       Security and has been observed using custom tooling and the SUPERSHELL framework
       in their operations. The actor has shown indications of transitioning from hacktivist
       collectives to working as a contractor for Chinese intelligence agencies.
+    alias:
+      - Uteus
     tide.vocab.stages: misp
   - id: 21ad5aad-0a55-457d-b94d-3b4565e82e0a
     name: CyberNiggers
@@ -9392,6 +11074,8 @@ keys:
       to conduct malicious actions such as configuration modification, reconnaissance,
       network traffic capture/exfiltration, and potentially lateral movement on compromised
       devices.
+    alias:
+      - UAT4356
     tide.vocab.stages: misp
   - id: d6882fb9-d1e4-4cec-889c-5423c772d199
     name: USDoD
@@ -9411,14 +11095,14 @@ keys:
       to the Scranos campaign reported in 2019.
     tide.vocab.stages: misp
   - id: 485947c7-edb6-4a07-9276-2114dc767551
-    name: PhantomCore
-    description: PhantomCore is a threat actor group known for using a remote access
-      malware called PhantomRAT. They have been observed executing malicious code
-      through specially crafted RAR archives, different from previous attacks exploiting
-      vulnerabilities. The attribution of their campaign to Ukraine is uncertain due
-      to limited visibility inside Russian networks. PhantomCore's use of RAR archives
-      in their attack chain has been previously observed in other threat actor groups
-      like Forest Blizzard.
+    name: Head Mare
+    description: Head Mare is a hacktivism focussed threat actor group known for targeting
+      Russia and Belarus sectors using a remote access malware called PhantomRAT.
+      They have been observed executing malicious code through specially crafted RAR
+      archives, different from previous attacks exploiting vulnerabilities. The attribution
+      of their campaign to Ukraine is uncertain due to limited visibility inside Russian
+      networks. PhantomCore's use of RAR archives in their attack chain has been previously
+      observed in other threat actor groups like Forest Blizzard.
     tide.vocab.stages: misp
   - id: 0558bc64-21d9-43e4-8b12-18172d9b5c7d
     name: CiberInteligenciaSV
@@ -9447,6 +11131,8 @@ keys:
       bypass security measures like DNS-based filtering and multifactor authentication.
       Despite lacking specific operational security measures, defenders have opportunities
       to detect and respond to ALPHA SPIDER's operations effectively.
+    alias:
+      - ALPHV Ransomware Group
     tide.vocab.stages: misp
   - id: 9d218bb3-fc59-43e0-a273-a0a0fb5c463e
     name: RansomHub
@@ -9488,6 +11174,9 @@ keys:
       to infect targets with malicious payloads. Cloudforce One has successfully disrupted
       their operations and provided recommendations for defense against their phishing
       campaigns.
+    alias:
+      - Storm-1837
+      - Flying Yeti
     tide.vocab.stages: misp
   - id: 1bd2034f-a135-4c71-b08f-867b7f9e7998
     name: SEXi
@@ -9578,6 +11267,9 @@ keys:
       using custom-made RATs like Vermin and open-source tools like Quasar for cyber-espionage.
       The group has resurfaced after periods of inactivity to conduct espionage operations
       against Ukraine's military and defense sectors.
+    alias:
+      - Vermin
+      - SickSync
     tide.vocab.stages: misp
   - id: 2ac0db88-8e88-447b-ad44-f781326f5884
     name: Void Arachne
@@ -9589,6 +11281,8 @@ keys:
       pornography-generating AI software and voice-and-face-swapping AI software.
       Void Arachne also promotes AI technologies for virtual kidnapping and uses AI
       voice-alternating technology to pressure victims into paying ransom.
+    alias:
+      - Silver Fox
     tide.vocab.stages: misp
   - id: c1e2121a-84c9-4fd0-99ef-917ded9cb3e1
     name: Markopolo
@@ -9660,6 +11354,9 @@ keys:
       Ruble, and Operation EUSec, focusing on exfiltrating region-specific data and
       selling it on the dark web. They have also been known to collaborate with different
       threat actors and have recently disclosed a zero-day exploit in NGINX 1.18.
+    alias:
+      - APT49
+      - AgainstTheWest
     tide.vocab.stages: misp
   - id: 46ef6903-deac-415a-afaf-97e3ce067d7e
     name: HellHounds
@@ -9693,6 +11390,8 @@ keys:
       promoting pro-PRC viewpoints. DRAGONBRIDGE has been linked to campaigns discrediting
       the US political system, sowing division between allies, and criticizing specific
       companies and individuals.
+    alias:
+      - Spamouflage Dragon
     tide.vocab.stages: misp
   - id: 99ad0cef-c53a-44d5-85d4-5459e59a06d5
     name: Boolka
@@ -9725,6 +11424,8 @@ keys:
       and XMRIG crypto miner. They are known for using obfuscation techniques, such
       as hexadecimal encoding and code obfuscation, to evade detection and compromise
       systems.
+    alias:
+      - 8220 Gang
     tide.vocab.stages: misp
   - id: df584835-97da-4e27-ab35-bcd3c5bf7815
     name: Void Banshee
@@ -9827,11 +11528,25 @@ keys:
     tide.vocab.stages: misp
   - id: d1ad4392-c85a-4f07-9818-a86f805a49f6
     name: Storm-0506
-    description: Storm-0569 is an initial access broker that distributes BATLOADER
-      using search engine optimization (SEO) poisoning with websites that spoof Zoom,
-      TeamViewer, Tableau, and AnyDesk. It uses the loader malware to inject the Cobalt
-      Strike payload and transfers access to Storm-0506 for the deployment of the
-      Black Basta ransomware.
+    description: 'Storm-0506 (DEV-0506) is a financially motivated cybercriminal group
+      operating as a core affiliate within the Black Basta ransomware-as-a-service
+      (RaaS) ecosystem, having switched from deploying Conti ransomware around April
+      2022. This actor''s operational model is distinguished by its strategic reliance
+      on a dynamic network of initial access brokers, showcasing a division of labor
+      common in RaaS operations. Throughout its history, Storm-0506 has leveraged
+      access obtained through various brokers: initially Storm-0450/0464 via Qakbot
+      infections (pre-September 2023), then expanding to include Storm-1674 delivering
+      DarkGate, Pikabot, and IcedID (September 2023), and later employing Storm-1674''s
+      Microsoft Teams vishing campaigns (October 2024) and Storm-0569''s SEO poisoning
+      leading to BATLOADER and Cobalt Strike (December 2023). Following successful
+      initial compromise, Storm-0506 employs a range of post-exploitation tools, including
+      Cobalt Strike Beacon, SystemBC, and Brute Ratel C4 backdoors, and notably, often
+      utilizes command-and-control (C2) infrastructure established by Storm-0365,
+      indicating close collaboration or shared resources. This actor is characterized
+      by hands-on-keyboard activity, culminating in the deployment of Black Basta
+      ransomware. A resurgence in activity observed in October 2024, directly linked
+      to Storm-1674''s vishing, underscores the ongoing and adaptive threat that Storm-0506
+      represents within the ransomware landscape.'
     tide.vocab.stages: misp
   - id: 0b71d2db-93fe-49b5-a9fd-7f8c94b86637
     name: SAMBASPIDER
@@ -9850,6 +11565,11 @@ keys:
       using existing tools to developing custom malware. They focus on efficient data
       exfiltration and multi-faceted extortion, often utilizing tools like COGSCAN
       and RCLONE for reconnaissance and data theft.
+    alias:
+      - Storm-1811
+      - CURLY SPIDER
+      - STAC5777
+      - Cardinal
     tide.vocab.stages: misp
   - id: 34f2d3ad-e367-4058-a10b-1f7a4274c418
     name: Hive0137
@@ -9969,6 +11689,8 @@ keys:
       where they disclose sensitive data, and has been involved in disinformation
       campaigns supporting Russian narratives. Their activities include collaboration
       with other hacktivist groups and targeting Ukrainian cyberdefense efforts.
+    alias:
+      - Russian Angry Hackers Did It
     tide.vocab.stages: misp
   - id: 6038ceaf-4c1b-470d-af36-c62948488786
     name: UAT-5394
@@ -10003,6 +11725,8 @@ keys:
       root keys, enabling the potential for custom firmware and homebrew software.
       Their exploits often involve kernel access and have raised concerns about the
       implications for piracy and litigation in the gaming community.
+    alias:
+      - Team Twiizer
     tide.vocab.stages: misp
   - id: 279ca8a7-1d04-4d95-aa8c-32c758c2de2b
     name: UTG-Q-010
@@ -10152,6 +11876,8 @@ keys:
       activities, framing it as a means to support their cause. Additionally, they
       have been noted for their potential to leak sensitive information from compromised
       devices.
+    alias:
+      - SkidSec Leaks
     tide.vocab.stages: misp
   - id: b3a4c34f-0ad6-4083-938a-958deb34b6c7
     name: Awaken Likho
@@ -10163,6 +11889,8 @@ keys:
       focusing on espionage against critical infrastructure in the defense and energy
       sectors. Analysis of their malware reveals a new version that is still in development,
       suggesting ongoing operational capabilities.
+    alias:
+      - Core Werewolf
     tide.vocab.stages: misp
   - id: a798eb63-b0b2-4da5-8a9e-d6e821f775eb
     name: CeranaKeeper
@@ -10194,6 +11922,8 @@ keys:
       attacks against Russian federal executive authorities in 2020, potentially alongside
       another Chinese group, TA428. Additionally, the group has been associated with
       the BackDoor.RemShell.24 malware, indicating a diverse toolkit in their operations.
+    alias:
+      - BlueTraveller
     tide.vocab.stages: misp
   - id: 94f0fd5e-68a7-458a-bb5f-f2f4e5230fcc
     name: Anonymous64
@@ -10205,6 +11935,8 @@ keys:
       is involved in an influence operation within China, using hacktivism as a cover.
       The accusations suggest that Anonymous 64 engages in sabotage activities, prompting
       authorities to call for public reporting of such actions.
+    alias:
+      - Anonymous 64
     tide.vocab.stages: misp
   - id: 4e26b4ac-5530-428b-8694-3dd6d24ee286
     name: Asnarök
@@ -10216,6 +11948,8 @@ keys:
       use of an IC.sh script that stole local user account data. The actor's activities
       were linked to a broader pattern of malicious exploit research and targeted
       vulnerabilities disclosed by bug bounty researchers.
+    alias:
+      - Personal Panda
     tide.vocab.stages: misp
   - id: ae17fcf4-1335-4dec-9976-e26d2e5f7290
     name: Shahid Hemmat
@@ -10331,6 +12065,8 @@ keys:
       and collaborate with other hacktivist groups. Additionally, they have been attributed
       to significant cyber disruptions, including a 100-hour DDoS campaign against
       a UAE bank, showcasing their operational capabilities.
+    alias:
+      - SN Blackmeta
     tide.vocab.stages: misp
   - id: 75d2d875-6e49-4152-b055-62337b0a22df
     name: Operation Cobalt Whisper
@@ -10425,6 +12161,14 @@ keys:
       like Upwork and Indeed, while employing automation scripts for account creation.
       WageMole's activities include sharing code within their group and requesting
       payments through platforms like PayPal to conceal their identity.
+    alias:
+      - Famous Chollima
+      - UNC5267
+      - Wagemole
+      - Nickel Tapestry
+      - Contagious Interview
+      - Storm-1877
+      - Void Dokkaebi
     tide.vocab.stages: misp
   - id: 84bf7b38-e120-44c9-bfdd-82740593a6c6
     name: APT73
@@ -10435,6 +12179,8 @@ keys:
       intended to signal operational parity with LockBit to inspire trust among low-level
       criminals. APT73 was formed by an alleged former LockBit affiliate following
       law enforcement's "Operation Cronos" in February 2024.
+    alias:
+      - Eraleig
     tide.vocab.stages: misp
   - id: 714f76b2-a8fd-49b0-8605-0eb1c9703140
     name: UAC-0194
@@ -10536,6 +12282,8 @@ keys:
       and local government. Their operations highlight the challenges of attribution
       due to the use of off-the-shelf tools and techniques that overlap with other
       state-sponsored groups.
+    alias:
+      - TAG-100
     tide.vocab.stages: misp
   - id: c4ff73cd-858a-4e84-b2cd-929532f8c320
     name: INDOHAXSEC TEAM
@@ -10601,6 +12349,8 @@ keys:
       with Stark Industries has led to the dismantling of parts of their infrastructure,
       revealing the network's breadth. AIZ is also linked to Entropy ransomware infections,
       which were preceded by detections of Cobalt Strike beacons and Dridex malware.
+    alias:
+      - AIZ
     tide.vocab.stages: misp
   - id: cbdf8d63-c114-47d5-8f32-f87f365c7c43
     name: UNC2465
@@ -10614,7 +12364,7 @@ keys:
       applying pressure on victims by releasing stolen data.
     tide.vocab.stages: misp
   - id: e7a64fd7-5d30-47ec-b9f6-8c555e5f319f
-    name: Liminal Panda
+    name: LIMINAL PANDA
     description: LIMINAL PANDA is a China-nexus APT that targets telecommunications
       entities, employing custom malware and publicly available tools for covert access,
       C2, and data exfiltration. The adversary demonstrates extensive knowledge of
@@ -10646,6 +12396,8 @@ keys:
       MESHAGENT and UltraVNC, to facilitate their operations. Their activities are
       mapped to MITRE ATT&CK, focusing on tactics related to credential theft and
       remote access.
+    alias:
+      - UNC4221
     tide.vocab.stages: misp
   - id: fba00660-d18c-4af7-831c-25757e495907
     name: Wassonite
@@ -10724,4 +12476,296 @@ keys:
       to gain unauthorized access and warned of potential exploitation of CVE-2024-55591
       by similar threat actors. Fortinet has stated that the leaked data originates
       from older campaigns and not from any recent incidents.
+    tide.vocab.stages: misp
+  - id: 12c9522e-41d7-442b-ae0e-134249732fbb
+    name: ExCobalt
+    description: ExCobalt is an APT group that has been active since at least 2016
+      and is believed to be linked to the notorious Cobalt Gang. The group primarily
+      targets Russian organizations across sectors—including metallurgy, telecommunications,
+      mining, information technology, government, and software development by exploiting
+      supply chain weaknesses and compromised contractors for initial access. ExCobalt’s
+      toolkit features a custom Golang‑based backdoor, GoRed, which enables remote
+      command execution, credential harvesting, and detailed system reconnaissance,
+      while the group also employs established tools such as Spark RAT, Mimikatz,
+      and multiple Linux privilege escalation exploits. Researchers note that ExCobalt
+      continually evolves its tactics and even modifies standard utilities to bypass
+      security controls and maintain persistent access, underscoring its commitment
+      to sophisticated cyberespionage and data theft operations.
+    tide.vocab.stages: misp
+  - id: 8b92f213-3dc6-4b45-a577-f81a6d237edf
+    name: UNC3973
+    description: UNC3973 is a financially motivated threat actor tracked by Mandiant,
+      distinguished from the broader BASTA ransomware ecosystem (primarily tracked
+      as UNC4393) due to its unique operational characteristics and TTPs. This actor
+      has demonstrated a specific focus on supply chain compromises, as evidenced
+      by their June campaign targeting credit unions in western Canada via a compromised
+      managed service provider (MSP). UNC3973 leverages unauthorized service accounts
+      with elevated privileges, specifically domain administrator accounts shared
+      between the compromised MSP and the target organizations, to gain initial access.This
+      actor's post-exploitation activity includes attempts to disable security controls
+      and deploy the SYSTEMBC tunneler for command and control (C2) communication,
+      followed by attempts to deploy BASTA ransomware. While their attempts to deploy
+      both SYSTEMBC and BASTA have been observed, these were thankfully thwarted by
+      endpoint security solutions in observed instances. The targeted, supply chain-enabled
+      nature of UNC3973's intrusions, coupled with its use of privileged shared accounts
+      and attempts at deploying BASTA, all suggest that it is an exclusive group,
+      perhaps even affiliates working closely with or possibly operating under the
+      direct control, BASTA ransomware operators. This group's ability to exploit
+      centralized access points, like MSPs, represents a significant threat to organizations
+      reliant on third-party providers.
+    tide.vocab.stages: misp
+  - id: 102b6626-1576-4034-83bb-bd9d54ae0e5e
+    name: Storm-0826
+    description: Storm-0826 is a financially motivated cybercriminal group operating
+      as an affiliate within the Black Basta ransomware-as-a-service (RaaS) ecosystem.
+      This actor's primary known method of obtaining initial access is through handoffs
+      from Storm-0464, a known distributor of the Qakbot malware
+    tide.vocab.stages: misp
+  - id: 019514dc-c894-751f-8cfd-ff2b932ff451
+    name: STAC5143
+    description: STAC5143 is a threat actor group tracked by Sophos, notable for its
+      sophisticated use of Microsoft Office 365's legitimate services to conduct ransomware
+      and data extortion campaigns. Unlike FIN7, which typically targets larger organizations
+      through phishing and malicious Google Ads, STAC5143 focuses on smaller victims
+      across diverse business sectors. Their operations begin with overwhelming targeted
+      individuals with email bombing, followed by Microsoft Teams messages impersonating
+      tech support to initiate a remote screen control session. Utilizing Microsoft's
+      Quick Assist or direct Teams screen sharing, they deploy malware, including
+      Java Archive (JAR) files and Python-based backdoors, from external SharePoint
+      file stores. This cluster exploits legitimate services within the Microsoft
+      Office 365 platform, using a Java-based proxy to execute PowerShell commands
+      and download malicious payloads. While employing publicly available tools like
+      RPivot, their obfuscation methods and the use of side-loaded DLLs for command
+      and control, combined with the deployment of Black Basta ransomware in one instance,
+      indicate a sophisticated and evolving threat actor adapting known techniques
+      for their specific objectives.
+    tide.vocab.stages: misp
+  - id: 835c7fc6-a066-447d-a0fc-b096bd9c412f
+    name: GOLD REBELLION
+    description: 'GOLD REBELLION is a financially motivated cybercriminal threat group
+      that operates the Black Basta name-and-shame ransomware. The group posted its
+      first victim to its leak site in April 2022 and has continued to publish victim
+      names at a rate of around 15 a month since then. GOLD REBELLION has not openly
+      advertised or appeared to recruit for an affiliate program but the variety of
+      tactics, techniques and procedures (TTP) observed in Black Basta intrusions
+      suggests that multiple individuals are engaged in the ransomware scheme.Several
+      security vendors and independent researchers have suggested the distributors
+      of Black Basta may be former affiliates of GOLD ULRICK''s Conti operation. Technical
+      artifacts analyzed by CTU researchers suggest that Black Basta has been under
+      development since at least early February 2022, several weeks before extensive
+      public leaks detailed GOLD ULRICK''s Conti operation. In November 2022, researchers
+      at SentinelOne linked custom tooling used by GOLD REBELLION to the GOLD NIAGARA
+      (FIN7) threat group. CTU researchers have not made independent observations
+      corroborating a relationship between these threat groups or any others.GOLD
+      REBELLION appear to have been a key customer of GOLD LAGOON''s Qakbot: CTU researchers
+      observed multiple incidents where Black Basta was distributed through it as
+      an initial access vector (IAV), leading to Cobalt Strike and further lateral
+      movement into the victim network. Following the takedown of Qakbot in August
+      2023, GOLD REBELLION explored new methods of delivery, including DarkGate and
+      Pikabot. In one incident, CTU researchers observed a threat actor gain access
+      to a victim network through a managed security services provider (MSSP). In
+      October 2024, GOLD REBELLION likely exploited a vulnerability in a Sonic Wall
+      VPN device for access. Also in 2024, CTU researchers observed multiple instances
+      of the group using social engineering to convince victims to download remote
+      management and monitoring tools like AnyDesk and Quick Assist. After spamming
+      inboxes with multiple emails, the threat actors approached the affected users
+      via Teams, purporting to be IT Support or Help Desk employees offering assistance
+      with email inbox issues.Other tools members of the group have used include the
+      SystemBC back connect malware, PsExec for remote execution, RDP for lateral
+      movement, batch files to delete their own tools and disable anti-virus programs
+      for defense evasion, and both Rclone and MegaSync for data exfiltration.'
+    alias:
+      - WANDERING SPIDER
+      - White Dev 115
+      - Dark Scorpius
+    tide.vocab.stages: misp
+  - id: eedb23e9-49f4-45ad-90b6-9ff3e9d7e2b6
+    name: JavaGhost
+    description: JavaGhost is a threat actor group that has targeted cloud environments,
+      particularly AWS, for phishing campaigns without engaging in data theft for
+      extortion. They exploit overly permissive IAM permissions and utilize long-term
+      access keys to gain initial access, employing the GetFederationToken API to
+      acquire temporary credentials for console access. JavaGhost has demonstrated
+      advanced evasion techniques, avoiding common detection methods by not using
+      the GetCallerIdentity API call. Their activities generate detectable logging
+      footprints in CloudTrail, allowing organizations to identify and respond to
+      their tactics.
+    tide.vocab.stages: misp
+  - id: a6ca6148-d49f-4b72-a4ad-181a00dfec68
+    name: Angry Likho
+    description: Angry Likho is an APT group that has been active since 2023, primarily
+      targeting large organizations and government agencies in Russia and Belarus.
+      Their attacks typically involve spear-phishing emails with malicious attachments,
+      such as RAR archives, and utilize a known payload, the Lumma stealer, for data
+      exfiltration. The group employs a compact infrastructure and has been linked
+      to espionage activities, particularly in sectors like aviation and pharmaceuticals.
+      Their operations have shown a focus on collecting sensitive information, including
+      cryptowallet files and user credentials.
+    alias:
+      - Sticky Werewolf
+    tide.vocab.stages: misp
+  - id: bdb9ac86-fd43-41e1-a06e-7cff2b5a922d
+    name: PlushDaemon
+    description: PlushDaemon is a China-aligned APT group that has conducted cyberespionage
+      operations against targets in China, Taiwan, Hong Kong, South Korea, the United
+      States, and New Zealand. They executed a supply chain attack on the South Korean
+      VPN provider IPany, compromising its installer to deploy the SlowStepper backdoor,
+      which features a toolkit of over 30 components. PlushDaemon primarily gains
+      initial access by hijacking legitimate updates of Chinese applications and has
+      also exploited vulnerabilities in legitimate web servers. Additionally, they
+      have utilized the Visual Studio command line utility regcap.exe to side-load
+      a malicious DLL named lregdll.dll.
+    tide.vocab.stages: misp
+  - id: 07e1bbc4-19ad-4706-a5fe-cf28f0b67300
+    name: Storm-2139
+    description: Storm-2139 is a cybercrime group that exploited stolen API keys from
+      compromised Azure OpenAI Service accounts to generate harmful content, including
+      non-consensual intimate imagery, using the DALL-E model. The group utilized
+      reverse proxy infrastructure and custom software to bypass guardrails in Microsoft’s
+      GenAI services. Microsoft has filed a lawsuit against four individuals associated
+      with Storm-2139, alleging they modified customer systems and resold access to
+      these capabilities. The group systematically harvested authentication tokens
+      from U.S.-based enterprises and is linked to a broader network of illicit AI
+      tool development and distribution.
+    tide.vocab.stages: misp
+  - id: 22bdf6e8-49c8-42a9-994e-9b6e90868543
+    name: Larva-208
+    description: LARVA-208 is a financially motivated threat actor employing sophisticated
+      phishing campaigns to harvest credentials and deploy ransomware. The actor uses
+      multiple tactics, including Open URL Redirection, fake login pages, and social
+      engineering, to bypass MFA and gain access to corporate networks. LARVA-208
+      has compromised over 618 organizations since June 2024, often deploying ransomware
+      payloads. The threat actor is linked to LARVA-148, a threat actor managing domain
+      acquisitions and attacks.
+    alias:
+      - EncryptHub
+    tide.vocab.stages: misp
+  - id: e8ff09b5-8291-454a-8ab5-df39bed2f99f
+    name: Ukrainian Cyber Alliance
+    description: Cyber Alliance is a hacktivist group that has demonstrated capabilities
+      in exploiting vulnerabilities, such as CVE-2023-22515 in Confluence, to escalate
+      privileges and access targeted infrastructure. They successfully accessed Trigona's
+      systems, exfiltrating sensitive data and ultimately defacing and deleting the
+      organization's site.
+    alias:
+      - UCA
+    tide.vocab.stages: misp
+  - id: 558e7697-7195-4086-a0d0-cd3b4c7b3747
+    name: Larva-24005
+    description: Larva-24005 is a threat actor that breaches servers in Korea to establish
+      a web server and PHP environment for phishing attacks, primarily targeting individuals
+      involved with North Korea and university professors researching the regime.
+      They exploit the BlueKeep vulnerability for initial access and utilize RDPWrap
+      and a custom keylogger post-compromise. Phishing emails are crafted to appear
+      as legitimate communications, often containing malicious URLs or compressed
+      files. The actor has been observed storing phishing pages in the IIS_USER account
+      and XAMPP home folder, although traces of these pages were later deleted.
+    tide.vocab.stages: misp
+  - id: cff9cc85-6f34-4deb-9239-730e34e639f3
+    name: GreenSpot
+    description: GreenSpot is an APT group believed to operate from Taiwan, active
+      since at least 2007, primarily targeting government, academic, and military
+      entities in China through phishing campaigns. The group frequently targets 163.com,
+      aiming to steal login credentials using deceptive domains, manipulated TLS certificates,
+      and counterfeit interfaces. Their tactics highlight the sophistication of modern
+      credential theft operations, necessitating detection efforts focused on irregular
+      domain registrations and certificate anomalies.
+    alias:
+      - PoisonVine
+      - APT-Q-20
+    tide.vocab.stages: misp
+  - id: 60b13884-76cf-4152-b78f-85ba2c4faf67
+    name: Teleboyi
+    description: Teleboyi is a threat actor reportedly based in China, associated
+      with the PlugX RAT. TeamT5 identified a custom PlugX loader used by Teleboyi
+      that employs a similar string decryption algorithm as seen in the McUtil.dll
+      loader from Operation Harvest. While there are weak links to the dsqurey[.]com
+      domain, the connection remains uncertain due to the domain's registration history.
+    tide.vocab.stages: misp
+  - id: 4d1692ca-8022-4258-9f35-149e3d0564bb
+    name: TRIPLESTRENGTH
+    description: TRIPLESTRENGTH is a financially motivated threat actor targeting
+      cloud environments and on-premises infrastructures for cryptojacking, ransomware,
+      and extortion. They exploit stolen credentials, cookies, and information stealer
+      logs to gain unauthorized access to platforms like Google Cloud, AWS, and Microsoft
+      Azure, deploying the unMiner application for cryptocurrency mining. Their ransomware
+      operations utilize lockers such as Phobos, LokiLocker, and RCRU64, involving
+      lateral movement and mass encryption. TRIPLESTRENGTH also engages in account
+      hijacking and collaborates with partners for ransomware and blackmail operations,
+      advertising their services in hacking-focused Telegram channels.
+    tide.vocab.stages: misp
+  - id: 9c2600e2-d9e6-42ea-963c-972a4b5673c6
+    name: Storm-2372
+    description: Storm-2372 is a suspected nation-state actor aligned with Russian
+      interests, engaging in device code phishing campaigns targeting governments,
+      NGOs, and various industries across Europe, North America, Africa, and the Middle
+      East. The actor employs tactics that involve impersonating prominent individuals
+      through third-party messaging services like WhatsApp and Signal to gain rapport
+      before sending phishing invitations. These invitations lure users into completing
+      device code authentication requests, granting Storm-2372 initial access to victim
+      accounts and enabling Graph API data collection activities, including email
+      harvesting. Microsoft has observed the actor utilizing keyword searches within
+      compromised accounts to exfiltrate sensitive information.
+    tide.vocab.stages: misp
+  - id: d424f90d-fc2b-428a-bbe6-41e390308fb3
+    name: GamaCopy
+    description: GamaCopy is a threat actor first discovered in June 2023, known for
+      launching cyberattacks against Russia’s defense and critical infrastructure
+      sectors by mimicking the TTPs of Gamaredon. The organization has been active
+      since at least August 2021 and primarily uses Russian-language bait documents
+      related to military facilities. Analysis of attack samples shows considerable
+      overlap in code structure and tactics, including the use of 7z-SFX documentation
+      to install UltraVNC and connecting via port 443. GamaCopy employs open-source
+      tools to obfuscate its activities while targeting sensitive information in the
+      context of the Russia-Ukraine conflict.
+    tide.vocab.stages: misp
+  - id: 5326f3c4-fd3d-450a-811b-cbb2dbcf6371
+    name: Mora_001
+    description: Mora_001 is a threat actor exhibiting a distinct operational signature
+      that combines opportunistic attacks with ties to the LockBit ecosystem. The
+      actor has been observed exploiting CVE-2024-55591 and CVE-2025-24472 vulnerabilities
+      affecting Fortinet devices. The ransom note associated with Mora_001 includes
+      the same TOX ID used by LockBit, indicating a potential affiliation or shared
+      communication channels. Their post-exploitation patterns suggest a structured
+      playbook that differentiates them from other ransomware operators, including
+      LockBit affiliates.
+    tide.vocab.stages: misp
+  - id: 7e3427c0-12d9-4fe4-a98e-0fe43db0ca28
+    name: LinkC Pub
+    description: Linkc is a newly emerged ransomware group that operates an onion-based
+      data leak site and has claimed one victim, a U.S.-based AI and cloud service
+      provider, H2O.ai, which was attacked on January 29, 2025. The group demanded
+      a ransom of $15 million for data decryption and removal, showcasing access to
+      sensitive information, including GPT model source code and customer data. Linkc's
+      DLS is well-constructed and quick to load, indicating potential for future victim
+      listings. However, there is currently no public acknowledgment from the victim,
+      and the group has not engaged in discussions on cybercrime forums.
+    alias:
+      - LinkC
+    tide.vocab.stages: misp
+  - id: a6c7ff17-b98b-469a-97cc-6303ba007e68
+    name: ScreamedJungle
+    description: ScreamedJungle is a threat actor that exploits vulnerabilities in
+      outdated Magento e-commerce platforms to inject malicious JavaScript code, specifically
+      Bablosoft JS, into compromised websites. This actor has harvested millions of
+      browser fingerprints by leveraging vulnerabilities such as CVE-2024-34102 and
+      CVE-2024-20720. ScreamedJungle utilizes PerfectCanvas technology to ensure pixel-perfect
+      replication of legitimate user fingerprints. Group-IB analysts estimate that
+      over 115 e-commerce sites have been impacted by this fingerprint theft campaign.
+    tide.vocab.stages: misp
+  - id: f0e7f369-a67d-4361-9710-9987bb306e92
+    name: FishMedley
+    description: Verticals targeted during Operation FishMedley include governments,
+      NGOs, and think tanks, across Asia, Europe, and the United States. ; Operators
+      used implants – such as ShadowPad, SodaMaster, and Spyder – that are common
+      or exclusive to China-aligned threat actors. ; We assess with high confidence
+      that Operation FishMedley was conducted by the FishMonger APT group.
+    tide.vocab.stages: misp
+  - id: e2a6fb97-b193-46a2-af73-098e13100dca
+    name: Swan Vector
+    description: Seqrite Labs APT-Team has recently uncovered a campaign which we
+      have termed as Swan Vector, that has been targeting the nations across the East
+      China sea such as Taiwan and Japan. The campaign is aimed at educational institutes
+      and mechanical engineering industry with lures aiming to deliver fake resume
+      of candidates which acts as a decoy.
     tide.vocab.stages: misp

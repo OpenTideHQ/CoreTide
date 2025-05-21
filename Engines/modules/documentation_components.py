@@ -39,6 +39,27 @@ CVE_DB_LINK = CONFIG.Documentation.cve["default_db_link"]
 FOOTER_CAPTION = "Generated from CoreTIDE Indexed Data @ "
 
 
+def actors_doc(actors:list[dict])->str:
+    data = []
+    sources = {}
+    actor_vocab_stages = vocab_metadata("actors", "stages")
+    for stage in actor_vocab_stages:
+        sources[stage.get("id")] = stage.get("icon") + " " + stage.get("name") #type: ignore
+
+    for actor in actors:
+        details = {}
+        actor_name:str = actor.get("name", "")
+        actor_data:dict = get_vocab_entry("actors", actor_name.split("::")[1]) #type: ignore
+        details["Actor"] = actor_data.get("name")
+        details["Description"] = str(actor_data.get("description")).replace("\n", "")
+        details["Aliases"] = ", ".join(actor_data.get("alias", [])) #type: ignore
+        details["Source"] = sources[actor_name.split("::")[0]]
+        details["Sighting"] = actor.get("sighting", "No documented sighting")
+        details["Reference"] = ", ".join(actor.get("references", ["No documented references"]))
+        data.append(details)
+
+    return pd.DataFrame(data).to_markdown(index=False)
+
 def criticality_doc(criticality_data: str) -> str:
     criticality_icon = get_icon("criticality")
     criticality_data_icon = get_icon(criticality_data, vocab="criticality")
@@ -66,7 +87,7 @@ def metadata_doc(metadata: dict, model_type: str) -> str:
             else:
                 metadata_enriched[meta_title] = value
         else:
-            log("WARNING", f"Missing title in metaschema : {metaschema} for key : {k}")
+            log("WARNING", f"Missing title in metaschema : {metaschema} for key : {key}")
             metadata_enriched[key] = value
     
     metadata_enriched.update(schema)

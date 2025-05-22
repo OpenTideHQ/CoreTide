@@ -88,12 +88,14 @@ keys:
 
   - id: 7d112622-4a2c-434a-b80a-f3998dfb090b
     name: URL
+    tide.vocab.stages: network
     description: |
       Represents a Uniform Resource Locator (URL), often used in web-based
       attacks or phishing campaigns.
 
   - id: 46673041-bbbb-4fd1-87fc-d89ac4c4546f
-    name: Cloud Resource
+    name: Resource
+    tide.vocab.stages: cloud
     description: |
       Represents a cloud-based resource, such as virtual machines, storage buckets, 
       or serverless functions. These resources are often targeted in cloud 

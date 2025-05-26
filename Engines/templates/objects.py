@@ -1,4 +1,4 @@
-MODEL_DOC_TEMPLATE = '''{frontmatter}
+OBJECT_DOC_TEMPLATE = '''{frontmatter}
 
 {title}
 

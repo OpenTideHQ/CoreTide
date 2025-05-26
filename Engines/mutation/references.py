@@ -12,10 +12,10 @@ from Engines.modules.files import resolve_paths
 ROOT = Path(str(git.Repo(".", search_parent_directories=True).working_dir))
 
 PATHS = resolve_paths()
-MODELS_SCOPE = ["tvm", "cdm", "bdr", "mdr"]
+OBJECTS_SCOPE = ["tvm", "cdm", "bdr", "mdr"]
 MODELS_FOLDER = dict()
 
-for model in MODELS_SCOPE:
+for model in OBJECTS_SCOPE:
     MODELS_FOLDER[model] = PATHS[model]
 PRIVATE_DOMAIN = "s.cec.eu.int"
 REF_TEMPLATE = """#references:
@@ -86,9 +86,9 @@ def upgrade_refs(old_refs):
 
 def run():
 
-    for model_type in MODELS_SCOPE:
-        folder = MODELS_FOLDER[model_type]
-        log("INFO", "Now processing all files under model type", model_type)
+    for object_type in OBJECTS_SCOPE:
+        folder = MODELS_FOLDER[object_type]
+        log("INFO", "Now processing all files under model type", object_type)
         for file in sorted(os.listdir(folder)):
             if not file.endswith(".yaml"):
                 if not file.endswith(".yml"):

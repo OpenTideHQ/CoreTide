@@ -8,7 +8,7 @@ sys.path.append(str(git.Repo(".", search_parent_directories=True).working_dir))
 
 from Engines.modules.framework import (
     get_type,
-    model_value,
+    object_value,
     get_value_metaschema,
     get_vocab_entry,
 )
@@ -25,7 +25,7 @@ ICONS = DataTide.Configurations.Documentation.icons
 DOCUMENTATION_CONFIG = DataTide.Configurations.Documentation
 CONFIG_INDEX = DataTide.Configurations.Index
 DEFINITIONS_INDEX = DataTide.TideSchemas.definitions
-MODELS_INDEX = DataTide.Objects.Index
+OBJECTS_INDEX = DataTide.Objects.Index
 
 FOLD = """
 <details>
@@ -71,7 +71,7 @@ def object_name(key):
     """
     if key == "Unknown":
         return ""
-    name = model_value(key, "name")
+    name = object_value(key, "name")
     name = f"  {get_icon(get_type(key)) or ''} {name}"
     return name or key
 
@@ -227,27 +227,27 @@ def rich_attack_links(
     return rich_techniques
 
 
-def backlink_resolver(model_uuid:str,
+def backlink_resolver(object_uuid:str,
                         raw_link:bool=False,
                         raw_hover:bool=False,
                         hover_length:int=150):
     """
-    Formats a markdown link to the model, using localized paths.
+    Formats a markdown link to the object, using localized paths.
 
     raw_link: returns the raw link, without markdown link formatting
     raw_hover: in combination with raw_link, returns a tuple with the cursor hovering content
     """
-    model_type = get_type(model_uuid)
+    object_type = get_type(object_uuid)
     file_link = backlink_name = icon = str()
 
-    model_data:dict = MODELS_INDEX[model_type][model_uuid]
-    icon = ICONS[model_type]
+    object_data:dict = OBJECTS_INDEX[object_type][object_uuid]
+    icon = ICONS[object_type]
 
-    doc_path = "../" + DOCUMENTATION_CONFIG.object_names[model_type] + "/"
+    doc_path = "../" + DOCUMENTATION_CONFIG.object_names[object_type] + "/"
     hover = ""
 
     def mdr_statuses(mdr_id):
-        mdr_configs = MODELS_INDEX["mdr"][mdr_id]["configurations"]
+        mdr_configs = OBJECTS_INDEX["mdr"][mdr_id]["configurations"]
         system_statuses = {}
         for system in mdr_configs:
             sys_status = mdr_configs[system]["status"]
@@ -256,26 +256,26 @@ def backlink_resolver(model_uuid:str,
 
         return [f"[{s}] : {status}" for s, status in system_statuses.items()]
 
-    if model_type in ["tvm", "bdr"]:
-        hover = model_value(model_uuid, "description")
-    if model_type == "cdm":
-        hover = model_value(model_uuid, "guidelines")
+    if object_type in ["tvm", "bdr"]:
+        hover = object_value(object_uuid, "description")
+    if object_type == "cdm":
+        hover = object_value(object_uuid, "guidelines")
     
-    if model_type == "mdr":
-        model_name = model_data["name"]
+    if object_type == "mdr":
+        object_name = object_data["name"]
 
-        backlink_name = model_name.replace("_", " ")
+        backlink_name = object_name.replace("_", " ")
         hover = "&#013;&#010;".join(
-            mdr_statuses(model_uuid)
+            mdr_statuses(object_uuid)
         )  # Magic entity codes to break in tooltips
-        mdr_description = model_value(model_uuid, "description") or ""
+        mdr_description = object_value(object_uuid, "description") or ""
         mdr_description = mdr_description
         hover += f"&#013;&#010;&#013;&#010;{mdr_description}"
-        file_link = f"{doc_path}{icon} {model_name}"
+        file_link = f"{doc_path}{icon} {object_name}"
     else:
-        model_name = model_data["name"].strip()
-        backlink_name = model_name
-        file_link = f"{doc_path}{icon} {model_name}"
+        object_name = object_data["name"].strip()
+        backlink_name = object_name
+        file_link = f"{doc_path}{icon} {object_name}"
 
     if DOCUMENTATION_TARGET == "generic":
         file_link = file_link.replace(" ", "%20")
@@ -283,7 +283,7 @@ def backlink_resolver(model_uuid:str,
 
     elif DOCUMENTATION_TARGET == "gitlab":
         if UUID_PERMALINKS:
-            file_link = doc_path + model_data.get("metadata",{}).get("uuid")
+            file_link = doc_path + object_data.get("metadata",{}).get("uuid")
         file_link = file_link.replace(" ", "-").replace("_", "-")
 
     hover = sanitize_hover(str(hover))
@@ -392,13 +392,13 @@ def make_vocab_link(field, key):
     return link
 
 
-def model_value_doc(model_id, key, with_icon=False, max_chars=None, legacy=False):
+def object_value_doc(object_id, key, with_icon=False, max_chars=None, legacy=False):
     """
-    Version of model_value() that add icon and data enrichment functions
+    Version of object_value() that add icon and data enrichment functions
     """
-    from Engines.modules.framework import get_type, model_value
+    from Engines.modules.framework import get_type, object_value
 
-    value = model_value(model_id, key)
+    value = object_value(object_id, key)
 
     if value:
         if with_icon:

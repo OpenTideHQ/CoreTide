@@ -14,7 +14,7 @@ sys.path.append(str(git.Repo(".", search_parent_directories=True).working_dir))
 
 from Engines.modules.framework import techniques_resolver, relations_list, get_type
 from Engines.modules.documentation import (
-    model_value_doc,
+    object_value_doc,
     get_icon,
     get_field_title,
     make_json_table,
@@ -24,22 +24,22 @@ from Engines.modules.tide import DataTide
 from Engines.modules.debug import DebugEnvironment
 
 DOCUMENTATION_TARGET = DataTide.Configurations.Documentation.documentation_target
-COVER_PAGES_ENABLED = DataTide.Configurations.Documentation.gitlab.get("model_cover_pages", False)
+COVER_PAGES_ENABLED = DataTide.Configurations.Documentation.gitlab.get("object_cover_pages", False)
 
 # For testing purposes, enabling this script to execute
 if DebugEnvironment.ENABLED:
     DOCUMENTATION_TARGET = "gitlab"
     COVER_PAGES_ENABLED = True
 
-MODELS_INDEX = DataTide.Objects.Index
+OBJECTS_INDEX = DataTide.Objects.Index
 METASCHEMAS_INDEX = DataTide.TideSchemas.Index
 ICONS = DataTide.Configurations.Documentation.icons
 
 PATHS_CONFIG = DataTide.Configurations.Global.Paths.Index
 
-MODELS_DOCS_PATH = Path(str(DataTide.Configurations.Global.Paths.Core.objects_docs_folder).replace(" ", "-"))
-MODELS_SCOPE = DataTide.Configurations.Documentation.scope
-MODELS_NAME = DataTide.Configurations.Documentation.object_names
+OBJECTS_DOCS_PATH = Path(str(DataTide.Configurations.Global.Paths.Core.objects_docs_folder).replace(" ", "-"))
+OBJECTS_SCOPE = DataTide.Configurations.Documentation.scope
+OBJECTS_NAME = DataTide.Configurations.Documentation.object_names
 
 DEPRECATED_STATUSES = ["DISABLED", "REMOVED"]
 
@@ -96,17 +96,17 @@ NAV_INDEX_FIELDS = {
         "modified",
         "statuses",
         "att&ck",
-        "detection_model"    
+        "detection_object"    
     ],
 }
 
-MODELS = NAV_INDEX_FIELDS.keys()
+OBJECTS = NAV_INDEX_FIELDS.keys()
 
 
-def build_search(model_type, mdr_status:Optional[Literal["ACTIVE", "DEPRECATED"]]=None):
+def build_search(object_type, mdr_status:Optional[Literal["ACTIVE", "DEPRECATED"]]=None):
 
     index = list()
-    index_data = MODELS_INDEX[model_type]
+    index_data = OBJECTS_INDEX[object_type]
     system_column = "🔧 Detection Systems"
     mdr_statuses = "♻️ Status"
     implementation_column = "🪛 Implementations"
@@ -126,8 +126,8 @@ def build_search(model_type, mdr_status:Optional[Literal["ACTIVE", "DEPRECATED"]
         
         # Logic to retain only MDR in the correct status, to allow breaking
         # the table into two
-        if model_type == "mdr":
-            configurations = model_value_doc(entry, "configurations") or {}
+        if object_type == "mdr":
+            configurations = object_value_doc(entry, "configurations") or {}
             status_check = list()
 
             for system in configurations:
@@ -145,7 +145,7 @@ def build_search(model_type, mdr_status:Optional[Literal["ACTIVE", "DEPRECATED"]
                 continue
 
         
-        for value in NAV_INDEX_FIELDS[model_type]:
+        for value in NAV_INDEX_FIELDS[object_type]:
             
             if value == "implementations":
                 relations = relations_list(entry, mode="count", direction="downstream")
@@ -161,17 +161,17 @@ def build_search(model_type, mdr_status:Optional[Literal["ACTIVE", "DEPRECATED"]
 
                 row[implementation_column] = " // ".join(implementations)
 
-            elif model_type == "cdm" and value == "att&ck":
+            elif object_type == "cdm" and value == "att&ck":
                 techniques = ", ".join(techniques_resolver(entry))
                 row[value] = techniques
 
-            elif model_type == "mdr":
+            elif object_type == "mdr":
 
                 if value == "statuses":
 
                     # Build a key value dict of systems and their status
                     statuses = dict()
-                    configurations = model_value_doc(entry, "configurations") or {}
+                    configurations = object_value_doc(entry, "configurations") or {}
                     for system in configurations:
                         sys_status = configurations[system]["status"]  # type: ignore
                         if mdr_status == "ACTIVE" and sys_status not in DEPRECATED_STATUSES:
@@ -187,60 +187,60 @@ def build_search(model_type, mdr_status:Optional[Literal["ACTIVE", "DEPRECATED"]
                     row[mdr_statuses] = statuses
 
                 elif value == "name":
-                    mdr_name = model_value_doc(entry, "name")
+                    mdr_name = object_value_doc(entry, "name")
                     row[value] = mdr_name
 
                 # List
                 elif value == "att&ck":
-                    model_value = (
-                        techniques_resolver(str(model_value_doc(entry, "uuid")))
+                    object_value = (
+                        techniques_resolver(str(object_value_doc(entry, "uuid")))
                         or ""
                     )
-                    if model_value:
-                        model_value = ", ".join(model_value)
-                    row[mdr_attack_technique] = model_value
+                    if object_value:
+                        object_value = ", ".join(object_value)
+                    row[mdr_attack_technique] = object_value
 
                 else:
-                    model_value = model_value_doc(
+                    object_value = object_value_doc(
                         entry, value, with_icon=True, max_chars=CHARS_CLIP
                     )
-                    row[value] = model_value
+                    row[value] = object_value
 
             else:
-                model_value = model_value_doc(
+                object_value = object_value_doc(
                     entry, value, with_icon=True, max_chars=CHARS_CLIP
                 )
 
-                if type(model_value) == list:
-                    if model_value != [None]:
-                        model_value = ", ".join(model_value)
+                if type(object_value) == list:
+                    if object_value != [None]:
+                        object_value = ", ".join(object_value)
 
-                elif type(model_value) == dict:
+                elif type(object_value) == dict:
                     # Mitigation for a possible edge case where list in a dict
                     # can be empty without invalidating validation.
                     # This approach removes dicts containing empty lists but
                     # keeps other dicts that contain values.
-                    model_value_iter = model_value.copy()
-                    for v in model_value_iter:
-                        if model_value_iter[v] == None or model_value_iter[v] == [None]:
-                            model_value.pop(v)
-                    if model_value != {}:
+                    object_value_iter = object_value.copy()
+                    for v in object_value_iter:
+                        if object_value_iter[v] == None or object_value_iter[v] == [None]:
+                            object_value.pop(v)
+                    if object_value != {}:
                         flat_values = [
-                            k.capitalize() + " : " + ", ".join(model_value[k])
-                            for k in model_value
+                            k.capitalize() + " : " + ", ".join(object_value[k])
+                            for k in object_value
                         ]
-                        model_value = ", ".join(flat_values)
+                        object_value = ", ".join(flat_values)
                     else:
-                        model_value = ""
+                        object_value = ""
 
-                row[value] = model_value
+                row[value] = object_value
 
         index.append(row)
 
     df = pd.DataFrame(index)
 
     rename_mapping = {
-        c: f"{get_field_title(c, METASCHEMAS_INDEX[model_type]['properties'])}"
+        c: f"{get_field_title(c, METASCHEMAS_INDEX[object_type]['properties'])}"
         for c in [x for x in df.columns if x not in custom_cols]
     }
     df = df.rename(columns=rename_mapping)
@@ -253,54 +253,54 @@ def build_search(model_type, mdr_status:Optional[Literal["ACTIVE", "DEPRECATED"]
 CENTER_TEXT = """
 <div align="center">
 
-### {icon} {count} {model_title}
+### {icon} {count} {object_title}
 </div>
 """
 
-def construct_navigation_index(model):
+def construct_navigation_index(object):
 
-    icon = ICONS[model]
-    model_title = DataTide.Configurations.Documentation.object_names[model]
+    icon = ICONS[object]
+    object_title = DataTide.Configurations.Documentation.object_names[object]
     nav_index = str()
 
     def count_mdr_statuses()->Tuple[int,int]:
         active_mdr = dict()
         deprecated_mdr = dict()
-        for mdr in MODELS_INDEX["mdr"]:
-            for system in MODELS_INDEX["mdr"][mdr]["configurations"]:
-                if MODELS_INDEX["mdr"][mdr]["configurations"][system]["status"] in DEPRECATED_STATUSES:
-                    deprecated_mdr[mdr] = MODELS_INDEX["mdr"][mdr]
+        for mdr in OBJECTS_INDEX["mdr"]:
+            for system in OBJECTS_INDEX["mdr"][mdr]["configurations"]:
+                if OBJECTS_INDEX["mdr"][mdr]["configurations"][system]["status"] in DEPRECATED_STATUSES:
+                    deprecated_mdr[mdr] = OBJECTS_INDEX["mdr"][mdr]
                 else:
-                    active_mdr[mdr] = MODELS_INDEX["mdr"][mdr]
+                    active_mdr[mdr] = OBJECTS_INDEX["mdr"][mdr]
 
         return len(active_mdr), len(deprecated_mdr)
 
 
-    if model == "mdr":
+    if object == "mdr":
         active_mdr_count, deprecated_mdr_count = count_mdr_statuses()
         
-        active_mdr_title = "Active " + model_title
+        active_mdr_title = "Active " + object_title
         active_mdr_summary = CENTER_TEXT.format(icon=icon,
                                                 count=active_mdr_count,
-                                                model_title=active_mdr_title)
-        active_mdr_details = build_search(model, mdr_status="ACTIVE")
+                                                object_title=active_mdr_title)
+        active_mdr_details = build_search(object, mdr_status="ACTIVE")
         
-        deprecated_mdr_title = "Deprecated " + model_title
+        deprecated_mdr_title = "Deprecated " + object_title
         deprecated_mdr_summary = CENTER_TEXT.format(icon=icon,
                                                     count=deprecated_mdr_count,
-                                                    model_title=deprecated_mdr_title)
-        deprecated_mdr_details = build_search(model, mdr_status="DEPRECATED")
+                                                    object_title=deprecated_mdr_title)
+        deprecated_mdr_details = build_search(object, mdr_status="DEPRECATED")
 
         nav_index = active_mdr_summary + "\n\n" + active_mdr_details
         nav_index += "\n\n---\n" + deprecated_mdr_summary + "\n\n" + deprecated_mdr_details
 
     else:
-        count = len(MODELS_INDEX[model])
+        count = len(OBJECTS_INDEX[object])
         summary = CENTER_TEXT.format(icon=icon,
                                     count=count,
-                                    model_title=model_title)
+                                    object_title=object_title)
 
-        details = build_search(model)
+        details = build_search(object)
         nav_index = summary + "\n\n" + details
 
     return nav_index
@@ -327,18 +327,18 @@ def run():
         log("SKIP",
             "Disabled in configuration",
             "Not generating cover pages as set to false or missing key",
-            "You can enable this feature by setting gitlab.model_cover_pages to True in documentation.toml")
+            "You can enable this feature by setting gitlab.object_cover_pages to True in documentation.toml")
         return
 
-    if not os.path.exists(MODELS_DOCS_PATH):
+    if not os.path.exists(OBJECTS_DOCS_PATH):
         log("ONGOING", "Create wiki and documentation folder")
-        MODELS_DOCS_PATH.mkdir(parents=True)
+        OBJECTS_DOCS_PATH.mkdir(parents=True)
 
-    for model in MODELS:
-        log("ONGOING", "Generating navigation index for model type", model)
+    for object in OBJECTS:
+        log("ONGOING", "Generating navigation index for object type", object)
         
-        nav_index = construct_navigation_index(model)
-        navigation_index_path = MODELS_DOCS_PATH / (MODELS_NAME[model] + ".md")
+        nav_index = construct_navigation_index(object)
+        navigation_index_path = OBJECTS_DOCS_PATH / (OBJECTS_NAME[object] + ".md")
         navigation_index_path = Path(str(navigation_index_path).replace(" ", "-"))
 
         with open(navigation_index_path, "w+", encoding="utf-8") as out:

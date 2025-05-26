@@ -10,7 +10,7 @@ from Engines.modules.logs import log
 from Engines.modules.tide import DataTide
 from Engines.modules.files import resolve_configurations
 
-MODELS_INDEX = DataTide.Objects.Index
+OBJECTS_INDEX = DataTide.Objects.Index
 CONFIGURATIONS = resolve_configurations()
 MODELS_TYPES = CONFIGURATIONS["global"]["models"]
 
@@ -24,8 +24,8 @@ def run():
     counter = 0
 
     for tide_model in MODELS_TYPES:
-        for tide_object in MODELS_INDEX[tide_model]:
-            tide_object_data = MODELS_INDEX[tide_model][tide_object]
+        for tide_object in OBJECTS_INDEX[tide_model]:
+            tide_object_data = OBJECTS_INDEX[tide_model][tide_object]
 
             tide_object_uuid = tide_object_data.get("uuid") or tide_object_data["metadata"]["uuid"]
             tide_object_name = tide_object_data["name"]

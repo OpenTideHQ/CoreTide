@@ -218,30 +218,30 @@ def indexer(write_index=False) -> dict:
 
     for meta_name in METASCHEMAS:
         if meta_name not in SKIPS:
-            model_cat_index = dict()
-            for model in os.listdir(PATHS[meta_name]):
+            object_cat_index = dict()
+            for object in os.listdir(PATHS[meta_name]):
                 
                 #Skips for empty InitTide repositories
-                if model == ".gitkeep":
+                if object == ".gitkeep":
                     continue
                 
-                model_path = Path(PATHS[meta_name]) / model
-                if (not os.path.isdir(model_path)) and (str(model_path).endswith(".yaml")):
+                object_path = Path(PATHS[meta_name]) / object
+                if (not os.path.isdir(object_path)) and (str(object_path).endswith(".yaml")):
                     obj_counter += 1
 
-                    if not model.endswith(".debug.yaml"):
-                        model_body = yaml.safe_load(open(model_path, encoding="utf-8"))
+                    if not object.endswith(".debug.yaml"):
+                        object_body = yaml.safe_load(open(object_path, encoding="utf-8"))
                         
                         #TODO Backward compatibility measure. To remove.
-                        model_body = patch.tide_1_patch(model_body, meta_name)
+                        object_body = patch.tide_1_patch(object_body, meta_name)
                         
-                        identifier = model_body.get("uuid") or model_body.get("metadata",{}).get("uuid")
+                        identifier = object_body.get("uuid") or object_body.get("metadata",{}).get("uuid")
                         if not identifier:
-                            log("FATAL", "Missing identifier from model in file", model)
+                            log("FATAL", "Missing identifier from object in file", object)
                         else:
-                            model_cat_index[identifier] = model_body
-                            files_index[identifier] = model
-            objects_index[meta_name] = model_cat_index
+                            object_cat_index[identifier] = object_body
+                            files_index[identifier] = object
+            objects_index[meta_name] = object_cat_index
 
     index["objects"] = objects_index
     index["files"] = files_index
@@ -254,13 +254,13 @@ def indexer(write_index=False) -> dict:
         log("SKIP", "Not able to find a objects.json index in Tide instance",
             "Should be generated in the next Framework generation pipeline run")
     else:
-        tide_model_index = json.load(open(TIDE_INDEXES_PATH/"objects.json", encoding="utf-8"))
+        tide_object_index = json.load(open(TIDE_INDEXES_PATH/"objects.json", encoding="utf-8"))
 
-        if tide_model_index:
-            if ("cdm" in tide_model_index) and ("bdr" in tide_model_index):
-                log("INFO", "Appending BDR to CDM in Model index as options")
-                tide_model_index["cdm"]["entries"].update(tide_model_index["bdr"]["entries"])
-            index["vocabs"].update(tide_model_index)
+        if tide_object_index:
+            if ("cdm" in tide_object_index) and ("bdr" in tide_object_index):
+                log("INFO", "Appending BDR to CDM in object index as options")
+                tide_object_index["cdm"]["entries"].update(tide_object_index["bdr"]["entries"])
+            index["vocabs"].update(tide_object_index)
     
     # Lookups indexer
 

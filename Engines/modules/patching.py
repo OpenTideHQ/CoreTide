@@ -27,7 +27,7 @@ class Tide2Patching:
             self.LEGACY_UUID_MAPPING = None
             pass
 
-    def tide_1_patch(self, model:dict, model_type:str)->dict:
+    def tide_1_patch(self, object:dict, object_type:str)->dict:
         """
         Dynamic Micro-Patching on the fly object in staging with new UUIDs to pass validation.
         Once merged to main they will be migrated definitely.
@@ -37,80 +37,80 @@ class Tide2Patching:
         
         if os.getenv("CI_COMMIT_REF_NAME") == "main":
             if os.getenv("DEPLOYMENT_PLAN") not in ["PRODUCTION", "STAGING"]:
-                if model_type != "mdr": # Allowing this option for Staging MDR documentation patching
-                    log("SKIP", "Not patching for validation, in main", model.get("name", ""))
-                    return model
+                if object_type != "mdr": # Allowing this option for Staging MDR documentation patching
+                    log("SKIP", "Not patching for validation, in main", object.get("name", ""))
+                    return object
 
-        if model.get("metadata", {}).get("schema"):
-            return model
+        if object.get("metadata", {}).get("schema"):
+            return object
 
-        log("ONGOING", f"Evaluating patching validation requirements for {model['name']}")
+        log("ONGOING", f"Evaluating patching validation requirements for {object['name']}")
 
-        if not model.get("metadata"):
+        if not object.get("metadata"):
             log("INFO", "Missing metadata section", "Transferring meta section to metadata")
-            model["metadata"] = model.pop("meta")
+            object["metadata"] = object.pop("meta")
 
-        if not model.get("metadata", {}).get("schema"):
-            schema_identifier = model_type.lower() + "::2.0"
-            model["metadata"]["schema"] = model_type.lower() + "::2.0"
-            log("INFO", "Adding schema identifier", f"{model['name']} => {schema_identifier}")
+        if not object.get("metadata", {}).get("schema"):
+            schema_identifier = object_type.lower() + "::2.0"
+            object["metadata"]["schema"] = object_type.lower() + "::2.0"
+            log("INFO", "Adding schema identifier", f"{object['name']} => {schema_identifier}")
         
-        if not model.get("metadata", {}).get("uuid"):
-            if "uuid" in model:
-                model["metadata"]["uuid"] = model.pop("uuid")
-                log("INFO", f"Relocating UUID in {model['name']} to new location")
-            elif "id" in model:
-                old_id = model.pop("id")
+        if not object.get("metadata", {}).get("uuid"):
+            if "uuid" in object:
+                object["metadata"]["uuid"] = object.pop("uuid")
+                log("INFO", f"Relocating UUID in {object['name']} to new location")
+            elif "id" in object:
+                old_id = object.pop("id")
                 if LEGACY_UUID_MAPPING:
                     if old_id in LEGACY_UUID_MAPPING:
-                        model["metadata"]["uuid"] = LEGACY_UUID_MAPPING[old_id]["uuid"]
-                        log("INFO", f"Adding temporary new UUID to {model['name']}", f"{old_id} => {model['metadata']['uuid']}")
+                        object["metadata"]["uuid"] = LEGACY_UUID_MAPPING[old_id]["uuid"]
+                        log("INFO", f"Adding temporary new UUID to {object['name']}", f"{old_id} => {object['metadata']['uuid']}")
 
                     else:
-                        model["metadata"]["uuid"] = str(uuid.uuid4())
-                        log("INFO", f"Adding temporary UUID to {model['name']}", f"{old_id} => {model['metadata']['uuid']}")
+                        object["metadata"]["uuid"] = str(uuid.uuid4())
+                        log("INFO", f"Adding temporary UUID to {object['name']}", f"{old_id} => {object['metadata']['uuid']}")
                         
                 else:
-                    model["metadata"]["uuid"] = str(uuid.uuid4())
-                    log("INFO", f"Adding temporary UUID to {model['name']}", model["metadata"]["uuid"])
+                    object["metadata"]["uuid"] = str(uuid.uuid4())
+                    log("INFO", f"Adding temporary UUID to {object['name']}", object["metadata"]["uuid"])
 
             else:
-                model["metadata"]["uuid"] = str(uuid.uuid4())
-                log("INFO", f"Adding temporary UUID to {model['name']}", model["metadata"]["uuid"])
+                object["metadata"]["uuid"] = str(uuid.uuid4())
+                log("INFO", f"Adding temporary UUID to {object['name']}", object["metadata"]["uuid"])
 
         if LEGACY_UUID_MAPPING:
-            if old_ids:=model.get("threat", {}).get("actors"):
+            if old_ids:=object.get("threat", {}).get("actors"):
                 updated_ids = []
                 for old in old_ids:
                     if old in LEGACY_UUID_MAPPING:
                         new_uuid = LEGACY_UUID_MAPPING[old]["uuid"]
                         updated_ids.append(new_uuid)
                         log("INFO",
-                            f"Updated old ids in model {model['name']}",
+                            f"Updated old ids in object {object['name']}",
                             f"field: threat.vectors , {old} => {new_uuid}")
                     else:
                         updated_ids.append(old)
-                model["threat"]["actors"] = updated_ids
+                object["threat"]["actors"] = updated_ids
 
-            if old_ids:=model.get("detection", {}).get("vectors"):
+            if old_ids:=object.get("detection", {}).get("vectors"):
                 updated_ids = []
                 for old in old_ids:
                     if old in LEGACY_UUID_MAPPING:
                         new_uuid = LEGACY_UUID_MAPPING[old]["uuid"]
                         updated_ids.append(new_uuid)
                         log("INFO",
-                            f"Updated old ids in model {model['name']}",
+                            f"Updated old ids in object {object['name']}",
                             f"field: detection.vectors , {old} => {new_uuid}")
                     else:
                         updated_ids.append(old)
-                model["detection"]["vectors"] = updated_ids
+                object["detection"]["vectors"] = updated_ids
 
-            if old:=model.get("detection_model"):
+            if old:=object.get("detection_object"):
                 if old in LEGACY_UUID_MAPPING:
                     new_uuid = LEGACY_UUID_MAPPING[old]["uuid"]
                     log("INFO",
-                        f"Updated old ids in model {model['name']}",
-                        f"field: detection_model , {old} => {new_uuid}")
-                    model["detection_model"] = new_uuid
+                        f"Updated old ids in object {object['name']}",
+                        f"field: detection_object , {old} => {new_uuid}")
+                    object["detection_object"] = new_uuid
 
-        return model
+        return object

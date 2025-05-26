@@ -39,60 +39,60 @@ def run():
         return item
 
     for tvm in DataTide.Objects.tvm:
-        model_data = {}
-        model = DataTide.Objects.tvm[tvm]
-        model_id = model.get("metadata",{}).get("uuid")
-        model_data["techniques"] = model["threat"]["att&ck"]
-        model_data["name"] = model["name"]
-        tvm_techniques[model_id] = model_data
+        object_data = {}
+        object = DataTide.Objects.tvm[tvm]
+        object_id = object.get("metadata",{}).get("uuid")
+        object_data["techniques"] = object["threat"]["att&ck"]
+        object_data["name"] = object["name"]
+        tvm_techniques[object_id] = object_data
 
     # Pivoting tvm data to make comments easier
 
     for cdm in DataTide.Objects.cdm:
-        model_data = {}
-        model = DataTide.Objects.cdm[cdm]
-        model_id = model.get("metadata",{}).get("uuid")
-        model_data["name"] = model["name"]
+        object_data = {}
+        object = DataTide.Objects.cdm[cdm]
+        object_id = object.get("metadata",{}).get("uuid")
+        object_data["name"] = object["name"]
 
-        if "att&ck" in model["detection"].keys():
+        if "att&ck" in object["detection"].keys():
             cdm_technique = []
-            cdm_technique.append(model["detection"]["att&ck"])
-            model_data["techniques"] = cdm_technique
+            cdm_technique.append(object["detection"]["att&ck"])
+            object_data["techniques"] = cdm_technique
 
         else:
             vec_techniques = []
-            vectors = model["detection"]["vectors"]
+            vectors = object["detection"]["vectors"]
             for v in vectors:
                 for tvm in DataTide.Objects.tvm:
                     vec = DataTide.Objects.tvm[tvm]
                     if vec["id"] == v:
                         for t in vec["threat"]["att&ck"]:
                             vec_techniques.append(t)
-            model_data["techniques"] = vec_techniques
+            object_data["techniques"] = vec_techniques
 
-        cdm_techniques[model_id] = model_data
+        cdm_techniques[object_id] = object_data
 
     for mdr in DataTide.Objects.mdr:
-        model_data = {}
-        model = DataTide.Objects.mdr[mdr]
-        model_id = model["metadata"]["uuid"]
-        model_data["name"] = model["name"]
-        parent = model.get("detection_model")
+        object_data = {}
+        object = DataTide.Objects.mdr[mdr]
+        object_id = object["metadata"]["uuid"]
+        object_data["name"] = object["name"]
+        parent = object.get("detection_model")
 
         if parent and not parent.startswith("BDR"):
 
             for cdm in DataTide.Objects.cdm:
-                model = DataTide.Objects.cdm[cdm]
-                if model.get("metadata",{}).get("uuid") == parent:
+                object = DataTide.Objects.cdm[cdm]
+                if object.get("metadata",{}).get("uuid") == parent:
 
-                    if "att&ck" in model["detection"].keys():
+                    if "att&ck" in object["detection"].keys():
                         cdm_technique = []
-                        cdm_technique.append(model["detection"]["att&ck"])
-                        model_data["techniques"] = cdm_technique
+                        cdm_technique.append(object["detection"]["att&ck"])
+                        object_data["techniques"] = cdm_technique
 
                     else:
                         vec_techniques = []
-                        vectors = model["detection"]["vectors"]
+                        vectors = object["detection"]["vectors"]
                         for v in vectors:
                             for tvm in DataTide.Objects.tvm:
                                 vec = DataTide.Objects.tvm[tvm]
@@ -100,9 +100,9 @@ def run():
                                     for t in vec["threat"]["att&ck"]:
                                         vec_techniques.append(t)
 
-                        model_data["techniques"] = vec_techniques
+                        object_data["techniques"] = vec_techniques
 
-            mdr_techniques[model_id] = model_data
+            mdr_techniques[object_id] = object_data
 
     pivot = {}
     for i in tvm_techniques:

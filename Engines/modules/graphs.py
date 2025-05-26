@@ -11,7 +11,7 @@ from Engines.modules.framework import (
     relations_upstream,
     chain_resolver,
     get_vocab_entry,
-    model_value,
+    object_value,
     techniques_resolver,
 )
 from Engines.modules.documentation import (
@@ -136,7 +136,7 @@ def chaining_graph(tvm):
     for v in chaining_data.copy():
         chaining_data = chain_resolver(v, chaining_data)
 
-    # Walk through all the chain links from the model
+    # Walk through all the chain links from the object
     chaining_data = chain_resolver(tvm, chaining_data)
 
     if not chaining_data:
@@ -155,7 +155,7 @@ def chaining_graph(tvm):
                 data["☣️ Vector"] = backlink_resolver(v)
                 data["⛓️ Link"] = f"`{link}`"
                 data["🎯 Target"] = backlink_resolver(target)
-                data["⛰️ Terrain"] = str(model_value(target, "terrain")).replace(
+                data["⛰️ Terrain"] = str(object_value(target, "terrain")).replace(
                     "\n", " "
                 )
                 data["🗡️ ATT&CK"] = rich_attack_links(
@@ -193,7 +193,7 @@ def chaining_graph(tvm):
                         vector_links.append(chain)
 
     for v in header:
-        killchain = model_value(v, "killchain")
+        killchain = object_value(v, "killchain")
         if killchain:
             if type(killchain) is list:
                 killchain = killchain[0]
@@ -209,7 +209,7 @@ def chaining_graph(tvm):
     killchain_subgraphs = "\n".join(killchain_subgraphs)
 
     # These props allow to expand the chaining diagram with more
-    # metadata present in the model
+    # metadata present in the object
     graph_properties = {
         "cve": {"relation": "exploits", "direction": "to", "shape": "flag"},
         "platforms": {"relation": "targets", "direction": "to", "shape": "database"},
@@ -219,7 +219,7 @@ def chaining_graph(tvm):
     properties_link_graph = []
     for prop in graph_properties:
         for v in header:
-            data = model_value(v, prop)
+            data = object_value(v, prop)
             if data:
                 for value in data:
                     if (
@@ -272,7 +272,7 @@ def chaining_graph(tvm):
         return br_data
 
     header_data = "\n".join(
-        [f"{v}[{mermaid_sanitizer(mermaid_sanitizer(str(model_value(v, 'name'))))}]" for v in header]
+        [f"{v}[{mermaid_sanitizer(mermaid_sanitizer(str(object_value(v, 'name'))))}]" for v in header]
     )
 
     vector_links = "\n".join(vector_links)

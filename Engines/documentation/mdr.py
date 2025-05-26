@@ -18,7 +18,7 @@ from Engines.modules.documentation import (
     rich_attack_links,
     get_vocab_description,
     GitlabMarkdown,
-    model_value_doc,
+    object_value_doc,
     FOLD,
 )
 from Engines.modules.files import safe_file_name
@@ -45,7 +45,7 @@ else:
 DEFAULT_RESPONDERS = DataTide.Configurations.Deployment.default_responders
 SYSTEMS_CONFIG = DataTide.Configurations.Systems.Index
 VOCAB_INDEX = DataTide.Vocabularies.Index
-MODELS_INDEX = DataTide.Objects.Index
+OBJECTS_INDEX = DataTide.Objects.Index
 MDR_ICON = get_icon("mdr")
 
 QUERY_FOLD = """
@@ -262,7 +262,7 @@ def documentation(mdr):
                 if cleaned_key == "status":
                     enriched_value = status_name
                 else:
-                    enriched_value = model_value_doc(
+                    enriched_value = object_value_doc(
                         uuid_data, cleaned_key, with_icon=True
                     )
                 data = (
@@ -304,7 +304,7 @@ def documentation(mdr):
     tlp = tlp_doc(mdr_metadata["tlp"])
 
     metadata = {k: v for k, v in mdr_metadata.items() if k != "tlp"}
-    metadata = metadata_doc(metadata, model_type="tvm")
+    metadata = metadata_doc(metadata, object_type="tvm")
 
     doc = TEMPLATEv3.format(
         frontmatter=frontmatter,
@@ -336,10 +336,10 @@ def run():
     # Initialize a counter of created documents
     mdr_doc_count = 0
 
-    for mdr_uuid in MODELS_INDEX["mdr"]:
+    for mdr_uuid in OBJECTS_INDEX["mdr"]:
         
         # Make a file name based on MDR data
-        mdr_data = MODELS_INDEX["mdr"][mdr_uuid]
+        mdr_data = OBJECTS_INDEX["mdr"][mdr_uuid]
         mdr_name = mdr_data.get("name")
 
         log("ONGOING",

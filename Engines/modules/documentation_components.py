@@ -12,7 +12,7 @@ from Engines.modules.tide import DataTide, IndexTide
 
 CONFIG = DataTide.Configurations
 INDEX = DataTide.Index
-SKIP_KEYS = DataTide.Configurations.Documentation.skip_model_keys
+SKIP_KEYS = DataTide.Configurations.Documentation.skip_object_keys
 DOCUMENTATION_TARGET = DataTide.Configurations.Documentation.documentation_target
 DEFINITIONS_INDEX = DataTide.TideSchemas.definitions
 
@@ -49,11 +49,11 @@ def criticality_doc(criticality_data: str) -> str:
     return criticality_doc_markdown
 
 
-def metadata_doc(metadata: dict, model_type: str) -> str:
+def metadata_doc(metadata: dict, object_type: str) -> str:
     """
     Generates a standardized metadata markdown format
     """
-    metaschema = INDEX["metaschemas"][model_type]["properties"]
+    metaschema = INDEX["metaschemas"][object_type]["properties"]
     metadata_enriched = dict()
     schema = dict()
 
@@ -66,7 +66,7 @@ def metadata_doc(metadata: dict, model_type: str) -> str:
             else:
                 metadata_enriched[meta_title] = value
         else:
-            log("WARNING", f"Missing title in metaschema : {metaschema} for key : {k}")
+            log("WARNING", f"Missing title in metaschema : {metaschema} for key : {key}")
             metadata_enriched[key] = value
     
     metadata_enriched.update(schema)
@@ -108,7 +108,7 @@ def relations_table(
 ):
 
     tree = None
-    model_type = get_type(id)
+    object_type = get_type(id)
 
     if direction == "downstream":
         tree = relations_downstream(id)
@@ -158,22 +158,22 @@ def relations_table(
 
         if direction == "downstream":
 
-            if model_type == "tvm":
+            if object_type == "tvm":
                 trunk_data["cdm"] = (
                     None if "cdm" not in trunk_data else trunk_data["cdm"]
                 )
-            if model_type in ["tvm", "cdm", "bdr"]:
+            if object_type in ["tvm", "cdm", "bdr"]:
                 trunk_data["mdr"] = (
                     None if "mdr" not in trunk_data else trunk_data["mdr"]
                 )
 
         elif direction == "upstream":
             if "bdr" not in trunk_data:
-                if model_type in ["mdr", "cdm"]:
+                if object_type in ["mdr", "cdm"]:
                     trunk_data["tvm"] = (
                         None if "tvm" not in trunk_data else trunk_data["tvm"]
                     )
-                if model_type in ["mdr"]:
+                if object_type in ["mdr"]:
                     trunk_data["cdm"] = (
                         None if "cdm" not in trunk_data else trunk_data["cdm"]
                     )
@@ -181,8 +181,8 @@ def relations_table(
         data.append(trunk_data)
 
     for col in data:
-        if col.get(model_type):
-            col.pop(model_type)
+        if col.get(object_type):
+            col.pop(object_type)
     table = pd.DataFrame(data)
 
     metrics = relations_list(id, mode="count", direction=direction)
@@ -204,16 +204,16 @@ def relations_table(
     return table
 
 
-def model_data_table(model_data: dict, id: str) -> Tuple[str, list[str]]:
+def object_data_table(object_data: dict, id: str) -> Tuple[str, list[str]]:
 
     metadata_doc = str()
     tag_list = list()
-    model_type = get_type(id)
-    metaschema = INDEX["metaschemas"][model_type]["properties"]
-    for field in model_data:
+    object_type = get_type(id)
+    metaschema = INDEX["metaschemas"][object_type]["properties"]
+    for field in object_data:
 
         if field not in SKIP_KEYS:
-            value = model_data[field]
+            value = object_data[field]
             field_title = get_field_title(field, metaschema)
             field_description = vocab_metadata(field, "description")
             value_doc = ""

@@ -13,7 +13,7 @@ from Engines.modules.tide import DataTide
 from Engines.modules.logs import log
 
 JSONSCHEMAS_INDEX = DataTide.JsonSchemas.Index
-MODELS_INDEX = DataTide.Objects.Index
+OBJECTS_INDEX = DataTide.Objects.Index
 
 
 def run():
@@ -28,14 +28,14 @@ def run():
     for schema in JSONSCHEMAS_INDEX:
         count = 0
 
-        if schema in MODELS_INDEX:
+        if schema in OBJECTS_INDEX:
             schema_data = JSONSCHEMAS_INDEX[schema]
             v = Draft7Validator(schema_data)
 
-            for model in MODELS_INDEX[schema]:
+            for model in OBJECTS_INDEX[schema]:
                 count += 1
 
-                body = MODELS_INDEX[schema][model]
+                body = OBJECTS_INDEX[schema][model]
                 metadata = body.get("metadata") or body["meta"]
                 metadata["created"] = str(metadata["created"])
                 metadata["modified"] = str(metadata["modified"])

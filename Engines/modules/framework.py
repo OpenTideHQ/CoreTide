@@ -11,7 +11,7 @@ from Engines.modules.logs import log
 
 DEFINITIONS_INDEX = DataTide.TideSchemas.definitions
 VOCAB_INDEX = DataTide.Vocabularies.Index
-MODELS_INDEX = DataTide.Objects.Index
+OBJECTS_INDEX = DataTide.Objects.Index
 CHAINING_INDEX = DataTide.Objects.chaining
 
 
@@ -297,28 +297,28 @@ def get_vocab_entry(vocab, identifier, field=None, newlines=False):
     return ""
 
 
-def get_key_in_model_body(model_body, key):
+def get_key_in_object_body(object_body, key):
     """
     Self-recursive function to return the value of a key nested within
-    the body of a model data.
+    the body of a object data.
     """
-    if key in model_body.keys():
-        return model_body[key]
+    if key in object_body.keys():
+        return object_body[key]
 
     else:
-        for model_key in model_body.keys():
-            if type(model_body[model_key]) is dict:
+        for object_key in object_body.keys():
+            if type(object_body[object_key]) is dict:
                 # Trick since recursive function would not return for all
                 # occurence, would break on first return. If the return is not
                 # None, it means it's the title and thus returns.
-                if get_key_in_model_body(model_body[model_key], key) != None:
-                    return get_key_in_model_body(model_body[model_key], key)
+                if get_key_in_object_body(object_body[object_key], key) != None:
+                    return get_key_in_object_body(object_body[object_key], key)
 
 
-def model_value(id, key):
-    model_type = get_type(id)
-    data = MODELS_INDEX[model_type][id]
-    value = get_key_in_model_body(data, key)
+def object_value(id, key):
+    object_type = get_type(id)
+    data = OBJECTS_INDEX[object_type][id]
+    value = get_key_in_object_body(data, key)
     return value
 
 
@@ -329,24 +329,24 @@ def parents(id: str) -> list:
     or in other word is a top-level Object, returns an empty string.
     """
 
-    model_type = get_type(id)
+    object_type = get_type(id)
     parents = []
     parent_mappings = {
         "cdm": {"data": "detection", "parent": "vectors"},
-        "mdr": {"parent": "detection_model"},
+        "mdr": {"parent": "detection_object"},
     }
 
-    if model_type not in parent_mappings:
+    if object_type not in parent_mappings:
         return []
 
-    model_data = MODELS_INDEX[model_type][id]
-    parent_loc = parent_mappings[model_type]
+    object_data = OBJECTS_INDEX[object_type][id]
+    parent_loc = parent_mappings[object_type]
 
     if "data" in parent_loc:
-        parents = model_data[parent_loc["data"]].get(parent_loc["parent"]) or []
+        parents = object_data[parent_loc["data"]].get(parent_loc["parent"]) or []
 
     else:
-        parents = model_data.get(parent_loc["parent"]) or []
+        parents = object_data.get(parent_loc["parent"]) or []
 
     if type(parents) is str:
         parents = [parents]
@@ -354,7 +354,7 @@ def parents(id: str) -> list:
     return parents
 
 
-def childs(model_id: str) -> list:
+def childs(object_id: str) -> list:
     """
     Returns the list of direct descendants for any given CoreTIDE Object,
     by performing a forward search.
@@ -367,69 +367,69 @@ def childs(model_id: str) -> list:
 
     mappings = {
         "tvm": {"child_type": "cdm", "data": "detection", "reference": "vectors"},
-        "cdm": {"child_type": "mdr", "reference": "detection_model"},
-        "bdr": {"child_type": "mdr", "reference": "detection_model"},
+        "cdm": {"child_type": "mdr", "reference": "detection_object"},
+        "bdr": {"child_type": "mdr", "reference": "detection_object"},
     }
 
-    model_type = get_type(model_id)
+    object_type = get_type(object_id)
 
-    if model_type not in mappings.keys():
+    if object_type not in mappings.keys():
         return []
 
-    child_type = mappings[model_type]["child_type"]
-    data = mappings[model_type].get("data", None)
-    reference = mappings[model_type]["reference"]
+    child_type = mappings[object_type]["child_type"]
+    data = mappings[object_type].get("data", None)
+    reference = mappings[object_type]["reference"]
 
-    CHILDS_INDEX = MODELS_INDEX[child_type]
+    CHILDS_INDEX = OBJECTS_INDEX[child_type]
     for child in CHILDS_INDEX:
         if child_type == "mdr":
             data = None
         
         if data:
-            if model_id in CHILDS_INDEX[child].get(data, {}).get(reference, []):
+            if object_id in CHILDS_INDEX[child].get(data, {}).get(reference, []):
                 implementations.append(child)
         else:
-            if model_id in CHILDS_INDEX[child].get(reference, []):
+            if object_id in CHILDS_INDEX[child].get(reference, []):
                 implementations.append(child)
 
     return implementations
 @overload
-def get_type(model_uuid:str)->str:
+def get_type(object_uuid:str)->str:
     ...
 @overload
-def get_type(model_uuid:str, mute:Literal[True])->str|None:
+def get_type(object_uuid:str, mute:Literal[True])->str|None:
     ...
 @overload
-def get_type(model_uuid:str, mute:Literal[False])->str:
+def get_type(object_uuid:str, mute:Literal[False])->str:
     ...
-def get_type(model_uuid:str, mute:bool=False):
+def get_type(object_uuid:str, mute:bool=False):
     """
-    Return the model type based on the schema identifier format.
+    Return the object type based on the schema identifier format.
     """
 
-    model_body = DataTide.Objects.FlatIndex.get(model_uuid, {})
+    object_body = DataTide.Objects.FlatIndex.get(object_uuid, {})
 
-    if not model_body:
+    if not object_body:
         if mute:
             return None
         else:
-            log("FATAL", "UUID does not exist in the index of Tide Objects", model_uuid)
+            log("FATAL", "UUID does not exist in the index of Tide Objects", object_uuid)
             raise Exception
 
-    schema = model_body.get("metadata", {}).get("schema")
+    schema = object_body.get("metadata", {}).get("schema")
     if not schema:
         #TODO For backwards compatibility with MDR still on 1.0. To be deprecated.
-        if model_body.get("configurations"):
+        if object_body.get("configurations"):
             return "mdr"
         if mute:
             return None
         else:
-            log("FATAL", "Missing schema identifier in object", model_body.get("name", "NAME NOT FOUND"))
+            log("FATAL", "Missing schema identifier in object", object_body.get("name", "NAME NOT FOUND"))
             raise Exception
         
     return schema.split("::")[0]
 
-def techniques_resolver(model_id: str, recursive=True) -> list:
+def techniques_resolver(object_id: str, recursive=True) -> list:
     """
     Returns the relevant technique for any object, based on its own
     and its parent properties. WARNING : only works when index is loaded
@@ -442,17 +442,17 @@ def techniques_resolver(model_id: str, recursive=True) -> list:
 
     techniques = []
 
-    # Find the model_type
-    model_type = get_type(model_id)
+    # Find the object_type
+    object_type = get_type(object_id)
         
-    # Load Model Data
-    model_body = MODELS_INDEX[model_type][model_id]
+    # Load object Data
+    object_body = OBJECTS_INDEX[object_type][object_id]
 
-    if model_type == "bdr":
+    if object_type == "bdr":
         return []  # Case for BDR, as they do not relate to a technique concept
 
-    if model_type == "mdr":
-        parent_id = model_body.get("detection_model") or model_body.get("tags", {}).get(
+    if object_type == "mdr":
+        parent_id = object_body.get("detection_object") or object_body.get("tags", {}).get(
             "coretide"
         )
         if not parent_id:
@@ -463,19 +463,19 @@ def techniques_resolver(model_id: str, recursive=True) -> list:
             else:
                 return techniques
 
-    if model_type == "cdm":
-        if "att&ck" in model_body["detection"]:
-            techniques = [model_body["detection"]["att&ck"]]
+    if object_type == "cdm":
+        if "att&ck" in object_body["detection"]:
+            techniques = [object_body["detection"]["att&ck"]]
         else:
-            parent_ids = model_body["detection"]["vectors"]
+            parent_ids = object_body["detection"]["vectors"]
             if recursive:
                 for parent_id in parent_ids:
                     techniques.extend(techniques_resolver(parent_id))
             else:
                 return techniques
 
-    if model_type == "tvm":
-        techniques = model_body["threat"]["att&ck"]
+    if object_type == "tvm":
+        techniques = object_body["threat"]["att&ck"]
 
     # Deduplicate techniques in case they were present
     # across multiple

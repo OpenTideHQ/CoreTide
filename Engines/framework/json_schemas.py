@@ -28,7 +28,7 @@ METASCHEMAS_FOLDER = Path(PATHS["metaschemas"])
 VOCABS_FOLDER = Path(PATHS["vocabularies"])
 JSON_SCHEMA_FOLDER = Path(PATHS["json_schemas"])
 ICONS = DataTide.Configurations.Documentation.icons
-TIDE_MODELS = DataTide.Configurations.Global.objects
+TIDE_OBJECTS = DataTide.Configurations.Global.objects
 SUBSCHEMAS_PATH = Path(PATHS["subschemas"])
 RECOMPOSITION = GLOBAL_CONFIG.recomposition
 
@@ -212,7 +212,7 @@ def make_markdown_dropdown(name, key, field=""):
     criticality = ""
     id_icon = ICONS["id"]
 
-    if (get_type(identifier, mute=True) or "") in TIDE_MODELS:
+    if (get_type(identifier, mute=True) or "") in TIDE_OBJECTS:
         criticality = key.get("criticality")
         crit_icon = get_icon("criticality")
         if not criticality:
@@ -279,7 +279,7 @@ def gen_lib_schema(
         # Edge case for possible model references, there is no description
         # in that case, only the id which is what the user needs to input
         # and the name used as a description.
-        if (VOCAB_INDEX[vocab]["metadata"].get("model")) or (vocab in TIDE_MODELS):
+        if (VOCAB_INDEX[vocab]["metadata"].get("model")) or (vocab in TIDE_OBJECTS):
             for key in VOCAB_INDEX[vocab]["entries"]:
                 value = key
                 key_data = VOCAB_INDEX[vocab]["entries"][key]

@@ -1,4 +1,4 @@
-models = [ "tvm", "cdm", "dom", "bdr", "mdr" ]
+objects = [ "tvm", "cdm", "dom", "bdr", "mdr" ]
 
 [paths.tide]
 tvm = "Objects/Threat Vectors/"

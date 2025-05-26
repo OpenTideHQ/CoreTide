@@ -31,7 +31,7 @@ if DebugEnvironment.ENABLED:
     DOCUMENTATION_TARGET = "gitlab"
     COVER_PAGES_ENABLED = True
 
-MODELS_INDEX = DataTide.Models.Index
+MODELS_INDEX = DataTide.Objects.Index
 METASCHEMAS_INDEX = DataTide.TideSchemas.Index
 ICONS = DataTide.Configurations.Documentation.icons
 

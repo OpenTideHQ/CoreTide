@@ -182,7 +182,7 @@ class DefenderForEndpointDeploy(DeployMDR):
                     str(rule_id))
                 
                 service.delete_detection_rule(rule_id)
-                file_path = DataTide.Configurations.Global.Paths.Tide.mdr / DataTide.Models.files[data.metadata.uuid]
+                file_path = DataTide.Configurations.Global.Paths.Tide.mdr / DataTide.Objects.files[data.metadata.uuid]
                 with open(file_path, "r", encoding="utf-8") as mdr_file:
                     content = mdr_file.readlines()
 
@@ -204,7 +204,7 @@ class DefenderForEndpointDeploy(DeployMDR):
         
             else:
                 rule_id = service.create_detection_rule(rule)
-                file_path = DataTide.Configurations.Global.Paths.Tide.mdr / DataTide.Models.files[data.metadata.uuid]
+                file_path = DataTide.Configurations.Global.Paths.Tide.mdr / DataTide.Objects.files[data.metadata.uuid]
                 with open(file_path, "r", encoding="utf-8") as mdr_file:
                     content = mdr_file.readlines()
                 
@@ -227,7 +227,7 @@ class DefenderForEndpointDeploy(DeployMDR):
     
     def deploy(self, mdr_deployment: Sequence[TideModels.MDR], deployment_plan:DeploymentStrategy):
         
-        mdr_deployment = [DataTide.Models.MDR[uuid] for uuid in mdr_deployment]
+        mdr_deployment = [DataTide.Objects.MDR[uuid] for uuid in mdr_deployment]
 
         deployment = TideDeployment(deployment=mdr_deployment,
                                     system=DetectionSystems.DEFENDER_FOR_ENDPOINT,

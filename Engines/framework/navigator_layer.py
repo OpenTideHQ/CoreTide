@@ -38,9 +38,9 @@ def run():
             return result
         return item
 
-    for tvm in DataTide.Models.tvm:
+    for tvm in DataTide.Objects.tvm:
         model_data = {}
-        model = DataTide.Models.tvm[tvm]
+        model = DataTide.Objects.tvm[tvm]
         model_id = model.get("metadata",{}).get("uuid")
         model_data["techniques"] = model["threat"]["att&ck"]
         model_data["name"] = model["name"]
@@ -48,9 +48,9 @@ def run():
 
     # Pivoting tvm data to make comments easier
 
-    for cdm in DataTide.Models.cdm:
+    for cdm in DataTide.Objects.cdm:
         model_data = {}
-        model = DataTide.Models.cdm[cdm]
+        model = DataTide.Objects.cdm[cdm]
         model_id = model.get("metadata",{}).get("uuid")
         model_data["name"] = model["name"]
 
@@ -63,8 +63,8 @@ def run():
             vec_techniques = []
             vectors = model["detection"]["vectors"]
             for v in vectors:
-                for tvm in DataTide.Models.tvm:
-                    vec = DataTide.Models.tvm[tvm]
+                for tvm in DataTide.Objects.tvm:
+                    vec = DataTide.Objects.tvm[tvm]
                     if vec["id"] == v:
                         for t in vec["threat"]["att&ck"]:
                             vec_techniques.append(t)
@@ -72,17 +72,17 @@ def run():
 
         cdm_techniques[model_id] = model_data
 
-    for mdr in DataTide.Models.mdr:
+    for mdr in DataTide.Objects.mdr:
         model_data = {}
-        model = DataTide.Models.mdr[mdr]
+        model = DataTide.Objects.mdr[mdr]
         model_id = model["metadata"]["uuid"]
         model_data["name"] = model["name"]
         parent = model.get("detection_model")
 
         if parent and not parent.startswith("BDR"):
 
-            for cdm in DataTide.Models.cdm:
-                model = DataTide.Models.cdm[cdm]
+            for cdm in DataTide.Objects.cdm:
+                model = DataTide.Objects.cdm[cdm]
                 if model.get("metadata",{}).get("uuid") == parent:
 
                     if "att&ck" in model["detection"].keys():
@@ -94,8 +94,8 @@ def run():
                         vec_techniques = []
                         vectors = model["detection"]["vectors"]
                         for v in vectors:
-                            for tvm in DataTide.Models.tvm:
-                                vec = DataTide.Models.tvm[tvm]
+                            for tvm in DataTide.Objects.tvm:
+                                vec = DataTide.Objects.tvm[tvm]
                                 if vec.get("metadata",{}).get("uuid") == v:
                                     for t in vec["threat"]["att&ck"]:
                                         vec_techniques.append(t)

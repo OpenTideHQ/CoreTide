@@ -11,8 +11,8 @@ from Engines.modules.logs import log
 
 DEFINITIONS_INDEX = DataTide.TideSchemas.definitions
 VOCAB_INDEX = DataTide.Vocabularies.Index
-MODELS_INDEX = DataTide.Models.Index
-CHAINING_INDEX = DataTide.Models.chaining
+MODELS_INDEX = DataTide.Objects.Index
+CHAINING_INDEX = DataTide.Objects.chaining
 
 
 def unroll_dot_dict(dot_dict, separator="."):
@@ -407,7 +407,7 @@ def get_type(model_uuid:str, mute:bool=False):
     Return the model type based on the schema identifier format.
     """
 
-    model_body = DataTide.Models.FlatIndex.get(model_uuid, {})
+    model_body = DataTide.Objects.FlatIndex.get(model_uuid, {})
 
     if not model_body:
         if mute:

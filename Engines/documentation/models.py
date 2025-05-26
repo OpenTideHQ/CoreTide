@@ -49,7 +49,7 @@ if DOCUMENTATION_TARGET == "gitlab":
 else:
     UUID_PERMALINKS = False
 
-MODELS_INDEX = DataTide.Models.Index
+MODELS_INDEX = DataTide.Objects.Index
 MODELS_NAME = DataTide.Configurations.Documentation.object_names
 
 if DataTide.Configurations.Documentation.cve.get("proxy"):

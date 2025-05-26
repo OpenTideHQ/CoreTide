@@ -51,7 +51,7 @@ class SplunkMetadataDeploy(SplunkEngineInit, DeployMetadata):
         for mdr in deployment:
             entry = dict()
             # Could load from index, but this is fast enough for lookup update purposes
-            body = DataTide.Models.mdr[mdr]
+            body = DataTide.Objects.mdr[mdr]
             mdr_uuid = body.get("uuid") or body["metadata"]["uuid"]
             log("ONGOING", "Generating Lookup entry", body["name"])
             

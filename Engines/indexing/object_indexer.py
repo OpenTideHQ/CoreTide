@@ -34,7 +34,7 @@ def run():
         "Creates Vocabulary like schema CoreTIDE models, so they can be used within JSON Schema for validation.",
     )
 
-    MODEL_SCOPE = DataTide.Configurations.Global.models
+    MODEL_SCOPE = DataTide.Configurations.Global.objects
     ICONS = DataTide.Configurations.Documentation.icons
     EXPORT_INDENT = 0
     if DEBUG:
@@ -53,7 +53,7 @@ def run():
             "model": True,
         }
         entries = {}
-        registry = DataTide.Models.Index[model_type]
+        registry = DataTide.Objects.Index[model_type]
 
         for model in registry:
 

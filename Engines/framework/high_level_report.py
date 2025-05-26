@@ -7,13 +7,13 @@ from pprint import pprint
 
 from Engines.modules.tide import DataTide
 
-tvm_count = len(DataTide.Models.tvm)
-cdm_count = len(DataTide.Models.cdm)
-mdr_count = len(DataTide.Models.mdr)
+tvm_count = len(DataTide.Objects.tvm)
+cdm_count = len(DataTide.Objects.cdm)
+mdr_count = len(DataTide.Objects.mdr)
 mdr_system_count = dict()
 
-for mdr in DataTide.Models.mdr:
-    data = DataTide.Models.mdr[mdr]
+for mdr in DataTide.Objects.mdr:
+    data = DataTide.Objects.mdr[mdr]
     for system in data.get("configurations"):
         if system not in mdr_system_count:
             mdr_system_count[system] = 1

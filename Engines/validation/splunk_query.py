@@ -94,7 +94,7 @@ class SplunkValidateQuery(SplunkEngineInit, ValidateQuery):
             )
         # Start deployment routine
         for mdr in deployment:
-            mdr_data:dict = DataTide.Models.mdr[mdr]
+            mdr_data:dict = DataTide.Objects.mdr[mdr]
             mdr_uuid = mdr_data.get("uuid") or mdr_data["metadata"]["uuid"]
 
             # Check if modified MDR contains a platform entry (by safety, but should not happen since

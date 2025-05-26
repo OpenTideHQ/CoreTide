@@ -25,7 +25,7 @@ ICONS = DataTide.Configurations.Documentation.icons
 DOCUMENTATION_CONFIG = DataTide.Configurations.Documentation
 CONFIG_INDEX = DataTide.Configurations.Index
 DEFINITIONS_INDEX = DataTide.TideSchemas.definitions
-MODELS_INDEX = DataTide.Models.Index
+MODELS_INDEX = DataTide.Objects.Index
 
 FOLD = """
 <details>

@@ -45,7 +45,7 @@ else:
 DEFAULT_RESPONDERS = DataTide.Configurations.Deployment.default_responders
 SYSTEMS_CONFIG = DataTide.Configurations.Systems.Index
 VOCAB_INDEX = DataTide.Vocabularies.Index
-MODELS_INDEX = DataTide.Models.Index
+MODELS_INDEX = DataTide.Objects.Index
 MDR_ICON = get_icon("mdr")
 
 QUERY_FOLD = """

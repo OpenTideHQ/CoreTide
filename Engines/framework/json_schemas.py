@@ -28,7 +28,7 @@ METASCHEMAS_FOLDER = Path(PATHS["metaschemas"])
 VOCABS_FOLDER = Path(PATHS["vocabularies"])
 JSON_SCHEMA_FOLDER = Path(PATHS["json_schemas"])
 ICONS = DataTide.Configurations.Documentation.icons
-TIDE_MODELS = DataTide.Configurations.Global.models
+TIDE_MODELS = DataTide.Configurations.Global.objects
 SUBSCHEMAS_PATH = Path(PATHS["subschemas"])
 RECOMPOSITION = GLOBAL_CONFIG.recomposition
 

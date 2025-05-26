@@ -6,14 +6,14 @@ sys.path.append(str(git.Repo(".", search_parent_directories=True).working_dir))
 
 from Engines.modules.logs import log, ANSI, coretide_intro
 from Engines.modules.tide import IndexTide
-from Engines.indexing import models_indexer
+from Engines.indexing import object_indexer
 from Engines.framework import templates
 print(coretide_intro())
 
 riptide = rf"""
 {ANSI.Colors.ORANGE}
    ___  _______  _____________  ____  
-  / _ \/  _/ _ \/_  __/  _/ _ \/ __/  
+  / _ \/  _/ _ \/_  __/  _/ _ \/ __/ 
  / , _// // ___/ / / _/ // // / _/    
 /_/|_/___/_/    /_/ /___/____/___/    
 {ANSI.Colors.BLUE}{ANSI.Formatting.ITALICS}{ANSI.Formatting.BOLD}CoreTIDE Meta Model Compilation Orchestration
@@ -28,7 +28,7 @@ log(
     "Generate entries in Tide namespace containing model data supportive of other generation routines",
 )
 
-models_indexer.run()
+object_indexer.run()
 templates.run()
 
 IndexTide.reload()

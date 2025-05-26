@@ -37,7 +37,7 @@ class DefenderForEndpointValidateQuery(ValidateQuery):
                  deployment_plan:DeploymentStrategy):
         
         if type(mdr_deployment[0]) is str:
-            mdr_deployment = [DataTide.Models.MDR[uuid] for uuid in mdr_deployment]
+            mdr_deployment = [DataTide.Objects.MDR[uuid] for uuid in mdr_deployment]
 
         deployment = TideDeployment(deployment=mdr_deployment,
                                     system=DetectionSystems.DEFENDER_FOR_ENDPOINT,

@@ -13,7 +13,7 @@ from Engines.modules.tide import DataTide
 from Engines.modules.logs import log
 
 JSONSCHEMAS_INDEX = DataTide.JsonSchemas.Index
-MODELS_INDEX = DataTide.Models.Index
+MODELS_INDEX = DataTide.Objects.Index
 
 
 def run():

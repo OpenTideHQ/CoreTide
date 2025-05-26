@@ -269,7 +269,7 @@ class SentinelDeploy(SentinelEngineInit):
 
         for mdr in deployment:
             print(deployment)
-            mdr_data = DataTide.Models.mdr[mdr]
+            mdr_data = DataTide.Objects.mdr[mdr]
 
             # Check if modified MDR contains a platform entry (by safety, but should not happen since
             # the orchestrator will filter for the platform)

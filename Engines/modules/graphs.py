@@ -21,7 +21,7 @@ from Engines.modules.documentation import (
 )
 from Engines.modules.tide import DataTide
 
-CHAINING_INDEX = DataTide.Models.chaining
+CHAINING_INDEX = DataTide.Objects.chaining
 
 def mermaid_sanitizer(string:str)->str:
     """

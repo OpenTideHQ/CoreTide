@@ -8,9 +8,9 @@ from Engines.modules.tide import DataTide
 
 playbook_mapping = list()
 
-for mdr in DataTide.Models.mdr:
+for mdr in DataTide.Objects.mdr:
 
-    content = DataTide.Models.mdr[mdr]
+    content = DataTide.Objects.mdr[mdr]
 
     if content["status"] == "PRODUCTION":
 

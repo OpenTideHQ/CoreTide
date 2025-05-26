@@ -10,7 +10,7 @@ from Engines.modules.logs import log
 from Engines.modules.tide import DataTide
 from Engines.modules.files import resolve_configurations
 
-MODELS_INDEX = DataTide.Models.Index
+MODELS_INDEX = DataTide.Objects.Index
 CONFIGURATIONS = resolve_configurations()
 MODELS_TYPES = CONFIGURATIONS["global"]["models"]
 

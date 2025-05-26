@@ -57,7 +57,7 @@ class SentinelOneValidateQuery(ValidateQuery):
         loaded_mdr = []
         for mdr in mdr_deployment:
             if type(mdr) is str:
-                loaded_mdr.append(DataTide.Models.MDR[mdr])
+                loaded_mdr.append(DataTide.Objects.MDR[mdr])
             elif type(mdr) is TideModels.MDR:
                 loaded_mdr.append(mdr)
         mdr_deployment = loaded_mdr

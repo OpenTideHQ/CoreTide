@@ -561,7 +561,7 @@ class DataTide:
     Index = IndexTide.load()
     
     @dataclass(frozen=True)
-    class Models:
+    class Objects:
         """TIDE Lookups Interface.
 
         Exposes all the configurations of the instance
@@ -667,7 +667,7 @@ class DataTide:
         @dataclass(frozen=True)
         class Global:
             Index = dict(IndexTide.load()["configurations"]["global"])
-            models = Index["models"]
+            objects = Index["models"]
             metaschemas = dict(Index["metaschemas"])
             recomposition = dict(Index["recomposition"])
             json_schemas = dict(Index["json_schemas"])

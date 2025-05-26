@@ -26,7 +26,7 @@ def run():
     )
 
     error_list = []
-    for tvm in (index := DataTide.Models.tvm):
+    for tvm in (index := DataTide.Objects.tvm):
         tvm_data = index[tvm]
         tvm_name = tvm_data["name"]
         tvm_id = tvm_data.get("metadata",{}).get("uuid")

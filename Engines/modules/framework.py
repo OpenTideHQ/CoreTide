@@ -460,7 +460,7 @@ def keep_active_mdr(mdr_list:list[str])->list[str]:
     
     return active_mdr
 
-def techniques_resolver(model_id: str, recursive=True) -> list:
+def techniques_resolver(object_id: str, recursive=True) -> list:
     """
     Returns the relevant technique for any object, based on its own
     and its parent properties. WARNING : only works when index is loaded

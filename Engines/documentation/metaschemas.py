@@ -52,6 +52,7 @@ METASCHEMA_DOC_TEMPLATE = '''
 '''
 
 def gen_schema_md(metaschema, template, object_type=None):
+def gen_schema_md(metaschema, template, object_type=None):
     '''
     Generates the markdown documentation for a given metaschema path
 
@@ -70,9 +71,12 @@ def gen_schema_md(metaschema, template, object_type=None):
 
     # Parses the metaschema to extract relevant fields    
     title = DOC_TITLES.get(object_type, " ")
+    title = DOC_TITLES.get(object_type, " ")
     description = metaschema.get("description", "")
     template_name = ""
 
+    if object_type:
+        if object_type == "mdr":
     if object_type:
         if object_type == "mdr":
             template_name = "MDR Detection Name.yaml"

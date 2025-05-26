@@ -14,7 +14,7 @@ from Engines.modules.deployment import CIEnvironment
 CONFIG = DataTide.Configurations
 INDEX = DataTide.Index
 SKIP_KEYS = DataTide.Configurations.Documentation.skip_object_keys
-DOCUMENTATION_TARGET = DataTide.Configurations.Documentation.documentation_target
+DOCUMENTATION_TARGET = CIEnvironment()._check_ci_environment()
 DEFINITIONS_INDEX = DataTide.TideSchemas.definitions
 
 from Engines.modules.framework import (

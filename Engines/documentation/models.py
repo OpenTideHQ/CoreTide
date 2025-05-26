@@ -32,15 +32,18 @@ from Engines.modules.documentation_components import (
     cve_doc,
     actors_doc,
     object_data_table,
+    object_data_table,
 )
 from Engines.modules.files import safe_file_name
 from Engines.modules.graphs import relationships_graph, chaining_graph
 from Engines.modules.tide import DataTide
 from Engines.modules.logs import log
-from Engines.modules.deployment import Proxy, CIEnvironment
-from Engines.templates.models import MODEL_DOC_TEMPLATE
+from Engines.modules.deployment import Proxy
+from Engines.templates.objects import OBJECT_DOC_TEMPLATE
 
 ROOT = Path(str(git.Repo(".", search_parent_directories=True).working_dir))
+OBJECTS_DOCS_PATH = Path(DataTide.Configurations.Global.Paths.Core.objects_docs_folder)
+OBJECTS_SCOPE = DataTide.Configurations.Documentation.scope
 OBJECTS_DOCS_PATH = Path(DataTide.Configurations.Global.Paths.Core.objects_docs_folder)
 OBJECTS_SCOPE = DataTide.Configurations.Documentation.scope
 
@@ -52,6 +55,8 @@ else:
 
 OBJECTS_INDEX = DataTide.Objects.Index
 OBJECTS_NAME = DataTide.Configurations.Documentation.object_names
+OBJECTS_INDEX = DataTide.Objects.Index
+OBJECTS_NAME = DataTide.Configurations.Documentation.object_names
 
 if DataTide.Configurations.Documentation.cve.get("proxy"):
     Proxy.set_proxy()
@@ -61,6 +66,9 @@ else:
 
 def documentation(object):
 
+    object_uuid = object.get("metadata", {}).get("uuid")
+    object_type = get_type(object_uuid)
+    title = f"{get_icon(object_type)} {object['name']}"
     object_uuid = object.get("metadata", {}).get("uuid")
     object_type = get_type(object_uuid)
     title = f"{get_icon(object_type)} {object['name']}"
@@ -77,7 +85,11 @@ def documentation(object):
     object_datafield = DataTide.Configurations.Global.data_fields[object_type]
     criticality = criticality_doc(object["criticality"])
     metadata = object.get("metadata") or object.get("meta") or {}
+    object_datafield = DataTide.Configurations.Global.data_fields[object_type]
+    criticality = criticality_doc(object["criticality"])
+    metadata = object.get("metadata") or object.get("meta") or {}
     metadata = {k: v for k, v in metadata.items() if k != "tlp"}
+    metadata = metadata_doc(metadata, object_type="tvm")
     metadata = metadata_doc(metadata, object_type="tvm")
 
     expand_header = ""
@@ -85,9 +97,6 @@ def documentation(object):
     expand_graphs = ""
 
     actors_sightings = ""
-
-    if DOCUMENTATION_TARGET == "gitlab":
-        title = ""
 
     references = object.get("references")
     
@@ -104,9 +113,13 @@ def documentation(object):
 
     description = object[object_datafield].get("description") or object[
         object_datafield
+    description = object[object_datafield].get("description") or object[
+        object_datafield
     ].get("guidelines")
     description = description.replace("\n", "\n> ")
 
+    tlp = tlp_doc((object.get("metadata") or object["meta"])["tlp"])
+    classification = (object.get("metadata") or object["meta"]).get(
     tlp = tlp_doc((object.get("metadata") or object["meta"])["tlp"])
     classification = (object.get("metadata") or object["meta"]).get(
         "classification"
@@ -115,6 +128,7 @@ def documentation(object):
         classification = classification_doc(classification)
 
     techniques = techniques_resolver(object_uuid, recursive=False)
+    techniques = techniques_resolver(object_uuid, recursive=False)
     if techniques:
         techniques = rich_attack_links(techniques)
         techniques = f'{get_icon("att&ck")} **ATT&CK Techniques** {techniques}'
@@ -122,13 +136,18 @@ def documentation(object):
         techniques = ""
 
     relation_graph = relationships_graph(object_uuid)
+    relation_graph = relationships_graph(object_uuid)
     relation_table = ""
+    if childs(object_uuid):
     if childs(object_uuid):
         relation_table = "\n\n **Descendants** \n\n" + relations_table(
             object_uuid, direction="downstream"
+            object_uuid, direction="downstream"
         )
     if parents(object_uuid):
+    if parents(object_uuid):
         relation_table += "\n\n **Ascendants** \n\n"
+        relation_table += relations_table(object_uuid, direction="upstream")
         relation_table += relations_table(object_uuid, direction="upstream")
 
     if not relation_graph and not relation_table:
@@ -138,16 +157,31 @@ def documentation(object):
 
     if object_type == "bdr":
         justification = object[object_datafield]["justification"].replace("\n", "\n> ")
+    if object_type == "bdr":
+        justification = object[object_datafield]["justification"].replace("\n", "\n> ")
         expand_description += f"\n\n## ❓ Justification \n\n > {justification}"
 
+    if object_type == "cdm":
+        tuning = object[object_datafield]["tuning"].replace("\n", "\n> ")
     if object_type == "cdm":
         tuning = object[object_datafield]["tuning"].replace("\n", "\n> ")
         expand_description += f"\n\n## 🔧 Tuning \n\n > {tuning}"
 
     if object_type == "tvm":
+    if object_type == "tvm":
 
         terrain = object[object_datafield]["terrain"].replace("\n", "\n> ")
+        terrain = object[object_datafield]["terrain"].replace("\n", "\n> ")
         expand_description += f"\n\n## 🖥️ Terrain \n\n > {terrain}"
+
+        if actors:=object[object_datafield].get("actors"):
+            # Filter out legacy actor definitions
+            if type(actors[0]) is str:
+                pass 
+            else:
+                actors_sightings = "\n\n### 🐲 Actors sightings \n\n"
+                actors_sightings += actors_doc(actors)
+
 
         if actors:=object[object_datafield].get("actors"):
             # Filter out legacy actor definitions

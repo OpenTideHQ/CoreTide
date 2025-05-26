@@ -14,17 +14,17 @@ from Engines.modules.tide import DataTide
 TIDE_INDEXES_PATH = Path(DataTide.Configurations.Global.Paths.Tide.tide_indexes)
 ICONS = DataTide.Configurations.Documentation.icons
 WIKI_PATH = (
-    str(DataTide.Configurations.Documentation.models_docs_folder)
+    str(DataTide.Configurations.Documentation.objects_docs_folder)
     .replace("../", "")
     .replace(" ", "-")
 )
 WIKI_MODEL_FOLDER = DataTide.Configurations.Documentation.object_names
-# Extracting the name of the top-level folder containing models documentation
+# Extracting the name of the top-level folder containing objects documentation
 WIKI_MODEL_DOCUMENTATION_FOLDER = DataTide.Configurations.Global.Paths.Core._raw[
-    "models_docs_folder"
+    "objects_docs_folder"
 ].split("/")[-2]
 DEBUG = DataTide.Configurations.DEBUG
-
+OBJECTS_INDEX_FILE = "objects.json"
 
 def run():
 

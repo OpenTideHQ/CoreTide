@@ -172,11 +172,14 @@ class IndexTide:
 
         for mdr in STG_INDEX:
             if mdr not in RECONCILED_INDEX["objects"]["mdr"]:
+            if mdr not in RECONCILED_INDEX["objects"]["mdr"]:
                 log("INFO", "Patching MDR in staging index", mdr)
+                RECONCILED_INDEX["objects"]["mdr"][mdr] = patch.tide_1_patch(STG_INDEX[mdr], "mdr")
                 RECONCILED_INDEX["objects"]["mdr"][mdr] = patch.tide_1_patch(STG_INDEX[mdr], "mdr")
                 added_mdr.append(mdr)
             else:
                 main_mdr_metadata = (
+                    RECONCILED_INDEX["objects"]["mdr"][mdr].get("meta") or RECONCILED_INDEX["objects"]["mdr"][mdr]["metadata"]
                     RECONCILED_INDEX["objects"]["mdr"][mdr].get("meta") or RECONCILED_INDEX["objects"]["mdr"][mdr]["metadata"]
                 )
                 main_version = main_mdr_metadata["version"]
@@ -944,7 +947,7 @@ class DataTide:
                 table: str
 
             Index = dict(IndexTide.load()["configurations"]["global"])
-            objects = Index["models"]
+            objects = Index["objects"]
             metaschemas = dict(Index["metaschemas"])
             recomposition = dict(Index["recomposition"])
             json_schemas = dict(Index["json_schemas"])

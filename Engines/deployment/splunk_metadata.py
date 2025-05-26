@@ -32,7 +32,7 @@ class SplunkMetadataDeploy(SplunkEngineInit, DeployMetadata):
 
         self.GITWIKI = WIKI_URL
         self.GITWIKI += str(
-            DataTide.Configurations.Documentation.models_docs_folder
+            DataTide.Configurations.Documentation.objects_docs_folder
         ).replace("../", "").replace("wiki", "")
         self.GITWIKI += "/" + DataTide.Configurations.Documentation.object_names["mdr"]
         self.GITWIKI = self.GITWIKI.replace(" ", "-")

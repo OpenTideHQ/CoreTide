@@ -40,7 +40,7 @@ from Engines.modules.deployment import Proxy
 from Engines.templates.models import MODEL_DOC_TEMPLATE
 
 ROOT = Path(str(git.Repo(".", search_parent_directories=True).working_dir))
-MODELS_DOCS_PATH = Path(DataTide.Configurations.Global.Paths.Core.models_docs_folder)
+MODELS_DOCS_PATH = Path(DataTide.Configurations.Global.Paths.Core.objects_docs_folder)
 MODELS_SCOPE = DataTide.Configurations.Documentation.scope
 
 DOCUMENTATION_TARGET = DataTide.Configurations.Documentation.documentation_target

@@ -8,8 +8,6 @@ from datetime import datetime
 import sys
 import traceback
 
-toolchain_start_time = datetime.now()
-
 sys.path.append(str(git.Repo(".", search_parent_directories=True).working_dir))
 
 from Engines.modules.logs import log
@@ -76,8 +74,3 @@ else:
         json.dump(stg_index, out, default=str)
 
 print("\n" + "Execution Report".center(80, "="))
-
-time_to_execute = datetime.now() - toolchain_start_time
-time_to_execute = "%.2f" % time_to_execute.total_seconds()
-
-print("\n⌛ Exported Staging index in {} seconds".format(time_to_execute))

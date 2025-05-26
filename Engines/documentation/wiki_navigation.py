@@ -37,7 +37,7 @@ ICONS = DataTide.Configurations.Documentation.icons
 
 PATHS_CONFIG = DataTide.Configurations.Global.Paths.Index
 
-MODELS_DOCS_PATH = Path(str(DataTide.Configurations.Global.Paths.Core.models_docs_folder).replace(" ", "-"))
+MODELS_DOCS_PATH = Path(str(DataTide.Configurations.Global.Paths.Core.objects_docs_folder).replace(" ", "-"))
 MODELS_SCOPE = DataTide.Configurations.Documentation.scope
 MODELS_NAME = DataTide.Configurations.Documentation.object_names
 

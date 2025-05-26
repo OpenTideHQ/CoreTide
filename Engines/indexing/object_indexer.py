@@ -14,17 +14,17 @@ from Engines.modules.tide import DataTide
 TIDE_INDEXES_PATH = Path(DataTide.Configurations.Global.Paths.Tide.tide_indexes)
 ICONS = DataTide.Configurations.Documentation.icons
 WIKI_PATH = (
-    str(DataTide.Configurations.Documentation.models_docs_folder)
+    str(DataTide.Configurations.Documentation.objects_docs_folder)
     .replace("../", "")
     .replace(" ", "-")
 )
 WIKI_MODEL_FOLDER = DataTide.Configurations.Documentation.object_names
-# Extracting the name of the top-level folder containing models documentation
+# Extracting the name of the top-level folder containing objects documentation
 WIKI_MODEL_DOCUMENTATION_FOLDER = DataTide.Configurations.Global.Paths.Core._raw[
-    "models_docs_folder"
+    "objects_docs_folder"
 ].split("/")[-2]
 DEBUG = DataTide.Configurations.DEBUG
-
+OBJECTS_INDEX_FILE = "objects.json"
 
 def run():
 
@@ -34,49 +34,48 @@ def run():
         "Creates Vocabulary like schema CoreTIDE models, so they can be used within JSON Schema for validation.",
     )
 
-    MODEL_SCOPE = DataTide.Configurations.Global.objects
+    OBJECT_SCOPE = DataTide.Configurations.Global.objects
     ICONS = DataTide.Configurations.Documentation.icons
     EXPORT_INDENT = 0
     if DEBUG:
         EXPORT_INDENT = 4
     
-    model_index = json.load(open(TIDE_INDEXES_PATH / "models.json"))
+    object_index = json.load(open(TIDE_INDEXES_PATH / OBJECTS_INDEX_FILE))
 
-    for model_type in MODEL_SCOPE:
+    for object_type in OBJECT_SCOPE:
 
-        index_name = DataTide.Configurations.Documentation.object_names[model_type]
+        index_name = DataTide.Configurations.Documentation.object_names[object_type]
         metadata = {
-            "field": model_type,
-            "icon": ICONS[model_type],
+            "field": object_type,
+            "icon": ICONS[object_type],
             "name": index_name,
             "description": index_name,
             "model": True,
         }
         entries = {}
-        registry = DataTide.Objects.Index[model_type]
+        registry = DataTide.Objects.Index[object_type]
 
-        for model in registry:
+        for object in registry:
 
-            model_data = registry[model]
+            object_data = registry[object]
 
             entry = {}
-            entry["name"] = model_data["name"]
-            entry["model"] = True  # Allows certain switches when generating json schema
-            entry["tlp"] = model_data["metadata"]["tlp"]
-            entry["criticality"] = model_data.get("criticality")
-            entry["aliases"] = model_data.get("actor", {}).get("aliases")
+            entry["name"] = object_data["name"]
+            entry["object"] = True  # Allows certain switches when generating json schema
+            entry["tlp"] = object_data["metadata"]["tlp"]
+            entry["criticality"] = object_data.get("criticality")
 
             description = str()
 
-            match model_type:
+            match object_type:
                 case "tvm":
-                    description = model_data.get("threat", {}).get("description")
+                    description = object_data.get("threat", {}).get("description")
                 case "cdm":
-                    description = model_data.get("detection", {}).get("guidelines")
+                    description = object_data.get("detection", {}).get("guidelines")
                 case "bdr":
-                    description = model_data.get("request", {}).get("description")
+                    description = object_data.get("request", {}).get("description")
                 case "mdr":
-                    description = model_data.get("description") or ""
+                    description = object_data.get("description") or ""
 
             entry["description"] = description
 
@@ -88,17 +87,17 @@ def run():
                 for k, v in entry.items()
             }
 
-            entries[model] = entry
+            entries[object] = entry
 
-        model_index[model_type] = {}
-        model_index[model_type]["metadata"] = metadata
-        model_index[model_type]["entries"] = entries
+        object_index[object_type] = {}
+        object_index[object_type]["metadata"] = metadata
+        object_index[object_type]["entries"] = entries
 
-    with open(TIDE_INDEXES_PATH / "models.json", "w+", encoding="utf-8") as export:
+    with open(TIDE_INDEXES_PATH / OBJECTS_INDEX_FILE, "w+", encoding="utf-8") as export:
         export.write("")
-        json.dump(model_index, export, indent=EXPORT_INDENT)
+        json.dump(object_index, export, indent=EXPORT_INDENT)
 
-    log("SUCCESS", "Finished indexing all models as vocabularies")
+    log("SUCCESS", "Finished indexing all objects as vocabularies")
 
 
 if __name__ == "__main__":

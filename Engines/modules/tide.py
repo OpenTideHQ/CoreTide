@@ -170,13 +170,13 @@ class IndexTide:
         patch = Tide2Patching()
 
         for mdr in STG_INDEX:
-            if mdr not in RECONCILED_INDEX["models"]["mdr"]:
+            if mdr not in RECONCILED_INDEX["objects"]["mdr"]:
                 log("INFO", "Patching MDR in staging index", mdr)
-                RECONCILED_INDEX["models"]["mdr"][mdr] = patch.tide_1_patch(STG_INDEX[mdr], "mdr")
+                RECONCILED_INDEX["objects"]["mdr"][mdr] = patch.tide_1_patch(STG_INDEX[mdr], "mdr")
                 added_mdr.append(mdr)
             else:
                 main_mdr_metadata = (
-                    RECONCILED_INDEX["models"]["mdr"][mdr].get("meta") or RECONCILED_INDEX["models"]["mdr"][mdr]["metadata"]
+                    RECONCILED_INDEX["objects"]["mdr"][mdr].get("meta") or RECONCILED_INDEX["objects"]["mdr"][mdr]["metadata"]
                 )
                 main_version = main_mdr_metadata["version"]
                 stg_mdr_metadata = (
@@ -199,7 +199,7 @@ class IndexTide:
                     updated_mdr = list()
 
                     log("INFO", "Doing a safety patching to avoid edge cases")
-                    RECONCILED_INDEX["models"]["mdr"][mdr] = patch.tide_1_patch(STG_INDEX[mdr], "mdr")
+                    RECONCILED_INDEX["objects"]["mdr"][mdr] = patch.tide_1_patch(STG_INDEX[mdr], "mdr")
         
         log("SUCCESS", "Finalized Staging Reconciliation Routine")
         log("INFO", "Updated MDRs from Production Index with Staging Data", str(len(updated_mdr)))
@@ -566,10 +566,12 @@ class DataTide:
 
         Exposes all the configurations of the instance
         """
-        Index = dict(IndexTide.load()["models"])
+        Index = dict(IndexTide.load()["objects"])
         """Index containing model types"""
         tvm = dict(Index["tvm"])
         """Threat Vector Models Data Index"""
+        dom = dict(Index["dom"])
+        """Detection Objective Models Data Index"""
         cdm = dict(Index["cdm"])
         """Cyber Detection Models Data Index"""
         mdr = dict(Index["mdr"])
@@ -602,6 +604,8 @@ class DataTide:
         Index = dict(IndexTide.load()["json_schemas"])
         tvm = dict(Index.get("tvm", {}))
         """Threat Vector Model JSON Schema"""
+        dom = dict(Index.get("dom", {}))
+        """Detection Objective Model JSON Schema"""
         cdm = dict(Index.get("cdm", {}))
         """Cyber Detection Model JSON Schema"""
         mdr = dict(Index.get("mdr", {}))
@@ -618,6 +622,8 @@ class DataTide:
         Index = dict(IndexTide.load()["templates"])
         tvm = str(Index.get("tvm"))
         """Threat Vector Model Object Template"""
+        dom = str(Index.get("cdm"))
+        """Detection Objective Model Object Template"""
         cdm = str(Index.get("cdm"))
         """Cyber Detection Model Object Template"""
         mdr = str(Index.get("mdr"))
@@ -640,10 +646,10 @@ class DataTide:
         """Threat Vector Model Tide Schema"""
         cdm = dict(Index["cdm"])
         """Cyber Detection Model Tide Schema"""
+        dom = dict(Index["dom"])
+        """Detection Objective Model Tide Schema"""
         mdr = dict(Index["mdr"])
         """Managed Detection Rule Tide Schema"""
-        mdrv2 = dict(Index.get("mdrv2", {}))
-        """DEPRECATED - Legacy MDR Version for backward compatibility use cases"""
         bdr = dict(Index["bdr"])
         """Business Detection Request Tide Schema"""
 
@@ -667,7 +673,7 @@ class DataTide:
         @dataclass(frozen=True)
         class Global:
             Index = dict(IndexTide.load()["configurations"]["global"])
-            objects = Index["models"]
+            objects = Index["objects"]
             metaschemas = dict(Index["metaschemas"])
             recomposition = dict(Index["recomposition"])
             json_schemas = dict(Index["json_schemas"])
@@ -697,7 +703,7 @@ class DataTide:
                     subschemas = Index["subschemas"]
                     definitions = Index["definitions"]
                     wiki_docs_folder = Index["wiki_docs_folder"]
-                    models_docs_folder = Index["models_docs_folder"]
+                    objects_docs_folder = Index["objects_docs_folder"]
                     schemas_docs_folder = Index["schemas_docs_folder"]
                     vocabularies_docs = Index["vocabularies_docs"]
                     resources = Index["resources"]
@@ -714,6 +720,7 @@ class DataTide:
                     the other attributes which are precomputed"""
                     
                     tvm = Index["tvm"]
+                    dom = Index["dom"]
                     cdm = Index["cdm"]
                     mdr = Index["mdr"]
                     bdr = Index["bdr"]
@@ -800,15 +807,15 @@ class DataTide:
             object_names = dict(Index["object_names"])
             titles = dict(Index["titles"])
             icons = dict(Index["icons"])
-            models_docs_folder: Path = Path(
+            objects_docs_folder: Path = Path(
                 IndexTide.load()["configurations"]["global"]["paths"]["core"][
-                    "models_docs_folder"
+                    "objects_docs_folder"
                 ]
             )
-            models_docs_folder = (
-                Path(str(models_docs_folder).replace(" ", "-"))
+            objects_docs_folder = (
+                Path(str(objects_docs_folder).replace(" ", "-"))
                 if documentation_target == "gitlab"
-                else models_docs_folder
+                else objects_docs_folder
             )
 
         @dataclass(frozen=True)

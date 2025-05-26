@@ -944,9 +944,7 @@ class DataTide:
                 table: str
 
             Index = dict(IndexTide.load()["configurations"]["global"])
-            objects = Index["objects"]
-            indexes = Indexes(**dict(Index["indexes"]))
-            exports = Exports(**dict(Index["exports"]))
+            objects = Index["models"]
             metaschemas = dict(Index["metaschemas"])
             recomposition = dict(Index["recomposition"])
             json_schemas = dict(Index["json_schemas"])

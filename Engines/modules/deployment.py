@@ -547,6 +547,7 @@ class ExternalIdHelper:
         file_path = (
             DataTide.Configurations.Global.Paths.Tide.mdr
             / DataTide.Objects.files[mdr_uuid]
+            / DataTide.Objects.files[mdr_uuid]
         )
         with open(file_path, "r", encoding="utf-8") as mdr_file:
             content = mdr_file.readlines()

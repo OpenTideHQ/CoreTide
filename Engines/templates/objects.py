@@ -26,6 +26,9 @@ OBJECT_DOC_TEMPLATE = '''{frontmatter}
 
 ## 🕸️ Relations
 
+{actors_sightings}
+
+### 🌊 OpenTide Objects
 {relation_graph}
 
 {relation_table}

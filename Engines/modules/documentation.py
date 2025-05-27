@@ -326,6 +326,12 @@ def get_field_title(field, metaschema, icon=True):
                     else:
                         vocab_name = field
                     title = VOCAB_INDEX[vocab_name]["metadata"]["name"]
+                
+                elif definition:=metaschema[field].get("tide.meta.definition"):
+                    definition_schema = DEFINITIONS_INDEX[definition]
+                    title = definition_schema.get("title", "") 
+                    if icon is True:
+                        title = definition_schema.get("icon", "") + " " + title
 
             if icon is True:
                 title_icon = metaschema[field].get("icon") or get_icon(field) or ""

@@ -77,7 +77,7 @@ def parse_misp_galaxy(galaxy_link:str)->list[dict]:
         actor_data["name"] = actor["value"]
         actor_data["description"] = actor.get("description")
         if actor.get("meta",{}).get("synonyms"):
-            actor["alias"] = actor["meta"]["synonyms"]
+            actor_data["alias"] = actor["meta"]["synonyms"]
         actor_data["tide.vocab.stages"] = "misp"
 
         groups_data.append(actor_data)

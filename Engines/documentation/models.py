@@ -30,7 +30,8 @@ from Engines.modules.documentation_components import (
     tlp_doc,
     relations_table,
     cve_doc,
-    object_data_table,
+    actors_doc,
+    model_data_table,
 )
 from Engines.modules.files import safe_file_name
 from Engines.modules.graphs import relationships_graph, chaining_graph
@@ -82,6 +83,8 @@ def documentation(object):
     expand_description = ""
     expand_graphs = ""
 
+    actors_sightings = ""
+
     if DOCUMENTATION_TARGET == "gitlab":
         title = ""
 
@@ -128,7 +131,7 @@ def documentation(object):
         relation_table += relations_table(object_uuid, direction="upstream")
 
     if not relation_graph and not relation_table:
-        relation_graph = "🚫 No related objects indexed."
+        relation_graph = "🚫 No related OpenTide objects indexed."
         if DOCUMENTATION_TARGET == "gitlab":
             GitlabMarkdown.negative_diff(relation_graph)
 
@@ -145,7 +148,16 @@ def documentation(object):
         terrain = object[object_datafield]["terrain"].replace("\n", "\n> ")
         expand_description += f"\n\n## 🖥️ Terrain \n\n > {terrain}"
 
-        cve = object[object_datafield].get("cve")
+        if actors:=model[model_datafield].get("actors"):
+            # Filter out legacy actor definitions
+            if type(actors[0]) is str:
+                pass 
+            else:
+                actors_sightings = "\n\n### 🐲 Actors sightings \n\n"
+                actors_sightings += actors_doc(actors)
+
+
+        cve = model[model_datafield].get("cve")
         if cve:
             cve = cve_doc(cve)
             expand_description += f"\n\n {cve}"
@@ -168,6 +180,7 @@ def documentation(object):
 
     doc = OBJECT_DOC_TEMPLATE.format(frontmatter=frontmatter,
                                     title=title,
+                                    actors_sightings=actors_sightings,
                                     criticality=criticality,
                                     tlp=tlp,
                                     techniques=techniques,

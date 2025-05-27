@@ -175,6 +175,7 @@ def build_search(model_type, mdr_status:Optional[Literal["ACTIVE", "DEPRECATED"]
                         actor_name = get_vocab_entry("actors", actor.get("name", "").split("::")[1], "name")
                         actor_aliases = get_vocab_entry("actors", actor.get("name", "").split("::")[1], "alias")
                         if actor_aliases:
+                            actor_aliases = list(set(actor_aliases))
                             actor_name += ", " + ", ".join(actor_aliases)
                         actors_list.append(actor_name)
                 

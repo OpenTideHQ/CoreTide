@@ -54,7 +54,7 @@ def actors_doc(actors:list[dict])->str:
         details["Description"] = str(actor_data.get("description")).replace("\n", "")
         details["Aliases"] = ", ".join(actor_data.get("alias", [])) #type: ignore
         details["Source"] = sources[actor_name.split("::")[0]]
-        details["Sighting"] = actor.get("sighting", "No documented sighting")
+        details["Sighting"] = actor.get("sighting", "No documented sighting").replace("\n", "")
         details["Reference"] = ", ".join(actor.get("references", ["No documented references"]))
         data.append(details)
 

@@ -12,7 +12,12 @@ start_time = time.time()
 
 sys.path.append(str(git.Repo(".", search_parent_directories=True).working_dir))
 
-from Engines.modules.framework import techniques_resolver, relations_list, get_type
+from Engines.modules.framework import (
+    techniques_resolver,
+    relations_list,
+    get_type,
+    get_vocab_entry
+)
 from Engines.modules.documentation import (
     object_value_doc,
     get_icon,
@@ -162,21 +167,25 @@ def build_search(object_type, mdr_status:Optional[Literal["ACTIVE", "DEPRECATED"
 
                 row[implementation_column] = " // ".join(implementations)
 
-            elif object_type == "tvm":
+            if model_type == "tvm":
                 if value == "actors":
                     actors_list = []
                     actors = object_value_doc(entry, "actors") or []
                     for actor in actors:
                         if type(actor) is dict:
-                            actors_list.append(actor.get("name"))
+                            actor_name = get_vocab_entry("actors", actor.get("name", "").split("::")[1], "name")
+                            actor_aliases = get_vocab_entry("actors", actor.get("name", "").split("::")[1], "alias")
+                            if actor_aliases:
+                                actor_name += ", " + ", ".join(actor_aliases)
+                            actors_list.append(actor_name)
                     actors_list = ", ".join(actors_list)
-                    row[value] = actors
+                    row[value] = actors_list
 
-            elif object_type == "cdm" and value == "att&ck":
+            if model_type == "cdm" and value == "att&ck":
                 techniques = ", ".join(techniques_resolver(entry))
                 row[value] = techniques
 
-            elif object_type == "mdr":
+            if model_type == "mdr":
 
                 if value == "statuses":
 

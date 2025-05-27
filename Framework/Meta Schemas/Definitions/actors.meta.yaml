@@ -4,14 +4,9 @@ tide.template.spacer: true
 icon: "🐲"
 type: array
 items:
-  type:
-    - object
-    - string
+  type: object
   required:
     - name
-  anyOf:
-    - type: object
-    - type: string
   properties:
     
     name:

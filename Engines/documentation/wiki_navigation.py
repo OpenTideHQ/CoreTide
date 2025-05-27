@@ -167,7 +167,7 @@ def build_search(model_type, mdr_status:Optional[Literal["ACTIVE", "DEPRECATED"]
 
                 row[implementation_column] = " // ".join(implementations)
 
-            elif model_type == "tvm":
+            if model_type == "tvm":
                 if value == "actors":
                     actors_list = []
                     actors = model_value_doc(entry, "actors") or []
@@ -181,11 +181,11 @@ def build_search(model_type, mdr_status:Optional[Literal["ACTIVE", "DEPRECATED"]
                     actors_list = ", ".join(actors_list)
                     row[value] = actors_list
 
-            elif model_type == "cdm" and value == "att&ck":
+            if model_type == "cdm" and value == "att&ck":
                 techniques = ", ".join(techniques_resolver(entry))
                 row[value] = techniques
 
-            elif model_type == "mdr":
+            if model_type == "mdr":
 
                 if value == "statuses":
 

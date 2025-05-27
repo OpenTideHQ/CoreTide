@@ -193,6 +193,7 @@ def documentation(object):
 
 
         cve = object[object_datafield].get("cve")
+        cve = object[object_datafield].get("cve")
         if cve:
             cve = cve_doc(cve)
             expand_description += f"\n\n {cve}"

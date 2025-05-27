@@ -194,8 +194,8 @@ def build_search(object_type, mdr_status:Optional[Literal["ACTIVE", "DEPRECATED"
                 actors_list = ", ".join(actors_list)
                 row[value] = actors_list
 
-            elif model_type == "cdm" and value == "vectors":
-                vectors = model_value_doc(entry, "vectors")
+            elif object_type == "cdm" and value == "vectors":
+                vectors = object_value_doc(entry, "vectors")
                 if vectors:
                     vectors = [vectors] if type(vectors) is str else vectors
                     vectors_links = []

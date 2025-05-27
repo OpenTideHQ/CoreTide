@@ -12,7 +12,12 @@ start_time = time.time()
 
 sys.path.append(str(git.Repo(".", search_parent_directories=True).working_dir))
 
-from Engines.modules.framework import techniques_resolver, relations_list, get_type
+from Engines.modules.framework import (
+    techniques_resolver,
+    relations_list,
+    get_type,
+    get_vocab_entry
+)
 from Engines.modules.documentation import (
     model_value_doc,
     get_icon,
@@ -168,9 +173,13 @@ def build_search(model_type, mdr_status:Optional[Literal["ACTIVE", "DEPRECATED"]
                     actors = model_value_doc(entry, "actors") or []
                     for actor in actors:
                         if type(actor) is dict:
-                            actors_list.append(actor.get("name"))
+                            actor_name = get_vocab_entry("actors", actor.get("name"), "name")
+                            actor_aliases = get_vocab_entry("actors", actor.get("name"), "alias")
+                            if actor_aliases:
+                                actor_name += ", " + ", ".join(actor_aliases)
+                            actors_list.append(actor_name)
                     actors_list = ", ".join(actors_list)
-                    row[value] = actors
+                    row[value] = actors_list
 
             elif model_type == "cdm" and value == "att&ck":
                 techniques = ", ".join(techniques_resolver(entry))

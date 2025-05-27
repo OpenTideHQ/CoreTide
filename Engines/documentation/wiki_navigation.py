@@ -162,17 +162,17 @@ def build_search(object_type, mdr_status:Optional[Literal["ACTIVE", "DEPRECATED"
 
                 row[implementation_column] = " // ".join(implementations)
 
-            elif model_type == "tvm":
+            elif object_type == "tvm":
                 if value == "actors":
                     actors_list = []
-                    actors = model_value_doc(entry, "actors") or []
+                    actors = object_value_doc(entry, "actors") or []
                     for actor in actors:
                         if type(actor) is dict:
                             actors_list.append(actor.get("name"))
                     actors_list = ", ".join(actors_list)
                     row[value] = actors
 
-            elif model_type == "cdm" and value == "att&ck":
+            elif object_type == "cdm" and value == "att&ck":
                 techniques = ", ".join(techniques_resolver(entry))
                 row[value] = techniques
 

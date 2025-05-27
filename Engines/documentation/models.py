@@ -31,7 +31,7 @@ from Engines.modules.documentation_components import (
     relations_table,
     cve_doc,
     actors_doc,
-    model_data_table,
+    object_data_table,
 )
 from Engines.modules.files import safe_file_name
 from Engines.modules.graphs import relationships_graph, chaining_graph
@@ -148,7 +148,7 @@ def documentation(object):
         terrain = object[object_datafield]["terrain"].replace("\n", "\n> ")
         expand_description += f"\n\n## 🖥️ Terrain \n\n > {terrain}"
 
-        if actors:=model[model_datafield].get("actors"):
+        if actors:=object[object_datafield].get("actors"):
             # Filter out legacy actor definitions
             if type(actors[0]) is str:
                 pass 
@@ -157,7 +157,7 @@ def documentation(object):
                 actors_sightings += actors_doc(actors)
 
 
-        cve = model[model_datafield].get("cve")
+        cve = object[object_datafield].get("cve")
         if cve:
             cve = cve_doc(cve)
             expand_description += f"\n\n {cve}"

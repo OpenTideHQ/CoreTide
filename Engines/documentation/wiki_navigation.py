@@ -173,8 +173,8 @@ def build_search(model_type, mdr_status:Optional[Literal["ACTIVE", "DEPRECATED"]
                     actors = model_value_doc(entry, "actors") or []
                     for actor in actors:
                         if type(actor) is dict:
-                            actor_name = get_vocab_entry("actors", actor.get("name"), "name")
-                            actor_aliases = get_vocab_entry("actors", actor.get("name"), "alias")
+                            actor_name = get_vocab_entry("actors", actor.get("name", "").split("::")[1], "name")
+                            actor_aliases = get_vocab_entry("actors", actor.get("name", "").split("::")[1], "alias")
                             if actor_aliases:
                                 actor_name += ", " + ", ".join(actor_aliases)
                             actors_list.append(actor_name)

@@ -167,25 +167,24 @@ def build_search(model_type, mdr_status:Optional[Literal["ACTIVE", "DEPRECATED"]
 
                 row[implementation_column] = " // ".join(implementations)
 
-            if model_type == "tvm":
-                if value == "actors":
-                    actors_list = []
-                    actors = model_value_doc(entry, "actors") or []
-                    for actor in actors:
-                        if type(actor) is dict:
-                            actor_name = get_vocab_entry("actors", actor.get("name", "").split("::")[1], "name")
-                            actor_aliases = get_vocab_entry("actors", actor.get("name", "").split("::")[1], "alias")
-                            if actor_aliases:
-                                actor_name += ", " + ", ".join(actor_aliases)
-                            actors_list.append(actor_name)
-                    actors_list = ", ".join(actors_list)
-                    row[value] = actors_list
+            elif model_type == "tvm" and value == "actors":
+                actors_list = []
+                actors = model_value_doc(entry, "actors") or []
+                for actor in actors:
+                    if type(actor) is dict:
+                        actor_name = get_vocab_entry("actors", actor.get("name", "").split("::")[1], "name")
+                        actor_aliases = get_vocab_entry("actors", actor.get("name", "").split("::")[1], "alias")
+                        if actor_aliases:
+                            actor_name += ", " + ", ".join(actor_aliases)
+                        actors_list.append(actor_name)
+                actors_list = ", ".join(actors_list)
+                row[value] = actors_list
 
-            if model_type == "cdm" and value == "att&ck":
+            elif model_type == "cdm" and value == "att&ck":
                 techniques = ", ".join(techniques_resolver(entry))
                 row[value] = techniques
 
-            if model_type == "mdr":
+            elif model_type == "mdr":
 
                 if value == "statuses":
 

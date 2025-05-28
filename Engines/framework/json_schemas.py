@@ -45,7 +45,6 @@ STAGE_DESCRIPTION_LIMIT = 300
 VOCAB_GENERATION_ENUM = True
 
 
-
 DROPDOWN_TEMPLATE = """
 ### {icon} {name}
 
@@ -100,7 +99,6 @@ def fetch_config_parameter_list(dot_path:str)->list:
     while key != config_path[-1]:
         
         if key == "tenants":
-            print(config_index)
             parameter_list = []
             parameter_key = config_path[config_path.index(key) + 1] 
             for tenant in config_index["tenants"]:
@@ -279,7 +277,7 @@ def gen_lib_schema(
         # Edge case for possible model references, there is no description
         # in that case, only the id which is what the user needs to input
         # and the name used as a description.
-        if (VOCAB_INDEX[vocab]["metadata"].get("model")) or (vocab in TIDE_OBJECTS):
+        if (VOCAB_INDEX[vocab]["metadata"].get("object")) or (vocab in TIDE_OBJECTS):
             for key in VOCAB_INDEX[vocab]["entries"]:
                 value = key
                 key_data = VOCAB_INDEX[vocab]["entries"][key]
@@ -661,8 +659,8 @@ def run():
     log(
         "INFO",
         "Generates JSON Schemas from metaschema files, dynamically "
-        "looking up Vocabulary values. JSON Schemas allow to validate the models "
-        "as per the CoreTIDE schema.",
+        "looking up Vocabulary values. JSON Schemas allow to validate the OpenTide Objects "
+        "as per their standard OpenTide schema.",
     )
 
     # Loops through all source yaml defined in meta_to_json and generates the
@@ -678,14 +676,14 @@ def run():
             placeholders = parsing.get("tide.placeholders") or {}
 
             log("ONGOING", "Generating json schema for : " + str(yaml_input))
-            # Generate coretide fields
+            
+            # Generate Schema
             generated = gen_json_schema(parsing)
 
-            # Removes the extra keys represented in the metaschema
+            # Removes the OpenTide reserved schema keys
             cleaned = remove_tide_keywords(generated)
 
-            # Export to json and pretty-print to file
-
+            # Export JSON Schemas
             log("ONGOING", "Exporting generated schema to : " + str(json_output))
             output = json.dumps(cleaned, indent=4, sort_keys=False, default=str)
             for placeholder in placeholders:

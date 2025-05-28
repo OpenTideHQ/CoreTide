@@ -33,6 +33,7 @@ proxy = false
 tvm = "Threat Vectors"
 cdm = "Detection Models"
 mdr = "Detection Rules"
+dom = "Detection Objectives"
 bdr = "Business Requests"
 lookup_metadata = "Lookup Metadata"
 

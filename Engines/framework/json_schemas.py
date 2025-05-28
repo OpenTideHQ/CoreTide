@@ -34,17 +34,6 @@ RECOMPOSITION = GLOBAL_CONFIG.recomposition
 
 STAGE_DESCRIPTION_LIMIT = 300
 
-# Mitigation for broken anyOf subschema validation in array values
-# from vscode-yaml extension from 1.10. Also fixes a glitch where
-# the first const would be displayed as if assigned instead of key description
-#
-# When set to True, it uses undocumented internal VSCode json extensions
-# to add Enum descriptions, which is not possible with vanilla json schema
-# Set to False if using another IDE, as it may lead to unpredicatable results,
-# and the validation there may not suffer from the same defect.
-VOCAB_GENERATION_ENUM = True
-
-
 DROPDOWN_TEMPLATE = """
 ### {icon} {name}
 
@@ -238,7 +227,6 @@ def make_markdown_dropdown(name, key, field=""):
 
 def gen_lib_schema(
     vocab: str,
-    mode: Literal["anyOf", "enum", "const"] = "anyOf",
     stages: str | list | None = None,
     no_wrap: bool = False,
     scoped: bool = False,
@@ -284,10 +272,9 @@ def gen_lib_schema(
                 buffer["const"] = value
 
                 dropdown = make_markdown_dropdown(key, key_data, field=vocab)
-                if mode != "const":
-                    buffer["description"] = key_data.get("description") or ""
-                    # buffer["type"] = "string"
-                    buffer["markdownDescription"] = dropdown
+                buffer["description"] = key_data.get("description") or ""
+                # buffer["type"] = "string"
+                buffer["markdownDescription"] = dropdown
 
                 # Handle if scoped
                 if scoped:
@@ -360,9 +347,8 @@ def gen_lib_schema(
 
                     dropdown = make_markdown_dropdown(key, key_data, field=vocab)
 
-                    if mode != "const":
-                        buffer["description"] = key_data.get("description") or ""
-                        buffer["markdownDescription"] = dropdown
+                    buffer["description"] = key_data.get("description") or ""
+                    buffer["markdownDescription"] = dropdown
 
                     copied = buffer.copy()
                     array.append(copied)
@@ -410,19 +396,13 @@ def gen_lib_schema(
                                 value,
                             )
 
-    if mode in ["anyOf", "const"]:
-        return array
+    if not enum:
+        enum = [""]
+    if enum_helper and search_hints:
+        enum.extend(enum_helper)
+        enum_description.extend(enum_description)
 
-    elif mode == "enum":
-        if not enum:
-            enum = [""]
-        if enum_helper and search_hints:
-            enum.extend(enum_helper)
-            enum_description.extend(enum_description)
-
-        return enum, enum_description
-    else:
-        return array
+    return enum, enum_description
 
 
 def remove_tide_keywords(dictionary:dict)->dict:
@@ -585,54 +565,44 @@ def gen_json_schema(dictionary):
                         dictionary[field]["items"]["enum"] = values_list
                         dictionary[field]["items"]["uniqueItems"] = True
                 
-                if dict_foo[field].get("tide.vocab"):
-                    if type(dict_foo[field]["tide.vocab"]) is str:
-                        query = dict_foo[field]["tide.vocab"]
-                    elif type(dict_foo[field]["tide.vocab"]) is bool:
-                        query = field
-
-                    title = VOCAB_INDEX[query]["metadata"]["name"]
-                    dictionary[field]["description"] = VOCAB_INDEX[query]["metadata"][
-                        "description"
-                    ]
-
-                    icon = get_icon(field)
+                if vocab:=dict_foo[field].get("tide.vocab"):
+                    if type(vocab) is str:
+                        # Add icon if available to title
+                        icon = get_icon(query)
+                        if icon:
+                            dictionary[field]["title"] = icon + " " + dictionary[field]["title"]
+                    if type(vocab) is bool:
+                        vocab = field
                     scoped = dict_foo[field].get("tide.vocab.scoped")
                     hint_no_wrap = dict_foo[field].get("tide.vocab.hints.no-wrap")
                     stages = dict_foo[field].get("tide.vocab.stages")
+        
+                    # Normalize vocabs to list to support all variants
+                    vocabs = [vocab] if type(vocab) is not list else vocab
+                    
+                    temp = {}
+                    enum = []
+                    markdown_enum = []
+                    for vocab in vocabs:
+                        new_enum, new_markdown_enum = gen_lib_schema(
+                            vocab=vocab,
+                            no_wrap=hint_no_wrap,
+                            stages=stages,
+                            scoped=scoped,
+                        )
+                        enum.extend(new_enum)
+                        markdown_enum.extend(new_markdown_enum)
+                    temp["enum"] = enum
+                    temp["markdownEnumDescriptions"] = markdown_enum
 
+                    # When no field type is present, assume it's a direct string
                     # When the type is set to string, oneOf allows only one value
                     # to be selected
-                    if "type" in dict_foo[field]:
-                        field_types = dict_foo[field]["type"]
+                    field_types =dict_foo[field].get("type")
+                    if field_types:
                         field_types = (
                             [field_types] if type(field_types) is str() else field_types
                         )
-                    else:
-                        field_types = None
-
-                    temp = {}
-                    if VOCAB_GENERATION_ENUM:
-                        enum, markdown_enum = gen_lib_schema(
-                            vocab=query,
-                            mode="enum",
-                            no_wrap=hint_no_wrap,
-                            stages=stages,
-                            scoped=scoped,
-                        )
-                        temp["enum"] = enum
-                        temp["markdownEnumDescriptions"] = markdown_enum
-
-                    else:
-                        temp["anyOf"] = gen_lib_schema(
-                            vocab=query,
-                            mode="anyOf",
-                            no_wrap=hint_no_wrap,
-                            stages=stages,
-                            scoped=scoped,
-                        )
-
-                    # When no field type is present, assume it's a direct string
                     if field_types is None:
                         dictionary[field].update(temp)
                     elif "string" in field_types:
@@ -640,12 +610,6 @@ def gen_json_schema(dictionary):
                     elif "array" in field_types:
                         dictionary[field]["items"] = temp
                         dictionary[field]["uniqueItems"] = True
-
-                    if title:
-                        if icon:
-                            dictionary[field]["title"] = f"{icon} {title}"
-                        else:
-                            dictionary[field]["title"] = title
 
                 else:
                     gen_json_schema(dictionary[field])

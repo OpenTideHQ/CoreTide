@@ -39,6 +39,8 @@ DROPDOWN_TEMPLATE = """
 
 {id_icon} **Identifier** : `{identifier}`
 
+_Vocabulary_ : `{source_vocab}`
+
 {criticality} {tlp}
 
 {stage}
@@ -189,7 +191,7 @@ def make_markdown_dropdown(name, key, field=""):
         or ICONS.get(field)
         or ""
     )
-
+    source_vocab = VOCAB_INDEX.get(field, {}).get("metadata", {}).get("name")
     link = key.get("link") or ""
 
     stage = key.get("tide.vocab.stages") or ""
@@ -207,10 +209,10 @@ def make_markdown_dropdown(name, key, field=""):
             criticality = "No Criticality Assigned"
         else:
             crit_value_icon = get_vocab_entry("criticality", criticality, "icon")
-        criticality = f"{crit_icon} **Criticality** : {crit_value_icon} {criticality}"
+        criticality = f"{crit_icon} **Criticality** : {crit_value_icon} {criticality} | "
     
     if tlp:
-        tlp = f" | **{get_icon(tlp, vocab='tlp')}TLP:{tlp.upper()}**"
+        tlp = f"**{get_icon(tlp, vocab='tlp')}TLP:{tlp.upper()}**"
     if stage:
         stage_description = stage_documentation(field, stage)
         if stage_description:

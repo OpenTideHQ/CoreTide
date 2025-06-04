@@ -4,6 +4,7 @@ from pathlib import Path
 import json
 import time
 import sys
+import datetime
 
 start_time = time.time()
 
@@ -71,6 +72,12 @@ class SplunkMetadataDeploy(SplunkEngineInit, DeployMetadata):
             entry["MDR_author"] = metadata.get("author")
             entry["MDR_version"] = metadata.get("version")
             entry["MDR_last_modified"] = str(metadata.get("modified"))
+
+            # Generate current ISO 8601 Date+Time with UTC offset
+            current_datetime = datetime.datetime.now(datetime.timezone.utc).astimezone()
+            current_datetime = current_datetime.replace(microsecond=0)
+            entry["MDR_deployed"] = str(current_datetime.isoformat())
+
             entry["MDR_detection_model"] = body.get("detection_model")
             entry["MDR_severity"] = body.get("response", {}).get("alert_severity")
             entry["MDR_alert_handling_team"] = (

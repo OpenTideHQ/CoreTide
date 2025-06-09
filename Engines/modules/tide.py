@@ -904,16 +904,6 @@ class DataTide:
                 modifiers = dict(Index.get("modifiers", {}))
 
             @dataclass(frozen=True)
-            class Sentinel:
-                Index = dict(IndexTide.load()["configurations"]["systems"]["sentinel"])
-                tide = dict(Index["tide"])
-                setup = dict(Index["setup"])
-                secrets = dict(Index["secrets"])
-                defaults = dict(Index["defaults"])
-                lookups = dict(Index["lookups"])
-
-
-            @dataclass(frozen=True)
             class CarbonBlackCloud:
                 Index = dict(
                     IndexTide.load()["configurations"]["systems"]["carbon_black_cloud"]

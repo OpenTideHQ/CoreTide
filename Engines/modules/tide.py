@@ -916,7 +916,7 @@ class DataTide:
             @dataclass
             class Sentinel(TideConfigs.Systems.Sentinel):
                 raw = dict(
-                    IndexTide.load()["configurations"]["systems"]["defender_for_endpoint"]
+                    IndexTide.load()["configurations"]["systems"]["sentinel"]
                 )
                 platform = TideLoader.load_platform_config(dict(raw["platform"]), DetectionSystems.SENTINEL)
                 modifiers = TideLoader.load_modifiers_config(raw["modifiers"]) if raw.get("modifiers") else None

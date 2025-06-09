@@ -438,7 +438,9 @@ class TideLoader:
                                 references=references,
                                 configurations=configurations)
 
-
+    @overload
+    @staticmethod
+    def load_platform_config(platform_config:dict, system:Literal[DetectionSystems.SENTINEL])->TideConfigs.Systems.Sentinel.Platform: ...
     @overload
     @staticmethod
     def load_platform_config(platform_config:dict, system:Literal[DetectionSystems.CROWDSTRIKE])->TideConfigs.Systems.Crowdstrike.Platform: ...
@@ -735,6 +737,7 @@ class DataTide:
                 defaults = dict(Index["defaults"])
                 lookups = dict(Index["lookups"])
 
+
             @dataclass(frozen=True)
             class CarbonBlackCloud:
                 Index = dict(
@@ -744,6 +747,15 @@ class DataTide:
                 setup = dict(Index["setup"])
                 secrets = dict(Index["secrets"])
                 validation = dict(Index["validation"])
+
+            @dataclass
+            class Sentinel(TideConfigs.Systems.Sentinel):
+                raw = dict(
+                    IndexTide.load()["configurations"]["systems"]["defender_for_endpoint"]
+                )
+                platform = TideLoader.load_platform_config(dict(raw["platform"]), DetectionSystems.SENTINEL)
+                modifiers = TideLoader.load_modifiers_config(raw["modifiers"]) if raw.get("modifiers") else None
+                tenants = TideLoader.load_tenants_config(raw["tenants"], DetectionSystems.SENTINEL) if raw.get("tenants") else None
 
             @dataclass
             class DefenderForEndpoint(TideConfigs.Systems.DefenderForEndpoint):

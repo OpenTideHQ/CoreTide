@@ -1,18 +1,20 @@
-  schema: sentinel::2.0
+  schema: sentinel::2.1
   status: DEVELOPMENT
   #contributors:
     #-
-  #trigger: GreaterThan
-  #threshold: 0
+  
+  trigger:
+    operator: GreaterThan
+    threshold: 0
   
   scheduling:
     #nrt: false
     frequency: 
     lookback: 
   
-  #alert:
-    #create_incident: true
-    #suppression: 
+  alert:
+    create_incident: true
+    suppression: false
     #title: 
     #description: |
       #...
@@ -23,11 +25,11 @@
       #- property: 
         #column: 
   
-  #grouping:
-    #event: SingleAlert
+  grouping:
+    event: SingleAlert
   
-    #alert:
-      #enabled: 
+    alert:
+      enabled: false
       #reopen_closed_incidents: 
       #grouping_lookback: 
       #matching: AllEntities

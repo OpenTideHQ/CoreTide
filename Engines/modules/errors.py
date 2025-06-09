@@ -80,12 +80,6 @@ class TideErrors(Exception):
         Raised for all errors related to incorrect MDR Data Structures
         """
         ...
-    class MDRDefaultsConfigurationDataError(TideDataModelErrors):
-        """
-        Raised when the default configuration from the configuration file creates
-        unforeseen errors. Operator mistake.
-        """
-        ...
     class TideQueryValidationError:
         """
         Raised when the MDR query failed validation

@@ -8,7 +8,6 @@ security solution that delivers visibility and AI-powered cyberthreat protection
 to help stop cyberattacks across Windows, macOS, Linux, Android, iOS, and IoT devices.
 """
 flags = [""]
-device_groups = [""]
 
 #[[modifiers]]
 #name = "Modifier Demo"

@@ -456,17 +456,17 @@ class TideDeployment:
         
         match system:
             case DetectionSystems.SPLUNK:
-                self.rule_deployment:Sequence[TenantDeployment.Splunk] = self.deployment_resolver(deployment, DetectionSystems.SPLUNK, strategy) #type:ignore
+                self.rule_deployment:Sequence[TenantDeployment.Splunk] = self.deployment_resolver(deployment, system, strategy) #type:ignore
             case DetectionSystems.SENTINEL:
-                self.rule_deployment:Sequence[TenantDeployment.Sentinel] = self.deployment_resolver(deployment, DetectionSystems.SENTINEL, strategy) #type:ignore
+                self.rule_deployment:Sequence[TenantDeployment.Sentinel] = self.deployment_resolver(deployment, system, strategy) #type:ignore
             case DetectionSystems.CARBON_BLACK_CLOUD:
-                self.rule_deployment:Sequence[TenantDeployment.CarbonBlackCloud] = self.deployment_resolver(deployment, DetectionSystems.CARBON_BLACK_CLOUD, strategy) #type:ignore
+                self.rule_deployment:Sequence[TenantDeployment.CarbonBlackCloud] = self.deployment_resolver(deployment, system, strategy) #type:ignore
             case DetectionSystems.DEFENDER_FOR_ENDPOINT:
-                self.rule_deployment:Sequence[TenantDeployment.DefenderForEndpoint] = self.deployment_resolver(deployment, DetectionSystems.DEFENDER_FOR_ENDPOINT, strategy) #type:ignore
+                self.rule_deployment:Sequence[TenantDeployment.DefenderForEndpoint] = self.deployment_resolver(deployment, system, strategy) #type:ignore
             case DetectionSystems.SENTINEL_ONE:
-                self.rule_deployment:Sequence[TenantDeployment.SentinelOne] = self.deployment_resolver(deployment, DetectionSystems.SENTINEL_ONE, strategy) #type:ignore
+                self.rule_deployment:Sequence[TenantDeployment.SentinelOne] = self.deployment_resolver(deployment, system, strategy) #type:ignore
             case DetectionSystems.CROWDSTRIKE:
-                self.rule_deployment:Sequence[TenantDeployment.Crowdstrike] = self.deployment_resolver(deployment, DetectionSystems.CROWDSTRIKE, strategy) #type:ignore
+                self.rule_deployment:Sequence[TenantDeployment.Crowdstrike] = self.deployment_resolver(deployment, system, strategy) #type:ignore
             case _:
                 raise NotImplementedError(f"System {system} is not implemented by TideDeployment")
 
@@ -474,10 +474,10 @@ class TideDeployment:
         match system:
             #case DetectionSystems.SPLUNK:
             #    return DataTide.Configurations.Systems.Splunk
-            #case DetectionSystems.SENTINEL:
-            #    return DataTide.Configurations.Systems.Sentinel
             #case DetectionSystems.CARBON_BLACK_CLOUD:
             #    return DataTide.Configurations.Systems.CarbonBlackCloud
+            case DetectionSystems.SENTINEL:
+                return DataTide.Configurations.Systems.Sentinel
             case DetectionSystems.DEFENDER_FOR_ENDPOINT:
                 return DataTide.Configurations.Systems.DefenderForEndpoint
             case DetectionSystems.SENTINEL_ONE:
@@ -492,6 +492,8 @@ class TideDeployment:
     def mdr_configuration_resolver(self, data:TideModels.MDR, system:DetectionSystems)->TideDefinitionsModels.SystemConfigurationModel:
 
         match system:
+            case DetectionSystems.SENTINEL:
+                mdr_config = data.configurations.sentinel
             case DetectionSystems.DEFENDER_FOR_ENDPOINT:
                 mdr_config = data.configurations.defender_for_endpoint
             case DetectionSystems.SENTINEL_ONE:
@@ -602,41 +604,6 @@ class TideDeployment:
         return base_dictionary
 
 
-    def defaults_resolver(self, data:TideModels.MDR, system:DetectionSystems) -> TideModels.MDR:
-        """
-        Computes a new MDR Configuration based on defaults, if they are present
-        in the System Configuration File, by first adding all default to a base
-        configuration, then re-adding the user-defined MDR configuration on top
-        """
-                
-        try:
-            defaults = self.system_configuration_resolver(system).defaults #type:ignore
-            if not defaults:
-                return data
-        except:
-            return data
-        
-        mdr_config = self.mdr_configuration_resolver(data, system)
-        new_config = dict()
-        
-        raw_config = asdict(mdr_config)
-        
-        # We first apply all the default onto a base configuration
-        # Then we apply the user defined MDR on top. This ensures that
-        # the defaults do not override anything already defined.
-        for default in defaults:
-            self._deep_update(new_config, {default: defaults[default]})
-
-        self._deep_update(new_config, raw_config)
-        
-        try:
-            return TideLoader.load_mdr(raw_config)
-        except:
-            log("FATAL",
-                "Combining the defaults with the MDR Data has created an incompatible schema. Review your default configuration.",
-                str(raw_config))
-            raise TideErrors.MDRDefaultsConfigurationDataError
-
     def modifiers_resolver(self, data:TideModels.MDR, target_tenant:str, system:DetectionSystems) -> TideModels.MDR:
         """
         Dynamically modifies MDR data based on 
@@ -667,6 +634,10 @@ class TideDeployment:
                 
                 match = False
                 
+                if mod.conditions.default:
+                    if mod.conditions.default is True:
+                        match = True
+                
                 if mod.conditions.status:
                     if mod.conditions.status == mdr_config.status:
                         match = True
@@ -688,7 +659,9 @@ class TideDeployment:
                         new_value = flatten_modifications[modification]
                         new_value = None if new_value in ["NONE", "NULL"] else new_value                     
                         if new_value:
-                            if "::" in new_value:
+                            if type(new_value) is not str:
+                                pass
+                            elif "::" in new_value:
                                 raw_mdr_config_flatten = pd.json_normalize(raw_mdr_config).to_dict(orient="records")[0] #type: ignore
                                 operator = new_value.split("::")[0]
                                 value = new_value.split("::")[1]
@@ -721,8 +694,7 @@ class TideDeployment:
         tenants_mapping = dict()
         
         for mdr in mdr_deployment:
-            mdr = self.defaults_resolver(data=mdr,
-                                        system=system)
+
             if type(mdr) is str:
                 mdr = DataTide.Objects.MDR[mdr]
             

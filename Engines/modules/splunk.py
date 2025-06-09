@@ -62,7 +62,7 @@ class SplunkEngineInit(ABC):
         ]["properties"]
         
         self.LOOKUPS_METADATA_INDEX = DataTide.Lookups.metadata
-        self.LOOKUPS_INDEX = DataTide.Lookups.lookups["sentinel"]
+        self.LOOKUPS_INDEX = DataTide.Lookups.lookups["splunk"]
 
         self.ALERT_SEVERITY_MAPPING = {
             "Informational": 2,

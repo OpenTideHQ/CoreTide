@@ -303,7 +303,7 @@ properties:
           - if:
               properties:
                 enabled: 
-                  enum: [true]
+                  const: true
             then:
               required:
                 - grouping_lookback

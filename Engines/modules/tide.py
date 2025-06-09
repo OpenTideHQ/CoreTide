@@ -265,6 +265,65 @@ class SystemLoader:
         return mdr_config, rule_id_bundle
 
     @staticmethod
+    def sentinel(mdr_config: dict[str, Any]) -> TideModels.MDR.Configurations.Sentinel:
+        Sentinel = TideModels.MDR.Configurations.Sentinel
+
+        mdr_config, base_config = SystemLoader._base_configuration(mdr_config)
+
+        query = mdr_config.pop("query")
+        trigger = Sentinel.Trigger(**mdr_config.pop("trigger", None))
+        scheduling = Sentinel.Scheduling(**mdr_config.pop("scheduling", None))
+        alert = mdr_config.pop("alert", None)
+        
+        custom_details = alert.pop("custom_details", None)
+        dynamic_properties = alert.pop("dynamic_properties", None)
+        
+        if custom_details:
+            custom_details = [Sentinel.Alert.CustomDetails(**detail) for detail in custom_details]
+        if dynamic_properties:
+            dynamic_properties = [Sentinel.Alert.DynamicProperties(**property) for property in dynamic_properties]
+
+        alert = Sentinel.Alert(**alert,
+                               custom_details=custom_details,
+                               dynamic_properties=dynamic_properties)
+
+        grouping = mdr_config.pop("grouping", None)
+        if grouping:
+            alert_grouping = grouping.pop("alert", None)
+            if alert:
+                alert_grouping = Sentinel.Grouping.AlertGrouping(**alert_grouping)
+            
+            grouping = Sentinel.Grouping(**grouping,
+                                         alert=alert_grouping)
+
+        entities = None
+        if "entities" in mdr_config:
+            entity_list = mdr_config.pop("entities")
+            entities = []
+            for mapping in entity_list:
+                entities.append(
+                    Sentinel.EntityMapping(
+                        entity=mapping["entity"],
+                        mappings=[Sentinel.EntityMapping.MappingEntry(**entry)
+                                  for entry in mapping["mappings"]]
+                    )
+                )
+
+        return Sentinel(
+            schema=base_config.schema,
+            status=base_config.status,
+            contributors=base_config.contributors,
+            tenants=base_config.tenants,
+            flags=base_config.flags,
+            query=query,
+            trigger=trigger,
+            scheduling=scheduling,
+            alert=alert,
+            grouping=grouping,
+            entities=entities
+        )
+
+    @staticmethod
     def crowdstrike(mdr_config:dict[str, Any])->TideModels.MDR.Configurations.Crowdstrike:
 
         Crowdstrike = TideModels.MDR.Configurations.Crowdstrike
@@ -424,7 +483,8 @@ class TideLoader:
 
         configurations = TideModels.MDR.Configurations()
         system_configurations:dict[str,Any] = mdr.pop("configurations")
-        
+        if system_configurations.get("sentinel"):
+            configurations.sentinel = SystemLoader.sentinel(system_configurations.pop("sentinel"))
         if system_configurations.get("defender_for_endpoint"):
             configurations.defender_for_endpoint = SystemLoader.defender_for_endpoint(system_configurations.pop("defender_for_endpoint"))
         if system_configurations.get("sentinel_one"):
@@ -458,6 +518,11 @@ class TideLoader:
             raise NotImplementedError("Missing Configuration Segment")
 
         match system:
+            case DetectionSystems.CROWDSTRIKE:
+                return TideConfigs.Systems.Crowdstrike.Platform(**platform_config)
+
+            case DetectionSystems.SENTINEL:
+                return TideConfigs.Systems.Sentinel.Platform(**platform_config)
 
             case DetectionSystems.DEFENDER_FOR_ENDPOINT:
                 return TideConfigs.Systems.DefenderForEndpoint.Platform(**platform_config)
@@ -513,6 +578,9 @@ class TideLoader:
             setup_with_secrets = HelperTide.fetch_config_envvar(tenant.pop("setup"))
             parameters = tenant.pop("parameters", None)
             match platform:
+                case DetectionSystems.SENTINEL:
+                    setup = TideConfigs.Systems.Sentinel.Tenant.Setup(**setup_with_secrets)
+
                 case DetectionSystems.DEFENDER_FOR_ENDPOINT:
                     if parameters:
                         parameters = TideConfigs.Systems.DefenderForEndpoint.Tenant.Parameters(**parameters)

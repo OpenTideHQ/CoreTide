@@ -19,14 +19,14 @@ flags = [""]
 #alert.title = "prefix::Staging "
 
 #[[tenants]]
-#name = "Default"
+#name = "Tenant"
 #description = "Tenant Description"
 #deployment = "ALWAYS" #STAGING, PRODUCTION, MANUAL (only when defined in MDR) or ALWAYS
 #[tenants.setup]
-#proxy = true
+#proxy = false
 #ssl = true
-#resource_group = "lzslz_rg"
-#workspace_name =  "lzslz-workspace8015868214"
+#resource_group = ""
+#workspace_name =  ""
 #workspace_id = "$AZURE_WORKSPACE_ID"
 #azure_tenant_id = "$AZURE_TENANT_ID"
 #azure_subscription_id = "$AZURE_SUBSCRIPTION_ID"

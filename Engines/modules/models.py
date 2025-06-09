@@ -95,7 +95,8 @@ class SystemConfig:
             status: Optional[Sequence[str]] = None
             flags: Optional[Sequence[Never] | Sequence[str]] = None
             tenants: Optional[Sequence[Never] | Sequence[str]] = None
-
+            default: Optional[bool] = None
+        
         conditions: Conditions
         modifications: Mapping[Any, str]
         name: Optional[str] = None
@@ -134,8 +135,21 @@ class TideConfigs:
 
         @dataclass
         class Sentinel(SystemConfig):
-            ...
+            
+            @dataclass
+            class Tenant(SystemConfig.Tenant):
 
+                @dataclass
+                class Setup(SystemConfig.Tenant.Setup):
+                    resource_group: str
+                    workspace_name: str
+                    workspace_id: str
+                    azure_tenant_id: str
+                    azure_subscription_id: str
+                    azure_client_id: str
+                    azure_client_secret: str
+
+                setup: Setup
         @dataclass
         class Splunk(SystemConfig):
             ...
@@ -162,10 +176,6 @@ class TideConfigs:
         class DefenderForEndpoint(SystemConfig):
             
             @dataclass
-            class Platform(SystemConfig.Platform):
-                device_groups: Sequence[str]
-
-            @dataclass
             class Tenant(SystemConfig.Tenant):
 
                 @dataclass
@@ -181,8 +191,6 @@ class TideConfigs:
                 setup:Setup
                 parameters: Optional[Parameters] = None
 
-
-            platform: Platform
             tenants: Optional[Sequence[Tenant]]
 
         @dataclass
@@ -406,18 +414,86 @@ class TideModels:
 
             @dataclass
             class Sentinel(TideDefinitionsModels.SystemConfigurationModel):
-                ...
+                
+                @dataclass
+                class Trigger:
+                    operator: str
+                    threshold: int
+
+                @dataclass
+                class Scheduling:
+                    nrt: Optional[bool] = None
+                    frequency: Optional[str] = None
+                    lookback: Optional[str] = None
+
+                @dataclass
+                class Alert:
+
+                    @dataclass
+                    class CustomDetails:
+                        key: str
+                        column: str
+
+                    @dataclass
+                    class DynamicProperties:
+                        property: str
+                        column: str
+
+                    create_incident: bool
+                    suppression: Union[str, bool]
+                    title: Optional[str] = None
+                    description: Optional[str] = None
+                    custom_details: Optional[Sequence[CustomDetails]] = None
+                    dynamic_properties: Optional[Sequence[DynamicProperties]] = None
+
+
+                @dataclass
+                class Grouping:
+
+                    @dataclass
+                    class AlertGrouping:
+                        # Required: enabled must be provided, others are optional.
+                        enabled: bool
+                        reopen_closed_incidents: Optional[bool] = None
+                        grouping_lookback: Optional[str] = None
+                        matching: Optional[str] = None
+                        group_by_entities: Optional[Sequence[str]] = None
+                        group_by_alert_details: Optional[Sequence[str]] = None
+                        group_by_custom_details: Optional[Sequence[str]] = None
+
+                    # The overall grouping configuration contains the event grouping details (required)
+                    # and an optional alert grouping configuration.
+                    event: str
+                    alert: AlertGrouping
+
+                @dataclass
+                class EntityMapping:
+
+                    @dataclass
+                    class MappingEntry:
+                        identifier: str
+                        column: str
+
+                    entity: str
+                    mappings: Sequence[MappingEntry]
+
+                query: str
+                trigger: Trigger
+                scheduling: Scheduling
+                alert: Alert
+                grouping: Optional[Grouping] = None
+                entities: Optional[Sequence[EntityMapping]] = None
 
             @dataclass
             class CarbonBlackCloud(TideDefinitionsModels.SystemConfigurationModel):
                 ...
                         
+            sentinel: Optional[Sentinel] = None
             defender_for_endpoint: Optional[DefenderForEndpoint] = None
             sentinel_one: Optional[SentinelOne] = None
             crowdstrike: Optional[Crowdstrike] = None
             carbon_black_cloud: Optional[Mapping] = None
             splunk: Optional[Mapping] = None
-            sentinel: Optional[Mapping] = None
 
         name: str
         metadata: TideDefinitionsModels.TideObjectMetadata
@@ -445,7 +521,7 @@ class TenantDeployment:
 
     @dataclass
     class Sentinel(TenantDeploymentModel):
-        tenant: TideConfigs.Systems.DefenderForEndpoint.Tenant
+        tenant: TideConfigs.Systems.Sentinel.Tenant
 
     @dataclass
     class CarbonBlackCloud(TenantDeploymentModel):

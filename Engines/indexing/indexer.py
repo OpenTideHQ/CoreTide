@@ -116,6 +116,7 @@ def indexer(write_index=False) -> dict:
         if os.path.isfile(
             json_schema_path
         ):  # In case we are generating the json for the first time
+            print("Loading... " + str(json_schema_path))
             json_schema_body = json.load(open(json_schema_path, encoding="utf-8"))
             json_index[meta_name] = json_schema_body
             obj_counter += 1

@@ -1,8 +1,7 @@
 import git
 import sys
 
-from typing import Sequence, Optional, Literal
-from dataclasses import dataclass, asdict
+from typing import Sequence
 
 sys.path.append(str(git.Repo(".", search_parent_directories=True).working_dir))
 
@@ -142,7 +141,7 @@ class CrowdstrikeDeploy(DeployMDR):
         """
         mdr_config = data.configurations.crowdstrike
         if not mdr_config:
-            raise Exception
+            raise TideErrors.TideSystemConfigurationErrors("Missing Crowdstrike")
     
         rule = self.compile_deployment(data=data, tenant_config=tenant_config)
 
@@ -213,11 +212,11 @@ class CrowdstrikeDeploy(DeployMDR):
 
         for tenant_deployment in deployment.rule_deployment:
             log("ONGOING", "Currently targeting tenant", tenant_deployment.tenant.name)
-            service = CrowdstrikeService(tenant_deployment.tenant) #type: ignore
+            service = CrowdstrikeService(tenant_deployment.tenant)
 
             for mdr in tenant_deployment.rules:
                 log("ONGOING", "Processing rule", mdr.name, mdr.metadata.uuid)
-                self.deploy_mdr(data=mdr, service=service, tenant_config=tenant_deployment.tenant) #type: ignore
+                self.deploy_mdr(data=mdr, service=service, tenant_config=tenant_deployment.tenant)
 
 def declare():
     return CrowdstrikeDeploy()

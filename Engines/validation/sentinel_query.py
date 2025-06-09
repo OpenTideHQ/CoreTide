@@ -2,9 +2,8 @@ import os
 import git
 import sys
 import json
-from typing import Literal
-from splunklib import client, results
-import traceback
+from typing import Literal, Sequence
+from datetime import timedelta
 
 import pandas as pd
 
@@ -14,28 +13,35 @@ from azure.core.exceptions import HttpResponseError
 
 sys.path.append(str(git.Repo(".", search_parent_directories=True).working_dir))
 
-from Engines.modules.sentinel import SentinelEngineInit, build_query
 from Engines.modules.plugins import ValidateQuery
 from Engines.modules.logs import log
 from Engines.modules.debug import DebugEnvironment
 from Engines.modules.tide import DataTide
-from datetime import timedelta
+from Engines.modules.models import TideModels, TideConfigs, TenantDeployment
+from Engines.modules.errors import TideErrors
+from Engines.modules.deployment import TideDeployment, DetectionSystems, DeploymentStrategy
 
 
-class SentinelValidateQuery(SentinelEngineInit, ValidateQuery):
+class SentinelValidateQuery(ValidateQuery):
 
-    def check_query(self, mdr:dict, service:LogsQueryClient):
-        mdr_uuid = mdr.get("uuid") or mdr["metadata"]["uuid"]
-        query:str = mdr["configurations"][self.DEPLOYER_IDENTIFIER].get("query")
+    def check_query(self,
+                    mdr:TideModels.MDR,
+                    tenant_config:TideConfigs.Systems.Sentinel.Tenant,
+                    service:LogsQueryClient):
+        mdr_uuid = mdr.metadata.uuid
+        if not mdr.configurations.sentinel:
+            raise TideErrors.TideMDRDataModelErrors("Missing Sentinel")
+        
+        query:str = mdr.configurations.sentinel.query
         if not query:
             os.environ["VALIDATION_ERROR_RAISED"] = "True"
-            log("FATAL", "Missing query in MDR", f"{mdr.get('name')} ({mdr_uuid})")
+            log("FATAL", "Missing query in MDR", f"{mdr.name} ({mdr_uuid})")
             return
 
-        query = build_query(mdr) + " | limit 1"
+        query += " | limit 1"
 
         try:
-            service.query_workspace(workspace_id=self.AZURE_SENTINEL_WORKSPACE_ID,
+            service.query_workspace(workspace_id=tenant_config.setup.workspace_id,
                                     query = query,
                                     timespan=timedelta(minutes=1))
             log("SUCCESS", "The query is a valid Sentinel KQL")
@@ -44,9 +50,9 @@ class SentinelValidateQuery(SentinelEngineInit, ValidateQuery):
             log("DEBUG", "Full error message", str(error))
             try:
                 log("FATAL",
-                    f"The KQL query is invalid for : {mdr['name']} ({mdr_uuid})",
+                    f"The KQL query is invalid for : {mdr.name} ({mdr_uuid})",
                     error.error.innererror["innererror"]["message"], #type: ignore
-                    f"Review the error and ensure your search can work in the relevant Sentinel workspace ({self.AZURE_SENTINEL_WORKSPACE_NAME})") 
+                    f"Review the error and ensure your search can work in the relevant Sentinel workspace ({tenant_config.setup.workspace_name})") 
             except:
                 log("FAILURE",
                     "Not able to parse out the error message",
@@ -56,35 +62,45 @@ class SentinelValidateQuery(SentinelEngineInit, ValidateQuery):
             os.environ["VALIDATION_ERROR_RAISED"] = "True"
 
 
-    def validate(self, deployment: list[str]):
-        if not deployment:
-            raise Exception("DEPLOYMENT NOT FOUND")
+    def validate(self, mdr_deployment: Sequence[TideModels.MDR] | list[str], deployment_plan:DeploymentStrategy):
+        
+        loaded_mdr = []
+        for mdr in mdr_deployment:
+            if type(mdr) is str:
+                loaded_mdr.append(DataTide.Models.MDR[mdr])
+            elif type(mdr) is TideModels.MDR:
+                loaded_mdr.append(mdr)
+        mdr_deployment = loaded_mdr
 
-        credentials = ClientSecretCredential(self.AZURE_TENANT_ID,
-                                             self.AZURE_CLIENT_ID,
-                                            self.AZURE_CLIENT_SECRET)
+        
+        
+        
+        deployment = TideDeployment(deployment=mdr_deployment,
+                                    system=DetectionSystems.SENTINEL,
+                                    strategy=deployment_plan)
 
-        service = LogsQueryClient(credential=credentials,
-                                  connection_verify=self.SSL_ENABLED)
 
-        # Start deployment routine
-        for mdr in deployment:
-            mdr_data:dict = DataTide.Models.mdr[mdr]
-            mdr_uuid = mdr_data.get("uuid") or mdr_data["metadata"]["uuid"]
+        for tenant_deployment in deployment.rule_deployment: #type: ignore
+            tenant_deployment: TenantDeployment.Sentinel # Force assignment here as case switch in TideDeployment doesn't seem to resolve perfectly
+            tenant_setup = tenant_deployment.tenant.setup
+            credentials = ClientSecretCredential(tenant_setup.azure_tenant_id,
+                                                tenant_setup.azure_client_id,
+                                                tenant_setup.azure_client_secret)
 
-            # Check if modified MDR contains a platform entry (by safety, but should not happen since
-            # the orchestrator will filter for the platform)
-            if self.DEPLOYER_IDENTIFIER in mdr_data["configurations"].keys():
+
+            service = LogsQueryClient(credential=credentials,
+                                    connection_verify=tenant_setup.ssl)
+
+
+            for mdr in tenant_deployment.rules:
+
                 # Connection routine, if not connected yet.
                 log("ONGOING",
                     "Validating KQL Query",
-                    f"{mdr_data['name']} ({mdr_uuid}")
-                self.check_query(mdr_data, service)
-            else:
-                log(
-                    "SKIP",
-                    f"🛑 Skipping {mdr_data.get('name')} as does not contain a Sentinel configuration section",
-                )
+                    f"{mdr.name} ({mdr.metadata.uuid}")
+                self.check_query(mdr=mdr,
+                                 service=service,
+                                 tenant_config=tenant_deployment.tenant)
 
 
 
@@ -92,5 +108,4 @@ def declare():
     return SentinelValidateQuery()
 
 if __name__ == "__main__" and DebugEnvironment.ENABLED:
-    print("RUNNING")
-    SentinelValidateQuery().validate(DebugEnvironment.MDR_DEPLOYMENT_TEST_UUIDS)
+    SentinelValidateQuery().validate(["5e791284-684c-4245-9ac7-cf00a1d041d6"], DeploymentStrategy.DEBUG)

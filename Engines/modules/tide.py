@@ -294,7 +294,7 @@ class SystemLoader:
         grouping = mdr_config.pop("grouping", None)
         if grouping:
             alert_grouping = grouping.pop("alert", None)
-            if alert:
+            if alert_grouping:
                 alert_grouping = Sentinel.Grouping.AlertGrouping(**alert_grouping)
             
             grouping = Sentinel.Grouping(**grouping,

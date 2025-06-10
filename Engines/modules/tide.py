@@ -271,8 +271,7 @@ class SystemLoader:
         Sentinel = TideModels.MDR.Configurations.Sentinel
 
         mdr_config, base_config = SystemLoader._base_configuration(mdr_config)
-        print("DEBUG")
-        print(mdr_config)
+
         query = mdr_config.pop("query")
         trigger = mdr_config.pop("trigger", None)
         if trigger:

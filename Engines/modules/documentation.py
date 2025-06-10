@@ -335,7 +335,7 @@ def get_field_title(field, metaschema, icon=True):
 
             if icon is True:
                 title_icon = metaschema[field].get("icon") or get_icon(field) or ""
-                title = title_icon + " " + title
+                title = title_icon + " " + (title or "_Missing_")
 
             return title.strip()
 

@@ -478,9 +478,9 @@ class TideModels:
                     mappings: Sequence[MappingEntry]
 
                 query: str
-                trigger: Trigger
                 scheduling: Scheduling
                 alert: Alert
+                trigger: Optional[Trigger] = None
                 grouping: Optional[Grouping] = None
                 entities: Optional[Sequence[EntityMapping]] = None
 

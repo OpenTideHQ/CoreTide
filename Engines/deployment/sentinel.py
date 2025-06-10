@@ -69,8 +69,9 @@ class SentinelDeploy(DeployMDR):
             rule.query_period = iso_duration_timedelta(
                 configuration.scheduling.lookback
             )
-            rule.trigger_threshold = configuration.trigger.threshold
-            rule.trigger_operator = configuration.trigger.operator
+            if configuration.trigger:
+                rule.trigger_threshold = configuration.trigger.threshold
+                rule.trigger_operator = configuration.trigger.operator
 
         details_overrides = service.alert_rules.models.AlertDetailsOverride()
 

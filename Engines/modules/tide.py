@@ -288,7 +288,7 @@ class SystemLoader:
             if dynamic_properties:
                 dynamic_properties = [Sentinel.Alert.DynamicProperties(**property) for property in dynamic_properties]
 
-        alert = Sentinel.Alert(**alert,
+        alert = Sentinel.Alert(**alert or {},
                                custom_details=custom_details,
                                dynamic_properties=dynamic_properties)
 

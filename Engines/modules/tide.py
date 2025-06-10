@@ -278,14 +278,15 @@ class SystemLoader:
             trigger = Sentinel.Trigger(**trigger)   
         scheduling = Sentinel.Scheduling(**mdr_config.pop("scheduling", None))
         alert = mdr_config.pop("alert", None)
-        
-        custom_details = alert.pop("custom_details", None)
-        dynamic_properties = alert.pop("dynamic_properties", None)
-        
-        if custom_details:
-            custom_details = [Sentinel.Alert.CustomDetails(**detail) for detail in custom_details]
-        if dynamic_properties:
-            dynamic_properties = [Sentinel.Alert.DynamicProperties(**property) for property in dynamic_properties]
+        custom_details = dynamic_properties = None
+        if alert:
+            custom_details = alert.pop("custom_details", None)
+            dynamic_properties = alert.pop("dynamic_properties", None)
+            
+            if custom_details:
+                custom_details = [Sentinel.Alert.CustomDetails(**detail) for detail in custom_details]
+            if dynamic_properties:
+                dynamic_properties = [Sentinel.Alert.DynamicProperties(**property) for property in dynamic_properties]
 
         alert = Sentinel.Alert(**alert,
                                custom_details=custom_details,

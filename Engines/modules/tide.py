@@ -271,7 +271,9 @@ class SystemLoader:
         mdr_config, base_config = SystemLoader._base_configuration(mdr_config)
 
         query = mdr_config.pop("query")
-        trigger = Sentinel.Trigger(**mdr_config.pop("trigger", None))
+        trigger = mdr_config.pop("trigger", None)
+        if trigger:
+            trigger = Sentinel.Trigger(**trigger)   
         scheduling = Sentinel.Scheduling(**mdr_config.pop("scheduling", None))
         alert = mdr_config.pop("alert", None)
         

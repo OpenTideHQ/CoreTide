@@ -431,10 +431,10 @@ class TideModels:
                         property: str
                         column: str
 
-                    create_incident: bool
-                    suppression: Union[str, bool]
                     title: Optional[str] = None
                     description: Optional[str] = None
+                    suppression: Union[str, bool] = False
+                    create_incident: bool = True 
                     custom_details: Optional[Sequence[CustomDetails]] = None
                     dynamic_properties: Optional[Sequence[DynamicProperties]] = None
 

@@ -117,6 +117,9 @@ class SentinelDeploy(DeployMDR):
             grouping_lookback = iso_duration_timedelta(
                 grouping_lookback
             )
+        else:
+            if not grouping_lookback:
+                grouping_lookback = iso_duration_timedelta("1h")
         reopen_closed_incident = configuration.grouping.alert.reopen_closed_incidents or False
         matching_method = configuration.grouping.alert.matching or "AllEntities" #Sane default, needed for typing
         group_by_entities = configuration.grouping.alert.group_by_entities

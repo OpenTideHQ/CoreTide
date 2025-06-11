@@ -110,11 +110,12 @@ class SentinelDeploy(DeployMDR):
 
         # Alert Grouping Configuration
         grouping_enabled = configuration.grouping.alert.enabled
+        grouping_lookback = configuration.grouping.alert.grouping_lookback
         if grouping_enabled:
-            if not configuration.grouping.alert.grouping_lookback:
+            if not grouping_lookback:
                 raise TideErrors.TideMDRDataModelErrors("Missing Grouping Lookback")
             grouping_lookback = iso_duration_timedelta(
-                configuration.grouping.alert.grouping_lookback
+                grouping_lookback
             )
         reopen_closed_incident = configuration.grouping.alert.reopen_closed_incidents or False
         matching_method = configuration.grouping.alert.matching or "AllEntities" #Sane default, needed for typing
@@ -124,7 +125,7 @@ class SentinelDeploy(DeployMDR):
 
         grouping_configuration = service.alert_rules.models.GroupingConfiguration(
             enabled=grouping_enabled,
-            lookback_duration=grouping_lookback,
+            lookback_duration=grouping_lookback, #type: ignore
             reopen_closed_incident=reopen_closed_incident,
             matching_method=matching_method,
             group_by_entities=group_by_entities, #type: ignore

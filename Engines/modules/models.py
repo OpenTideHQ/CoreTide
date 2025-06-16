@@ -435,6 +435,8 @@ class TideModels:
                     description: Optional[str] = None
                     suppression: Union[str, bool] = False
                     create_incident: bool = True 
+                    tactics: Optional[Sequence[str]] = None
+                    techniques: Optional[Sequence[str]] = None
                     custom_details: Optional[Sequence[CustomDetails]] = None
                     dynamic_properties: Optional[Sequence[DynamicProperties]] = None
 

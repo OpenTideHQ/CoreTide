@@ -4,7 +4,7 @@ from tokenize import String
 import git
 
 from dataclasses import dataclass
-from typing import Literal, Never, Optional, Sequence, Mapping, Any, Union
+from typing import Literal, Never, Optional, List, Sequence, Mapping, Any, Union
 from enum import Enum, auto
 
 sys.path.append(str(git.Repo(".", search_parent_directories=True).working_dir))
@@ -435,8 +435,8 @@ class TideModels:
                     description: Optional[str] = None
                     suppression: Union[str, bool] = False
                     create_incident: bool = True 
-                    tactics: Optional[Sequence[str]] = None
-                    techniques: Optional[Sequence[str]] = None
+                    tactics: Optional[List[str]] = None
+                    techniques: Optional[List[str]] = None
                     custom_details: Optional[Sequence[CustomDetails]] = None
                     dynamic_properties: Optional[Sequence[DynamicProperties]] = None
 

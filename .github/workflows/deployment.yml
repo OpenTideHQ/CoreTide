@@ -1,0 +1,38 @@
+name: Deployment
+
+on:
+  workflow_call:
+
+jobs:
+  Deployment:
+    name: Deploy
+    # if: ${{ github.ref == 'refs/heads/main' && needs.Validation.outputs.CHANGES == 'true' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2 # Needed to compare HEAD to HEAD~1
+
+      - name: Checkout Tide Core
+        uses: actions/checkout@v4
+        with:
+          repository: OpenTideHQ/CoreTide
+          path: coretide
+
+      - name: Tide Setup
+        uses: ./coretide/.github/actions/tide-setup
+        id: tide_setup
+        with:
+          coretide-ref: "refs/heads/development"
+          coretide-path: "coretide"
+          python-version: "3.12"
+          requirements-file: "coretide/Engines/requirements.txt"
+          git-user-name: "${{ github.actor }}"
+          git-user-email: "${{ github.actor }}@users.noreply.github.com"
+
+      - name: Deployment Routine
+        shell: bash
+        run: |
+          cd coretide/Orchestration
+          python deploy.py

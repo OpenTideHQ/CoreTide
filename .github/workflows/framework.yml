@@ -1,0 +1,76 @@
+name: Framework Generation Pipeline
+
+on:
+  workflow_call: {}
+
+jobs:
+  Framework:
+    name: Framework Setup
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2 # Needed to compare HEAD to HEAD~1
+
+      - name: Checkout Tide Core
+        uses: actions/checkout@v4
+        with:
+          repository: OpenTideHQ/CoreTide
+          path: "coretide"
+          ref: refs/heads/feature/github-action-support
+
+      - uses: ./coretide/.github/actions/tide-setup
+        name: Tide Setup
+        id: tide_setup
+        with:
+          coretide-ref: "refs/heads/development"
+          coretide-path: "coretide"
+          python-version: "3.12"
+          requirements-file: "coretide/Engines/requirements.txt"
+          git-user-name: "${{ github.actor }}"
+          git-user-email: "${{ github.actor }}@users.noreply.github.com"
+
+      - name: Run OpenTide Framework Setup
+        shell: bash
+        run: |
+          export MDE_TENANT_ID=test-placeholder-tenant-id
+          export MDE_CLIENT_ID=test-placeholder-client-id
+          export MDE_CLIENT_SECRET=test-placeholder-client
+          export AZURE_WORKSPACE_ID=test-placeholder-client
+          export AZURE_SUBSCRIPTION_ID=test-placeholder-client
+          export AZURE_TENANT_ID=test-placeholder-client
+          export AZURE_CLIENT_ID=test-placeholder-client
+          export AZURE_CLIENT_SECRET=test-placeholder-client
+          cd coretide/Orchestration
+          python generate.py
+
+      - name: Check for Changes and Commit
+        id: check_changes
+        shell: bash
+        run: |
+          echo "Checking for changes"
+
+          changes=$(git status --porcelain -- . ':!coretide')
+          echo $changes
+
+          if [[ -z "$changes" ]]; then
+            echo "No changes, exiting"
+            exit 0
+          fi
+
+          REPO_NAME=$(basename "$(git rev-parse --show-toplevel)")
+
+          echo "REPO_NAME: $REPO_NAME"
+
+          filtered_changes=$(echo "$changes" | grep -vE '(M|A|D) $REPO_NAME/|(M|A|D) coretide/')
+          echo "Filtered changes: $filtered_changes"
+          if [[ -z "$filtered_changes" ]]; then
+            echo "Changes only in Local Instance or CoreTide directories, not committing"
+            exit 0
+          fi
+
+          echo "Updated files, committing"
+          git add -- . ':!PanTide' ':!CoreTide' ':!coretide'
+          git commit -m "CoreTide Framework Automation [skip ci]"
+          git push origin HEAD:${{ github.ref }}

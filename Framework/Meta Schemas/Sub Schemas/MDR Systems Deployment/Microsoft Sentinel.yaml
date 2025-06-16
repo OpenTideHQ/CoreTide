@@ -1,5 +1,5 @@
 required: 
-  #- schema #To be enabled at a later date. Must be part of the public release
+  - schema
   - status
   - query
   - scheduling
@@ -7,7 +7,9 @@ required:
   - grouping
 
 tide.template.force-required:
-  - schema
+  - trigger
+  - operator
+  - threshold
 
 if:
   allOf:
@@ -206,6 +208,44 @@ properties:
         example: rule {{columnName1}} display name
         tide.mdr.parameter: alertDetailsOverride.alertDescriptionFormat
       
+      tactics:
+        title: MITRE ATT&CK Tactics
+        type: array
+        tide.template.hide: true
+        description: Mapping of relevant tactics
+        items:
+          type: string
+          enum:
+            - Collection
+            - CommandAndControl
+            - CredentialAccess
+            - DefenseEvasion
+            - Discovery
+            - Execution
+            - Exfiltration
+            - Impact
+            - ImpairProcessControl
+            - InhibitResponseFunction
+            - InitialAccess
+            - LateralMovement
+            - Persistence
+            - PreAttack
+            - PrivilegeEscalation
+            - Reconnaissance
+            - ResourceDevelopment
+
+      techniques:
+        title: MITRE ATT&CK Tactics
+        type: array
+        tide.template.hide: true
+        description: |
+          Mapping of relevant tactics - Warning : it's currently not possible
+          to support all valid techniques as a schema for each target system,
+          as they all support different variants and version of ATT&CK.
+          You must check on the GUI what techniques are available and replicate here.
+        items:
+          type: string
+          pattern: ^T\d{4}(\.\d{3})?$
 
       custom_details:
         title: Custom Details

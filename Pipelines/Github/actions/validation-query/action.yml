@@ -1,0 +1,24 @@
+name: "Query Validation"
+description: "Run OpenTide Query Validation"
+runs:
+  using: "composite"
+  steps:
+    - name: Validate Query
+      id: validate_query
+      shell: bash
+      run: |
+        export MDE_TENANT_ID=test-placeholder-tenant-id
+        export MDE_CLIENT_ID=test-placeholder-client-id
+        export MDE_CLIENT_SECRET=test-placeholder-client
+        export SPLUNK_URL=test-placeholder-client
+        export SPLUNK_PORT=test-placeholder-client
+        export SPLUNK_APP=test-placeholder-client
+        export SPLUNK_TOKEN=test-placeholder-client
+        export CBC_URL=test-placeholder-client
+        export DEPLOYMENT_PLAN=PRODUCTION
+        export CI_PROJECT_DIR=$(pwd)
+        export MAIN_HEAD_SHA=$(git rev-parse main) 
+        export MAIN_HEAD_SHA_PREVIOUS=$(git rev-parse 'main~1') 
+        # Supported plan : ['STAGING', 'PRODUCTION', 'FULL', 'ALWAYS', 'MANUAL', 'DEBUG']
+        cd coretide/Orchestration
+        python validate_query.py

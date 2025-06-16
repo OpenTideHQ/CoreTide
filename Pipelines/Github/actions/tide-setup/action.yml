@@ -1,0 +1,48 @@
+name: Setup Tide Environment
+description: |
+  This action sets up the Tide environment by checking out the CoreTide repository,
+  installing dependencies, and running the framework setup script.
+
+inputs:
+  coretide-ref:
+    description: "Ref to checkout for the CoreTide repository"
+    required: true
+
+  coretide-path:
+    description: "Path to the CoreTide repository"
+    required: true
+
+  python-version:
+    description: "Python version to use for the setup"
+    required: true
+
+  requirements-file:
+    description: "Path to the requirements file for Python dependencies"
+    required: true
+
+  git-user-name:
+    description: "Git user name for commits"
+    required: true
+
+  git-user-email:
+    description: "Git user email for commits"
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - name: Set up Python 3.12
+      uses: actions/setup-python@v5
+      with:
+        python-version: "${{ inputs.python-version }}"
+
+    - name: Install requirements
+      shell: bash
+      run: |
+        pip install -r ${{ inputs.requirements-file }}
+
+    - name: Configure Git
+      shell: bash
+      run: |
+        git config --global user.name "${{ inputs.git-user-name }}"
+        git config --global user.email "${{ inputs.git-user-email }}"

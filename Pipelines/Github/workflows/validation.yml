@@ -1,0 +1,44 @@
+name: Validation
+
+on:
+  workflow_call: {}
+
+jobs:
+  Validation:
+    name: OpenTide Validation
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2 # Needed to compare HEAD to HEAD~1
+
+      - name: Checkout Tide Core
+        uses: actions/checkout@v4
+        with:
+          repository: OpenTideHQ/CoreTide
+          path: "coretide"
+          ref: refs/heads/feature/github-action-support
+
+      - uses: ./coretide/Pipelines/Github/actions/tide-setup
+        name: Tide Setup
+        id: tide_setup
+        with:
+          coretide-ref: "refs/heads/development"
+          coretide-path: "coretide"
+          python-version: "3.12"
+          requirements-file: "coretide/Engines/requirements.txt"
+          git-user-name: "${{ github.actor }}"
+          git-user-email: "${{ github.actor }}@users.noreply.github.com"
+
+      - uses: ./coretide/Pipelines/Github/actions/validation-schema
+        name: Run OpenTide Object Validation
+        id: object_validation
+
+      - uses: ./coretide/Pipelines/Github/actions/check-mdr-changes
+        name: Check MDR Changes
+        id: detect
+
+      - uses: ./coretide/Pipelines/Github/actions/validation-query
+        name: Run OpenTide Query Validation
+        id: query_validation

@@ -212,7 +212,7 @@ for tenant in DataTide.Configurations.Systems.Sentinel.tenants:  # type: ignore
                                            )
         else:
             continue # Do not process other types of detections
-        create_incident = rule.get("incident_configuration", {}).get("create_incidentt", "false")
+        create_incident = rule.get("incident_configuration", {}).get("create_incident", "false")
         
         # Suppression
         if rule.get("suppression_enabled", False) is False:
@@ -229,7 +229,7 @@ for tenant in DataTide.Configurations.Systems.Sentinel.tenants:  # type: ignore
             custom_details = CUSTOM_DETAILS_TEMPLATE.strip("\n")
 
         # Dynamic Properties Handling
-        if dynamic_properties:=rule.get("custom_details"):
+        if dynamic_properties:=rule.get("dynamic_properties"):
             dynamic_properties_commented = ""
             dynamic_properties = "\n".join([CUSTOM_DETAILS.format(key=k, column=v).strip("\n") for k,v in dynamic_properties.items()])
         else:

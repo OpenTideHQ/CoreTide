@@ -92,6 +92,12 @@ class SentinelDeploy(DeployMDR):
 
         rule.alert_details_override = details_overrides
 
+        # MITRE ATT&CK Mapping
+        if techniques:=configuration.alert.techniques:
+            rule.techniques = techniques
+        if tactics:=configuration.alert.tactics:
+            rule.techniques = tactics
+
         # Custom Details
         if custom_details:=configuration.alert.custom_details:
             rule.custom_details = {detail.key:detail.column for detail in custom_details}

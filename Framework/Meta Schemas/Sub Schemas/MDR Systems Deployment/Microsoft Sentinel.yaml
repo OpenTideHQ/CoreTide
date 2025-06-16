@@ -52,6 +52,21 @@ properties:
       type: string
       format: email
 
+  tenants: 
+    title: Target Tenants
+    icon: 🏢
+    description: |
+      Override the default organizations and deploy to selected tenants only.
+    type: array
+    tide.config.system.tenants: sentinel
+
+  flags:
+    title: Flags
+    icon: 🚩
+    description: Flags allow to customize the rule behaviour using the modifiers framework
+    type: array
+    tide.config.parameter-list: systems.sentinel.platform.flags
+
   trigger: 
     title: Alert Trigger
     type: object

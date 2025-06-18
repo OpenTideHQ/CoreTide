@@ -1,5 +1,7 @@
 import git
 import sys
+import json
+
 from pathlib import Path
 
 sys.path.append(str(git.Repo(".", search_parent_directories=True).working_dir))
@@ -130,12 +132,12 @@ configurations:
 
 SENTINEL = """
   schema: sentinel::2.1
-  status: PRODUCTION
+  status: {status}
   tenants:
     - {tenant_name}
   #contributors:
     #-
-  
+ 
 {trigger}
   
 {scheduling}
@@ -188,17 +190,16 @@ for tenant in DataTide.Configurations.Systems.Sentinel.tenants:  # type: ignore
     service = SentinelService(tenant).connect() #type: ignore
     rules = service.alert_rules.list(resource_group_name=tenant.setup.resource_group, # type: ignore
                                     workspace_name=tenant.setup.workspace_name # type: ignore
-                                    )
-    import json
-    
+                                    )    
     rules_list = [rule.as_dict() for rule in rules]
-
-    with open("output.json", "w+", encoding="utf-8") as f:
+    
+    with open(f"output-{tenant.name}.json", "w+", encoding="utf-8") as f:
         json.dump(rules_list, f, indent=4)
     
     for rule in rules_list:
         tenant_name = tenant.name
         
+        status = "PRODUCTION" if rule.get("enabled", False) is True else "DISABLED"
         
         # Trigger and Scheduling
         if rule.get("kind") == "nrt":
@@ -299,15 +300,15 @@ for tenant in DataTide.Configurations.Systems.Sentinel.tenants:  # type: ignore
             grouping_lookback = convert_period(grouping_configuration["lookback_duration"])
             grouping_matching_method = grouping_configuration["matching_method"]
             if group_by_entities:=grouping_configuration.get("group_by_entities"):
-                group_by_entities = "      - " + "\n      - ".join([group_by_entities])
+                group_by_entities = "group_by_entities:\n        - " + "\n      - ".join(group_by_entities)
             else:
                 group_by_entities = "OPENTIDE::REMOVE"
             if group_by_alert_details:=grouping_configuration.get("group_by_alert_details"):
-                group_by_alert_details = "      - " + "\n      - ".join([group_by_alert_details])
+                group_by_alert_details = "group_by_alert_details:\n        - " + "\n      - ".join(group_by_alert_details)
             else:
                 group_by_alert_details = "OPENTIDE::REMOVE"
             if group_by_custom_details:=grouping_configuration.get("group_by_custom_details"):
-                group_by_custom_details = "      - " + "\n      - ".join([group_by_custom_details])
+                group_by_custom_details = "group_by_custom_details:\n        - " + "\n      - ".join(group_by_custom_details)
             else:
                 group_by_custom_details = "OPENTIDE::REMOVE"
 
@@ -335,7 +336,7 @@ for tenant in DataTide.Configurations.Systems.Sentinel.tenants:  # type: ignore
         sentinel = SENTINEL.format(**locals())
         sentinel = "\n  ".join(sentinel.split("\n")).strip("\n")
 
-        rule_name = rule["display_name"] + " - " + tenant_name
+        rule_name = '"' + rule["display_name"] + " - " + tenant_name + '"'
         rule_uuid = rule["name"]
         rule_description = "\n  ".join(rule["description"].split("\n"))
         rule_creation = rule_modified = rule["last_modified_utc"].split("T")[0]

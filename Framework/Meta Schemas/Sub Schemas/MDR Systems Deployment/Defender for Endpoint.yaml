@@ -461,7 +461,7 @@ properties:
           Device groups to which this response action will be applied to
         type: array
         tide.mdr.parameter: detectionAction.organizationalScope.scopeNames
-        tide.config.parameter-list: systems.defender_for_endpoint.platform.device_groups
+        tide.config.parameter-list: systems.defender_for_endpoint.tenants.device_groups
 
   query: 
     title: Defender For Endpoint Detection Rule

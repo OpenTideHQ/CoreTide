@@ -498,7 +498,7 @@ properties:
                 type: object
                 properties:
                   identifier:
-                    enum: [Sid, Name, AadUserId, PUID, ObjectGuid]
+                    enum: [Sid, Name, FullName, AadUserId, PUID, ObjectGuid]
               items:
                 type: object
                 properties:
@@ -510,6 +510,13 @@ properties:
                           The name of the account. This field should hold only the name without any domain added to it.
 
                           Required: **Yes**
+                      - const: FullName
+                        description: Not part of schema, included for backward compatibility with old version of entity mapping.
+                        markdownDescription: |
+                          Not part of schema, included for backward compatibility with old version of entity mapping.
+                          `Use Name instead of it`
+
+                          Required: **Yes, but only for backwards compatibility** 
                       - const: NTDomain
                         description: 'The NETBIOS domain name as it appears in the alert format – domain\username. Examples: Finance, NT AUTHORITY'
                         markdownDescription: |
@@ -535,21 +542,21 @@ properties:
 
                           Required: **Yes**
                       - const: AadTenantId
-                        description: The Azure AD tenant ID, if known.
+                        description: The Microsoft Entra tenant ID, if known.
                         markdownDescription: |
-                          The Azure AD tenant ID, if known.
+                          The Microsoft Entra tenant ID, if known.
 
                           Required: **No**
                       - const: AadUserId
-                        description: The Azure AD account object ID, if known.
+                        description: The Microsoft Entra account object ID, if known.
                         markdownDescription: |
-                          The Azure AD account object ID, if known.
+                          The Microsoft Entra account object ID, if known.
 
                           Required: **Yes**
                       - const: PUID
-                        description: The Azure AD Passport User ID, if known.
+                        description: The Microsoft Entra Passport User ID, if known.
                         markdownDescription: |
-                          The Azure AD Passport User ID, if known.
+                          The Microsoft Entra Passport User ID, if known.
 
                           Required: **Yes**
                       - const: IsDomainJoined
@@ -559,17 +566,36 @@ properties:
 
                           Required: **No**
                       - const: DisplayName
-                        description: The display name of the account.
+                        description: Not part of schema, included for backward compatibility with old version of entity mapping.
                         markdownDescription: |
-                          The display name of the account.
-
-                          Required: **No**
+                          Not part of schema, included for backward compatibility with old version of entity mapping.
+                          `Use Name instead of it`
+                          
+                          Required: **Yes, but only for backwards compatibility** 
                       - const: ObjectGuid
                         description: The objectGUID attribute is a single-value attribute that is the unique identifier for the object, assigned by Active Directory.
                         markdownDescription: |
                           The objectGUID attribute is a single-value attribute that is the unique identifier for the object, assigned by Active Directory.
 
                           Required: **Yes**
+                      - const: CloudAppAccountId
+                        description: The AccountID in alerts from the CloudApp provider. Refers to account IDs in third-party apps that are not supported in other Microsoft products.
+                        markdownDescription: |
+                          The AccountID in alerts from the CloudApp provider. Refers to account IDs in third-party apps that are not supported in other Microsoft products.
+
+                          Required: **No**
+                      - const: IsAnonymized
+                        description: "Indicates whether the user name is anonymized. Optional. Default value: false."
+                        markdownDescription: |
+                          Indicates whether the user name is anonymized. Optional. Default value: `false`.
+                          
+                          Required: **No**
+                      - const: Stream
+                        description: The source of discovery logs related to the specific account. Optional.
+                        markdownDescription: |
+                          The source of discovery logs related to the specific account. Optional.
+                          
+                          Required: **No**
 
 
         - properties:
@@ -582,12 +608,19 @@ properties:
                 type: object
                 properties:
                   identifier:
-                    enum: [HostName, NetBiosName, AzureID, OMSAgentID]
+                    enum: [HostName, FullName, NetBiosName, AzureID, OMSAgentID]
               items:
                 type: object
                 properties:
                   identifier:
                     anyOf:
+                      - const: FullName
+                        description: Not part of schema, included for backward compatibility with old version of entity mapping.
+                        markdownDescription: |
+                          Not part of schema, included for backward compatibility with old version of entity mapping.
+                          `Use HostName instead of it`
+
+                          Required: **Yes, but only for backwards compatibility** 
                       - const: DnsDomain
                         description: The DNS domain that this host belongs to. Should contain the complete DNS suffix for the domain, if known.
                         markdownDescription: |
@@ -707,6 +740,20 @@ properties:
                           The malware category by the vendor, e.g. Trojan.
 
                           Required: **No**
+                      - const: Files
+                        description: List of linked file entities on which the malware was found. Can contain the File entities inline or as reference. See the File entity for more details on structure.
+                        markdownDescription: |
+                          List of linked file entities on which the malware was found. Can contain the File entities inline or as reference.
+                          See the [File](https://learn.microsoft.com/en-us/azure/sentinel/entities-reference#file) entity for more details on structure.
+
+                          Required: **No**
+                      - const: Processes
+                        description: List of linked process entities on which the malware was found. This would often be used when the alert triggered on fileless activity. See the Process entity for more details on structure.
+                        markdownDescription: |
+                          List of linked process entities on which the malware was found. This would often be used when the alert triggered on fileless activity.
+                          See the [Processes](https://learn.microsoft.com/en-us/azure/sentinel/entities-reference#process) entity for more details on structure.
+
+                          Required: **No**
 
         - properties:
             entity:
@@ -724,10 +771,10 @@ properties:
                 properties:
                   identifier:
                     anyOf:
-                      - const: Name
-                        description: The file name without the path (some alerts might not include path).
-                        markdownDescription: | 
-                          The file name without the path (some alerts might not include path).
+                      - const: Type
+                        description: The type of the object.
+                        markdownDescription: |
+                          This should always be the string "file".
 
                           Required: **Yes**
                       - const: Directory
@@ -736,7 +783,58 @@ properties:
                           The full path to the file.
 
                           Required: **No**
+                      - const: Name
+                        description: The file name without the path (some alerts might not include path).
+                        markdownDescription: |
+                          The file name without the path (some alerts might not include path).
 
+                          Required: **Yes**
+                      - const: AlternateDataStreamName
+                        description: The file stream name in NTFS filesystem (null for the main stream).
+                        markdownDescription: |
+                          The alternate data stream name for the file in the NTFS filesystem.  
+                          If the file is using the main stream, this value will be null.
+
+                          Required: **No**
+                      - const: Host
+                        description: The host on which the file was stored.
+                        markdownDescription: |
+                          An entity representing the host where the file was stored.
+
+                          Required: **Yes**
+                      - const: HostUrl
+                        description: URL where the file was downloaded from (Mark of the Web).
+                        markdownDescription: |
+                          An entity representing the URL from which the file was downloaded  
+                          [Mark of the Web](https://learn.microsoft.com/en-us/deployedge/per-site-configuration-by-policy).
+
+                          Required: **No**
+                      - const: WindowsSecurityZoneType
+                        description: Windows Security Zone to which the URL belongs (Mark of the Web).
+                        markdownDescription: |
+                          Specifies the Windows Security Zone classification of the URL.
+
+                          Required: **No**
+                      - const: ReferrerUrl
+                        description: Referrer URL of the file download HTTP request (Mark of the Web).
+                        markdownDescription: |
+                          An entity representing the referrer URL of the file download request  
+                          [Mark of the Web](https://learn.microsoft.com/en-us/deployedge/per-site-configuration-by-policy).
+
+                          Required: **No**
+                      - const: SizeInBytes
+                        description: The size of the file in bytes.
+                        markdownDescription: |
+                          A long integer value representing the size of the file in bytes.
+
+                          Required: **No**
+                      - const: FileHashes
+                        description: The file hashes associated with this file.
+                        markdownDescription: |
+                          A list of entities (FileHash) associated with this file,  
+                          representing various hash values.
+
+                          Required: **No**
         - properties:
             entity:
               {type: string, enum: [Process]}
@@ -783,6 +881,39 @@ properties:
                           The time when the process started to run.
 
                           Required: **No**
+                      - const: ImageFile
+                        description: Can contain the File entity inline or as reference. See the File entity for more details on structure.
+                        markdownDescription: |
+                          Can contain the File entity inline or as reference.
+                          See the [File](https://learn.microsoft.com/en-us/azure/sentinel/entities-reference#file) entity for more details on structure.
+
+                          Required: **No**
+                      - const: Account
+                        description: The account running the processes. Can contain the Account entity inline or as reference. See the Account entity for more details on structure.
+                        markdownDescription: |
+                          The account running the processes. Can contain the Account entity inline or as reference.
+                          See the [Account](https://learn.microsoft.com/en-us/azure/sentinel/entities-reference#account) entity for more details on structure.
+
+                          Required: **No**
+                      - const: ParentProcess
+                        description: The parent process entity. Can contain partial data, for example, only the PID.
+
+                        markdownDescription: |
+                          The parent process entity. Can contain partial data, for example, only the PID.
+
+                          Required: **No**
+                      - const: Host
+                        description: The host on which the process was running.
+                        markdownDescription: |
+                          The host on which the process was running.
+
+                          Required: **No**
+                      - const: LogonSession
+                        description: The session in which the process was running.
+                        markdownDescription: |
+                          The session in which the process was running.
+
+                          Required: **No**
 
 
         - properties:
@@ -804,9 +935,18 @@ properties:
                       - const: AppId
                         description: The technical identifier of the application. This should be one of the values defined in the list of cloud application identifiers. The value for AppId field is optional.
                         markdownDescription: |
+                          `Deprecated; use SaasId field instead`
                           The technical identifier of the application. This should be one of the values defined in the list of
                           [cloud application identifiers](https://learn.microsoft.com/en-us/azure/sentinel/entities-reference#cloud-application-identifiers).
                           The value for AppId field is optional.
+                          
+                          Required: **Yes**
+                      - const: SaasId
+                        description: Replaces deprecated AppId field. The technical identifier of the application. Possible values are those defined in the list of cloud application identifiers. Value optional. Should not contain InstanceId.
+                        markdownDescription: |
+                          Replaces deprecated AppId field. The technical identifier of the application.
+                          Possible values are those defined in the list of [cloud application identifiers](https://learn.microsoft.com/en-us/azure/sentinel/entities-reference#cloud-application-identifiers).
+                          Value optional. Should not contain InstanceId.
                           
                           Required: **Yes**
                       - const: Name
@@ -820,6 +960,26 @@ properties:
                         markdownDescription: |
                           The user-defined instance name of the cloud application. It is often used to distinguish between several
                           applications of the same type that a customer has.
+
+                          Required: **No**
+                      - const: InstanceId
+                        description: The identifier of the specific session of the application. This is a zero-based running number. Value optional.
+                        markdownDescription: |
+                          The identifier of the specific session of the application.
+                          This is a zero-based running number. Value optional.
+
+                          Required: **No**
+                      - const: Risk
+                        description: Lets you filter apps by risk score so that you can focus on, for example, reviewing only highly risky apps. Possible values like Low, Medium, High or Unknown.
+                        markdownDescription: |
+                          Lets you filter apps by risk score so that you can focus on, for example, reviewing only highly risky apps.
+                          Possible values like Low, Medium, High or Unknown.
+
+                          Required: **No**
+                      - const: Stream
+                        description: The source of discovery logs related to the specific cloud app. Optional.
+                        markdownDescription: |
+                          The source of discovery logs related to the specific cloud app. Optional.
 
                           Required: **No**
 
@@ -845,6 +1005,24 @@ properties:
                           The name of the DNS record associated with the alert.
 
                           Required: **Yes**
+                      - const: IpAddress
+                        description: Entities corresponding to the resolved IP addresses.
+                        markdownDescription: |
+                          Entities corresponding to the resolved IP addresses.
+
+                          Required: **No**
+                      - const: DnsServerIp
+                        description: An entity representing the DNS server resolving the request.
+                        markdownDescription: |
+                          An entity representing the DNS server resolving the request.
+
+                          Required: **No**
+                      - const: HostIpAddress
+                        description: An entity representing the DNS request client.
+                        markdownDescription: |
+                          An entity representing the DNS request client.
+
+                          Required: **No**
 
         - properties:
             entity:
@@ -868,6 +1046,30 @@ properties:
                           The Azure resource ID of the resource.
 
                           Required: **Yes**
+                      - const: SubscriptionId
+                        description: The subscription ID of the resource.
+                        markdownDescription: |
+                          The subscription ID of the resource.
+
+                          Required: **No**
+                      - const: ActiveContacts
+                        description: Active contacts associated with the resource.
+                        markdownDescription: |
+                          Active contacts associated with the resource.
+
+                          Required: **No**
+                      - const: ResourceType
+                        description: The type of the resource.
+                        markdownDescription: |
+                          The type of the resource.
+
+                          Required: **No**
+                      - const: ResourceName
+                        description: The name of the resource.
+                        markdownDescription: |
+                          The name of the resource.
+
+                          Required: **No**
 
         - properties:
             entity:
@@ -1129,6 +1331,63 @@ properties:
                         description: The MAC address of the device.
                         markdownDescription: |
                           The MAC address of the device.
+
+                          Required: **No**
+                      - const: Site
+                        description: The site location of the device.
+                        markdownDescription: |
+                          The site location of the device.
+
+                          Required: **No**
+                      - const: Zone
+                        description: The zone location of the device.
+                        markdownDescription: |
+                          The zone location of the device.
+
+                          Required: **No**
+                      - const: Importance
+                        description: "One of the following values: Low, Normal, High"
+                        markdownDescription: |
+                          One of the following values:
+                          - Low
+                          - Normal
+                          - High
+
+                          Required: **No**
+                      - const: PurdueLayer
+                        description: The Purdue Layer of the device.
+                        markdownDescription: |
+                          The Purdue Layer of the device.
+
+                          Required: **No**
+                      - const: IsProgramming
+                        description: Indicates whether the device classified as programming device.
+                        markdownDescription: |
+                          Indicates whether the device classified as programming device.
+
+                          Required: **No**
+                      - const: IsAuthorized
+                        description: Indicates whether the device classified as authorized device.
+                        markdownDescription: |
+                          Indicates whether the device classified as authorized device.
+
+                          Required: **No**
+                      - const: IsScanner
+                        description: Indicates whether the device classified as a scanner device.
+                        markdownDescription: |
+                          Indicates whether the device classified as a scanner device.
+
+                          Required: **No**
+                      - const: DevicePageLink
+                        description: A URL to the device page in Defender for IoT portal.
+                        markdownDescription: |
+                          A URL to the device page in Defender for IoT portal.
+
+                          Required: **No**
+                      - const: DeviceSubType
+                        description: The name of the device subtype.
+                        markdownDescription: |
+                          The name of the device subtype.
 
                           Required: **No**
 

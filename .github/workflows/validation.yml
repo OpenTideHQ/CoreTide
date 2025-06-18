@@ -20,7 +20,7 @@ jobs:
           path: "coretide"
           ref: refs/heads/feature/github-action-support
 
-      - uses: ./coretide/.github/actions/tide-setup
+      - uses: ./coretide/Pipelines/GitHub/actions/tide-setup
         name: Tide Setup
         id: tide_setup
         with:
@@ -31,14 +31,14 @@ jobs:
           git-user-name: "${{ github.actor }}"
           git-user-email: "${{ github.actor }}@users.noreply.github.com"
 
-      - uses: ./coretide/.github/actions/validation-schema
+      - uses: ./coretide/Pipelines/GitHub/actions/validation-schema
         name: Run OpenTide Object Validation
         id: object_validation
 
-      - uses: ./coretide/.github/actions/check-mdr-changes
+      - uses: ./coretide/Pipelines/GitHub/actions/check-mdr-changes
         name: Check MDR Changes
         id: detect
 
-      - uses: ./coretide/.github/actions/validation-query
+      - uses: ./coretide/Pipelines/GitHub/actions/validation-query
         name: Run OpenTide Query Validation
         id: query_validation

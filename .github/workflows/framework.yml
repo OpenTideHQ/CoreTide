@@ -20,7 +20,7 @@ jobs:
           path: "coretide"
           ref: refs/heads/feature/github-action-support
 
-      - uses: ./coretide/.github/actions/tide-setup
+      - uses: ./coretide/Pipelines/GitHub/actions/tide-setup
         name: Tide Setup
         id: tide_setup
         with:

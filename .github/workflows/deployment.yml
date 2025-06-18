@@ -21,7 +21,7 @@ jobs:
           path: coretide
 
       - name: Tide Setup
-        uses: ./coretide/.github/actions/tide-setup
+        uses: ./coretide/Pipelines/GitHub/actions/tide-setup
         id: tide_setup
         with:
           coretide-ref: "refs/heads/development"

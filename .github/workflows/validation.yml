@@ -17,19 +17,12 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: OpenTideHQ/CoreTide
-          path: "coretide"
-          ref: refs/heads/feature/github-action-support
+          path: ${{ env.CORETIDE_PATH }}
+          ref: ${{ env.CORETIDE_REF }}
 
       - uses: ./coretide/Pipelines/GitHub/tide-setup
         name: Tide Setup
         id: tide_setup
-        with:
-          coretide-ref: "refs/heads/development"
-          coretide-path: "coretide"
-          python-version: "3.12"
-          requirements-file: "coretide/Engines/requirements.txt"
-          git-user-name: "${{ github.actor }}"
-          git-user-email: "${{ github.actor }}@users.noreply.github.com"
 
       - uses: ./coretide/Pipelines/GitHub/validation-schema
         name: Run OpenTide Object Validation

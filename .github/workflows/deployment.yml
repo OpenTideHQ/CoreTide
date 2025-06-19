@@ -19,6 +19,7 @@ jobs:
         with:
           repository: OpenTideHQ/CoreTide
           path: coretide
+          ref: refs/heads/feature/github-action-support
 
       - name: Tide Setup
         uses: ./coretide/Pipelines/GitHub/tide-setup

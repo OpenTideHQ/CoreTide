@@ -1,0 +1,23 @@
+name: "Deployment Routing"
+description: "Deploy the object that are changed"
+runs:
+  using: "composite"
+  steps:
+    - name: Deployment Routine
+      shell: bash
+      run: |
+        export MDE_TENANT_ID=test-placeholder-tenant-id
+        export MDE_CLIENT_ID=test-placeholder-client-id
+        export MDE_CLIENT_SECRET=test-placeholder-client
+        export AZURE_WORKSPACE_ID=test-placeholder-client
+        export AZURE_SUBSCRIPTION_ID=test-placeholder-client
+        export AZURE_TENANT_ID=test-placeholder-client
+        export AZURE_CLIENT_ID=test-placeholder-client
+        export AZURE_CLIENT_SECRET=test-placeholder-client
+        export MDE_TENANT_ID=test-placeholder-tenant-id
+        export DEPLOYMENT_PLAN=PRODUCTION
+        export CI_PROJECT_DIR=$(pwd)
+        export MAIN_HEAD_SHA=$(git rev-parse main) 
+        export MAIN_HEAD_SHA_PREVIOUS=$(git rev-parse 'main~1')
+        cd coretide/Orchestration
+        python deploy.py

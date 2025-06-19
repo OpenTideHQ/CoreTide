@@ -76,3 +76,10 @@ jobs:
       - uses: ./coretide/Pipelines/GitHub/deployment
         name: Deployment Routine
         id: deployment_routine
+        with:
+          azure_workspace_id: ${{ inputs.azure_workspace_id }}
+          azure_subscription_id: ${{ inputs.azure_subscription_id }}
+          azure_tenant_id: ${{ inputs.azure_tenant_id }}
+          azure_client_id: ${{ inputs.azure_client_id }}
+          azure_client_secret: ${{ inputs.azure_client_secret }}
+          deployment_plan: ${{ inputs.deployment_plan }}

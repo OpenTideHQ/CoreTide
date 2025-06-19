@@ -72,8 +72,6 @@ jobs:
         with:
           python-version: ${{ inputs.python_version }}
           requirements-file: ${{ inputs.requirements_file }}
-          git-user-name: "${{ github.actor }}"
-          git-user-email: "${{ github.actor }}@users.noreply.github.com"
 
       - uses: ./coretide/Pipelines/GitHub/deployment
         name: Deployment Routine

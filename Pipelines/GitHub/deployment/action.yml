@@ -26,13 +26,14 @@ runs:
   steps:
     - name: Deployment Routine
       shell: bash
+      env:
+        AZURE_WORKSPACE_ID: ${{ inputs.azure_workspace_id }}
+        AZURE_SUBSCRIPTION_ID: ${{ inputs.azure_subscription_id }}
+        AZURE_TENANT_ID: ${{ inputs.azure_tenant_id }}
+        AZURE_CLIENT_ID: ${{ inputs.azure_client_id }}
+        AZURE_CLIENT_SECRET: ${{ inputs.azure_client_secret }}
+        DEPLOYMENT_PLAN: ${{ inputs.deployment_plan }}
       run: |
-        export AZURE_WORKSPACE_ID=${{ inputs.azure_workspace_id }}
-        export AZURE_SUBSCRIPTION_ID=${{ inputs.azure_subscription_id }}
-        export AZURE_TENANT_ID=${{ inputs.azure_tenant_id }}
-        export AZURE_CLIENT_ID=${{ inputs.azure_client_id }}
-        export AZURE_CLIENT_SECRET=${{ inputs.azure_client_secret }}
-        export DEPLOYMENT_PLAN=${{ inputs.deployment_plan }}
         export CI_PROJECT_DIR=$(pwd)
         export MAIN_HEAD_SHA=$(git rev-parse main) 
         export MAIN_HEAD_SHA_PREVIOUS=$(git rev-parse 'main~1')

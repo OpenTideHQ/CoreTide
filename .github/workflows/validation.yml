@@ -1,7 +1,20 @@
 name: Validation
 
 on:
-  workflow_call: {}
+  workflow_call:
+    inputs:
+      python_version:
+        type: string
+        required: true
+      requirements_file:
+        type: string
+        required: true
+      coretide_ref:
+        type: string
+        required: true
+      coretide_path:
+        type: string
+        required: true
 
 jobs:
   Validation:
@@ -17,8 +30,8 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: OpenTideHQ/CoreTide
-          path: ${{ env.CORETIDE_PATH }}
-          ref: ${{ env.CORETIDE_REF }}
+          path: ${{ inputs.coretide_path }}
+          ref: ${{ inputs.coretide_ref }}
 
       - uses: ./coretide/Pipelines/GitHub/tide-setup
         name: Tide Setup

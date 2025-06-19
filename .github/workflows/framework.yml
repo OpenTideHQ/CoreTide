@@ -1,7 +1,20 @@
 name: Framework Generation Pipeline
 
 on:
-  workflow_call: {}
+  workflow_call:
+    inputs:
+      python_version:
+        type: string
+        required: true
+      requirements_file:
+        type: string
+        required: true
+      coretide_ref:
+        type: string
+        required: true
+      coretide_path:
+        type: string
+        required: true
 
 jobs:
   Framework:
@@ -17,20 +30,18 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: OpenTideHQ/CoreTide
-          path: "coretide"
-          ref: refs/heads/feature/github-action-support
+          path: ${{ inputs.coretide_path }}
+          ref: ${{ inputs.coretide_ref }}
 
       - uses: ./coretide/Pipelines/GitHub/tide-setup
         name: Tide Setup
         id: tide_setup
         with:
-          coretide-ref: "refs/heads/development"
-          coretide-path: "coretide"
-          python-version: "3.12"
-          requirements-file: "coretide/Engines/requirements.txt"
-          git-user-name: "${{ github.actor }}"
-          git-user-email: "${{ github.actor }}@users.noreply.github.com"
+          python_version: ${{ inputs.python_version }}
+          requirements_file: ${{ inputs.requirements_file }}
 
       - uses: ./coretide/Pipelines/GitHub/framework-setup
         name: Framework Setup
         id: framework_setup
+        with:
+          coretide_path: ${{ inputs.coretide_path }}

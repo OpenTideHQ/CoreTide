@@ -1,5 +1,10 @@
 name: "Framework Setup"
 description: "Framework Setup"
+
+inputs:
+  coretide_path:
+    description: "Path where coretide has been cloned"
+
 runs:
   using: "composite"
   steps:
@@ -12,10 +17,12 @@ runs:
     - name: Check for Changes and Commit
       id: check_changes
       shell: bash
+      env:
+        CORETIDE_PATH: ${{ inputs.coretide_path }}
       run: |
         echo "Checking for changes"
 
-        changes=$(git status --porcelain -- . ':!coretide')
+        changes=$(git status --porcelain -- . ':!$CORETIDE_PATH')
         echo $changes
 
         if [[ -z "$changes" ]]; then
@@ -27,7 +34,7 @@ runs:
 
         echo "REPO_NAME: $REPO_NAME"
 
-        filtered_changes=$(echo "$changes" | grep -vE '(M|A|D) $REPO_NAME/|(M|A|D) coretide/')
+        filtered_changes=$(echo "$changes" | grep -vE '(M|A|D) $REPO_NAME/|(M|A|D) $CORETIDE_PATH/')
         echo "Filtered changes: $filtered_changes"
         if [[ -z "$filtered_changes" ]]; then
           echo "Changes only in Local Instance or CoreTide directories, not committing"
@@ -35,6 +42,6 @@ runs:
         fi
 
         echo "Updated files, committing"
-        git add -- . ':!PanTide' ':!CoreTide' ':!coretide'
+        git add -- . ':!PanTide' ':!CoreTide' ':!$CORETIDE_PATH'
         git commit -m "CoreTide Framework Automation [skip ci]"
         git push origin HEAD:${{ github.ref }}

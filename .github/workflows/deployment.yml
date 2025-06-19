@@ -35,5 +35,15 @@ jobs:
       - name: Deployment Routine
         shell: bash
         run: |
+          export MDE_TENANT_ID=test-placeholder-tenant-id
+          export MDE_CLIENT_ID=test-placeholder-client-id
+          export MDE_CLIENT_SECRET=test-placeholder-client
+          export AZURE_WORKSPACE_ID=test-placeholder-client
+          export AZURE_SUBSCRIPTION_ID=test-placeholder-client
+          export AZURE_TENANT_ID=test-placeholder-client
+          export AZURE_CLIENT_ID=test-placeholder-client
+          export AZURE_CLIENT_SECRET=test-placeholder-client
+          export MDE_TENANT_ID=test-placeholder-tenant-id
+          export DEPLOYMENT_PLAN=PRODUCTION
           cd coretide/Orchestration
           python deploy.py

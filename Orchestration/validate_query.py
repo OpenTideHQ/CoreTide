@@ -1,19 +1,19 @@
-from typing import Literal
-from Engines.modules.tide import DataTide
-from Engines.modules.plugins import DeployTide
-from Engines.modules.logs import log, ANSI, coretide_intro
+import traceback
+import sys
+import git
+import os
+
+sys.path.append(str(git.Repo(".", search_parent_directories=True).working_dir))
+
 from Engines.modules.deployment import (
     make_deploy_plan,
     DeploymentStrategy,
     CIEnvironment,
 )
-import os
-import git
-import sys
-import traceback
-
-sys.path.append(str(git.Repo(".", search_parent_directories=True).working_dir))
-
+from Engines.modules.logs import log, ANSI, coretide_intro
+from Engines.modules.plugins import DeployTide
+from Engines.modules.tide import DataTide
+from typing import Literal
 
 print(coretide_intro())
 

@@ -45,5 +45,8 @@ jobs:
           export AZURE_CLIENT_SECRET=test-placeholder-client
           export MDE_TENANT_ID=test-placeholder-tenant-id
           export DEPLOYMENT_PLAN=PRODUCTION
+          export CI_PROJECT_DIR=$(pwd)
+          export MAIN_HEAD_SHA=$(git rev-parse main) 
+          export MAIN_HEAD_SHA_PREVIOUS=$(git rev-parse 'main~1')
           cd coretide/Orchestration
           python deploy.py

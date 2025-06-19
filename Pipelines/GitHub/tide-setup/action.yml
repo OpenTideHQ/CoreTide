@@ -4,14 +4,6 @@ description: |
   installing dependencies, and running the framework setup script.
 
 inputs:
-  coretide-ref:
-    description: "Ref to checkout for the CoreTide repository"
-    required: true
-
-  coretide-path:
-    description: "Path to the CoreTide repository"
-    required: true
-
   python-version:
     description: "Python version to use for the setup"
     required: true

@@ -1,5 +1,5 @@
-name: "Object Validation"
-description: "Run OpenTide Object Validation"
+name: "Framework Setup"
+description: "Framework Setup"
 runs:
   using: "composite"
   steps:

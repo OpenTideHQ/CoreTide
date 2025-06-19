@@ -22,7 +22,7 @@ runs:
       run: |
         echo "Checking for changes"
 
-        changes=$(git status --porcelain -- . ':!$CORETIDE_PATH')
+        changes=$(git status --porcelain -- . ':!$CORETIDE_PATH' ':!coretide')
         echo $changes
 
         if [[ -z "$changes" ]]; then

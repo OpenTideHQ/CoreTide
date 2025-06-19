@@ -70,8 +70,8 @@ jobs:
         uses: ./coretide/Pipelines/GitHub/tide-setup
         id: tide_setup
         with:
-          python-version: ${{ inputs.python_version }}
-          requirements-file: ${{ inputs.requirements_file }}
+          python_version: ${{ inputs.python_version }}
+          requirements_file: ${{ inputs.requirements_file }}
 
       - uses: ./coretide/Pipelines/GitHub/deployment
         name: Deployment Routine

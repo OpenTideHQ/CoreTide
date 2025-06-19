@@ -34,14 +34,6 @@ jobs:
       - name: Run OpenTide Framework Setup
         shell: bash
         run: |
-          export MDE_TENANT_ID=test-placeholder-tenant-id
-          export MDE_CLIENT_ID=test-placeholder-client-id
-          export MDE_CLIENT_SECRET=test-placeholder-client
-          export AZURE_WORKSPACE_ID=test-placeholder-client
-          export AZURE_SUBSCRIPTION_ID=test-placeholder-client
-          export AZURE_TENANT_ID=test-placeholder-client
-          export AZURE_CLIENT_ID=test-placeholder-client
-          export AZURE_CLIENT_SECRET=test-placeholder-client
           cd coretide/Orchestration
           python generate.py
 

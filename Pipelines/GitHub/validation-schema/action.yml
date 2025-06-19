@@ -6,6 +6,5 @@ runs:
     - name: Running Object Validation
       shell: bash
       run: |
-        echo "Running object validation..."
         cd coretide/Orchestration
         python validate.py

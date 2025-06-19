@@ -15,6 +15,9 @@ on:
       coretide_path:
         type: string
         required: true
+      deployment_plan:
+        type: string
+        required: true
 
 jobs:
   Validation:
@@ -36,6 +39,9 @@ jobs:
       - uses: ./coretide/Pipelines/GitHub/tide-setup
         name: Tide Setup
         id: tide_setup
+        with:
+          python_version: ${{ inputs.python_version }}
+          requirements_file: ${{ inputs.requirements_file }}
 
       - uses: ./coretide/Pipelines/GitHub/validation-schema
         name: Run OpenTide Object Validation
@@ -48,3 +54,5 @@ jobs:
       - uses: ./coretide/Pipelines/GitHub/validation-query
         name: Run OpenTide Query Validation
         id: query_validation
+        with:
+          deployment_plan: ${{ inputs.deployment_plan }}

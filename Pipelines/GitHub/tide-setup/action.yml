@@ -3,18 +3,24 @@ description: |
   This action sets up the Tide environment by checking out the CoreTide repository,
   installing dependencies, and running the framework setup script.
 
+inputs:
+  python_version:
+    description: "python version to use"
+  requirements_file:
+    description: "requirements.txt file path"
+
 runs:
   using: "composite"
   steps:
     - name: Set up Python 3.12
       uses: actions/setup-python@v5
       with:
-        python-version: ${{ env.PYTHON_VERSION }}
+        python-version: ${{ inputs.python_version }}
 
     - name: Install requirements
       shell: bash
       run: |
-        pip install -r ${{ env.REQUIREMENTS_FILE }}
+        pip install -r ${{ inputs.requirements_file }}
 
     - name: Configure Git
       shell: bash

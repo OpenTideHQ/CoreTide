@@ -9,3 +9,5 @@ GitPython
 splunk-sdk
 carbon-black-cloud-sdk
 toml
+azure-mgmt-securityinsight
+azure-identity

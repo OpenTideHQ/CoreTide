@@ -177,7 +177,9 @@ class SplunkDeploy(SplunkEngineInit, DeployMDR):
         # Add correlation search setup
         if self.CORRELATION_SEARCHES:
             config["action.correlationsearch.enabled"] = "true"
-            config["action.correlationsearch.label"] = name
+            # For compatibility with Splunk Enterprise Security post-processing on
+            # correlation searches, append " - Rule" to the MDR name
+            config["action.correlationsearch.label"] = name + ' - Rule'
             techniques = techniques_resolver(uuid)
             if techniques:
                 config["action.correlationsearch.annotations.mitre_attack"] = ", ".join(

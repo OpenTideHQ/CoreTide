@@ -207,6 +207,12 @@ class TideDefinitionsModels:
 
     @dataclass
     class TideObjectMetadata:
+        
+        @dataclass
+        class Organisation:
+            uuid: str
+            name: str
+            
         uuid: str
         schema: str
         version: str | int
@@ -215,6 +221,7 @@ class TideDefinitionsModels:
         tlp: str
         author: str
         contributors: Optional[Sequence[str]] = None
+        organisation: Optional[Organisation] = None
 
     @dataclass
     class TideObjectReferences:

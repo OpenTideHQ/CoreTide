@@ -466,13 +466,16 @@ class TideLoader:
     @staticmethod
     def load_mdr(mdr:dict)->TideModels.MDR:
         mdr = deepcopy(mdr)
-        organisation = mdr.pop("organisation", None)
-        
+
+        metadata = mdr.pop("metadata")
+        organisation = metadata.pop("organisation", None)
+
         if organisation:
             organisation = TideDefinitionsModels.TideObjectMetadata.Organisation(**organisation)
         
-        metadata = TideDefinitionsModels.TideObjectMetadata(**mdr.pop("metadata"),
+        metadata = TideDefinitionsModels.TideObjectMetadata(**metadata,
                                                             organisation=organisation)
+        
         response_config = mdr.pop("response", {})
         if response_config:
             procedure = response_config.pop("procedure", None)

@@ -38,6 +38,7 @@ class SplunkDeploy(SplunkEngineInit, DeployMDR):
 
         # Before processing MDR data, adding config configuration
         uuid = mdr.get("uuid") or mdr["metadata"]["uuid"]
+        # For compatibility with Splunk Enterprise Security post-processing on correlation searches, append " - Rule" to the MDR name
         name = mdr["name"] + ' - Rule'
         description = mdr["description"]
         mdr_splunk = mdr["configurations"]["splunk"]

@@ -38,5 +38,9 @@ runs:
         export MAIN_HEAD_SHA=$(git rev-parse main) 
         export MAIN_HEAD_SHA_PREVIOUS=$(git rev-parse 'main~1')
 
+        set -a 
+        source $GITHUB_OUTPUT
+        set +a 
+
         cd coretide/Orchestration
         python deploy.py

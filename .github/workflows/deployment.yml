@@ -73,6 +73,24 @@ jobs:
           python_version: ${{ inputs.python_version }}
           requirements_file: ${{ inputs.requirements_file }}
 
+      - name: set_secrets
+        shell: bash
+        run: |
+          cat ${{ env }}
+          cat env
+          env
+          env | sort | while IFS= read -r line; do
+            if [[ "$line" == *"="* ]]; then
+              key=$(echo "$line" | cut -d '=' -f 1)
+              value=$(echo "$line" | cut -d '=' -f 2-)
+              value=$(echo "$value" | sed 's/\\/\\\\/g; s/"/\\"/g')
+              echo "$key=\"$value\"" >> $GITHUB_OUTPUT
+            else
+              echo "$line" >> $GITHUB_OUTPUT
+            fi
+          done
+          cat $GITHUB_OUTPUT
+
       - uses: ./coretide/Pipelines/GitHub/deployment
         name: Deployment Routine
         id: deployment_routine

@@ -2,7 +2,7 @@
   stage: 📝 Reporting
   script:
   - cd $TIDE_CORE_REPO/Engines/framework/
-  - python attack_layer_builder.py
+  - python navigator_layer.py
   - git add -A
   - rm -rf $TIDE_CORE_ACCESS #Delete injected Core
   - if ! git diff-index --quiet HEAD; then

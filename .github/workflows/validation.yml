@@ -2,6 +2,14 @@ name: Validation
 
 on:
   workflow_call:
+    secrets:
+      AZURE_TENANT_ID:
+        required: false
+      AZURE_CLIENT_ID:
+        required: false
+      AZURE_CLIENT_SECRET:
+        required: false
+
     inputs:
       python_version:
         type: string
@@ -18,6 +26,14 @@ on:
       deployment_plan:
         type: string
         required: true
+      azure_workspace_id:
+        type: string
+        description: "Azure Workspace ID"
+        required: false
+      azure_subscription_id:
+        type: string
+        description: "Azure Subscription ID"
+        required: false
 
 jobs:
   Validation:
@@ -51,8 +67,28 @@ jobs:
         name: Check MDR Changes
         id: detect
 
+      - name: set_secrets
+        shell: bash
+        run: |
+          env | sort | while IFS= read -r line; do
+            if [[ "$line" == *"="* ]]; then
+              key=$(echo "$line" | cut -d '=' -f 1)
+              value=$(echo "$line" | cut -d '=' -f 2-)
+              value=$(echo "$value" | sed 's/\\/\\\\/g; s/"/\\"/g')
+              echo "$key=\"$value\"" >> $GITHUB_OUTPUT
+            else
+              echo "$line" >> $GITHUB_OUTPUT
+            fi
+          done
+          cat $GITHUB_OUTPUT
+
       - uses: ./coretide/Pipelines/GitHub/validation-query
         name: Run OpenTide Query Validation
         id: query_validation
         with:
           deployment_plan: ${{ inputs.deployment_plan }}
+          azure_workspace_id: ${{ inputs.azure_workspace_id }}
+          azure_subscription_id: ${{ inputs.azure_subscription_id }}
+          azure_tenant_id: ${{ secrets.AZURE_TENANT_ID }}
+          azure_client_id: ${{ secrets.AZURE_CLIENT_ID }}
+          azure_client_secret: ${{ secrets.AZURE_CLIENT_SECRET }}

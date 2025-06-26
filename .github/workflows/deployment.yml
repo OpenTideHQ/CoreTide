@@ -84,9 +84,6 @@ jobs:
       - name: set_secrets
         shell: bash
         run: |
-          cat ${{ env }}
-          cat env
-          env
           env | sort | while IFS= read -r line; do
             if [[ "$line" == *"="* ]]; then
               key=$(echo "$line" | cut -d '=' -f 1)

@@ -300,6 +300,7 @@ class SystemLoader:
                                          alert=alert_grouping)
 
         entity_list = mdr_config.pop("entities", None)
+        entities = None
         if entity_list:
             entities = []
             for mapping in entity_list:

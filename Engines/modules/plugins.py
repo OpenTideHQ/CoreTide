@@ -8,6 +8,7 @@ sys.path.append(str(git.Repo(".", search_parent_directories=True).working_dir))
 
 from Engines.modules.tide import DataTide
 from Engines.modules.logs import log
+from Engines.modules.deployment import enabled_systems
 
 class PluginTide(ABC):
     pass
@@ -59,8 +60,17 @@ class PluginEnginesLoader:
     def _generic_loader(self, tier:PluginTide, identifier: str):
         log("ONGOING", "Initiating deployment plugin routine")
         available_plugins: dict = {}
+        available_systems = enabled_systems()
         CONFIGURATIONS: dict[str, dict] = DataTide.Configurations.Systems.Index
         for system in CONFIGURATIONS:
+            
+            if system not in available_systems:
+                log("SKIP",
+                    "Not loading plugin for",
+                    system,
+                    f"System is currently disabled. You can enable it under Configuration/systems/{system}.toml")
+                continue
+
             plugin_name: str = system + identifier
             plugin = None
             

@@ -2,6 +2,14 @@ name: Deployment
 
 on:
   workflow_call:
+    secrets:
+      AZURE_TENANT_ID:
+        required: false
+      AZURE_CLIENT_ID:
+        required: false
+      AZURE_CLIENT_SECRET:
+        required: false
+
     inputs:
       azure_workspace_id:
         type: string
@@ -97,7 +105,7 @@ jobs:
         with:
           azure_workspace_id: ${{ inputs.azure_workspace_id }}
           azure_subscription_id: ${{ inputs.azure_subscription_id }}
-          azure_tenant_id: ${{ inputs.azure_tenant_id }}
-          azure_client_id: ${{ inputs.azure_client_id }}
-          azure_client_secret: ${{ inputs.azure_client_secret }}
+          azure_tenant_id: ${{ secrets.AZURE_TENANT_ID }}
+          azure_client_id: ${{ secrets.AZURE_CLIENT_ID }}
+          azure_client_secret: ${{ secrets.AZURE_CLIENT_SECRET }}
           deployment_plan: ${{ inputs.deployment_plan }}

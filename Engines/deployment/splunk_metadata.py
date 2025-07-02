@@ -87,9 +87,7 @@ class SplunkMetadataDeploy(SplunkEngineInit, DeployMetadata):
             entry["MDR_response_procedure"] = json.dumps(procedure)
             entry["MDR_attack_technique"] = techniques
             entry["MDR_saw_playbook"] = body.get("response", {}).get("playbook")
-            entry["MDR_documentation"] = self.GITWIKI + body.get("name").replace(
-                " ", "-"
-            ).replace("_", "-")
+            entry["MDR_documentation"] = self.GITWIKI + mdr_uuid
 
             entry = {k: v if v is not None else "" for k, v in entry.items()}
 

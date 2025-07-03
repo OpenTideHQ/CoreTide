@@ -65,7 +65,7 @@ def run():
             for v in vectors:
                 for tvm in DataTide.Objects.tvm:
                     vec = DataTide.Objects.tvm[tvm]
-                    if vec["id"] == v:
+                    if vec.get("metadata",{}).get("uuid") == v:
                         for t in vec["threat"]["att&ck"]:
                             vec_techniques.append(t)
             object_data["techniques"] = vec_techniques

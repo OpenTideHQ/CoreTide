@@ -38,7 +38,7 @@ class SplunkDeploy(SplunkEngineInit, DeployMDR):
 
         # Before processing MDR data, adding config configuration
         uuid = mdr.get("uuid") or mdr["metadata"]["uuid"]
-        name = mdr["name"]
+        name = mdr["name"].strip()
         description = mdr["description"]
         mdr_splunk = mdr["configurations"]["splunk"]
         advanced_config = mdr_splunk.pop(
@@ -179,7 +179,8 @@ class SplunkDeploy(SplunkEngineInit, DeployMDR):
             config["action.correlationsearch.enabled"] = "true"
             # For compatibility with Splunk Enterprise Security post-processing on
             # correlation searches, append " - Rule" to the MDR name
-            config["action.correlationsearch.label"] = name + ' - Rule'
+            name += ' - Rule' 
+            config["action.correlationsearch.label"] = name
             techniques = techniques_resolver(uuid)
             if techniques:
                 config["action.correlationsearch.annotations.mitre_attack"] = ", ".join(

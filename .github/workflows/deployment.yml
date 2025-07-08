@@ -2,35 +2,7 @@ name: Deployment
 
 on:
   workflow_call:
-    secrets:
-      AZURE_TENANT_ID:
-        required: false
-      AZURE_CLIENT_ID:
-        required: false
-      AZURE_CLIENT_SECRET:
-        required: false
-
     inputs:
-      azure_workspace_id:
-        type: string
-        description: "Azure Workspace ID"
-        required: false
-      azure_subscription_id:
-        type: string
-        description: "Azure Subscription ID"
-        required: false
-      azure_tenant_id:
-        type: string
-        description: "Azure Tenant ID"
-        required: false
-      azure_client_id:
-        type: string
-        description: "Azure Client ID"
-        required: false
-      azure_client_secret:
-        type: string
-        description: "Azure Client Secret"
-        required: false
       deployment_plan:
         type: string
         description: "Deployment Plan"
@@ -55,7 +27,11 @@ on:
         description: "Requirements file path"
         required: false
         default: "coretide/Engines/requirements.txt"
-
+      opentide_secrets:
+        type: string
+        description: "Content of the OpenTide secrets file"
+        required: false
+        default: "" 
 jobs:
   Deployment:
     name: Deploy
@@ -74,6 +50,7 @@ jobs:
           path: ${{ inputs.coretide_path }}
           ref: ${{ inputs.coretide_ref }}
 
+
       - name: Tide Setup
         uses: ./coretide/Pipelines/GitHub/tide-setup
         id: tide_setup
@@ -81,28 +58,18 @@ jobs:
           python_version: ${{ inputs.python_version }}
           requirements_file: ${{ inputs.requirements_file }}
 
-      - name: set_secrets
-        shell: bash
+      - name: Restore env vars from string
+        id: restore_env_vars
         run: |
-          env | sort | while IFS= read -r line; do
-            if [[ "$line" == *"="* ]]; then
-              key=$(echo "$line" | cut -d '=' -f 1)
-              value=$(echo "$line" | cut -d '=' -f 2-)
-              value=$(echo "$value" | sed 's/\\/\\\\/g; s/"/\\"/g')
-              echo "$key=\"$value\"" >> $GITHUB_OUTPUT
-            else
-              echo "$line" >> $GITHUB_OUTPUT
+          IFS=';' read -ra KV <<< "${{ env.env_string }}"
+          for pair in "${KV[@]}"; do
+            if [[ -n "$pair" ]]; then
+              echo "$pair" >> $GITHUB_ENV
             fi
           done
-          cat $GITHUB_OUTPUT
+        with:
+          env_string: ${{ inputs.opentide_secrets }}
 
       - uses: ./coretide/Pipelines/GitHub/deployment
         name: Deployment Routine
         id: deployment_routine
-        with:
-          azure_workspace_id: ${{ inputs.azure_workspace_id }}
-          azure_subscription_id: ${{ inputs.azure_subscription_id }}
-          azure_tenant_id: ${{ secrets.AZURE_TENANT_ID }}
-          azure_client_id: ${{ secrets.AZURE_CLIENT_ID }}
-          azure_client_secret: ${{ secrets.AZURE_CLIENT_SECRET }}
-          deployment_plan: ${{ inputs.deployment_plan }}

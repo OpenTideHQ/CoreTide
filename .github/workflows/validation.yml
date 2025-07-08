@@ -3,10 +3,6 @@ name: Validation
 on:
   workflow_call:
     inputs:
-      deployment_plan:
-        type: string
-        description: "Deployment Plan"
-        required: false
       coretide_path:
         type: string
         description: "Path where CoreTide needs to be cloned into"
@@ -40,18 +36,6 @@ jobs:
     outputs:
       mdr_changes: ${{ steps.detect_mdr_changes.outputs.changes }}
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 100
-
-      - name: Checkout Tide Core
-        uses: actions/checkout@v4
-        with:
-          repository: OpenTideHQ/CoreTide
-          path: ${{ inputs.coretide_path }}
-          ref: refs/heads/${{ inputs.coretide_ref }}
-
       - uses: ./coretide/Pipelines/GitHub/tide-setup
         name: Tide Setup
         id: tide_setup
@@ -59,6 +43,9 @@ jobs:
           python_version: ${{ inputs.python_version }}
           requirements_file: ${{ inputs.requirements_file }}
           opentide_secrets: ${{ inputs.opentide_secrets }}
+          coretide_ref: ${{ inputs.coretide_ref }}
+          path: ${{ inputs.coretide_path }}
+          repository: OpenTideHQ/CoreTide
 
       - uses: ./coretide/Pipelines/GitHub/validation-schema
         name: Run OpenTide Object Validation

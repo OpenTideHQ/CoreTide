@@ -11,10 +11,31 @@ inputs:
   opentide_secrets:
     description: "Content of the OpenTide secrets file, formatted as key=value pairs separated by semicolons"
     required: true
-    
+  coretide_path:
+    description: "Path where CoreTide needs to be cloned into"
+    required: false
+    default: coretide
+  coretide_ref:
+    description: "Ref to clone CoreTide from"
+    required: false
+    default: development
+
 runs:
   using: "composite"
   steps:
+
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 100
+
+    - name: Checkout Tide Core
+      uses: actions/checkout@v4
+      with:
+        repository: OpenTideHQ/CoreTide
+        path: ${{ inputs.coretide_path }}
+        ref: refs/heads/${{ inputs.coretide_ref }}
+
     - name: Set up Python 3.12
       uses: actions/setup-python@v5
       with:

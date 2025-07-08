@@ -28,14 +28,23 @@ on:
         description: "Content of the OpenTide secrets file"
         required: true
 
-
 jobs:
   Validation:
     name: OpenTide Validation
     runs-on: ubuntu-latest
-    outputs:
-      mdr_changes: ${{ steps.detect_mdr_changes.outputs.changes }}
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2 # Needed to compare HEAD to HEAD~1
+
+      - name: Checkout Tide Core
+        uses: actions/checkout@v4
+        with:
+          repository: OpenTideHQ/CoreTide
+          path: ${{ inputs.coretide_path }}
+          ref: refs/heads/${{ inputs.coretide_ref }}
+
       - uses: ./coretide/Pipelines/GitHub/tide-setup
         name: Tide Setup
         id: tide_setup
@@ -43,21 +52,18 @@ jobs:
           python_version: ${{ inputs.python_version }}
           requirements_file: ${{ inputs.requirements_file }}
           opentide_secrets: ${{ inputs.opentide_secrets }}
-          coretide_ref: ${{ inputs.coretide_ref }}
-          path: ${{ inputs.coretide_path }}
-          repository: OpenTideHQ/CoreTide
 
       - uses: ./coretide/Pipelines/GitHub/validation-schema
         name: Run OpenTide Object Validation
         id: object_validation
-      
+
       - uses: ./coretide/Pipelines/GitHub/check-mdr-changes
         name: Check MDR Changes
-        id: detect_mdr_changes
+        id: detect
 
       - uses: ./coretide/Pipelines/GitHub/validation-query
         name: Run OpenTide Query Validation
         id: query_validation
-        if: github.event_name == 'pull_request' && steps.detect_mdr_changes.outputs.mdr_changes == 'true'
+        if: github.event_name == 'pull_request' && steps.detect.outputs.changes == 'true'
         with:
           deployment_plan: STAGING

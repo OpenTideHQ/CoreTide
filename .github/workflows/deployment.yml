@@ -37,12 +37,12 @@ jobs:
     name: Deploy
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
+      - name: Checkout Tide Instance
         uses: actions/checkout@v4
         with:
           fetch-depth: 100
 
-      - name: Checkout Tide Core
+      - name: Checkout CoreTide
         uses: actions/checkout@v4
         with:
           repository: OpenTideHQ/CoreTide

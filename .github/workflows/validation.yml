@@ -36,9 +36,9 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          fetch-depth: 2 # Needed to compare HEAD to HEAD~1
+          fetch-depth: 100
 
-      - name: Checkout Tide Core
+      - name: Checkout CoreTide
         uses: actions/checkout@v4
         with:
           repository: OpenTideHQ/CoreTide

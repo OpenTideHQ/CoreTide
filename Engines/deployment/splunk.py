@@ -279,6 +279,10 @@ class SplunkDeploy(SplunkEngineInit, DeployMDR):
                         actions_config["action.notable.param.severity"] = mdr[
                             "response"
                         ]["alert_severity"].lower()
+                        
+                    # Ensuring security domain is lowercased
+                    if  security_domain:=mdr_config.get("action.notable.param.security_domain"):
+                        mdr_config["action.notable.param.security_domain"] = security_domain.lower()
                 if "risk" in triggered_actions:
                     # Explicitely set _risk_score to 0 since it is set to 1 by the platform
                     # as a way to show a default GUI, but interferes with automation.

@@ -37,5 +37,5 @@ runs:
             echo "$pair" >> $GITHUB_ENV
           fi
         done
-      with:
+      env:
         env_string: ${{ inputs.opentide_secrets }}

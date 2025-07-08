@@ -35,7 +35,8 @@ runs:
       shell: bash
       run: |
         echo $opentide_secrets
-        IFS=';' read -ra KV <<< $opentide_secrets
+        decoded_secrets=$(echo $opentide_secrets | base64 --decode)
+        IFS=';' read -ra KV <<< $decoded_secrets
         for pair in "${KV[@]}"; do
           echo $pair
           if [[ -n "$pair" ]]; then

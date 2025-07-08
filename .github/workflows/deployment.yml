@@ -44,7 +44,7 @@ on:
         type: string
         description: "Ref to clone CoreTide from"
         required: false
-        default: refs/heads/main
+        default: refs/heads/development
       python_version:
         type: string
         description: "Python version to use"

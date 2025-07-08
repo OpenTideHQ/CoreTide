@@ -27,3 +27,15 @@ runs:
       run: |
         git config --global user.name "${{ github.actor }}"
         git config --global user.email "${{ github.actor }}@users.noreply.github.com"
+
+    - name: Restore env vars from string
+      shell: bash
+      run: |
+        IFS=';' read -ra KV <<< "${{ env.env_string }}"
+        for pair in "${KV[@]}"; do
+          if [[ -n "$pair" ]]; then
+            echo "$pair" >> $GITHUB_ENV
+          fi
+        done
+      with:
+        env_string: ${{ inputs.opentide_secrets }}

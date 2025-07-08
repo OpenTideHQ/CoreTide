@@ -4,21 +4,6 @@ description: "Run OpenTide Query Validation"
 inputs:
   deployment_plan:
     description: "STAGING/PRODUCTION"
-  azure_workspace_id:
-    description: "Azure Workspace ID"
-    required: false
-  azure_subscription_id:
-    description: "Azure Subscription ID"
-    required: false
-  azure_tenant_id:
-    description: "Azure Tenant ID"
-    required: false
-  azure_client_id:
-    description: "Azure Client ID"
-    required: false
-  azure_client_secret:
-    description: "Azure Client Secret"
-    required: false
 
 runs:
   using: "composite"
@@ -26,11 +11,6 @@ runs:
     - name: Validate Query
       id: validate_query
       env:
-        AZURE_WORKSPACE_ID: ${{ inputs.azure_workspace_id }}
-        AZURE_SUBSCRIPTION_ID: ${{ inputs.azure_subscription_id }}
-        AZURE_TENANT_ID: ${{ inputs.azure_tenant_id }}
-        AZURE_CLIENT_ID: ${{ inputs.azure_client_id }}
-        AZURE_CLIENT_SECRET: ${{ inputs.azure_client_secret }}
         DEPLOYMENT_PLAN: ${{ inputs.deployment_plan }}
       shell: bash
       run: |

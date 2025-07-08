@@ -50,24 +50,12 @@ jobs:
           path: ${{ inputs.coretide_path }}
           ref: refs/heads/${{ inputs.coretide_ref }}
 
-
       - name: Tide Setup
         uses: ./coretide/Pipelines/GitHub/tide-setup
         id: tide_setup
         with:
           python_version: ${{ inputs.python_version }}
           requirements_file: ${{ inputs.requirements_file }}
-
-      - name: Restore env vars from string
-        id: restore_env_vars
-        run: |
-          IFS=';' read -ra KV <<< "${{ env.env_string }}"
-          for pair in "${KV[@]}"; do
-            if [[ -n "$pair" ]]; then
-              echo "$pair" >> $GITHUB_ENV
-            fi
-          done
-        with:
           env_string: ${{ inputs.opentide_secrets }}
 
       - uses: ./coretide/Pipelines/GitHub/deployment

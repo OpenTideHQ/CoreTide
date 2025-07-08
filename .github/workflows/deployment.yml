@@ -35,7 +35,8 @@ on:
 jobs:
   Deployment:
     name: Deploy
-    if: ${{ Validation.outputs.CHANGES == 'true' }}
+    if: ${{ Validation.outputs.mdr_changes == 'true' }}
+    needs: Validation
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code

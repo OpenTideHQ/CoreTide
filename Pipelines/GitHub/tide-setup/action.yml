@@ -40,7 +40,6 @@ runs:
           if [[ -n "$pair" ]]; then
             echo "$pair" >> $GITHUB_ENV
           fi
-        env
         done
       env:
         opentide_secrets: ${{ inputs.opentide_secrets }}

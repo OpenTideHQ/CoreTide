@@ -35,6 +35,7 @@ runs:
     - name: Restore env vars from string
       shell: bash
       run: |
+        echo $env.opentide_secrets
         IFS=';' read -ra KV <<< "${{ env.opentide_secrets }}"
         for pair in "${KV[@]}"; do
           if [[ -n "$pair" ]]; then

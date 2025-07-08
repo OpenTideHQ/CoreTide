@@ -57,7 +57,7 @@ jobs:
         with:
           python_version: ${{ inputs.python_version }}
           requirements_file: ${{ inputs.requirements_file }}
-          env_string: ${{ inputs.opentide_secrets }}
+          opentide_secrets: ${{ inputs.opentide_secrets }}
 
       - uses: ./coretide/Pipelines/GitHub/validation-schema
         name: Run OpenTide Object Validation

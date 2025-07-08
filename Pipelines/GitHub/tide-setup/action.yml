@@ -8,7 +8,11 @@ inputs:
     description: "python version to use"
   requirements_file:
     description: "requirements.txt file path"
-
+  opentide_secrets:
+    description: "Content of the OpenTide secrets file, formatted as key=value pairs separated by semicolons"
+    default: ""
+    required: true
+    
 runs:
   using: "composite"
   steps:

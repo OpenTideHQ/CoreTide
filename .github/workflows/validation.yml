@@ -37,11 +37,13 @@ jobs:
   Validation:
     name: OpenTide Validation
     runs-on: ubuntu-latest
+    outputs:
+      mdr_changes: ${{ steps.detect_mdr_changes.outputs.changes }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          fetch-depth: 2 # Needed to compare HEAD to HEAD~1
+          fetch-depth: 100
 
       - name: Checkout Tide Core
         uses: actions/checkout@v4
@@ -61,13 +63,16 @@ jobs:
       - uses: ./coretide/Pipelines/GitHub/validation-schema
         name: Run OpenTide Object Validation
         id: object_validation
-
+        with:
+          deployment_plan: ${{ github.event_name == 'pull_request' && 'STAGING' || (github.ref == format('refs/heads/{0}', github.event.repository.default_branch) && 'PRODUCTION' || 'STAGING') }}
+      
       - uses: ./coretide/Pipelines/GitHub/check-mdr-changes
         name: Check MDR Changes
-        id: detect
+        id: detect_mdr_changes
 
       - uses: ./coretide/Pipelines/GitHub/validation-query
         name: Run OpenTide Query Validation
         id: query_validation
+        if: github.event_name == 'pull_request' && steps.detect_mdr_changes.outputs.mdr_changes == 'true'
         with:
-          deployment_plan: ${{ inputs.deployment_plan }}
+          deployment_plan: STAGING

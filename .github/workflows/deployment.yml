@@ -35,13 +35,13 @@ on:
 jobs:
   Deployment:
     name: Deploy
-    # if: ${{ github.ref == 'refs/heads/main' && needs.Validation.outputs.CHANGES == 'true' }}
+    if: ${{ Validation.outputs.CHANGES == 'true' }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          fetch-depth: 2 # Needed to compare HEAD to HEAD~1
+          fetch-depth: 100
 
       - name: Checkout Tide Core
         uses: actions/checkout@v4
@@ -61,3 +61,5 @@ jobs:
       - uses: ./coretide/Pipelines/GitHub/deployment
         name: Deployment Routine
         id: deployment_routine
+        with:
+          deployment_plan: ${{ github.event_name == 'pull_request' && 'STAGING' || (github.ref == format('refs/heads/{0}', github.event.repository.default_branch) && 'PRODUCTION' || 'STAGING') }}

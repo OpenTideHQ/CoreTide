@@ -34,13 +34,14 @@ on:
 
 jobs:
   Framework:
-    name: Framework Setup
+    name: Framework Generation
     runs-on: ubuntu-latest
+    if: github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          fetch-depth: 2 # Needed to compare HEAD to HEAD~1
+          fetch-depth: 100
 
       - name: Checkout Tide Core
         uses: actions/checkout@v4

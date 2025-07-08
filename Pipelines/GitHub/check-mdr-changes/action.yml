@@ -1,10 +1,14 @@
 name: "Detect MDR Changes"
 description: "Detect any changes to managed detection rules"
+outputs:
+  mdr_changes:
+    description: "Whether detection rules have changed"
+    value: ${{ steps.detect_mdr_changes.outputs.CHANGES }}
 runs:
   using: "composite"
   steps:
     - name: Detect changes
-      id: detect
+      id: detect_mdr_changes
       shell: bash
       run: |
         echo "Checking for changes in detection rules"

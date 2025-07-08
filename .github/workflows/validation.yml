@@ -30,8 +30,7 @@ on:
       opentide_secrets:
         type: string
         description: "Content of the OpenTide secrets file"
-        required: false
-        default: "" 
+        required: true
 
 
 jobs:

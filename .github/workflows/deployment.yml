@@ -31,7 +31,7 @@ on:
         type: string
         description: "Content of the OpenTide secrets file"
         required: false
-        default: "" 
+
 jobs:
   Deployment:
     name: Deploy

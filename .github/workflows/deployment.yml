@@ -3,10 +3,6 @@ name: Deployment
 on:
   workflow_call:
     inputs:
-      deployment_plan:
-        type: string
-        description: "Deployment Plan"
-        required: false
       coretide_path:
         type: string
         description: "Path where CoreTide needs to be cloned into"

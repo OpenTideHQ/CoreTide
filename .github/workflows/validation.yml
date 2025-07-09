@@ -43,6 +43,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 100
+          ref: ${{ github.ref }}
 
       - name: Checkout CoreTide
         uses: actions/checkout@v4

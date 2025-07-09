@@ -213,24 +213,56 @@ def diff_calculation(plan: DeploymentStrategy) -> list:
     match TARGET_CI:
         case CIEnvironment.CIPlatforms.GitHubActions:
             log("INFO", "Identified GitHub Actions as the CI Runtime Platform")
-            REPO_DIR = os.getenv("CI_PROJECT_DIR")
+            REPO_DIR = os.getenv("GITHUB_WORKSPACE")
             LATEST_COMMIT = os.getenv("GITHUB_SHA")
             repo = Repo(REPO_DIR)
 
+            log("INFO",
+                "Will initialize repository located on",
+                str(REPO_DIR),
+                f"Current branch is {str(repo.active_branch.name)}")
+
             if plan is DeploymentStrategy.PRODUCTION:
-                BASE_COMMIT = os.getenv("MAIN_HEAD_SHA_PREVIOUS")
-                print(f"Base Commit: {BASE_COMMIT} - PRODUCTION")
+                commits = list(repo.iter_commits("HEAD", max_count=2))
+                if len(commits) > 1:
+                    BASE_COMMIT = commits[1].hexsha
+                else:
+                    return []
+
             elif plan is DeploymentStrategy.STAGING:
-                BASE_COMMIT = os.getenv("MAIN_HEAD_SHA")
-                print(f"Base Commit: {BASE_COMMIT} - STAGING")
-            else:
+                repo.remotes.origin.fetch()
+                source_branch = os.getenv("GITHUB_HEAD_REF")
+                target_branch = os.getenv("GITHUB_BASE_REF")
+
+                if not source_branch or not target_branch:
+                    log(
+                        "FATAL",
+                        "Could not identify source and target branch using predefined Azure Pipeline variables",
+                        "Expected to find SYSTEM_PULLREQUEST_SOURCEBRANCH and SYSTEM_PULLREQUEST_TARGETBRANCHNAME",
+                        "Ensure this is runnning in a Pull Request pipeline",
+                    )
+                    raise KeyError
+
+                source_branch = source_branch.replace("refs/heads/", "")
+                source_branch = "origin/" + source_branch
+                target_branch = "origin/" + target_branch
                 log(
-                    "FATAL",
-                    f"Illegal Deployment Plan {
-                        str(plan)
-                    } passed to diff_calculation algorithm",
+                    "INFO",
+                    "Identified source and target branch in the pull request",
+                    f"source: {source_branch} -> target: {target_branch}",
                 )
-                raise KeyError
+                base_commit = repo.merge_base(target_branch, source_branch)
+
+                if base_commit[0]:
+                    BASE_COMMIT = base_commit[0].hexsha
+                else:
+                    log(
+                        "FATAL",
+                        "Could not identify the base of the Pull Request",
+                        "You may not have a sufficient Checkout Depth configuration",
+                        "If you run very old Pull Requests, this setting may need to be increased, or reopen a PR",
+                    )
+                    raise TideErrors
 
         case CIEnvironment.CIPlatforms.GitlabCI:
             log("INFO", "Identified Gitlab CI as the CI Runtime Platform")

@@ -37,7 +37,7 @@ jobs:
     name: OpenTide Validation
     runs-on: ubuntu-latest
     outputs:
-      mdr_changes: ${{ steps.detect.outputs.changes }}
+      mdr_changes: ${{ steps.detect_mdr_changes.outputs.mdr_changes }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -65,11 +65,11 @@ jobs:
 
       - uses: ./coretide/Pipelines/GitHub/check-mdr-changes
         name: Check MDR Changes
-        id: detect
+        id: detect_mdr_changes
 
       - uses: ./coretide/Pipelines/GitHub/validation-query
         name: Run OpenTide Query Validation
         id: query_validation
-        if: github.event_name == 'pull_request' && steps.detect.outputs.changes == 'true'
+        if: github.event_name == 'pull_request' && steps.detect_mdr_changes.outputs.mdr_changes == 'true'
         with:
           deployment_plan: STAGING

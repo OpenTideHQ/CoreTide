@@ -50,11 +50,6 @@ if DEPLOYMENT_PLAN is DeploymentStrategy.PRODUCTION:
 deployment_list = make_deploy_plan(DEPLOYMENT_PLAN)  # type: ignore
 
 if len(deployment_list) == 0:  # In case of no deployments possible, fail graciously
-    log(
-        "SKIP",
-        "Nothing could deploy, no MDR can be addressed within this deployment context",
-    )
-    
     environment = CIEnvironment().environment
     log("FAILURE",
         "Nothing could deploy, no MDR can be addressed within this deployment context",
@@ -66,6 +61,13 @@ if len(deployment_list) == 0:  # In case of no deployments possible, fail gracio
     if environment is CIEnvironment.CIPlatforms.GitlabCI:
         traceback.print_exc()
         sys.exit(19)
+    elif environment is CIEnvironment.CIPlatforms.GitHubActions:
+        # GitHub Actions does not support exit codes, so we use a warning
+        # to indicate that no deployment was identified.
+        print("::warning::No deployment was identified in this context")
+        exit(0)
+    else:
+        exit()
 
 # Need reindexation after MDR promotion is complete.
 IndexTide.reload()

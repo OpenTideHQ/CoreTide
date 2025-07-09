@@ -45,6 +45,13 @@ jobs:
           fetch-depth: 100
           ref: ${{ github.ref }}
 
+      - name: Checkout CoreTide
+        uses: actions/checkout@v4
+        with:
+          repository: OpenTideHQ/CoreTide
+          path: ${{ inputs.coretide_path }}
+          ref: refs/heads/${{ inputs.coretide_ref }}
+
       - uses: ./coretide/Pipelines/GitHub/check-mdr-changes
         name: Check MDR Changes
         id: detect_mdr_changes
@@ -56,7 +63,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          fetch-depth: 100
+          fetch-depth: 1
           ref: ${{ github.ref }}
 
       - name: Checkout CoreTide

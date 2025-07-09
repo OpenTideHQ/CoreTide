@@ -30,14 +30,28 @@ on:
     outputs:
       mdr_changes:
         description: "Whether MDR changes were detected"
-        value: ${{ jobs.Validation.outputs.mdr_changes }}
+        value: ${{ jobs.CheckMDRChanges.outputs.mdr_changes }}
 
 jobs:
-  Validation:
-    name: OpenTide Validation
+  CheckMDRChanges:
+    name: Check MDR Changes
     runs-on: ubuntu-latest
     outputs:
       mdr_changes: ${{ steps.detect_mdr_changes.outputs.mdr_changes }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 100
+          ref: ${{ github.ref }}
+
+      - uses: ./coretide/Pipelines/GitHub/check-mdr-changes
+        name: Check MDR Changes
+        id: detect_mdr_changes
+
+  SchemaValidation:
+    name: OpenTide Schema Validation
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -64,13 +78,27 @@ jobs:
         name: Run OpenTide Object Validation
         id: object_validation
 
-      - uses: ./coretide/Pipelines/GitHub/check-mdr-changes
-        name: Check MDR Changes
-        id: detect_mdr_changes
+  QueryValidation:
+    name: OpenTide Query Validation
+    runs-on: ubuntu-latest
+    if: ${{ github.event_name == 'pull_request' && needs.CheckMDRChanges.outputs.mdr_changes == 'true'}}
+    needs: CheckMDRChanges
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 100
+          ref: ${{ github.ref }}
+
+      - name: Checkout CoreTide
+        uses: actions/checkout@v4
+        with:
+          repository: OpenTideHQ/CoreTide
+          path: ${{ inputs.coretide_path }}
+          ref: refs/heads/${{ inputs.coretide_ref }}
 
       - uses: ./coretide/Pipelines/GitHub/validation-query
         name: Run OpenTide Query Validation
         id: query_validation
-        if: github.event_name == 'pull_request' && steps.detect_mdr_changes.outputs.mdr_changes == 'true'
         with:
           deployment_plan: STAGING

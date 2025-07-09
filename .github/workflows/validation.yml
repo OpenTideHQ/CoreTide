@@ -104,6 +104,14 @@ jobs:
           path: ${{ inputs.coretide_path }}
           ref: refs/heads/${{ inputs.coretide_ref }}
 
+      - uses: ./coretide/Pipelines/GitHub/tide-setup
+        name: Tide Setup
+        id: tide_setup
+        with:
+          python_version: ${{ inputs.python_version }}
+          requirements_file: ${{ inputs.requirements_file }}
+          opentide_secrets: ${{ inputs.opentide_secrets }}
+
       - uses: ./coretide/Pipelines/GitHub/validation-query
         name: Run OpenTide Query Validation
         id: query_validation

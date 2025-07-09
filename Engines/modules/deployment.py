@@ -219,8 +219,7 @@ def diff_calculation(plan: DeploymentStrategy) -> list:
 
             log("INFO",
                 "Will initialize repository located on",
-                str(REPO_DIR),
-                f"Current branch is {str(repo.active_branch.name)}")
+                str(REPO_DIR))
 
             if plan is DeploymentStrategy.PRODUCTION:
                 commits = list(repo.iter_commits("HEAD", max_count=2))

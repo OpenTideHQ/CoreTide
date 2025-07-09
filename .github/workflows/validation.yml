@@ -27,11 +27,17 @@ on:
         type: string
         description: "Content of the OpenTide secrets file"
         required: true
+    outputs:
+      mdr_changes:
+        description: "Whether MDR changes were detected"
+        value: ${{ jobs.Validation.outputs.mdr_changes }}
 
 jobs:
   Validation:
     name: OpenTide Validation
     runs-on: ubuntu-latest
+    outputs:
+      mdr_changes: ${{ steps.detect.outputs.changes }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4

@@ -24,3 +24,4 @@ CoreTide is a platform that has been built on thousands of manhours at the Europ
 - Object validation, Query Validation
 - Documentation Self-Generation, creates a collection of interconnected markdown files 
 - Full UUIDv4 Object system
+- test 

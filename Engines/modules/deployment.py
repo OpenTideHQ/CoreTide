@@ -1,3 +1,19 @@
+import pandas as pd
+from git.repo import Repo
+from Engines.modules.framework import unroll_dot_dict
+from Engines.modules.models import (
+    TideDefinitionsModels,
+    TideModels,
+    SystemConfig,
+    DeploymentStrategy,
+    TenantDeployment,
+    TenantDeploymentModel,
+)
+from Engines.modules.tide import DataTide, DetectionSystems, TideLoader
+from Engines.modules.errors import TideErrors
+from Engines.modules.debug import DebugEnvironment
+from Engines.modules.tide import DataTide, HelperTide
+from Engines.modules.logs import log
 import sys
 import os
 import git
@@ -11,22 +27,6 @@ from dataclasses import asdict
 
 sys.path.append(str(git.Repo(".", search_parent_directories=True).working_dir))
 
-from Engines.modules.logs import log
-from Engines.modules.tide import DataTide, HelperTide
-from Engines.modules.debug import DebugEnvironment
-from Engines.modules.errors import TideErrors
-from Engines.modules.tide import DataTide, DetectionSystems, TideLoader
-from Engines.modules.models import (TideDefinitionsModels,
-                                    TideModels,
-                                    SystemConfig,
-                                    DeploymentStrategy,
-                                    TenantDeployment,
-                                    TenantDeploymentModel) 
-from Engines.modules.framework import unroll_dot_dict
-
-from git.repo import Repo
-
-import pandas as pd
 
 SYSTEMS_CONFIGS_INDEX = DataTide.Configurations.Systems.Index
 PRODUCTION_STATUS = DataTide.Configurations.Deployment.status["production"]
@@ -37,6 +37,7 @@ class CIEnvironment:
     """
     Returns the CI Environment based on the environment variables
     """
+
     def __init__(self):
         self.environment = self._check_ci_environment()
 
@@ -44,45 +45,54 @@ class CIEnvironment:
         """
         Represents the supported CI options
         """
+
         AzurePipeline = auto()
         GitlabCI = auto()
+        GitHubActions = auto()
 
     def _check_ci_environment(self) -> CIPlatforms:
-        
         if os.getenv("TF_BUILD"):
             log("SUCCESS", "Discovered CI Environment to be Azure Pipeline")
             return self.CIPlatforms.AzurePipeline
+        elif os.getenv("GITHUB_ACTIONS"):
+            log("SUCCESS", "Discovered CI Environment to be GitHub Actions")
+            return self.CIPlatforms.GitHubActions
         elif os.getenv("CI"):
             log("SUCCESS", "Discovered CI Environment to be Gitlab CI")
             return self.CIPlatforms.GitlabCI
         else:
-            log("FATAL",
+            log(
+                "FATAL",
                 "CI Target environment variable is not implemented",
                 "Ensure that you have configured a variable OpenTide.TargetCi as part of your pipeline",
-                "Current supported values: GitlabCI, AzurePipelines")
+                "Current supported values: GitlabCI, AzurePipelines",
+            )
             raise Exception
 
+
 def make_deploy_plan(
-    plan: DeploymentStrategy,
-    wide_scope = False
+    plan: DeploymentStrategy, wide_scope=False
 ) -> dict[str, list[str]]:
     """
     Algorithm which assembles the MDR to deploy, organized per system
 
     plan: Execution environment used to calculate the acceptable statuses
     wide_scope: If set to true, will return all statuses regardless of the plan.
-    
+
     plan is still required if wide_scope is set to True as it configures the calculation
     algorithm behaviour. wide_scope is useful to validate all MDR regardless of statuses if
-    using the deploy plan to calculate the MDR that were modified. 
+    using the deploy plan to calculate the MDR that were modified.
     """
-    
+
     SYSTEMS_DEPLOYMENT = enabled_systems()
 
     log("INFO", "Compiling MDRs to deploy in plan", plan.name)
     if wide_scope:
-        log("WARNING", "Wide Scope has been enabled for the deployment plan calculation",
-        "This will assemble the plan with no consideration for statuses. Use with caution.")
+        log(
+            "WARNING",
+            "Wide Scope has been enabled for the deployment plan calculation",
+            "This will assemble the plan with no consideration for statuses. Use with caution.",
+        )
 
     mdr_files = list()
     deploy_mdr = dict()
@@ -117,13 +127,17 @@ def make_deploy_plan(
                             deploy_mdr.setdefault(system, []).append(mdr_uuid)
                             log(
                                 "SUCCESS",
-                                f"[{system.upper()}][{platform_status}] Identified MDR to deploy in {plan}",
+                                f"[{system.upper()}][{
+                                    platform_status
+                                }] Identified MDR to deploy in {plan}",
                                 name,
                             )
                         else:
                             log(
                                 "WARNING",
-                                f"[{system.upper()}][{platform_status}] Skipping as cannot be deployed in {plan}",
+                                f"[{system.upper()}][{
+                                    platform_status
+                                }] Skipping as cannot be deployed in {plan}",
                                 name,
                             )
 
@@ -135,13 +149,17 @@ def make_deploy_plan(
                             deploy_mdr.setdefault(system, []).append(mdr_uuid)
                             log(
                                 "SUCCESS",
-                                f"[{system.upper()}][{platform_status}] Identified MDR to deploy in {plan}",
+                                f"[{system.upper()}][{
+                                    platform_status
+                                }] Identified MDR to deploy in {plan}",
                                 name,
                             )
                         else:
                             log(
                                 "WARNING",
-                                f"[{system.upper()}][{platform_status}] Skipping as cannot be deployed in {plan}",
+                                f"[{system.upper()}][{
+                                    platform_status
+                                }] Skipping as cannot be deployed in {plan}",
                                 name,
                             )
 
@@ -155,20 +173,18 @@ def make_deploy_plan(
     return deploy_mdr
 
 
-
-def modified_mdr_files(plan: DeploymentStrategy)->list[Path]:
-
+def modified_mdr_files(plan: DeploymentStrategy) -> list[Path]:
     MDR_PATH = Path(DataTide.Configurations.Global.Paths.Tide.mdr)
     MDR_PATH_RAW = DataTide.Configurations.Global.Paths.Tide._raw["mdr"]
     MDR_PATH_RAW = MDR_PATH_RAW.replace(r"/", r"\/")
 
-    mdr_path_regex = (
-        rf"^.*{MDR_PATH_RAW}[^\/]+(\.yaml|\.yml)$"
-    )
+    mdr_path_regex = rf"^.*{MDR_PATH_RAW}[^\/]+(\.yaml|\.yml)$"
     mdr_files = [
-        mdr.split("/")[-1] for mdr in diff_calculation(plan) if re.match(mdr_path_regex, mdr)
+        mdr.split("/")[-1]
+        for mdr in diff_calculation(plan)
+        if re.match(mdr_path_regex, mdr)
     ]
-    #Extracting only the file name so it can be appended to MDR_PATH
+    # Extracting only the file name so it can be appended to MDR_PATH
     # which is absolute, and thus more reliable
 
     mdr_files = [(MDR_PATH / f) for f in mdr_files]
@@ -176,12 +192,10 @@ def modified_mdr_files(plan: DeploymentStrategy)->list[Path]:
     return mdr_files
 
 
-
-
 def diff_calculation(plan: DeploymentStrategy) -> list:
     """
     Calculates the files in scope of deployment based on the execution context.
-    
+
     Limitation: Tied to certain Gitlab CI variables, need more separation
     to work in other environments
 
@@ -193,11 +207,62 @@ def diff_calculation(plan: DeploymentStrategy) -> list:
 
     """
     scope = list()
-    
 
     TARGET_CI = CIEnvironment().environment
 
     match TARGET_CI:
+        case CIEnvironment.CIPlatforms.GitHubActions:
+            log("INFO", "Identified GitHub Actions as the CI Runtime Platform")
+            REPO_DIR = os.getenv("GITHUB_WORKSPACE")
+            LATEST_COMMIT = os.getenv("GITHUB_SHA")
+            repo = Repo(REPO_DIR)
+
+            log("INFO",
+                "Will initialize repository located on",
+                str(REPO_DIR))
+
+            if plan is DeploymentStrategy.PRODUCTION:
+                commits = list(repo.iter_commits("HEAD", max_count=2))
+                if len(commits) > 1:
+                    BASE_COMMIT = commits[1].hexsha
+                else:
+                    return []
+
+            elif plan is DeploymentStrategy.STAGING:
+                repo.remotes.origin.fetch()
+                source_branch = os.getenv("GITHUB_HEAD_REF")
+                target_branch = os.getenv("GITHUB_BASE_REF")
+
+                if not source_branch or not target_branch:
+                    log(
+                        "FATAL",
+                        "Could not identify source and target branch using predefined Azure Pipeline variables",
+                        "Expected to find SYSTEM_PULLREQUEST_SOURCEBRANCH and SYSTEM_PULLREQUEST_TARGETBRANCHNAME",
+                        "Ensure this is runnning in a Pull Request pipeline",
+                    )
+                    raise KeyError
+
+                source_branch = source_branch.replace("refs/heads/", "")
+                source_branch = "origin/" + source_branch
+                target_branch = "origin/" + target_branch
+                log(
+                    "INFO",
+                    "Identified source and target branch in the pull request",
+                    f"source: {source_branch} -> target: {target_branch}",
+                )
+                base_commit = repo.merge_base(target_branch, source_branch)
+
+                if base_commit[0]:
+                    BASE_COMMIT = base_commit[0].hexsha
+                else:
+                    log(
+                        "FATAL",
+                        "Could not identify the base of the Pull Request",
+                        "You may not have a sufficient Checkout Depth configuration",
+                        "If you run very old Pull Requests, this setting may need to be increased, or reopen a PR",
+                    )
+                    raise TideErrors
+
         case CIEnvironment.CIPlatforms.GitlabCI:
             log("INFO", "Identified Gitlab CI as the CI Runtime Platform")
             REPO_DIR = os.getenv("CI_PROJECT_DIR")
@@ -210,7 +275,9 @@ def diff_calculation(plan: DeploymentStrategy) -> list:
                 BASE_COMMIT = os.getenv("CI_MERGE_REQUEST_DIFF_BASE_SHA")
                 # Allows the proper base commit calculation for Merged Result pipelines
                 if os.getenv("CI_MERGE_REQUEST_EVENT_TYPE") == "merged_result":
-                    log("INFO", "Currently running a diff calculation for merge results")
+                    log(
+                        "INFO", "Currently running a diff calculation for merge results"
+                    )
                     for commit in repo.iter_commits():
                         if commit.hexsha == os.getenv("CI_COMMIT_BEFORE_SHA"):
                             mr_correct_parent = commit.parents[1]
@@ -223,62 +290,75 @@ def diff_calculation(plan: DeploymentStrategy) -> list:
                             LATEST_COMMIT = mr_correct_parent
                             break
             else:
-                log("FATAL", f"Illegal Deployment Plan {str(plan)} passed to diff_calculation algorithm")
+                log(
+                    "FATAL",
+                    f"Illegal Deployment Plan {
+                        str(plan)
+                    } passed to diff_calculation algorithm",
+                )
                 raise KeyError
 
         case CIEnvironment.CIPlatforms.AzurePipeline:
             log("INFO", "Identified Azure Pipeline as the CI Runtime Platform")
             REPO_DIR = os.getenv("BUILD_SOURCESDIRECTORY")
             LATEST_COMMIT = os.getenv("BUILD_SOURCEVERSION")
-            log("INFO",
-                "Will initialize repository located on",
-                str(REPO_DIR))
+            log("INFO", "Will initialize repository located on", str(REPO_DIR))
             repo = Repo(REPO_DIR)
             if plan is DeploymentStrategy.PRODUCTION:
-                commits = list(repo.iter_commits('HEAD', max_count=2))
+                commits = list(repo.iter_commits("HEAD", max_count=2))
                 if len(commits) > 1:
                     BASE_COMMIT = commits[1].hexsha
                 else:
                     return []
-                
+
             elif plan is DeploymentStrategy.STAGING:
                 repo.remotes.origin.fetch()
                 source_branch = os.getenv("SYSTEM_PULLREQUEST_SOURCEBRANCH")
-                target_branch = os.getenv("SYSTEM_PULLREQUEST_TARGETBRANCHNAME")
-                
+                target_branch = os.getenv(
+                    "SYSTEM_PULLREQUEST_TARGETBRANCHNAME")
+
                 if not source_branch or not target_branch:
-                    log("FATAL",
+                    log(
+                        "FATAL",
                         "Could not identify source and target branch using predefined Azure Pipeline variables",
                         "Expected to find SYSTEM_PULLREQUEST_SOURCEBRANCH and SYSTEM_PULLREQUEST_TARGETBRANCHNAME",
-                        "Ensure this is runnning in a Pull Request pipeline")
+                        "Ensure this is runnning in a Pull Request pipeline",
+                    )
                     raise KeyError
-                
+
                 source_branch = source_branch.replace("refs/heads/", "")
                 source_branch = "origin/" + source_branch
                 target_branch = "origin/" + target_branch
-                log("INFO",
+                log(
+                    "INFO",
                     "Identified source and target branch in the pull request",
-                    f"source: {source_branch} -> target: {target_branch}")
+                    f"source: {source_branch} -> target: {target_branch}",
+                )
                 base_commit = repo.merge_base(target_branch, source_branch)
-                
+
                 if base_commit[0]:
                     BASE_COMMIT = base_commit[0].hexsha
                 else:
-                    log("FATAL",
+                    log(
+                        "FATAL",
                         "Could not identify the base of the Pull Request",
                         "You may not have a sufficient OpenTide.Repo.Checkout.Depth configuration",
-                        "If you run very old Pull Requests, this setting may need to be increased, or reopen a PR")
+                        "If you run very old Pull Requests, this setting may need to be increased, or reopen a PR",
+                    )
                     raise TideErrors
 
             else:
-                log("FATAL", f"Illegal Deployment Plan {str(plan)} passed to diff_calculation algorithm")
+                log(
+                    "FATAL",
+                    f"Illegal Deployment Plan {
+                        str(plan)
+                    } passed to diff_calculation algorithm",
+                )
                 raise KeyError
 
-        case _: 
-            log("FATAL",
-                "Illegal CI Environment detected",
-                str(TARGET_CI))
-            
+        case _:
+            log("FATAL", "Illegal CI Environment detected", str(TARGET_CI))
+
             raise Exception
 
     log(
@@ -332,7 +412,9 @@ def diff_calculation(plan: DeploymentStrategy) -> list:
     modified_files = [f.b_path for f in diff.iter_change_type("M")]
 
     scope = added_files + renamed_files + modified_files
-    scope = list(set(scope)) #De-duplicate - may happen if file modified and renamed, for example
+    scope = list(
+        set(scope)
+    )  # De-duplicate - may happen if file modified and renamed, for example
     log("INFO", "Computed diff scope", ", ".join(scope))
 
     return scope
@@ -379,7 +461,7 @@ class Proxy:
             proxy_host = PROXY_CONFIG["proxy_host"]
             proxy_port = PROXY_CONFIG["proxy_port"]
             if proxy_host and proxy_port and proxy_user and proxy_pass:
-                proxy = (f"http://{proxy_user}:{proxy_pass}@{proxy_host}:{proxy_port}")
+                proxy = f"http://{proxy_user}:{proxy_pass}@{proxy_host}:{proxy_port}"
                 os.environ["HTTP_PROXY"] = proxy
                 os.environ["HTTPS_PROXY"] = proxy
                 log("SUCCESS", "Proxy environment setup successful")
@@ -388,7 +470,7 @@ class Proxy:
                     "FAILURE",
                     "Could not retrieve all proxy information",
                     "Control that all proxy infos are entered in CI variables",
-                    "Expects proxy_user, proxy_password, proxy_host and proxy_port"
+                    "Expects proxy_user, proxy_password, proxy_host and proxy_port",
                 )
 
     @staticmethod
@@ -404,32 +486,39 @@ class ExternalIdHelper:
     """
 
     @staticmethod
-    def remove_id(rule_id:int|str, tenant_name:str, mdr_uuid:str):
+    def remove_id(rule_id: int | str, tenant_name: str, mdr_uuid: str):
         """
         Removes an existing external ID. Mostly used in rule deletion workflows
         """
-        file_path = DataTide.Configurations.Global.Paths.Tide.mdr / DataTide.Models.files[mdr_uuid]
+        file_path = (
+            DataTide.Configurations.Global.Paths.Tide.mdr
+            / DataTide.Models.files[mdr_uuid]
+        )
         with open(file_path, "r", encoding="utf-8") as mdr_file:
             content = mdr_file.readlines()
 
         updated_content = list()
 
-        #Remove previous rule ID from file
+        # Remove previous rule ID from file
         for line in content:
             if line.strip() != f"rule_id::{tenant_name}: {rule_id}":
                 updated_content.append(line)
 
         with open(file_path, "w", encoding="utf-8") as mdr_file:
-            log("SUCCESS",
-            f"Removed ID in MDR File for tenant {tenant_name}")
+            log("SUCCESS", f"Removed ID in MDR File for tenant {tenant_name}")
             mdr_file.writelines(updated_content)
 
     @staticmethod
-    def insert_id(rule_id:int|str, tenant_name:str, mdr_uuid:str, system_name:str):
+    def insert_id(
+        rule_id: int | str, tenant_name: str, mdr_uuid: str, system_name: str
+    ):
         """
         Adds a new rule_id::<tenant>::<id> key to store IDs generated by the target system
         """
-        file_path = DataTide.Configurations.Global.Paths.Tide.mdr / DataTide.Models.files[mdr_uuid]
+        file_path = (
+            DataTide.Configurations.Global.Paths.Tide.mdr
+            / DataTide.Models.files[mdr_uuid]
+        )
         with open(file_path, "r", encoding="utf-8") as mdr_file:
             content = mdr_file.readlines()
 
@@ -437,7 +526,8 @@ class ExternalIdHelper:
         for line in content:
             if line.strip().removesuffix(":").strip() == system_name:
                 updated_content.append(line)
-                updated_content.append(f"    rule_id::{tenant_name}: {rule_id}\n")
+                updated_content.append(
+                    f"    rule_id::{tenant_name}: {rule_id}\n")
             else:
                 updated_content.append(line)
 
@@ -445,36 +535,50 @@ class ExternalIdHelper:
             print("SHIT")
             print(updated_content)
             mdr_file.writelines(updated_content)
-            log("SUCCESS",
-            f"Updated MDR File with new ID for tenant {tenant_name}",
-            str(rule_id))
+            log(
+                "SUCCESS",
+                f"Updated MDR File with new ID for tenant {tenant_name}",
+                str(rule_id),
+            )
 
 
 class TideDeployment:
-
-    def __init__(self, deployment, system:DetectionSystems, strategy):
-        
+    def __init__(self, deployment, system: DetectionSystems, strategy):
         match system:
             case DetectionSystems.SPLUNK:
-                self.rule_deployment:Sequence[TenantDeployment.Splunk] = self.deployment_resolver(deployment, system, strategy) #type:ignore
+                self.rule_deployment: Sequence[TenantDeployment.Splunk] = (
+                    self.deployment_resolver(deployment, system, strategy)
+                )  # type:ignore
             case DetectionSystems.SENTINEL:
-                self.rule_deployment:Sequence[TenantDeployment.Sentinel] = self.deployment_resolver(deployment, system, strategy) #type:ignore
+                self.rule_deployment: Sequence[TenantDeployment.Sentinel] = (
+                    self.deployment_resolver(deployment, system, strategy)
+                )  # type:ignore
             case DetectionSystems.CARBON_BLACK_CLOUD:
-                self.rule_deployment:Sequence[TenantDeployment.CarbonBlackCloud] = self.deployment_resolver(deployment, system, strategy) #type:ignore
+                self.rule_deployment: Sequence[TenantDeployment.CarbonBlackCloud] = (
+                    self.deployment_resolver(deployment, system, strategy)
+                )  # type:ignore
             case DetectionSystems.DEFENDER_FOR_ENDPOINT:
-                self.rule_deployment:Sequence[TenantDeployment.DefenderForEndpoint] = self.deployment_resolver(deployment, system, strategy) #type:ignore
+                self.rule_deployment: Sequence[TenantDeployment.DefenderForEndpoint] = (
+                    self.deployment_resolver(deployment, system, strategy)
+                )  # type:ignore
             case DetectionSystems.SENTINEL_ONE:
-                self.rule_deployment:Sequence[TenantDeployment.SentinelOne] = self.deployment_resolver(deployment, system, strategy) #type:ignore
+                self.rule_deployment: Sequence[TenantDeployment.SentinelOne] = (
+                    self.deployment_resolver(deployment, system, strategy)
+                )  # type:ignore
             case DetectionSystems.CROWDSTRIKE:
-                self.rule_deployment:Sequence[TenantDeployment.Crowdstrike] = self.deployment_resolver(deployment, system, strategy) #type:ignore
+                self.rule_deployment: Sequence[TenantDeployment.Crowdstrike] = (
+                    self.deployment_resolver(deployment, system, strategy)
+                )  # type:ignore
             case _:
-                raise NotImplementedError(f"System {system} is not implemented by TideDeployment")
+                raise NotImplementedError(
+                    f"System {system} is not implemented by TideDeployment"
+                )
 
-    def system_configuration_resolver(self, system:DetectionSystems): #type:ignore
+    def system_configuration_resolver(self, system: DetectionSystems):  # type:ignore
         match system:
-            #case DetectionSystems.SPLUNK:
+            # case DetectionSystems.SPLUNK:
             #    return DataTide.Configurations.Systems.Splunk
-            #case DetectionSystems.CARBON_BLACK_CLOUD:
+            # case DetectionSystems.CARBON_BLACK_CLOUD:
             #    return DataTide.Configurations.Systems.CarbonBlackCloud
             case DetectionSystems.SENTINEL:
                 return DataTide.Configurations.Systems.Sentinel
@@ -484,13 +588,12 @@ class TideDeployment:
                 return DataTide.Configurations.Systems.SentinelOne
             case DetectionSystems.CROWDSTRIKE:
                 return DataTide.Configurations.Systems.Crowdstrike
-            #case _:
+            # case _:
             #    raise NotImplemented
-        
 
-
-    def mdr_configuration_resolver(self, data:TideModels.MDR, system:DetectionSystems)->TideDefinitionsModels.SystemConfigurationModel:
-
+    def mdr_configuration_resolver(
+        self, data: TideModels.MDR, system: DetectionSystems
+    ) -> TideDefinitionsModels.SystemConfigurationModel:
         match system:
             case DetectionSystems.SENTINEL:
                 mdr_config = data.configurations.sentinel
@@ -501,143 +604,200 @@ class TideDeployment:
             case DetectionSystems.CROWDSTRIKE:
                 mdr_config = data.configurations.crowdstrike
             case _:
-                log("FATAL", "Could not resolve mdr configuration for system", str(system))
+                log(
+                    "FATAL",
+                    "Could not resolve mdr configuration for system",
+                    str(system),
+                )
                 raise Exception(NotImplemented)
 
         if not mdr_config:
-            log("FAILURE",
+            log(
+                "FAILURE",
                 "Was not able to retrieve MDR configuration for targeted system",
-                f"[{data.metadata.uuid}] {data.name} - Available configurations : [{str(data.configurations)}]")
+                f"[{data.metadata.uuid}] {data.name} - Available configurations : [{
+                    str(data.configurations)
+                }]",
+            )
             raise Exception(NotImplemented)
 
-        return mdr_config    
+        return mdr_config
 
-    def tenants_resolver(self, data:TideModels.MDR, system:DetectionSystems, deployment_strategy:DeploymentStrategy)->Sequence[SystemConfig.Tenant]:
+    def tenants_resolver(
+        self,
+        data: TideModels.MDR,
+        system: DetectionSystems,
+        deployment_strategy: DeploymentStrategy,
+    ) -> Sequence[SystemConfig.Tenant]:
         """
         Returns a list of all the tenants configurations, if they are allowed to be targeted.
         - If ALWAYS, will be targeted on every deployment
         - If MANUAL, can only be targeted if defined in the MDR
         - If STAGING or PRODUCTION, can only be targeted if the current deployment plan alligns with it
         """
-        tenants = self.system_configuration_resolver(system).tenants #type: ignore
+        tenants = self.system_configuration_resolver(
+            system).tenants  # type: ignore
         mdr_tenants = self.mdr_configuration_resolver(data, system).tenants
         target_tenants = list()
-                    
-        log("ONGOING",
+
+        log(
+            "ONGOING",
             "Currently resolving available tenant deployments for rule",
             data.name,
-            data.metadata.uuid)
-        
+            data.metadata.uuid,
+        )
+
         if not tenants:
-            log("FATAL",
+            log(
+                "FATAL",
                 "Missing tenant configuration for enabled system",
                 system.name,
-                "Review the system configuration and ensure you have at least one tenant")
+                "Review the system configuration and ensure you have at least one tenant",
+            )
             raise Exception
-        
+
         for tenant in tenants:
-            
-            
             # If Deployment Plan is ALWAYS, we always target the tenant
             if tenant.deployment is DeploymentStrategy.ALWAYS:
-                log("SUCCESS",
-                    "Assigned to tenant")
+                log("SUCCESS", "Assigned to tenant")
                 target_tenants.append(tenant)
                 continue
-            
+
             # Resolve tenant deployments when they are specific or not in the MDR spec
             if mdr_tenants:
-                log("INFO",
+                log(
+                    "INFO",
                     "Found specific tenants targeted by rule",
                     data.name,
-                    str(mdr_tenants))
+                    str(mdr_tenants),
+                )
 
                 if tenant.name in mdr_tenants:
-                    if (tenant.deployment is DeploymentStrategy.MANUAL) or (tenant.deployment is deployment_strategy):
+                    if (tenant.deployment is DeploymentStrategy.MANUAL) or (
+                        tenant.deployment is deployment_strategy
+                    ):
                         target_tenants.append(tenant)
-                        log("SUCCESS",
-                            f"Adding tenant {tenant.name} to the tenant deployment list",
-                            f"Compatible with current deployment plan : {deployment_strategy}")
+                        log(
+                            "SUCCESS",
+                            f"Adding tenant {
+                                tenant.name
+                            } to the tenant deployment list",
+                            f"Compatible with current deployment plan : {
+                                deployment_strategy
+                            }",
+                        )
                     else:
-                        log("SKIP",
-                            f"Skipping tenant {tenant.name} as is not compatible with current deployment plan",
-                            f"Tenant deployment plan : {tenant.deployment}, current deployment plan : {deployment_strategy.name}")
+                        log(
+                            "SKIP",
+                            f"Skipping tenant {
+                                tenant.name
+                            } as is not compatible with current deployment plan",
+                            f"Tenant deployment plan : {
+                                tenant.deployment
+                            }, current deployment plan : {deployment_strategy.name}",
+                        )
                 else:
-                    log("SKIP",
-                        f"Skipping tenant {tenant.name} as is not defined by MDR tenant list",
-                        str(mdr_tenants))
-                                
+                    log(
+                        "SKIP",
+                        f"Skipping tenant {
+                            tenant.name
+                        } as is not defined by MDR tenant list",
+                        str(mdr_tenants),
+                    )
+
             else:
-                log("INFO",
+                log(
+                    "INFO",
                     "Did not find tenants specified in detection rule, will resolve available ones",
-                    data.name)
-                
+                    data.name,
+                )
+
                 if tenant.deployment is DeploymentStrategy.MANUAL:
-                    log("SKIP",
-                        f"Skipping tenant {tenant.name} as can only be assigned within the MDR defined tenant",
-                        "You can define custom target tenants under the tenants keyword")
+                    log(
+                        "SKIP",
+                        f"Skipping tenant {
+                            tenant.name
+                        } as can only be assigned within the MDR defined tenant",
+                        "You can define custom target tenants under the tenants keyword",
+                    )
                     continue
 
                 elif tenant.deployment is deployment_strategy:
                     target_tenants.append(tenant)
-                    log("SUCCESS",
-                        f"Adding tenant {tenant.name} to the tenant deployment list",
-                        f"Compatible with current deployment plan : {deployment_strategy}")
+                    log(
+                        "SUCCESS",
+                        f"Adding tenant {
+                            tenant.name} to the tenant deployment list",
+                        f"Compatible with current deployment plan : {
+                            deployment_strategy
+                        }",
+                    )
                 else:
-                    log("SKIP",
-                        f"Skipping tenant {tenant.name} as is not compatible with current deployment plan",
-                        f"Tenant deployment plan : {tenant.deployment}, current deployment plan : {deployment_strategy.name}")
+                    log(
+                        "SKIP",
+                        f"Skipping tenant {
+                            tenant.name
+                        } as is not compatible with current deployment plan",
+                        f"Tenant deployment plan : {
+                            tenant.deployment
+                        }, current deployment plan : {deployment_strategy.name}",
+                    )
 
         return target_tenants
 
-
-    def _deep_update(self, base_dictionary:MutableMapping, updating_dictionary:MutableMapping)->MutableMapping:
+    def _deep_update(
+        self, base_dictionary: MutableMapping, updating_dictionary: MutableMapping
+    ) -> MutableMapping:
         """
         Performs a deep nested mapping, so can combine dictionaries
         without overriding them
         """
         for key, value in updating_dictionary.items():
             if isinstance(value, MutableMapping):
-                base_dictionary[key] = self._deep_update(base_dictionary.get(key, {}), value)
+                base_dictionary[key] = self._deep_update(
+                    base_dictionary.get(key, {}), value
+                )
             else:
                 base_dictionary[key] = value
         return base_dictionary
 
-
-    def modifiers_resolver(self, data:TideModels.MDR, target_tenant:str, system:DetectionSystems) -> TideModels.MDR:
+    def modifiers_resolver(
+        self, data: TideModels.MDR, target_tenant: str, system: DetectionSystems
+    ) -> TideModels.MDR:
         """
-        Dynamically modifies MDR data based on 
+        Dynamically modifies MDR data based on
         """
 
         system_configuration = self.system_configuration_resolver(system)
-        modifiers = system_configuration.modifiers #type: ignore
+        modifiers = system_configuration.modifiers  # type: ignore
         mdr_config = self.mdr_configuration_resolver(data, system)
-        system_identifier = system_configuration.platform.identifier #type: ignore
-        
+        system_identifier = system_configuration.platform.identifier  # type: ignore
+
         if not mdr_config:
             raise NotImplemented
 
         raw_data = asdict(data)
         raw_mdr_config = asdict(mdr_config)
-        
-        log("ONGOING",
-            "Checking modifiers for system",
-            str(system),
-            str(modifiers))
-        
+
+        log("ONGOING", "Checking modifiers for system",
+            str(system), str(modifiers))
+
         if modifiers:
             log("INFO", "Found modifiers in configuration for system", str(system))
             for mod in modifiers:
-                log("ONGOING",
-                    f"Evaluating modifier {str(mod.name)} {str(mod.description)}",
-                    str(mod.conditions))
-                
+                log(
+                    "ONGOING",
+                    f"Evaluating modifier {str(mod.name)} {
+                        str(mod.description)}",
+                    str(mod.conditions),
+                )
+
                 match = False
-                
+
                 if mod.conditions.default:
                     if mod.conditions.default is True:
                         match = True
-                
+
                 if mod.conditions.status:
                     if mod.conditions.status == mdr_config.status:
                         match = True
@@ -653,62 +813,98 @@ class TideDeployment:
                         match = False
 
                 if match is True:
-                    log("INFO", "Condition Matching", str(mod.name or ""), str(mod.description or ""))
-                    flatten_modifications = pd.json_normalize(mod.modifications).to_dict(orient="records")[0] #type: ignore
+                    log(
+                        "INFO",
+                        "Condition Matching",
+                        str(mod.name or ""),
+                        str(mod.description or ""),
+                    )
+                    flatten_modifications = pd.json_normalize(
+                        mod.modifications
+                    ).to_dict(orient="records")[0]  # type: ignore
                     for modification in flatten_modifications:
                         new_value = flatten_modifications[modification]
-                        new_value = None if new_value in ["NONE", "NULL"] else new_value                     
+                        new_value = None if new_value in [
+                            "NONE", "NULL"] else new_value
                         if new_value:
                             if type(new_value) is not str:
                                 pass
                             elif "::" in new_value:
-                                raw_mdr_config_flatten = pd.json_normalize(raw_mdr_config).to_dict(orient="records")[0] #type: ignore
+                                raw_mdr_config_flatten = pd.json_normalize(
+                                    raw_mdr_config
+                                ).to_dict(orient="records")[0]  # type: ignore
                                 operator = new_value.split("::")[0]
                                 value = new_value.split("::")[1]
-                                log("DEBUG", f"Found mod {modification} with operator {operator} with value {value}")
+                                log(
+                                    "DEBUG",
+                                    f"Found mod {modification} with operator {
+                                        operator
+                                    } with value {value}",
+                                )
                                 log("DEBUG", str(raw_mdr_config_flatten))
                                 if modification in raw_mdr_config_flatten:
-                                    log("DEBUG", str(raw_mdr_config_flatten[modification]))
+                                    log(
+                                        "DEBUG",
+                                        str(raw_mdr_config_flatten[modification]),
+                                    )
                                     if operator == "prefix":
-                                        new_value = value + (raw_mdr_config_flatten[modification] or "")
+                                        new_value = value + (
+                                            raw_mdr_config_flatten[modification] or ""
+                                        )
                                     elif operator == "suffix":
-                                        new_value = (raw_mdr_config_flatten[modification] or "") + value
+                                        new_value = (
+                                            raw_mdr_config_flatten[modification] or ""
+                                        ) + value
                                     log("DEBUG", "Generated new value", new_value)
                                 else:
                                     new_value = value
 
-                        updated_config = unroll_dot_dict({modification:new_value})
-                        log("ONGOING", f"Applying modification {modification} -> {str(new_value)}")
+                        updated_config = unroll_dot_dict(
+                            {modification: new_value})
+                        log(
+                            "ONGOING",
+                            f"Applying modification {
+                                modification} -> {str(new_value)}",
+                        )
                         if updated_config:
-                            raw_mdr_config = self._deep_update(raw_mdr_config.copy(), updated_config) #type: ignore
+                            raw_mdr_config = self._deep_update(
+                                raw_mdr_config.copy(), updated_config
+                            )  # type: ignore
 
         raw_data["configurations"].update({system_identifier: raw_mdr_config})
         log("INFO", "New recompiled modified deployment", str(raw_data))
-        
+
         return TideLoader.load_mdr(raw_data)
 
-    def deployment_resolver(self, mdr_deployment:Sequence[TideModels.MDR], system:DetectionSystems, deployment_strategy:DeploymentStrategy)->Sequence[TenantDeploymentModel]:
-
+    def deployment_resolver(
+        self,
+        mdr_deployment: Sequence[TideModels.MDR],
+        system: DetectionSystems,
+        deployment_strategy: DeploymentStrategy,
+    ) -> Sequence[TenantDeploymentModel]:
         deployment = list()
         tenants_data = dict()
         tenants_mapping = dict()
-        
-        for mdr in mdr_deployment:
 
+        for mdr in mdr_deployment:
             if type(mdr) is str:
                 mdr = DataTide.Models.MDR[mdr]
-            
+
             tenants = self.tenants_resolver(mdr, system, deployment_strategy)
-            
+
             for tenant in tenants:
                 tenants_data[tenant.name] = tenant
-                tenants_mapping.setdefault(tenant.name, []).append(self.modifiers_resolver(data=mdr, 
-                                                                                           target_tenant=tenant.name,
-                                                                                           system=system))
+                tenants_mapping.setdefault(tenant.name, []).append(
+                    self.modifiers_resolver(
+                        data=mdr, target_tenant=tenant.name, system=system
+                    )
+                )
 
         for tenant in tenants_mapping:
-            deployment.append(TenantDeploymentModel(tenant=tenants_data[tenant],
-                                                    rules=tenants_mapping[tenant]))
+            deployment.append(
+                TenantDeploymentModel(
+                    tenant=tenants_data[tenant], rules=tenants_mapping[tenant]
+                )
+            )
 
         return deployment
-    

@@ -1,5 +1,5 @@
-name: "Framework Setup"
-description: "Framework Setup"
+name: Framework Generation
+description: Generates Schemas, Indexes and Templates
 
 inputs:
   coretide_path:

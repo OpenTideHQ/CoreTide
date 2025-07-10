@@ -54,7 +54,7 @@ jobs:
           requirements_file: ${{ inputs.requirements_file }}
           opentide_secrets: ${{ inputs.opentide_secrets }}
 
-      - uses: ./coretide/Pipelines/GitHub/framework-setup
+      - uses: ./coretide/Pipelines/GitHub/framework
         name: Framework Setup
         id: framework_setup
         with:

@@ -5,6 +5,8 @@ inputs:
   deployment_plan:
     description: "Deployment Plan"
     required: false
+  coretide_path:
+    description: "Path where coretide has been cloned"
 
 runs:
   using: "composite"
@@ -16,3 +18,35 @@ runs:
         python deploy.py
       env:
         DEPLOYMENT_PLAN: ${{ inputs.deployment_plan }}
+    
+    - name: MDR Promotion
+      id: mdr_promotion
+      shell: bash
+      env:
+        CORETIDE_PATH: ${{ inputs.coretide_path }}
+      run: |
+        echo "Checking for changes"
+
+        changes=$(git status --porcelain -- . ':!$CORETIDE_PATH' ':!coretide')
+        echo $changes
+
+        if [[ -z "$changes" ]]; then
+          echo "No changes, exiting"
+          exit 0
+        fi
+
+        REPO_NAME=$(basename "$(git rev-parse --show-toplevel)")
+
+        echo "REPO_NAME: $REPO_NAME"
+
+        filtered_changes=$(echo "$changes" | grep -vE '(M|A|D) $REPO_NAME/|(M|A|D) $CORETIDE_PATH/')
+        echo "Filtered changes: $filtered_changes"
+        if [[ -z "$filtered_changes" ]]; then
+          echo "Changes only in Local Instance or CoreTide directories, not committing"
+          exit 0
+        fi
+
+        echo "Updated files, committing"
+        git add -- . ':!${REPO_NAME}' ':!CoreTide' ':!coretide' ':!$CORETIDE_PATH'
+        git commit -m "CoreTide MDR Promotion [skip ci]"
+        git push origin HEAD:${{ github.ref }}

@@ -90,3 +90,4 @@ jobs:
         id: deployment_routine
         with:
           deployment_plan: PRODUCTION
+          coretide_path: ${{ inputs.coretide_path }}

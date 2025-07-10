@@ -299,16 +299,16 @@ class SystemLoader:
             grouping = Sentinel.Grouping(**grouping,
                                          alert=alert_grouping)
 
+        entity_list = mdr_config.pop("entities", None)
         entities = None
-        if "entities" in mdr_config:
-            entity_list = mdr_config.pop("entities")
+        if entity_list:
             entities = []
             for mapping in entity_list:
                 entities.append(
                     Sentinel.EntityMapping(
                         entity=mapping["entity"],
                         mappings=[Sentinel.EntityMapping.MappingEntry(**entry)
-                                  for entry in mapping["mappings"]]
+                                    for entry in mapping["mappings"]]
                     )
                 )
 

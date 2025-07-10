@@ -14,11 +14,6 @@ runs:
         cd coretide/Orchestration
         python generate.py
 
-    - name: Remove CoreTide instance by safety
-      shell: bash
-      run: |
-        rm -rf coretide
-
     - name: Check for Changes and Commit
       id: check_changes
       shell: bash

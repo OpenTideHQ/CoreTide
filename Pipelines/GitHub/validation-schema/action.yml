@@ -1,0 +1,10 @@
+name: "Object Validation"
+description: "Run OpenTide Object Validation"
+runs:
+  using: "composite"
+  steps:
+    - name: Running Object Validation
+      shell: bash
+      run: |
+        cd coretide/Orchestration
+        python validate.py

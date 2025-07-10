@@ -1,0 +1,21 @@
+name: "Detect MDR Changes"
+description: "Detect any changes to managed detection rules"
+outputs:
+  mdr_changes:
+    description: "Whether detection rules have changed"
+    value: ${{ steps.detect_mdr_changes.outputs.CHANGES }}
+runs:
+  using: "composite"
+  steps:
+    - name: Detect changes
+      id: detect_mdr_changes
+      shell: bash
+      run: |
+        echo "Checking for changes in detection rules"
+        if git diff HEAD HEAD~ --name-only | grep -q '^Objects/Detection Rules' ; then
+          echo "Detection Rules file modified, will execute a deployment routine"
+          echo "CHANGES=true" >> $GITHUB_OUTPUT
+        else
+          echo "No Detection Rules file modified, will skip the deployment routine"
+          echo "CHANGES=false" >> $GITHUB_OUTPUT
+        fi

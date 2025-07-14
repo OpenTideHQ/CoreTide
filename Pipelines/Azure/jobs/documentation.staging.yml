@@ -2,15 +2,15 @@ steps:
   - template: ../templates/coretide_initialization.yml
   # Mitigation for Post-Checkout errors when using the built-in resources
   - script: |
-      wiki_url="$(OpenTide.Wiki.RepoUrl)"
-      access_token="$(System.AccessToken)"
-      stripped_url="${wiki_url#https://}"
-      wiki_url_with_token="https://${access_token}@${stripped_url}"
+      org_url="$(System.TeamFoundationCollectionUri)"
+      organization="${wiki_url#https://}"
 
-      git clone $(wiki_url_with_token) \
+      wiki_url_with_token=https://$(System.AccessToken)@$(organization)/System.TeamProject/_git/$(OpenTide.Wiki.RepoName)
+
+      git clone $wiki_url_with_token \
         --branch $(OpenTide.Wiki.BranchName) \
         --depth 1 \
-        $(Build.SourcesDirectory)/$(OpenTide.Wiki.RepoName)
+        $(Build.SourcesDirectory)/$(OpenTide.Wiki.RepoName)     
     displayName: Checkout Tide Instance Wiki 
   #- checkout: Wiki
   #  fetchDepth: 1

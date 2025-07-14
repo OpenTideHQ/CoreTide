@@ -1,9 +1,18 @@
 steps:
   - template: ../templates/coretide_initialization.yml
-  - checkout: Wiki
-    fetchDepth: 1
-    persistCredentials: true
+  # Mitigation for Post-Checkout errors when using the built-in resources
+  - script: |
+      git clone $(OpenTide.Wiki.RepoUrl) \
+        -c http.extraheader="Authorization: Bearer $(System.AccessToken)" \
+        --single-branch \
+        --no-tags \
+        --shallow \
+        $(Build.SourcesDirectory)
     displayName: Checkout Tide Instance Wiki 
+  #- checkout: Wiki
+  #  fetchDepth: 1
+  #  persistCredentials: true
+  #  displayName: Checkout Tide Instance Wiki 
   - script: |
       mv $(OpenTide.Wiki.RepoName) ./coretide
     displayName: Move Wiki to CoreTide

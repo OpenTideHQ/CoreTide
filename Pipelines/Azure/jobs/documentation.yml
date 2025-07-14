@@ -3,7 +3,7 @@ steps:
   # Mitigation for Post-Checkout errors when using the built-in resources
   - script: |
       org_url="$(System.TeamFoundationCollectionUri)"
-      organization="${wiki_url#https://}"
+      organization="${org_url#https://}"
 
       wiki_url_with_token=https://$(System.AccessToken)@$(organization)/System.TeamProject/_git/$(OpenTide.Wiki.RepoName)
 

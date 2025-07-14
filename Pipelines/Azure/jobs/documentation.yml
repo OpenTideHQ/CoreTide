@@ -1,19 +1,9 @@
 steps:
   - template: ../templates/coretide_initialization.yml
-  # Mitigation for Post-Checkout errors when using the built-in resources
-  #- script: |
-  #    wiki_url_with_token=https://$(System.AccessToken)@dev.azure.com/$(OpenTide.Wiki.Organisation)/$(OpenTide.Wiki.Project)/_git/$(OpenTide.Wiki.RepoName)
-#
-  #    git clone $wiki_url_with_token \
-  #      --branch $(OpenTide.Wiki.BranchName) \
-  #      --depth 1 \
-  #      $(Build.SourcesDirectory)/$(OpenTide.Wiki.RepoName)     
-  #  displayName: Checkout Tide Instance Wiki 
   - checkout: Wiki
     fetchDepth: 1
     persistCredentials: true
     displayName: Checkout Tide Instance Wiki
-    clean: false 
   - script: |
       mv $(OpenTide.Wiki.RepoName) ./coretide
     displayName: Move Wiki to CoreTide
@@ -27,6 +17,7 @@ steps:
       cp index.json $(OpenTide.Wiki.RepoName)/
     displayName: Copy Index to Wiki
   - script: |
+      cd coretide
       if [ -e $(OpenTide.Wiki.RepoName)/staging_index.json ]
         then cp $(OpenTide.Wiki.RepoName)/staging_index.json ./
       fi
@@ -41,8 +32,11 @@ steps:
       cp -fr wiki/. ./$(OpenTide.Wiki.RepoName)/ 
     displayName: Copy Documentation in Wiki
   - script: |
-      cd coretide/$(OpenTide.Wiki.RepoName)
-      [[ $(git status --porcelain) ]] || { echo "No changes, exiting"; exit 0; }
+      mv coretide/$(OpenTide.Wiki.RepoName) ./$(OpenTide.Wiki.RepoName)/
+    displayName: Move Back Wiki Repo to resources
+  - script: |
+      cd $(OpenTide.Wiki.RepoName)
+      [[ $(git status --porcelain) ]] || { echo "No changes to the Wiki, exiting"; exit 0; }
       echo "Updated files, commiting"
       git rebase origin/$(OpenTide.Wiki.BranchName)
       git add -A

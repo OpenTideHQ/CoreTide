@@ -7,7 +7,7 @@ steps:
       stripped_url="${wiki_url#https://}"
       wiki_url_with_token="https://${access_token}@${stripped_url}"
 
-      git clone $(wiki_url_with_token) \
+      git clone $wiki_url_with_token \
         --branch $(OpenTide.Wiki.BranchName) \
         --depth 1 \
         $(Build.SourcesDirectory)/$(OpenTide.Wiki.RepoName)     

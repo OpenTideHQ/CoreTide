@@ -5,7 +5,7 @@ steps:
       git clone $(OpenTide.Wiki.RepoUrl) \
         -c http.extraheader="Authorization: Bearer $(System.AccessToken)" \
         --branch $(OpenTide.Wiki.BranchName) \
-        --shallow \
+        --depth 1 \
         $(Build.SourcesDirectory)
     displayName: Checkout Tide Instance Wiki 
   #- checkout: Wiki

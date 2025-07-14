@@ -6,7 +6,7 @@ stages:
       - job: Framework
         displayName: Framework Generation
         condition: | 
-          or(eq(variables['Build.SourceBranch'], variables['OpenTide.DefaultBranch']),
+          or(eq(variables['Build.SourceBranchName'], variables['OpenTide.DefaultBranch']),
              eq(variables['Build.Reason'], 'Manual')
              )
         steps:

@@ -6,7 +6,7 @@ steps:
         -c http.extraheader="Authorization: Bearer $(System.AccessToken)" \
         --branch $(OpenTide.Wiki.BranchName) \
         --depth 1 \
-        $(Build.SourcesDirectory)
+        $(Build.SourcesDirectory)/$(OpenTide.Wiki.RepoName) 
     displayName: Checkout Tide Instance Wiki 
   #- checkout: Wiki
   #  fetchDepth: 1

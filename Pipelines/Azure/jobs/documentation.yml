@@ -1,18 +1,19 @@
 steps:
   - template: ../templates/coretide_initialization.yml
   # Mitigation for Post-Checkout errors when using the built-in resources
-  - script: |
-      wiki_url_with_token=https://$(System.AccessToken)@dev.azure.com/$(OpenTide.Wiki.Organisation)/$(OpenTide.Wiki.Project)/_git/$(OpenTide.Wiki.RepoName)
-
-      git clone $wiki_url_with_token \
-        --branch $(OpenTide.Wiki.BranchName) \
-        --depth 1 \
-        $(Build.SourcesDirectory)/$(OpenTide.Wiki.RepoName)     
-    displayName: Checkout Tide Instance Wiki 
-  #- checkout: Wiki
-  #  fetchDepth: 1
-  #  persistCredentials: true
+  #- script: |
+  #    wiki_url_with_token=https://$(System.AccessToken)@dev.azure.com/$(OpenTide.Wiki.Organisation)/$(OpenTide.Wiki.Project)/_git/$(OpenTide.Wiki.RepoName)
+#
+  #    git clone $wiki_url_with_token \
+  #      --branch $(OpenTide.Wiki.BranchName) \
+  #      --depth 1 \
+  #      $(Build.SourcesDirectory)/$(OpenTide.Wiki.RepoName)     
   #  displayName: Checkout Tide Instance Wiki 
+  - checkout: Wiki
+    fetchDepth: 1
+    persistCredentials: true
+    displayName: Checkout Tide Instance Wiki
+    clean: false 
   - script: |
       mv $(OpenTide.Wiki.RepoName) ./coretide
     displayName: Move Wiki to CoreTide

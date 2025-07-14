@@ -2,10 +2,7 @@ steps:
   - template: ../templates/coretide_initialization.yml
   # Mitigation for Post-Checkout errors when using the built-in resources
   - script: |
-      org_url="$(System.TeamFoundationCollectionUri)"
-      organization="${org_url#https://}"
-
-      wiki_url_with_token=https://$(System.AccessToken)@$(organization)/System.TeamProject/_git/$(OpenTide.Wiki.RepoName)
+      wiki_url_with_token=https://$(System.AccessToken)@$(OpenTide.Wiki.Organisation)/$(OpenTide.Wiki.Project)/_git/$(OpenTide.Wiki.RepoName)
 
       git clone $wiki_url_with_token \
         --branch $(OpenTide.Wiki.BranchName) \

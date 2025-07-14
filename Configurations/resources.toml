@@ -1,7 +1,7 @@
 [attack]
-enterprise = "attack/enterprise-attack-v16.1.xlsx"
-mobile = "attack/mobile-attack-v16.1.xlsx"
-ics = "attack/ics-attack-v16.1.xlsx"
+enterprise = "attack/enterprise-attack-v17.1.xlsx"
+mobile = "attack/mobile-attack-v17.1.xlsx"
+ics = "attack/ics-attack-v17.1.xlsx"
 
 [d3fend]
 ontology = "d3fend/d3fend-ontology.json"

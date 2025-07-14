@@ -7,142 +7,1390 @@ icon: 🔒
 keys:
   - id: M1036
     name: Account Use Policies
-    description: Configure features related to account use like login attempt lockouts,
-      specific login times, etc.
+    description: 'Account Use Policies help mitigate unauthorized access by configuring
+      and enforcing rules that govern how and when accounts can be used. These policies
+      include enforcing account lockout mechanisms, restricting login times, and setting
+      inactivity timeouts. Proper configuration of these policies reduces the risk
+      of brute-force attacks, credential theft, and unauthorized access by limiting
+      the opportunities for malicious actors to exploit accounts. This mitigation
+      can be implemented through the following measures:
+
+
+      Account Lockout Policies:
+
+
+      - Implementation: Configure account lockout settings so that after a defined
+      number of failed login attempts (e.g., 3-5 attempts), the account is locked
+      for a specific time period (e.g., 15 minutes) or requires an administrator to
+      unlock it.
+
+      - Use Case: This prevents brute-force attacks by limiting how many incorrect
+      password attempts can be made before the account is temporarily disabled, reducing
+      the likelihood of an attacker successfully guessing a password.
+
+
+      Login Time Restrictions:
+
+
+      - Implementation: Set up login time policies to restrict when users or groups
+      can log into systems. For example, only allowing login during standard business
+      hours (e.g., 8 AM to 6 PM) for non-administrative accounts.
+
+      - Use Case: This prevents unauthorized access outside of approved working hours,
+      where login attempts might be more suspicious or harder to monitor. For example,
+      if an account that is only supposed to be active during the day logs in at 2
+      AM, it should raise an alert or be blocked.
+
+
+      Inactivity Timeout and Session Termination:
+
+
+      - Implementation: Enforce session timeouts after a period of inactivity (e.g.,
+      10-15 minutes) and require users to re-authenticate if they wish to resume the
+      session.
+
+      - Use Case: This policy prevents attackers from hijacking active sessions left
+      unattended. For example, if an employee walks away from their computer without
+      locking it, an attacker with physical access to the system would be unable to
+      exploit the session.
+
+
+      Password Aging Policies:
+
+
+      - Implementation: Enforce password aging rules, requiring users to change their
+      passwords after a defined period (e.g., 90 days) and ensure passwords are not
+      reused by maintaining a password history.
+
+      - Use Case: This limits the risk of compromised passwords being used indefinitely.
+      Regular password changes make it more difficult for attackers to reuse stolen
+      credentials.
+
+
+      Account Expiration and Deactivation:
+
+
+      - Implementation: Configure user accounts, especially for temporary or contract
+      workers, to automatically expire after a set date or event. Accounts that remain
+      unused for a specific period should be deactivated automatically.
+
+      - Use Case: This prevents dormant accounts from becoming an attack vector. For
+      example, an attacker can exploit unused accounts if they are not properly monitored
+      or deactivated.
+
+
+      **Tools for Implementation**:
+
+
+      - Group Policy Objects (GPOs) in Windows: To enforce account lockout thresholds,
+      login time restrictions, session timeouts, and password policies.
+
+      - Identity and Access Management (IAM) solutions: For centralized management
+      of user accounts, session policies, and automated deactivation of accounts.
+
+      - Security Information and Event Management (SIEM) platforms: To monitor and
+      alert on unusual login activity, such as failed logins or out-of-hours access
+      attempts.
+
+      - Multi-Factor Authentication (MFA) Tools: To further enforce secure login attempts,
+      preventing brute-force or credential stuffing attacks.
+
+      '
     link: https://attack.mitre.org/mitigations/M1036
   - id: M1015
     name: Active Directory Configuration
-    description: 'Implement robust Active Directory configurations using group policies
-      to control access and reduce the attack surface. Specific examples include:
+    description: 'Implement robust Active Directory (AD) configurations using group
+      policies to secure user accounts, control access, and minimize the attack surface.
+      AD configurations enable centralized control over account settings, logon policies,
+      and permissions, reducing the risk of unauthorized access and lateral movement
+      within the network. This mitigation can be implemented through the following
+      measures:
 
 
-      * Account Configuration: Use provisioned domain accounts rather than local accounts
-      to leverage centralized control and auditing capabilities.
+      Account Configuration:
 
-      * Interactive Logon Restrictions: Enforce group policies that prohibit interactive
-      logons for accounts that should not directly access systems.
 
-      * Remote Desktop Settings: Limit Remote Desktop logons to authorized accounts
-      to prevent misuse by adversaries.
+      - Implementation: Use domain accounts instead of local accounts to leverage
+      AD’s centralized management, including group policies, auditing, and access
+      control.
 
-      * Dedicated Administrative Accounts: Create specialized domain-wide accounts
-      that are restricted from interactive logons but can perform specific tasks like
-      installations or repository access.
+      - Use Case: For IT staff managing shared resources, provision domain accounts
+      that allow IT teams to log in centrally, reducing the risk of unmanaged, rogue
+      local accounts on individual machines.
 
-      * Authentication Silos: Configure Authentication Silos in Active Directory to
-      create access zones with restrictions based on membership in the Protected Users
-      global security group. This setup enhances security by applying additional protections
-      to high-risk accounts, limiting their exposure to potential attacks.'
+
+      Interactive Logon Restrictions:
+
+
+      - Implementation: Configure group policies to restrict interactive logons (e.g.,
+      direct physical or RDP logons) for service accounts or privileged accounts that
+      do not require such access.
+
+      - Use Case: Prevent service accounts, such as SQL Server accounts, from having
+      interactive logon privileges. This reduces the risk of these accounts being
+      leveraged for lateral movement if compromised.
+
+
+      Remote Desktop Settings:
+
+
+      - Implementation: Limit Remote Desktop Protocol (RDP) access to specific, authorized
+      accounts. Use group policies to enforce this, allowing only necessary users
+      to establish RDP sessions.
+
+      - Use Case: On sensitive servers (e.g., domain controllers or financial databases),
+      restrict RDP access to administrative accounts only, while all other users are
+      denied access.
+
+
+      Dedicated Administrative Accounts:
+
+
+      - Implementation: Create domain-wide administrative accounts that are restricted
+      from interactive logons, designed solely for high-level tasks (e.g., software
+      installation, patching).
+
+      - Use Case: Create separate administrative accounts for different purposes,
+      such as one set of accounts for installations and another for managing repository
+      access. This limits exposure and helps reduce attack vectors.
+
+
+      Authentication Silos:
+
+
+      - Implementation: Configure Authentication Silos in AD, using group policies
+      to create access zones with restrictions based on membership, such as the Protected
+      Users security group. This restricts access to critical accounts and minimizes
+      exposure to potential threats.
+
+      - Use Case: Place high-risk or high-value accounts, such as executive or administrative
+      accounts, in an Authentication Silo with extra controls, limiting their exposure
+      to only necessary systems. This reduces the risk of credential misuse or abuse
+      if these accounts are compromised.
+
+
+      **Tools for Implementation**:
+
+
+      - Active Directory Group Policies: Use Group Policy Management Console (GPMC)
+      to configure, deploy, and enforce policies across AD environments.
+
+      - PowerShell: Automate account configuration, logon restrictions, and policy
+      application using PowerShell scripts.
+
+      - AD Administrative Center: Manage Authentication Silos and configure high-level
+      policies for critical user groups within AD.'
     link: https://attack.mitre.org/mitigations/M1015
   - id: M1049
     name: Antivirus/Antimalware
-    description: Use signatures or heuristics to detect malicious software.
+    description: 'Antivirus/Antimalware solutions utilize signatures, heuristics,
+      and behavioral analysis to detect, block, and remediate malicious software,
+      including viruses, trojans, ransomware, and spyware. These solutions continuously
+      monitor endpoints and systems for known malicious patterns and suspicious behaviors
+      that indicate compromise. Antivirus/Antimalware software should be deployed
+      across all devices, with automated updates to ensure protection against the
+      latest threats. This mitigation can be implemented through the following measures:
+
+
+      Signature-Based Detection:
+
+
+      - Implementation: Use predefined signatures to identify known malware based
+      on unique patterns such as file hashes, byte sequences, or command-line arguments.
+      This method is effective against known threats.
+
+      - Use Case: When malware like "Emotet" is detected, its signature (such as a
+      specific file hash) matches a known database of malicious software, triggering
+      an alert and allowing immediate quarantine of the infected file.
+
+
+      Heuristic-Based Detection:
+
+
+      - Implementation: Deploy heuristic algorithms that analyze behavior and characteristics
+      of files and processes to identify potential malware, even if it doesn’t match
+      a known signature.
+
+      - Use Case: If a program attempts to modify multiple critical system files or
+      initiate suspicious network communications, heuristic analysis may flag it as
+      potentially malicious, even if no specific malware signature is available.
+
+
+      Behavioral Detection (Behavior Prevention):
+
+
+      - Implementation: Use behavioral analysis to detect patterns of abnormal activities,
+      such as unusual system calls, unauthorized file encryption, or attempts to escalate
+      privileges.
+
+      - Use Case: Behavioral analysis can detect ransomware attacks early by identifying
+      behavior like mass file encryption, even before a specific ransomware signature
+      has been identified.
+
+
+      Real-Time Scanning:
+
+
+      - Implementation: Enable real-time scanning to automatically inspect files and
+      network traffic for signs of malware as they are accessed, downloaded, or executed.
+
+      - Use Case: When a user downloads an email attachment, the antivirus solution
+      scans the file in real-time, checking it against both signatures and heuristics
+      to detect any malicious content before it can be opened.
+
+
+      Cloud-Assisted Threat Intelligence:
+
+
+      - Implementation: Use cloud-based threat intelligence to ensure the antivirus
+      solution can access the latest malware definitions and real-time threat feeds
+      from a global database of emerging threats.
+
+      - Use Case: Cloud-assisted antivirus solutions quickly identify newly discovered
+      malware by cross-referencing against global threat databases, providing real-time
+      protection against zero-day attacks.
+
+
+      **Tools for Implementation**:
+
+
+      - Endpoint Security Platforms: Use solutions such as EDR for comprehensive antivirus/antimalware
+      protection across all systems.
+
+      - Centralized Management: Implement centralized antivirus management consoles
+      that provide visibility into threat activity, enable policy enforcement, and
+      automate updates.
+
+      - Behavioral Analysis Tools: Leverage solutions with advanced behavioral analysis
+      capabilities to detect malicious activity patterns that don’t rely on known
+      signatures.'
     link: https://attack.mitre.org/mitigations/M1049
   - id: M1013
     name: Application Developer Guidance
-    description: This mitigation describes any guidance or training given to developers
-      of applications to avoid introducing security weaknesses that an adversary may
-      be able to take advantage of.
+    description: "Application Developer Guidance focuses on providing developers with\
+      \ the knowledge, tools, and best practices needed to write secure code, reduce\
+      \ vulnerabilities, and implement secure design principles. By integrating security\
+      \ throughout the software development lifecycle (SDLC), this mitigation aims\
+      \ to prevent the introduction of exploitable weaknesses in applications, systems,\
+      \ and APIs. This mitigation can be implemented through the following measures:\n\
+      \ \nPreventing SQL Injection (Secure Coding Practice):\n\n- Implementation:\
+      \ Train developers to use parameterized queries or prepared statements instead\
+      \ of directly embedding user input into SQL queries.\n- Use Case: A web application\
+      \ accepts user input to search a database. By sanitizing and validating user\
+      \ inputs, developers can prevent attackers from injecting malicious SQL commands.\n\
+      \nCross-Site Scripting (XSS) Mitigation:\n\n- Implementation: Require developers\
+      \ to implement output encoding for all user-generated content displayed on a\
+      \ web page.\n- Use Case: An e-commerce site allows users to leave product reviews.\
+      \ Properly encoding and escaping user inputs prevents malicious scripts from\
+      \ being executed in other users’ browsers.\n\nSecure API Design:\n\n- Implementation:\
+      \ Train developers to authenticate all API endpoints and avoid exposing sensitive\
+      \ information in API responses.\n- Use Case: A mobile banking application uses\
+      \ APIs for account management. By enforcing token-based authentication for every\
+      \ API call, developers reduce the risk of unauthorized access.\n\nStatic Code\
+      \ Analysis in the Build Pipeline:\n\n- Implementation: Incorporate tools into\
+      \ CI/CD pipelines to automatically scan for vulnerabilities during the build\
+      \ process.\n- Use Case: A fintech company integrates static analysis tools to\
+      \ detect hardcoded credentials in their source code before deployment.\n\nThreat\
+      \ Modeling in the Design Phase:\n\n- Implementation: Use frameworks like STRIDE\
+      \ (Spoofing, Tampering, Repudiation, Information Disclosure, Denial of Service,\
+      \ Elevation of Privilege) to assess threats during application design.\n- Use\
+      \ Case: Before launching a customer portal, a SaaS company identifies potential\
+      \ abuse cases, such as session hijacking, and designs mitigations like secure\
+      \ session management.\n\n**Tools for Implementation**:\n\n- Static Code Analysis\
+      \ Tools: Use tools that can scan for known vulnerabilities in source code.\n\
+      - Dynamic Application Security Testing (DAST): Use tools like Burp Suite or\
+      \ OWASP ZAP to simulate runtime attacks and identify vulnerabilities.\n- Secure\
+      \ Frameworks: Recommend secure-by-default frameworks (e.g., Django for Python,\
+      \ Spring Security for Java) that enforce security best practices."
     link: https://attack.mitre.org/mitigations/M1013
   - id: M1048
     name: Application Isolation and Sandboxing
-    description: Restrict execution of code to a virtual environment on or in transit
-      to an endpoint system.
+    description: 'Application Isolation and Sandboxing refers to the technique of
+      restricting the execution of code to a controlled and isolated environment (e.g.,
+      a virtual environment, container, or sandbox). This method prevents potentially
+      malicious code from affecting the rest of the system or network by limiting
+      access to sensitive resources and critical operations. The goal is to contain
+      threats and minimize their impact. This mitigation can be implemented through
+      the following measures:
+
+
+      Browser Sandboxing:
+
+
+      - Use Case: Implement browser sandboxing to isolate untrusted web content, preventing
+      malicious web pages or scripts from accessing sensitive system files.
+
+      - Implementation: Use tools like Google Chrome''s built-in sandbox or deploy
+      solutions like Bromium to secure user web interactions.
+
+
+      Application Virtualization:
+
+
+      - Use Case: Deploy critical or high-risk applications in a virtualized environment
+      to ensure any compromise does not affect the host system.
+
+      - Implementation: Use application virtualization platforms to run applications
+      in isolated environments.
+
+
+      Email Attachment Sandboxing:
+
+
+      - Use Case: Route email attachments to a sandbox environment to detect and block
+      malware before delivering emails to end-users.
+
+      - Implementation: Integrate security solutions with sandbox capabilities to
+      analyze email attachments.
+
+
+      Endpoint Sandboxing:
+
+
+      - Use Case: Run all downloaded files and applications in a restricted environment
+      to monitor their behavior for malicious activity.
+
+      - Implementation: Use endpoint protection tools for sandboxing at the endpoint
+      level.'
     link: https://attack.mitre.org/mitigations/M1048
   - id: M1047
     name: Audit
-    description: Perform audits or scans of systems, permissions, insecure software,
-      insecure configurations, etc. to identify potential weaknesses.
+    description: "Auditing is the process of recording activity and systematically\
+      \ reviewing and analyzing the activity and system configurations. The primary\
+      \ purpose of auditing is to detect anomalies and identify potential threats\
+      \ or weaknesses in the environment. Proper auditing configurations can also\
+      \ help to meet compliance requirements. The process of auditing encompasses\
+      \ regular analysis of user behaviors and system logs in support of proactive\
+      \ security measures.\n\nAuditing is applicable to all systems used within an\
+      \ organization, from the front door of a building to accessing a file on a fileserver.\
+      \ It is considered more critical for regulated industries such as, healthcare,\
+      \ finance and government where compliance requirements demand stringent tracking\
+      \ of user and system activates.This mitigation can be implemented through the\
+      \ following measures: \n\nSystem Audit:\n\n- Use Case: Regularly assess system\
+      \ configurations to ensure compliance with organizational security policies.\n\
+      - Implementation: Use tools to scan for deviations from established benchmarks.\n\
+      \nPermission Audits:\n\n- Use Case: Review file and folder permissions to minimize\
+      \ the risk of unauthorized access or privilege escalation.\n- Implementation:\
+      \ Run access reviews to identify users or groups with excessive permissions.\n\
+      \nSoftware Audits:\n\n- Use Case: Identify outdated, unsupported, or insecure\
+      \ software that could serve as an attack vector.\n- Implementation: Use inventory\
+      \ and vulnerability scanning tools to detect outdated versions and recommend\
+      \ secure alternatives.\n\nConfiguration Audits:\n\n- Use Case: Evaluate system\
+      \ and network configurations to ensure secure settings (e.g., disabled SMBv1,\
+      \ enabled MFA).\n- Implementation: Implement automated configuration scanning\
+      \ tools like SCAP (Security Content Automation Protocol) to identify non-compliant\
+      \ systems.\n\nNetwork Audits:\n\n- Use Case: Examine network traffic, firewall\
+      \ rules, and endpoint communications to identify unauthorized or insecure connections.\n\
+      - Implementation: Utilize tools such as Wireshark, or Zeek to monitor and log\
+      \ suspicious network behavior."
     link: https://attack.mitre.org/mitigations/M1047
   - id: M1040
     name: Behavior Prevention on Endpoint
-    description: Use capabilities to prevent suspicious behavior patterns from occurring
-      on endpoint systems. This could include suspicious process, file, API call,
-      etc. behavior.
+    description: 'Behavior Prevention on Endpoint refers to the use of technologies
+      and strategies to detect and block potentially malicious activities by analyzing
+      the behavior of processes, files, API calls, and other endpoint events. Rather
+      than relying solely on known signatures, this approach leverages heuristics,
+      machine learning, and real-time monitoring to identify anomalous patterns indicative
+      of an attack. This mitigation can be implemented through the following measures:
+
+
+      Suspicious Process Behavior:
+
+
+      - Implementation: Use Endpoint Detection and Response (EDR) tools to monitor
+      and block processes exhibiting unusual behavior, such as privilege escalation
+      attempts.
+
+      - Use Case: An attacker uses a known vulnerability to spawn a privileged process
+      from a user-level application. The endpoint tool detects the abnormal parent-child
+      process relationship and blocks the action.
+
+
+      Unauthorized File Access:
+
+
+      - Implementation: Leverage Data Loss Prevention (DLP) or endpoint tools to block
+      processes attempting to access sensitive files without proper authorization.
+
+      - Use Case: A process tries to read or modify a sensitive file located in a
+      restricted directory, such as /etc/shadow on Linux or the SAM registry hive
+      on Windows. The endpoint tool identifies this anomalous behavior and prevents
+      it.
+
+
+      Abnormal API Calls:
+
+
+      - Implementation: Implement runtime analysis tools to monitor API calls and
+      block those associated with malicious activities.
+
+      - Use Case: A process dynamically injects itself into another process to hijack
+      its execution. The endpoint detects the abnormal use of APIs like `OpenProcess`
+      and `WriteProcessMemory` and terminates the offending process.
+
+
+      Exploit Prevention:
+
+
+      - Implementation: Use behavioral exploit prevention tools to detect and block
+      exploits attempting to gain unauthorized access.
+
+      - Use Case: A buffer overflow exploit is launched against a vulnerable application.
+      The endpoint detects the anomalous memory write operation and halts the process.'
     link: https://attack.mitre.org/mitigations/M1040
   - id: M1046
     name: Boot Integrity
-    description: Use secure methods to boot a system and verify the integrity of the
-      operating system and loading mechanisms.
+    description: 'Boot Integrity ensures that a system starts securely by verifying
+      the integrity of its boot process, operating system, and associated components.
+      This mitigation focuses on leveraging secure boot mechanisms, hardware-rooted
+      trust, and runtime integrity checks to prevent tampering during the boot sequence.
+      It is designed to thwart adversaries attempting to modify system firmware, bootloaders,
+      or critical OS components. This mitigation can be implemented through the following
+      measures:
+
+
+      Implementation of Secure Boot:
+
+
+      - Implementation: Enable UEFI Secure Boot on all systems and configure it to
+      allow only signed bootloaders and operating systems.
+
+      - Use Case: An adversary attempts to replace the system’s bootloader with a
+      malicious version to gain persistence. Secure Boot prevents the untrusted bootloader
+      from executing, halting the attack.
+
+
+      Utilization of TPMs:
+
+
+      - Implementation: Configure systems to use TPM-based attestation for boot integrity,
+      ensuring that any modification to the firmware, bootloader, or OS is detected.
+
+      - Use Case: A compromised firmware component alters the boot sequence. The TPM
+      detects the change and triggers an alert, allowing the organization to respond
+      before further damage.
+
+
+      Enable Bootloader Passwords:
+
+
+      - Implementation: Protect BIOS/UEFI settings with a strong password and limit
+      physical access to devices.
+
+      - Use Case: An attacker with physical access attempts to disable Secure Boot
+      or modify the boot sequence. The password prevents unauthorized changes.
+
+
+      Runtime Integrity Monitoring:
+
+
+      - Implementation: Deploy solutions to verify the integrity of critical files
+      and processes after boot.
+
+      - Use Case: A malware infection modifies kernel modules post-boot. Runtime integrity
+      monitoring detects the modification and prevents the malicious module from loading.'
     link: https://attack.mitre.org/mitigations/M1046
   - id: M1045
     name: Code Signing
-    description: Enforce binary and application integrity with digital signature verification
-      to prevent untrusted code from executing.
+    description: 'Code Signing is a security process that ensures the authenticity
+      and integrity of software by digitally signing executables, scripts, and other
+      code artifacts. It prevents untrusted or malicious code from executing by verifying
+      the digital signatures against trusted sources. Code signing protects against
+      tampering, impersonation, and distribution of unauthorized or malicious software,
+      forming a critical defense against supply chain and software exploitation attacks.
+      This mitigation can be implemented through the following measures:
+
+
+      Enforce Signed Code Execution:
+
+
+      - Implementation: Configure operating systems (e.g., Windows with AppLocker
+      or Linux with Secure Boot) to allow only signed code to execute.
+
+      - Use Case: Prevent the execution of malicious PowerShell scripts by requiring
+      all scripts to be signed with a trusted certificate.
+
+
+      Vendor-Signed Driver Enforcement:
+
+
+      - Implementation: Enable kernel-mode code signing to ensure that only drivers
+      signed by trusted vendors can be loaded.
+
+      - Use Case: A malicious driver attempting to modify system memory fails to load
+      because it lacks a valid signature.
+
+
+      Certificate Revocation Management:
+
+
+      - Implementation: Use Online Certificate Status Protocol (OCSP) or Certificate
+      Revocation Lists (CRLs) to block certificates associated with compromised or
+      deprecated code.
+
+      - Use Case: A compromised certificate used to sign a malicious update is revoked,
+      preventing further execution of the software.
+
+
+      Third-Party Software Verification:
+
+
+      - Implementation: Require software from external vendors to be signed with valid
+      certificates before deployment.
+
+      - Use Case: An organization only deploys signed and verified third-party software
+      to prevent supply chain attacks.
+
+
+      Script Integrity in CI/CD Pipelines:
+
+
+      - Implementation: Integrate code signing into CI/CD pipelines to sign and verify
+      code artifacts before production release.
+
+      - Use Case: A software company ensures that all production builds are signed,
+      preventing tampered builds from reaching customers.
+
+
+      **Key Components of Code Signing**
+
+
+      - Digital Signature Verification: Verifies the authenticity of code by ensuring
+      it was signed by a trusted entity.
+
+      - Certificate Management: Uses Public Key Infrastructure (PKI) to manage signing
+      certificates and revocation lists.
+
+      - Enforced Policy for Unsigned Code: Prevents the execution of unsigned or untrusted
+      binaries and scripts.
+
+      - Hash Integrity Check: Confirms that code has not been altered since signing
+      by comparing cryptographic hashes.
+
+      '
     link: https://attack.mitre.org/mitigations/M1045
   - id: M1043
     name: Credential Access Protection
-    description: Use capabilities to prevent successful credential access by adversaries;
-      including blocking forms of credential dumping.
+    description: 'Credential Access Protection focuses on implementing measures to
+      prevent adversaries from obtaining credentials, such as passwords, hashes, tokens,
+      or keys, that could be used for unauthorized access. This involves restricting
+      access to credential storage mechanisms, hardening configurations to block credential
+      dumping methods, and using monitoring tools to detect suspicious credential-related
+      activity. This mitigation can be implemented through the following measures:
+
+
+      Restrict Access to Credential Storage:
+
+
+      - Use Case: Prevent adversaries from accessing the SAM (Security Account Manager)
+      database on Windows systems.
+
+      - Implementation: Enforce least privilege principles and restrict administrative
+      access to credential stores such as `C:\Windows\System32\config\SAM`.
+
+
+      Use Credential Guard:
+
+
+      - Use Case: Isolate LSASS (Local Security Authority Subsystem Service) memory
+      to prevent credential dumping.
+
+      - Implementation: Enable Windows Defender Credential Guard on enterprise endpoints
+      to isolate secrets and protect them from unauthorized access.
+
+
+      Monitor for Credential Dumping Tools:
+
+
+      - Use Case: Detect and block known tools like Mimikatz or Windows Credential
+      Editor.
+
+      - Implementation: Flag suspicious process behavior related to credential dumping.
+
+
+      Disable Cached Credentials:
+
+
+      - Use Case: Prevent adversaries from exploiting cached credentials on endpoints.
+
+      - Implementation: Configure group policy to reduce or eliminate the use of cached
+      credentials (e.g., set Interactive logon: Number of previous logons to cache
+      to 0).
+
+
+      Enable Secure Boot and Memory Protections:
+
+
+      - Use Case: Prevent memory-based attacks used to extract credentials.
+
+      - Implementation: Configure Secure Boot and enforce hardware-based security
+      features like DEP (Data Execution Prevention) and ASLR (Address Space Layout
+      Randomization).'
     link: https://attack.mitre.org/mitigations/M1043
   - id: M1053
     name: Data Backup
-    description: Take and store data backups from end user systems and critical servers.
-      Ensure backup and storage systems are hardened and kept separate from the corporate
-      network to prevent compromise.
+    description: 'Data Backup involves taking and securely storing backups of data
+      from end-user systems and critical servers. It ensures that data remains available
+      in the event of system compromise, ransomware attacks, or other disruptions.
+      Backup processes should include hardening backup systems, implementing secure
+      storage solutions, and keeping backups isolated from the corporate network to
+      prevent compromise during active incidents. This mitigation can be implemented
+      through the following measures:
+
+
+      Regular Backup Scheduling:
+
+      - Use Case: Ensure timely and consistent backups of critical data.
+
+      - Implementation: Schedule daily incremental backups and weekly full backups
+      for all critical servers and systems.
+
+
+      Immutable Backups:
+
+      - Use Case: Protect backups from modification or deletion, even by attackers.
+
+      - Implementation: Use write-once-read-many (WORM) storage for backups, preventing
+      ransomware from encrypting or deleting backup files.
+
+
+      Backup Encryption:
+
+      - Use Case: Protect data integrity and confidentiality during transit and storage.
+
+      - Implementation: Encrypt backups using strong encryption protocols (e.g., AES-256)
+      before storing them in local, cloud, or remote locations.
+
+
+      Offsite Backup Storage:
+
+      - Use Case: Ensure data availability during physical disasters or onsite breaches.
+
+      - Implementation: Use cloud-based solutions like AWS S3, Azure Backup, or physical
+      offsite storage to maintain a copy of critical data.
+
+
+      Backup Testing:
+
+      - Use Case: Validate backup integrity and ensure recoverability.
+
+      - Implementation: Regularly test data restoration processes to ensure that backups
+      are not corrupted and can be recovered quickly.'
     link: https://attack.mitre.org/mitigations/M1053
   - id: M1057
     name: Data Loss Prevention
-    description: 'Use a data loss prevention (DLP) strategy to categorize sensitive
-      data, identify data formats indicative of personal identifiable information
-      (PII), and restrict exfiltration of sensitive data.(Citation: PurpleSec Data
-      Loss Prevention)'
+    description: 'Data Loss Prevention (DLP) involves implementing strategies and
+      technologies to identify, categorize, monitor, and control the movement of sensitive
+      data within an organization. This includes protecting data formats indicative
+      of Personally Identifiable Information (PII), intellectual property, or financial
+      data from unauthorized access, transmission, or exfiltration. DLP solutions
+      integrate with network, endpoint, and cloud platforms to enforce security policies
+      and prevent accidental or malicious data leaks. (Citation: PurpleSec Data Loss
+      Prevention) This mitigation can be implemented through the following measures:
+
+
+      Sensitive Data Categorization:
+
+
+      - Use Case: Identify and classify data based on sensitivity (e.g., PII, financial
+      data, trade secrets).
+
+      - Implementation: Use DLP solutions to scan and tag files containing sensitive
+      information using predefined patterns, such as Social Security Numbers or credit
+      card details.
+
+
+      Exfiltration Restrictions:
+
+
+      - Use Case: Prevent unauthorized transmission of sensitive data.
+
+      - Implementation: Enforce policies to block unapproved email attachments, unauthorized
+      USB usage, or unencrypted data uploads to cloud storage.
+
+
+      Data-in-Transit Monitoring:
+
+
+      - Use Case: Detect and prevent the transmission of sensitive data over unapproved
+      channels.
+
+      - Implementation: Deploy network-based DLP tools to inspect outbound traffic
+      for sensitive content (e.g., financial records or PII) and block unapproved
+      transmissions.
+
+
+      Endpoint Data Protection:
+
+
+      - Use Case: Monitor and control sensitive data usage on endpoints.
+
+      - Implementation: Use endpoint-based DLP agents to block copy-paste actions
+      of sensitive data and unauthorized printing or file sharing.
+
+
+      Cloud Data Security:
+
+
+      - Use Case: Protect data stored in cloud platforms.
+
+      - Implementation: Integrate DLP with cloud storage platforms like Google Drive,
+      OneDrive, or AWS to monitor and restrict sensitive data sharing or downloads.'
     link: https://attack.mitre.org/mitigations/M1057
   - id: M1042
     name: Disable or Remove Feature or Program
-    description: Remove or deny access to unnecessary and potentially vulnerable software
-      to prevent abuse by adversaries.
+    description: "Disable or remove unnecessary and potentially vulnerable software,\
+      \ features, or services to reduce the attack surface and prevent abuse by adversaries.\
+      \ This involves identifying software or features that are no longer needed or\
+      \ that could be exploited and ensuring they are either removed or properly disabled.\
+      \ This mitigation can be implemented through the following measures: \n\nRemove\
+      \ Legacy Software:\n\n- Use Case: Disable or remove older versions of software\
+      \ that no longer receive updates or security patches (e.g., legacy Java, Adobe\
+      \ Flash).\n- Implementation: A company removes Flash Player from all employee\
+      \ systems after it has reached its end-of-life date.\n\nDisable Unused Features:\n\
+      \n- Use Case: Turn off unnecessary operating system features like SMBv1, Telnet,\
+      \ or RDP if they are not required.\n- Implementation: Disable SMBv1 in a Windows\
+      \ environment to mitigate vulnerabilities like EternalBlue.\n\nControl Applications\
+      \ Installed by Users:\n\n- Use Case: Prevent users from installing unauthorized\
+      \ software via group policies or other management tools.\n- Implementation:\
+      \ Block user installations of unauthorized file-sharing applications (e.g.,\
+      \ BitTorrent clients) in an enterprise environment.\n\nRemove Unnecessary Services:\n\
+      \n- Use Case: Identify and disable unnecessary default services running on endpoints,\
+      \ servers, or network devices.\n- Implementation: Disable unused administrative\
+      \ shares (e.g., C$, ADMIN$) on workstations.\n\nRestrict Add-ons and Plugins:\n\
+      \n- Use Case: Remove or disable browser plugins and add-ons that are not needed\
+      \ for business purposes.\n- Implementation: Disable Java and ActiveX plugins\
+      \ in web browsers to prevent drive-by attacks.\n\n"
     link: https://attack.mitre.org/mitigations/M1042
   - id: M1055
     name: Do Not Mitigate
-    description: This category is to associate techniques that mitigation might increase
-      risk of compromise and therefore mitigation is not recommended.
+    description: 'The Do Not Mitigate category highlights scenarios where attempting
+      to mitigate a specific technique may inadvertently increase the organization''s
+      security risk or operational instability. This could happen due to the complexity
+      of the system, the integration of critical processes, or the potential for introducing
+      new vulnerabilities. Instead of direct mitigation, these situations may call
+      for alternative strategies such as detection, monitoring, or response. The Do
+      Not Mitigate category underscores the importance of assessing the trade-offs
+      between mitigation efforts and overall system integrity. This mitigation can
+      be implemented through the following measures:
+
+
+      Complex Systems Where Mitigation is Risky:
+
+
+      - Interpretation: In certain systems, direct mitigation could introduce new
+      risks, especially if the system is highly interconnected or complex, such as
+      in legacy industrial control systems (ICS). Patching or modifying these systems
+      could result in unplanned downtime, disruptions, or even safety risks.
+
+      - Use Case: In a power grid control system, attempting to patch or disable certain
+      services related to device communications might disrupt critical operations,
+      leading to unintended service outages.
+
+
+      Risk of Reducing Security Coverage:
+
+
+      - Interpretation: In some cases, mitigating a technique might reduce the visibility
+      or effectiveness of other security controls, limiting an organization’s ability
+      to detect broader attacks.
+
+      - Use Case: Disabling script execution on a web server to mitigate potential
+      PowerShell-based attacks could interfere with legitimate administrative operations
+      that rely on scripting, while attackers may still find alternate ways to execute
+      code.
+
+
+      Introduction of New Vulnerabilities:
+
+
+      - Interpretation: In highly sensitive or tightly controlled environments, implementing
+      certain mitigations might create vulnerabilities in other parts of the system.
+      For instance, disabling default security mechanisms in an attempt to resolve
+      compatibility issues may open the system to exploitation.
+
+      - Use Case: Disabling certificate validation to resolve internal communication
+      issues in a secure environment could lead to man-in-the-middle attacks, creating
+      a greater vulnerability than the original problem.
+
+
+      Negative Impact on Performance and Availability:
+
+
+      - Interpretation: Mitigations that involve removing or restricting system functionalities
+      can have unintended consequences for system performance and availability. Some
+      mitigations, while effective at blocking certain attacks, may introduce performance
+      bottlenecks or compromise essential operations.
+
+      - Use Case: Implementing high levels of encryption to mitigate data theft might
+      result in significant performance degradation in systems handling large volumes
+      of real-time transactions.'
     link: https://attack.mitre.org/mitigations/M1055
   - id: M1041
     name: Encrypt Sensitive Information
-    description: Protect sensitive information with strong encryption.
+    description: 'Protect sensitive information at rest, in transit, and during processing
+      by using strong encryption algorithms. Encryption ensures the confidentiality
+      and integrity of data, preventing unauthorized access or tampering. This mitigation
+      can be implemented through the following measures:
+
+
+      Encrypt Data at Rest:
+
+
+      - Use Case: Use full-disk encryption or file-level encryption to secure sensitive
+      data stored on devices.
+
+      - Implementation: Implement BitLocker for Windows systems or FileVault for macOS
+      devices to encrypt hard drives.
+
+
+      Encrypt Data in Transit:
+
+
+      - Use Case: Use secure communication protocols (e.g., TLS, HTTPS) to encrypt
+      sensitive data as it travels over networks.
+
+      - Implementation: Enable HTTPS for all web applications and configure mail servers
+      to enforce STARTTLS for email encryption.
+
+
+      Encrypt Backups:
+
+
+      - Use Case: Ensure that backup data is encrypted both during storage and transfer
+      to prevent unauthorized access.
+
+      - Implementation: Encrypt cloud backups using AES-256 before uploading them
+      to Amazon S3 or Google Cloud.
+
+
+      Encrypt Application Secrets:
+
+
+      - Use Case: Store sensitive credentials, API keys, and configuration files in
+      encrypted vaults.
+
+      - Implementation: Use HashiCorp Vault or AWS Secrets Manager to manage and encrypt
+      secrets.
+
+
+      Database Encryption:
+
+
+      - Use Case: Enable Transparent Data Encryption (TDE) or column-level encryption
+      in database management systems.
+
+      - Implementation: Use MySQL’s built-in encryption features to encrypt sensitive
+      database fields such as social security numbers.'
     link: https://attack.mitre.org/mitigations/M1041
   - id: M1039
     name: Environment Variable Permissions
-    description: Prevent modification of environment variables by unauthorized users
-      and groups.
+    description: 'Restrict the modification of environment variables to authorized
+      users and processes by enforcing strict permissions and policies. This ensures
+      the integrity of environment variables, preventing adversaries from abusing
+      or altering them for malicious purposes. This mitigation can be implemented
+      through the following measures:
+
+
+      Restrict Write Access:
+
+
+      - Use Case: Set file system-level permissions to restrict access to environment
+      variable configuration files (e.g., `.bashrc`, `.bash_profile`, `.zshrc`, `systemd`
+      service files).
+
+      - Implementation: Configure `/etc/environment` or `/etc/profile` on Linux systems
+      to only allow root or administrators to modify the file.
+
+
+      Secure Access Controls:
+
+
+      - Use Case: Limit access to environment variable settings in application deployment
+      tools or CI/CD pipelines to authorized personnel.
+
+      - Implementation: Use role-based access control (RBAC) in tools like Jenkins
+      or GitLab to ensure only specific users can modify environment variables.
+
+
+      Restrict Process Scope:
+
+
+      - Use Case: Configure policies to ensure environment variables are only accessible
+      to the processes they are explicitly intended for.
+
+      - Implementation: Use containerized environments like Docker to isolate environment
+      variables to specific containers and ensure they are not inherited by other
+      processes.
+
+
+      Audit Environment Variable Changes:
+
+
+      - Use Case: Enable logging for changes to critical environment variables.
+
+      - Implementation: Use `auditd` on Linux to monitor changes to files like `/etc/environment`
+      or application-specific environment files.'
     link: https://attack.mitre.org/mitigations/M1039
   - id: M1038
     name: Execution Prevention
-    description: Block execution of code on a system through application control,
-      and/or script blocking.
+    description: "Prevent the execution of unauthorized or malicious code on systems\
+      \ by implementing application control, script blocking, and other execution\
+      \ prevention mechanisms. This ensures that only trusted and authorized code\
+      \ is executed, reducing the risk of malware and unauthorized actions. This mitigation\
+      \ can be implemented through the following measures:\n\nApplication Control:\n\
+      \n- Use Case: Use tools like AppLocker or Windows Defender Application Control\
+      \ (WDAC) to create whitelists of authorized applications and block unauthorized\
+      \ ones. On Linux, use tools like SELinux or AppArmor to define mandatory access\
+      \ control policies for application execution.\n- Implementation: Allow only\
+      \ digitally signed or pre-approved applications to execute on servers and endpoints.\
+      \ (e.g., `New-AppLockerPolicy -PolicyType Enforced -FilePath \"C:\\Policies\\\
+      AppLocker.xml\"`) \n\n\nScript Blocking:\n\n- Use Case: Use script control mechanisms\
+      \ to block unauthorized execution of scripts, such as PowerShell or JavaScript.\
+      \ Web Browsers: Use browser extensions or settings to block JavaScript execution\
+      \ from untrusted sources.\n- Implementation: Configure PowerShell to enforce\
+      \ Constrained Language Mode for non-administrator users. (e.g., `Set-ExecutionPolicy\
+      \ AllSigned`) \n\nExecutable Blocking:\n\n- Use Case: Prevent execution of binaries\
+      \ from suspicious locations, such as `%TEMP%` or `%APPDATA%` directories.\n\
+      - Implementation: Block execution of `.exe`, `.bat`, or `.ps1` files from user-writable\
+      \ directories.\n\nDynamic Analysis Prevention:\n- Use Case: Use behavior-based\
+      \ execution prevention tools to identify and block malicious activity in real\
+      \ time.\n- Implemenation: Employ EDR solutions that analyze runtime behavior\
+      \ and block suspicious code execution."
     link: https://attack.mitre.org/mitigations/M1038
   - id: M1050
     name: Exploit Protection
-    description: Use capabilities to detect and block conditions that may lead to
-      or be indicative of a software exploit occurring.
+    description: 'Deploy capabilities that detect, block, and mitigate conditions
+      indicative of software exploits. These capabilities aim to prevent exploitation
+      by addressing vulnerabilities, monitoring anomalous behaviors, and applying
+      exploit-mitigation techniques to harden systems and software.
+
+
+      Operating System Exploit Protections:
+
+
+      - Use Case: Enable built-in exploit protection features provided by modern operating
+      systems, such as Microsoft''s Exploit Protection, which includes techniques
+      like Data Execution Prevention (DEP), Address Space Layout Randomization (ASLR),
+      and Control Flow Guard (CFG).
+
+      - Implementation: Enforce DEP for all programs and enable ASLR to randomize
+      memory addresses used by system and application processes. Windows: Configure
+      Exploit Protection through the Windows Security app or deploy settings via Group
+      Policy.
+
+      `ExploitProtectionExportSettings.exe -path "exploit_settings.xml"`
+
+      Linux: Use Kernel-level hardening features like SELinux, AppArmor, or GRSEC
+      to enforce memory protections and prevent exploits.
+
+
+      Third-Party Endpoint Security:
+
+
+      - Use Case: Use endpoint protection tools with built-in exploit protection,
+      such as enhanced memory protection, behavior monitoring, and real-time exploit
+      detection.
+
+      - Implementation: Deploy tools to detect and block exploitation attempts targeting
+      unpatched software.
+
+
+      Virtual Patching:
+
+      - Use Case: Use tools to implement virtual patches that mitigate vulnerabilities
+      in applications or operating systems until official patches are applied.
+
+      - Implementation: Use Intrusion Prevention System (IPS) to block exploitation
+      attempts on known vulnerabilities in outdated applications.
+
+
+      Hardening Application Configurations:
+
+
+      - Use Case: Disable risky application features that can be exploited, such as
+      macros in Microsoft Office or JScript in Internet Explorer.
+
+      - Implementation: Configure Microsoft Office Group Policies to disable execution
+      of macros in downloaded files.'
     link: https://attack.mitre.org/mitigations/M1050
   - id: M1037
     name: Filter Network Traffic
-    description: Use network appliances to filter ingress or egress traffic and perform
-      protocol-based filtering. Configure software on endpoints to filter network
-      traffic.
+    description: 'Employ network appliances and endpoint software to filter ingress,
+      egress, and lateral network traffic. This includes protocol-based filtering,
+      enforcing firewall rules, and blocking or restricting traffic based on predefined
+      conditions to limit adversary movement and data exfiltration. This mitigation
+      can be implemented through the following measures:
+
+
+      Ingress Traffic Filtering:
+
+
+      - Use Case: Configure network firewalls to allow traffic only from authorized
+      IP addresses to public-facing servers.
+
+      - Implementation: Limit SSH (port 22) and RDP (port 3389) traffic to specific
+      IP ranges.
+
+
+      Egress Traffic Filtering:
+
+
+      - Use Case: Use firewalls or endpoint security software to block unauthorized
+      outbound traffic to prevent data exfiltration and command-and-control (C2) communications.
+
+      - Implementation: Block outbound traffic to known malicious IPs or regions where
+      communication is unexpected.
+
+
+      Protocol-Based Filtering:
+
+
+      - Use Case: Restrict the use of specific protocols that are commonly abused
+      by adversaries, such as SMB, RPC, or Telnet, based on business needs.
+
+      - Implementation: Disable SMBv1 on endpoints to prevent exploits like EternalBlue.
+
+
+      Network Segmentation:
+
+
+      - Use Case: Create network segments for critical systems and restrict communication
+      between segments unless explicitly authorized.
+
+      - Implementation: Implement VLANs to isolate IoT devices or guest networks from
+      core business systems.
+
+
+      Application Layer Filtering:
+
+
+      - Use Case: Use proxy servers or Web Application Firewalls (WAFs) to inspect
+      and block malicious HTTP/S traffic.
+
+      - Implementation: Configure a WAF to block SQL injection attempts or other web
+      application exploitation techniques.'
     link: https://attack.mitre.org/mitigations/M1037
   - id: M1035
     name: Limit Access to Resource Over Network
-    description: Prevent access to file shares, remote access to systems, unnecessary
-      services. Mechanisms to limit access may include use of network concentrators,
-      RDP gateways, etc.
+    description: 'Restrict access to network resources, such as file shares, remote
+      systems, and services, to only those users, accounts, or systems with a legitimate
+      business requirement. This can include employing technologies like network concentrators,
+      RDP gateways, and zero-trust network access (ZTNA) models, alongside hardening
+      services and protocols. This mitigation can be implemented through the following
+      measures:
+
+
+      Audit and Restrict Access:
+
+
+      - Regularly audit permissions for file shares, network services, and remote
+      access tools.
+
+      - Remove unnecessary access and enforce least privilege principles for users
+      and services.
+
+      - Use Active Directory and IAM tools to restrict access based on roles and attributes.
+
+
+      Deploy Secure Remote Access Solutions:
+
+
+      - Use RDP gateways, VPN concentrators, and ZTNA solutions to aggregate and secure
+      remote access connections.
+
+      - Configure access controls to restrict connections based on time, device, and
+      user identity.
+
+      - Enforce MFA for all remote access mechanisms.
+
+
+      Disable Unnecessary Services:
+
+
+      - Identify running services using tools like netstat (Windows/Linux) or Nmap.
+
+      - Disable unused services, such as Telnet, FTP, and legacy SMB, to reduce the
+      attack surface.
+
+      - Use firewall rules to block traffic on unused ports and protocols.
+
+
+      Network Segmentation and Isolation:
+
+
+      - Use VLANs, firewalls, or micro-segmentation to isolate critical network resources
+      from general access.
+
+      - Restrict communication between subnets to prevent lateral movement.
+
+
+      Monitor and Log Access:
+
+
+      - Monitor access attempts to file shares, RDP, and remote network resources
+      using SIEM tools.
+
+      - Enable auditing and logging for successful and failed attempts to access restricted
+      resources.
+
+
+      *Tools for Implementation*
+
+
+      File Share Management:
+
+
+      - Microsoft Active Directory Group Policies
+
+      - Samba (Linux/Unix file share management)
+
+      - AccessEnum (Windows access auditing tool)
+
+
+      Secure Remote Access:
+
+
+      - Microsoft Remote Desktop Gateway
+
+      - Apache Guacamole (open-source RDP/VNC gateway)
+
+      - Zero Trust solutions: Tailscale, Cloudflare Zero Trust
+
+
+      Service and Protocol Hardening:
+
+
+      - Nmap or Nessus for network service discovery
+
+      - Windows Group Policy Editor for disabling SMBv1, Telnet, and legacy protocols
+
+      - iptables or firewalld (Linux) for blocking unnecessary traffic
+
+
+      Network Segmentation:
+
+
+      - pfSense for open-source network isolation'
     link: https://attack.mitre.org/mitigations/M1035
   - id: M1034
     name: Limit Hardware Installation
-    description: Block users or groups from installing or using unapproved hardware
-      on systems, including USB devices.
+    description: "Prevent unauthorized users or groups from installing or using hardware,\
+      \ such as external drives, peripheral devices, or unapproved internal hardware\
+      \ components, by enforcing hardware usage policies and technical controls. This\
+      \ includes disabling USB ports, restricting driver installation, and implementing\
+      \ endpoint security tools to monitor and block unapproved devices. This mitigation\
+      \ can be implemented through the following measures:\n\nDisable USB Ports and\
+      \ Hardware Installation Policies:\n\n- Use Group Policy Objects (GPO) to disable\
+      \ USB mass storage devices:\n     - Navigate to Computer Configuration > Administrative\
+      \ Templates > System > Removable Storage Access.\n     - Deny write and read\
+      \ access to USB devices.\n- Whitelist approved devices using unique serial numbers\
+      \ via Windows Device Installation Policies.\n\nDeploy Endpoint Protection and\
+      \ Device Control Solutions:\n\n- Use tools like Microsoft Defender for Endpoint,\
+      \ Symantec Endpoint Protection, or Tanium to monitor and block unauthorized\
+      \ hardware.\n- Implement device control policies to allow specific hardware\
+      \ types (e.g., keyboards, mice) and block others.\n\nHarden BIOS/UEFI and System\
+      \ Firmware:\n\n- Set strong passwords for BIOS/UEFI access.\n- Enable Secure\
+      \ Boot to prevent rogue hardware components from loading unauthorized firmware.\n\
+      \nRestrict Peripheral Devices and Drivers:\n\n- Use Windows Device Manager Policies\
+      \ to block installation of unapproved drivers.\n- Monitor hardware installation\
+      \ attempts through endpoint monitoring tools.\n\nDisable Bluetooth and Wireless\
+      \ Hardware:\n\n- Use GPO or MDM tools to disable Bluetooth and Wi-Fi interfaces\
+      \ across systems.\n- Restrict hardware pairing to approved devices only.\n\n\
+      Logging and Monitoring:\n\n- Enable logging for hardware installation events\
+      \ in Windows Event Logs (Event ID 20001 for Device Setup Manager).\n- Use SIEM\
+      \ solutions (e.g., Splunk, Elastic Stack) to detect unauthorized hardware installation\
+      \ activities.\n\n*Tools for Implementation*\n\nUSB and Device Control:\n\n-\
+      \ Microsoft Group Policy Objects (GPO)\n- Microsoft Defender for Endpoint\n\
+      - Symantec Endpoint Protection\n- McAfee Device Control\n\nEndpoint Monitoring:\n\
+      \n- EDRs\n- OSSEC (open-source host-based IDS)\n\nHardware Whitelisting:\n\n\
+      - BitLocker for external drives (Windows)\n- Windows Device Installation Policies\n\
+      - Device Control \n\nBIOS/UEFI Security:\n\n- Secure Boot (Windows/Linux)\n\
+      Firmware management tools like Dell Command Update or HP Sure Start"
     link: https://attack.mitre.org/mitigations/M1034
   - id: M1033
     name: Limit Software Installation
-    description: Block users or groups from installing unapproved software.
+    description: 'Prevent users or groups from installing unauthorized or unapproved
+      software to reduce the risk of introducing malicious or vulnerable applications.
+      This can be achieved through allowlists, software restriction policies, endpoint
+      management tools, and least privilege access principles. This mitigation can
+      be implemented through the following measures:
+
+
+      Application Whitelisting
+
+
+      - Implement Microsoft AppLocker or Windows Defender Application Control (WDAC)
+      to create and enforce allowlists for approved software.
+
+      - Whitelist applications based on file hash, path, or digital signatures.
+
+
+      Restrict User Permissions
+
+
+      - Remove local administrator rights for all non-IT users.
+
+      - Use Role-Based Access Control (RBAC) to restrict installation permissions
+      to privileged accounts only.
+
+
+      Software Restriction Policies (SRP)
+
+
+      - Use GPO to configure SRP to deny execution of binaries from directories such
+      as `%AppData%`, `%Temp%`, and external drives.
+
+      - Restrict specific file types (`.exe`, `.bat`, `.msi`, `.js`, `.vbs`) to trusted
+      directories only.
+
+
+      Endpoint Management Solutions
+
+
+      - Deploy tools like Microsoft Intune, SCCM, or Jamf for centralized software
+      management.
+
+      - Maintain a list of approved software, versions, and updates across the enterprise.
+
+
+      Monitor Software Installation Events
+
+
+      - Enable logging of software installation events and monitor Windows Event ID
+      4688 and Event ID 11707 for software installs.
+
+      - Use SIEM or EDR tools to alert on attempts to install unapproved software.
+
+
+      Implement Software Inventory Management
+
+
+      - Use tools like OSQuery or Wazuh to scan for unauthorized software on endpoints
+      and servers.
+
+      - Conduct regular audits to detect and remove unapproved software.
+
+
+      *Tools for Implementation*
+
+
+      Application Whitelisting:
+
+
+      - Microsoft AppLocker
+
+      - Windows Defender Application Control (WDAC)
+
+
+      Endpoint Management:
+
+
+      - Microsoft Intune
+
+      - SCCM (System Center Configuration Manager)
+
+      - Jamf Pro (macOS)
+
+      - Puppet or Ansible for automation
+
+
+      Software Restriction Policies:
+
+
+      - Group Policy Object (GPO)
+
+      - Microsoft Software Restriction Policies (SRP)
+
+
+      Monitoring and Logging:
+
+
+      - Splunk
+
+      - OSQuery
+
+      - Wazuh (open-source SIEM and XDR)
+
+      - EDRs
+
+
+      Inventory Management and Auditing:
+
+
+      - OSQuery
+
+      - Wazuh'
     link: https://attack.mitre.org/mitigations/M1033
   - id: M1032
     name: Multi-factor Authentication
-    description: Use two or more pieces of evidence to authenticate to a system; such
-      as username and password in addition to a token from a physical smart card or
-      token generator.
+    description: 'Multi-Factor Authentication (MFA) enhances security by requiring
+      users to provide at least two forms of verification to prove their identity
+      before granting access. These factors typically include:
+
+
+      - *Something you know*: Passwords, PINs.
+
+      - *Something you have*: Physical tokens, smartphone authenticator apps.
+
+      - *Something you are*: Biometric data such as fingerprints, facial recognition,
+      or retinal scans.
+
+
+      Implementing MFA across all critical systems and services ensures robust protection
+      against account takeover and unauthorized access. This mitigation can be implemented
+      through the following measures:
+
+
+      Identity and Access Management (IAM):
+
+
+      - Use IAM solutions like Azure Active Directory, Okta, or AWS IAM to enforce
+      MFA policies for all user logins, especially for privileged roles.
+
+      - Enable conditional access policies to enforce MFA for risky sign-ins (e.g.,
+      unfamiliar devices, geolocations).
+
+
+      Authentication Tools and Methods:
+
+
+      - Use authenticator applications such as Google Authenticator, Microsoft Authenticator,
+      or Authy for time-based one-time passwords (TOTP).
+
+      - Deploy hardware-based tokens like YubiKey, RSA SecurID, or smart cards for
+      additional security.
+
+      - Enforce biometric authentication for compatible devices and applications.
+
+
+      Secure Legacy Systems:
+
+
+      - Integrate MFA solutions with older systems using third-party tools like Duo
+      Security or Thales SafeNet.
+
+      - Enable RADIUS/NPS servers to facilitate MFA for VPNs, RDP, and other network
+      logins.
+
+
+      Monitoring and Alerting:
+
+
+      - Use SIEM tools to monitor failed MFA attempts, login anomalies, or brute-force
+      attempts against MFA systems.
+
+      - Implement alerts for suspicious MFA activities, such as repeated failed codes
+      or new device registrations.
+
+
+      Training and Policy Enforcement:
+
+
+      - Educate employees on the importance of MFA and secure authenticator usage.
+
+      - Enforce policies that require MFA on all critical systems, especially for
+      remote access, privileged accounts, and cloud applications.'
     link: https://attack.mitre.org/mitigations/M1032
   - id: M1031
     name: Network Intrusion Prevention
@@ -150,16 +1398,111 @@ keys:
     link: https://attack.mitre.org/mitigations/M1031
   - id: M1030
     name: Network Segmentation
-    description: Architect sections of the network to isolate critical systems, functions,
-      or resources. Use physical and logical segmentation to prevent access to potentially
-      sensitive systems and information. Use a DMZ to contain any internet-facing
-      services that should not be exposed from the internal network. Configure separate
-      virtual private cloud (VPC) instances to isolate critical cloud systems.
+    description: 'Network segmentation involves dividing a network into smaller, isolated
+      segments to control and limit the flow of traffic between devices, systems,
+      and applications. By segmenting networks, organizations can reduce the attack
+      surface, restrict lateral movement by adversaries, and protect critical assets
+      from compromise.
+
+
+      Effective network segmentation leverages a combination of physical boundaries,
+      logical separation through VLANs, and access control policies enforced by network
+      appliances like firewalls, routers, and cloud-based configurations. This mitigation
+      can be implemented through the following measures:
+
+
+      Segment Critical Systems:
+
+
+      - Identify and group systems based on their function, sensitivity, and risk.
+      Examples include payment systems, HR databases, production systems, and internet-facing
+      servers.
+
+      - Use VLANs, firewalls, or routers to enforce logical separation.
+
+
+      Implement DMZ for Public-Facing Services:
+
+
+      - Host web servers, DNS servers, and email servers in a DMZ to limit their access
+      to internal systems.
+
+      - Apply strict firewall rules to filter traffic between the DMZ and internal
+      networks.
+
+
+      Use Cloud-Based Segmentation:
+
+
+      - In cloud environments, use VPCs, subnets, and security groups to isolate applications
+      and enforce traffic rules.
+
+      - Apply AWS Transit Gateway or Azure VNet peering for controlled connectivity
+      between cloud segments.
+
+
+      Apply Microsegmentation for Workloads:
+
+
+      - Use software-defined networking (SDN) tools to implement workload-level segmentation
+      and prevent lateral movement.
+
+
+      Restrict Traffic with ACLs and Firewalls:
+
+
+      - Apply Access Control Lists (ACLs) to network devices to enforce "deny by default"
+      policies.
+
+      - Use firewalls to restrict both north-south (external-internal) and east-west
+      (internal-internal) traffic.
+
+
+      Monitor and Audit Segmented Networks:
+
+
+      - Regularly review firewall rules, ACLs, and segmentation policies.
+
+      - Monitor network flows for anomalies to ensure segmentation is effective.
+
+
+      Test Segmentation Effectiveness:
+
+
+      - Perform periodic penetration tests to verify that unauthorized access is blocked
+      between network segments.'
     link: https://attack.mitre.org/mitigations/M1030
   - id: M1028
     name: Operating System Configuration
-    description: Make configuration changes related to the operating system or a common
-      feature of the operating system that result in system hardening against techniques.
+    description: "Operating System Configuration involves adjusting system settings\
+      \ and hardening the default configurations of an operating system (OS) to mitigate\
+      \ adversary exploitation and prevent abuse of system functionality. Proper OS\
+      \ configurations address security vulnerabilities, limit attack surfaces, and\
+      \ ensure robust defense against a wide range of techniques. This mitigation\
+      \ can be implemented through the following measures: \n\nDisable Unused Features:\n\
+      \n- Turn off SMBv1, LLMNR, and NetBIOS where not needed.\n- Disable remote registry\
+      \ and unnecessary services.\n\nEnforce OS-level Protections:\n\n- Enable Data\
+      \ Execution Prevention (DEP), Address Space Layout Randomization (ASLR), and\
+      \ Control Flow Guard (CFG) on Windows.\n- Use AppArmor or SELinux on Linux for\
+      \ mandatory access controls.\n\nSecure Access Settings:\n\n- Enable User Account\
+      \ Control (UAC) for Windows.\n- Restrict root/sudo access on Linux/macOS and\
+      \ enforce strong permissions using sudoers files.\n\nFile System Hardening:\n\
+      \n- Implement least-privilege access for critical files and system directories.\n\
+      - Audit permissions regularly using tools like icacls (Windows) or getfacl/chmod\
+      \ (Linux/macOS).\n\nSecure Remote Access:\n\n- Restrict RDP, SSH, and VNC to\
+      \ authorized IPs using firewall rules.\n- Enable NLA for RDP and enforce strong\
+      \ password/lockout policies.\n\nHarden Boot Configurations:\n\n- Enable Secure\
+      \ Boot and enforce UEFI/BIOS password protection.\n- Use BitLocker or LUKS to\
+      \ encrypt boot drives.\n\nRegular Audits:\n\n- Periodically audit OS configurations\
+      \ using tools like CIS Benchmarks or SCAP tools.\n\n*Tools for Implementation*\n\
+      \nWindows:\n\n- Microsoft Group Policy Objects (GPO): Centrally enforce OS security\
+      \ settings.\n- Windows Defender Exploit Guard: Built-in OS protection against\
+      \ exploits.\n- CIS-CAT Pro: Audit Windows security configurations based on CIS\
+      \ Benchmarks.\n\nLinux/macOS:\n\n- AppArmor/SELinux: Enforce mandatory access\
+      \ controls.\n- Lynis: Perform comprehensive security audits.\n- SCAP Security\
+      \ Guide: Automate configuration hardening using Security Content Automation\
+      \ Protocol.\n\nCross-Platform:\n\n- Ansible or Chef/Puppet: Automate configuration\
+      \ hardening at scale.\n- OpenSCAP: Perform compliance and configuration checks."
     link: https://attack.mitre.org/mitigations/M1028
   - id: M1060
     name: Out-of-Band Communications Channel
@@ -177,92 +1520,1121 @@ keys:
     link: https://attack.mitre.org/mitigations/M1060
   - id: M1027
     name: Password Policies
-    description: Set and enforce secure password policies for accounts.
+    description: "Set and enforce secure password policies for accounts to reduce\
+      \ the likelihood of unauthorized access. Strong password policies include enforcing\
+      \ password complexity, requiring regular password changes, and preventing password\
+      \ reuse. This mitigation can be implemented through the following measures:\n\
+      \nWindows Systems:\n\n- Use Group Policy Management Console (GPMC) to configure:\n\
+      \    - Minimum password length (e.g., 12+ characters).\n    - Password complexity\
+      \ requirements.\n    - Password history (e.g., disallow last 24 passwords).\n\
+      \    - Account lockout duration and thresholds.\n\nLinux Systems:\n\n- Configure\
+      \ Pluggable Authentication Modules (PAM):\n- Use `pam_pwquality` to enforce\
+      \ complexity and length requirements.\n- Implement `pam_tally2` or `pam_faillock`\
+      \ for account lockouts.\n- Use `pwunconv` to disable password reuse.\n\nPassword\
+      \ Managers:\n\n- Enforce usage of enterprise password managers (e.g., Bitwarden,\
+      \ 1Password, LastPass) to generate and store strong passwords.\n\nPassword Blacklisting:\n\
+      \n- Use tools like Have I Been Pwned password checks or NIST-based blacklist\
+      \ solutions to prevent users from setting compromised passwords.\n\nRegular\
+      \ Auditing:\n\n- Periodically audit password policies and account configurations\
+      \ to ensure compliance using tools like LAPS (Local Admin Password Solution)\
+      \ and vulnerability scanners.\n\n*Tools for Implementation*\n\nWindows:\n\n\
+      - Group Policy Management Console (GPMC): Enforce password policies.\n- Microsoft\
+      \ Local Administrator Password Solution (LAPS): Enforce random, unique admin\
+      \ passwords.\n\nLinux/macOS:\n\n- PAM Modules (pam_pwquality, pam_tally2, pam_faillock):\
+      \ Enforce password rules.\n- Lynis: Audit password policies and system configurations.\n\
+      \nCross-Platform:\n\n- Password Managers (Bitwarden, 1Password, KeePass): Manage\
+      \ and enforce strong passwords.\n- Have I Been Pwned API: Prevent the use of\
+      \ breached passwords.\n- NIST SP 800-63B compliant tools: Enforce password guidelines\
+      \ and blacklisting."
     link: https://attack.mitre.org/mitigations/M1027
   - id: M1056
     name: Pre-compromise
-    description: This category is used for any applicable mitigation activities that
-      apply to techniques occurring before an adversary gains Initial Access, such
-      as Reconnaissance and Resource Development techniques.
+    description: 'Pre-compromise mitigations involve proactive measures and defenses
+      implemented to prevent adversaries from successfully identifying and exploiting
+      weaknesses during the Reconnaissance and Resource Development phases of an attack.
+      These activities focus on reducing an organization''s attack surface, identify
+      adversarial preparation efforts, and increase the difficulty for attackers to
+      conduct successful operations. This mitigation can be implemented through the
+      following measures:
+
+
+      Limit Information Exposure:
+
+
+      - Regularly audit and sanitize publicly available data, including job posts,
+      websites, and social media.
+
+      - Use tools like OSINT monitoring platforms (e.g., SpiderFoot, Recon-ng) to
+      identify leaked information.
+
+
+      Protect Domain and DNS Infrastructure:
+
+
+      - Enable DNSSEC and use WHOIS privacy protection.
+
+      - Monitor for domain hijacking or lookalike domains using services like RiskIQ
+      or DomainTools.
+
+
+      External Monitoring:
+
+
+      - Use tools like Shodan, Censys to monitor your external attack surface.
+
+      - Deploy external vulnerability scanners to proactively address weaknesses.
+
+
+      Threat Intelligence:
+
+
+      - Leverage platforms like MISP, Recorded Future, or Anomali to track adversarial
+      infrastructure, tools, and activity.
+
+
+      Content and Email Protections:
+
+
+      - Use email security solutions like Proofpoint, Microsoft Defender for Office
+      365, or Mimecast.
+
+      - Enforce SPF/DKIM/DMARC policies to protect against email spoofing.
+
+
+      Training and Awareness:
+
+
+      - Educate employees on identifying phishing attempts, securing their social
+      media, and avoiding information leaks.'
     link: https://attack.mitre.org/mitigations/M1056
   - id: M1026
     name: Privileged Account Management
-    description: Manage the creation, modification, use, and permissions associated
-      to privileged accounts, including SYSTEM and root.
+    description: 'Privileged Account Management focuses on implementing policies,
+      controls, and tools to securely manage privileged accounts (e.g., SYSTEM, root,
+      or administrative accounts). This includes restricting access, limiting the
+      scope of permissions, monitoring privileged account usage, and ensuring accountability
+      through logging and auditing.This mitigation can be implemented through the
+      following measures:
+
+
+      Account Permissions and Roles:
+
+
+      - Implement RBAC and least privilege principles to allocate permissions securely.
+
+      - Use tools like Active Directory Group Policies to enforce access restrictions.
+
+
+      Credential Security:
+
+
+      - Deploy password vaulting tools like CyberArk, HashiCorp Vault, or KeePass
+      for secure storage and rotation of credentials.
+
+      - Enforce password policies for complexity, uniqueness, and expiration using
+      tools like Microsoft Group Policy Objects (GPO).
+
+
+      Multi-Factor Authentication (MFA):
+
+
+      - Enforce MFA for all privileged accounts using Duo Security, Okta, or Microsoft
+      Azure AD MFA.
+
+
+      Privileged Access Management (PAM):
+
+
+      - Use PAM solutions like CyberArk, BeyondTrust, or Thycotic to manage, monitor,
+      and audit privileged access.
+
+
+      Auditing and Monitoring:
+
+
+      - Integrate activity monitoring into your SIEM (e.g., Splunk or QRadar) to detect
+      and alert on anomalous privileged account usage.
+
+
+      Just-In-Time Access:
+
+
+      - Deploy JIT solutions like Azure Privileged Identity Management (PIM) or configure
+      ephemeral roles in AWS and GCP to grant time-limited elevated permissions.
+
+
+      *Tools for Implementation*
+
+
+      Privileged Access Management (PAM):
+
+
+      - CyberArk, BeyondTrust, Thycotic, HashiCorp Vault.
+
+
+      Credential Management:
+
+
+      - Microsoft LAPS (Local Admin Password Solution), Password Safe, HashiCorp Vault,
+      KeePass.
+
+
+      Multi-Factor Authentication:
+
+
+      - Duo Security, Okta, Microsoft Azure MFA, Google Authenticator.
+
+
+      Linux Privilege Management:
+
+
+      - sudo configuration, SELinux, AppArmor.
+
+
+      Just-In-Time Access:
+
+
+      - Azure Privileged Identity Management (PIM), AWS IAM Roles with session constraints,
+      GCP Identity-Aware Proxy.'
     link: https://attack.mitre.org/mitigations/M1026
   - id: M1025
     name: Privileged Process Integrity
-    description: Protect processes with high privileges that can be used to interact
-      with critical system components through use of protected process light, anti-process
-      injection defenses, or other process integrity enforcement measures.
+    description: 'Privileged Process Integrity focuses on defending highly privileged
+      processes (e.g., system services, antivirus, or authentication processes) from
+      tampering, injection, or compromise by adversaries. These processes often interact
+      with critical components, making them prime targets for techniques like code
+      injection, privilege escalation, and process manipulation. This mitigation can
+      be implemented through the following measures:
+
+
+      Protected Process Mechanisms:
+
+
+      - Enable RunAsPPL on Windows systems to protect LSASS and other critical processes.
+
+      - Use registry modifications to enforce protected process settings: `HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Lsa\RunAsPPL`
+
+
+      Anti-Injection and Memory Protection:
+
+
+      - Enable Control Flow Guard (CFG), DEP, and ASLR to protect against process
+      memory tampering.
+
+      - Deploy endpoint protection tools that actively block process injection attempts.
+
+
+      Code Signing Validation:
+
+
+      - Implement policies for Windows Defender Application Control (WDAC) or AppLocker
+      to enforce execution of signed binaries.
+
+      - Ensure critical processes are signed with valid certificates.
+
+
+      Access Controls:
+
+
+      - Use DACLs and MIC to limit which users and processes can interact with privileged
+      processes.
+
+      - Disable unnecessary debugging capabilities for high-privileged processes.
+
+
+      Kernel-Level Protections:
+
+
+      - Ensure Kernel Patch Protection (PatchGuard) is enabled on Windows systems.
+
+      - Leverage SELinux or AppArmor on Linux to enforce kernel-level security policies.
+
+
+      *Tools for Implementation*
+
+
+      Protected Process Light (PPL):
+
+
+      - RunAsPPL (Windows)
+
+      - Windows Defender Credential Guard
+
+
+      Code Integrity and Signing:
+
+
+      - Windows Defender Application Control (WDAC)
+
+      - AppLocker
+
+      - SELinux/AppArmor (Linux)
+
+
+      Memory Protection:
+
+
+      - Control Flow Guard (CFG), Data Execution Prevention (DEP), ASLR
+
+
+      Process Isolation/Sandboxing:
+
+
+      - Firejail (Linux Sandbox)
+
+      - Windows Sandbox
+
+      - QEMU/KVM-based isolation
+
+
+      Kernel Protection:
+
+
+      - PatchGuard (Windows Kernel Patch Protection)
+
+      - SELinux (Mandatory Access Control for Linux)
+
+      - AppArmor'
     link: https://attack.mitre.org/mitigations/M1025
   - id: M1029
     name: Remote Data Storage
-    description: Use remote security log and sensitive file storage where access can
-      be controlled better to prevent exposure of intrusion detection log data or
-      sensitive information.
+    description: "Remote Data Storage focuses on moving critical data, such as security\
+      \ logs and sensitive files, to secure, off-host locations to minimize unauthorized\
+      \ access, tampering, or destruction by adversaries. By leveraging remote storage\
+      \ solutions, organizations enhance the protection of forensic evidence, sensitive\
+      \ information, and monitoring data. This mitigation can be implemented through\
+      \ the following measures:\n\nCentralized Log Management:\n\n- Configure endpoints\
+      \ to forward security logs to a centralized log collector or SIEM.\n- Use tools\
+      \ like Splunk Graylog, or Security Onion to aggregate and store logs.\n- Example\
+      \ command (Linux): `sudo auditd | tee /var/log/audit/audit.log | nc <remote-log-server>\
+      \ 514`\n\nRemote File Storage Solutions:\n\n- Utilize cloud storage solutions\
+      \ like AWS S3, Google Cloud Storage, or Azure Blob Storage for sensitive data.\n\
+      - Ensure proper encryption at rest and access control policies (IAM roles, ACLs).\n\
+      \nIntrusion Detection Log Forwarding:\n\n- Forward logs from IDS/IPS systems\
+      \ (e.g., Zeek/Suricata) to a remote security information system.\n- Example\
+      \ for Suricata log forwarding:\n`outputs:\n  - type: syslog\n    protocol: tls\n\
+      \    address: <remote-syslog-server>`\n\nImmutable Backup Configurations:\n\n\
+      - Enable immutable storage settings for backups to prevent adversaries from\
+      \ modifying or deleting data.\n- Example: AWS S3 Object Lock.\n\nData Encryption:\n\
+      \n- Ensure encryption for sensitive data using AES-256 at rest and TLS 1.2+\
+      \ for data in transit.\nTools: OpenSSL, BitLocker, LUKS for Linux."
     link: https://attack.mitre.org/mitigations/M1029
   - id: M1022
     name: Restrict File and Directory Permissions
-    description: Restrict access by setting directory and file permissions that are
-      not specific to users or privileged accounts.
+    description: 'Restricting file and directory permissions involves setting access
+      controls at the file system level to limit which users, groups, or processes
+      can read, write, or execute files. By configuring permissions appropriately,
+      organizations can reduce the attack surface for adversaries seeking to access
+      sensitive data, plant malicious code, or tamper with system files.
+
+
+      Enforce Least Privilege Permissions:
+
+
+      - Remove unnecessary write permissions on sensitive files and directories.
+
+      - Use file ownership and groups to control access for specific roles.
+
+
+      Example (Windows): Right-click the shared folder → Properties → Security tab
+      → Adjust permissions for NTFS ACLs.
+
+
+      Harden File Shares:
+
+
+      - Disable anonymous access to shared folders.
+
+      - Enforce NTFS permissions for shared folders on Windows.
+
+
+      Example: Set permissions to restrict write access to critical files, such as
+      system executables (e.g., `/bin` or `/sbin` on Linux). Use tools like `chown`
+      and `chmod` to assign file ownership and limit access.
+
+
+      On Linux, apply:
+
+      `chmod 750 /etc/sensitive.conf`
+
+      `chown root:admin /etc/sensitive.conf`
+
+
+      File Integrity Monitoring (FIM):
+
+
+      - Use tools like Tripwire, Wazuh, or OSSEC to monitor changes to critical file
+      permissions.
+
+
+      Audit File System Access:
+
+
+      - Enable auditing to track permission changes or unauthorized access attempts.
+
+      - Use auditd (Linux) or Event Viewer (Windows) to log activities.
+
+
+      Restrict Startup Directories:
+
+
+      - Configure permissions to prevent unauthorized writes to directories like `C:\ProgramData\Microsoft\Windows\Start
+      Menu`.
+
+
+      Example: Restrict write access to critical directories like `/etc/`, `/usr/local/`,
+      and Windows directories such as `C:\Windows\System32`.
+
+
+      - On Windows, use icacls to modify permissions: `icacls "C:\Windows\System32"
+      /inheritance:r /grant:r SYSTEM:(OI)(CI)F`
+
+      - On Linux, monitor permissions using tools like `lsattr` or `auditd`.'
     link: https://attack.mitre.org/mitigations/M1022
   - id: M1044
     name: Restrict Library Loading
-    description: Prevent abuse of library loading mechanisms in the operating system
-      and software to load untrusted code by configuring appropriate library loading
-      mechanisms and investigating potential vulnerable software.
+    description: "Restricting library loading involves implementing security controls\
+      \ to ensure that only trusted and verified libraries (DLLs, shared objects,\
+      \ etc.) are loaded into processes. Adversaries often abuse Dynamic-Link Library\
+      \ (DLL) Injection, DLL Search Order Hijacking, or LD_PRELOAD mechanisms to execute\
+      \ malicious code by forcing the operating system to load untrusted libraries.\
+      \ This mitigation can be implemented through the following measures: \n\nEnforce\
+      \ Safe Library Loading Practices:\n\n- Enable `SafeDLLSearchMode` on Windows.\n\
+      - Restrict `LD_PRELOAD` and `LD_LIBRARY_PATH` usage on Linux systems.\n\nCode\
+      \ Signing Enforcement:\n\n- Require digital signatures for all libraries loaded\
+      \ into processes.\n- Use tools like Signtool, and WDAC to enforce signed DLL\
+      \ execution.\n\nEnvironment Hardening:\n\n- Secure library paths and directories\
+      \ to prevent adversaries from placing rogue libraries.\n- Monitor user-writable\
+      \ directories and system configurations for unauthorized changes.\n\nAudit and\
+      \ Monitor Library Loading:\n\n- Enable `Sysmon` on Windows to monitor for suspicious\
+      \ library loads.\n- Use `auditd` on Linux to monitor shared library paths and\
+      \ configuration file changes.\n\nUse Application Control Solutions:\n\n- Implement\
+      \ AppLocker, WDAC, or SELinux to allow only trusted libraries.\n\n*Tools for\
+      \ Implementation*\n\nWindows-Specific Tools:\n\n- AppLocker: Application whitelisting\
+      \ for DLLs.\n- Windows Defender Application Control (WDAC): Restrict unauthorized\
+      \ library execution.\n- Signtool: Verify and enforce code signing.\n- Sysmon:\
+      \ Monitor DLL load events (Event ID 7).\n\nLinux-Specific Tools:\n\n- auditd:\
+      \ Monitor changes to library paths and critical files.\n- SELinux/AppArmor:\
+      \ Define policies to restrict library loading.\n- ldconfig and chattr: Secure\
+      \ LD configuration files and prevent unauthorized modifications.\n\nCross-Platform\
+      \ Solutions:\n\n- Wazuh or OSSEC: File integrity monitoring for library changes.\n\
+      - Tripwire: Detect and alert on unauthorized library modifications."
     link: https://attack.mitre.org/mitigations/M1044
   - id: M1024
     name: Restrict Registry Permissions
-    description: Restrict the ability to modify certain hives or keys in the Windows
-      Registry.
+    description: "Restricting registry permissions involves configuring access control\
+      \ settings for sensitive registry keys and hives to ensure that only authorized\
+      \ users or processes can make modifications. By limiting access, organizations\
+      \ can prevent unauthorized changes that adversaries might use for persistence,\
+      \ privilege escalation, or defense evasion. This mitigation can be implemented\
+      \ through the following measures:\n\nReview and Adjust Permissions on Critical\
+      \ Keys\n\n- Regularly review permissions on keys such as `Run`, `RunOnce`, and\
+      \ `Services` to ensure only authorized users have write access.\n- Use tools\
+      \ like `icacls` or `PowerShell` to automate permission adjustments.\n\nEnable\
+      \ Registry Auditing\n\n- Enable auditing on sensitive keys to log access attempts.\n\
+      - Use Event Viewer or SIEM solutions to analyze logs and detect suspicious activity.\n\
+      - Example Audit Policy: `auditpol /set /subcategory:\"Registry\" /success:enable\
+      \ /failure:enable`\n\nProtect Credential-Related Hives\n\n- Limit access to\
+      \ hives like `SAM`,`SECURITY`, and `SYSTEM` to prevent credential dumping or\
+      \ other unauthorized access.\n- Use LSA Protection to add an additional security\
+      \ layer for credential storage.\n\nRestrict Registry Editor Usage\n\n- Use Group\
+      \ Policy to restrict access to regedit.exe for non-administrative users.\n-\
+      \ Block execution of registry editing tools on endpoints where they are unnecessary.\n\
+      \nDeploy Baseline Configuration Tools\n\n- Use tools like Microsoft Security\
+      \ Compliance Toolkit or CIS Benchmarks to apply and maintain secure registry\
+      \ configurations.\n\n*Tools for Implementation* \n\nRegistry Permission Tools:\n\
+      \n- Registry Editor (regedit): Built-in tool to manage registry permissions.\n\
+      - PowerShell: Automate permissions and manage keys. `Set-ItemProperty -Path\
+      \ \"HKLM:\\Software\\Microsoft\\Windows\\CurrentVersion\\Run\" -Name \"KeyName\"\
+      \ -Value \"Value\"`\n- icacls: Command-line tool to modify ACLs.\n\nMonitoring\
+      \ Tools:\n\n- Sysmon: Monitor and log registry events.\n- Event Viewer: View\
+      \ registry access logs.\n\nPolicy Management Tools:\n\n- Group Policy Management\
+      \ Console (GPMC): Enforce registry permissions via GPOs.\n- Microsoft Endpoint\
+      \ Manager: Deploy configuration baselines for registry permissions."
     link: https://attack.mitre.org/mitigations/M1024
   - id: M1021
     name: Restrict Web-Based Content
-    description: Restrict use of certain websites, block downloads/attachments, block
-      Javascript, restrict browser extensions, etc.
+    description: 'Restricting web-based content involves enforcing policies and technologies
+      that limit access to potentially malicious websites, unsafe downloads, and unauthorized
+      browser behaviors. This can include URL filtering, download restrictions, script
+      blocking, and extension control to protect against exploitation, phishing, and
+      malware delivery. This mitigation can be implemented through the following measures:
+
+
+      Deploy Web Proxy Filtering:
+
+
+      - Use solutions to filter web traffic based on categories, reputation, and content
+      types.
+
+      - Enforce policies that block unsafe websites or file types at the gateway level.
+
+
+      Enable DNS-Based Filtering:
+
+
+      - Implement tools to restrict access to domains associated with malware or phishing
+      campaigns.
+
+      - Use public DNS filtering services to enhance protection.
+
+
+      Enforce Content Security Policies (CSP):
+
+
+      - Configure CSP headers on internal and external web applications to restrict
+      script execution, iframe embedding, and cross-origin requests.
+
+
+      Control Browser Features:
+
+
+      - Disable unapproved browser features like automatic downloads, developer tools,
+      or unsafe scripting.
+
+      - Enforce policies through tools like Group Policy Management to control browser
+      settings.
+
+
+      Monitor and Alert on Web-Based Threats:
+
+
+      - Use SIEM tools to collect and analyze web proxy logs for signs of anomalous
+      or malicious activity.
+
+      - Configure alerts for access attempts to blocked domains or repeated file download
+      failures.'
     link: https://attack.mitre.org/mitigations/M1021
   - id: M1020
     name: SSL/TLS Inspection
-    description: Break and inspect SSL/TLS sessions to look at encrypted web traffic
-      for adversary activity.
+    description: 'SSL/TLS inspection involves decrypting encrypted network traffic
+      to examine its content for signs of malicious activity. This capability is crucial
+      for detecting threats that use encryption to evade detection, such as phishing,
+      malware, or data exfiltration. After inspection, the traffic is re-encrypted
+      and forwarded to its destination. This mitigation can be implemented through
+      the following measures:
+
+
+      Deploy SSL/TLS Inspection Appliances:
+
+
+      - Implement SSL/TLS inspection solutions to decrypt and inspect encrypted traffic.
+
+      - Ensure appliances are placed at critical network choke points for maximum
+      coverage.
+
+
+      Configure Decryption Policies:
+
+
+      - Define rules to decrypt traffic for specific applications, ports, or domains.
+
+      - Avoid decrypting sensitive or privacy-related traffic, such as financial or
+      healthcare websites, to comply with regulations.
+
+
+      Integrate Threat Intelligence:
+
+
+      - Use threat intelligence feeds to correlate inspected traffic with known indicators
+      of compromise (IOCs).
+
+
+      Integrate with Security Tools:
+
+
+      - Combine SSL/TLS inspection with SIEM and NDR tools to analyze decrypted traffic
+      and generate alerts for suspicious activity.
+
+      - Example Tools: Splunk, Darktrace
+
+
+      Implement Certificate Management:
+
+
+      - Use trusted internal or third-party certificates for traffic re-encryption
+      after inspection.
+
+      - Regularly update certificate authorities (CAs) to ensure secure re-encryption.
+
+
+      Monitor and Tune:
+
+
+      - Continuously monitor SSL/TLS inspection logs for anomalies and fine-tune policies
+      to reduce false positives.'
     link: https://attack.mitre.org/mitigations/M1020
   - id: M1054
     name: Software Configuration
-    description: Implement configuration changes to software (other than the operating
-      system) to mitigate security risks associated to how the software operates.
+    description: 'Software configuration refers to making security-focused adjustments
+      to the settings of applications, middleware, databases, or other software to
+      mitigate potential threats. These changes help reduce the attack surface, enforce
+      best practices, and protect sensitive data. This mitigation can be implemented
+      through the following measures:
+
+
+      Conduct a Security Review of Application Settings:
+
+
+      - Review the software documentation to identify recommended security configurations.
+
+      - Compare default settings against organizational policies and compliance requirements.
+
+
+      Implement Access Controls and Permissions:
+
+
+      - Restrict access to sensitive features or data within the software.
+
+      - Enforce least privilege principles for all roles and accounts interacting
+      with the software.
+
+
+      Enable Logging and Monitoring:
+
+
+      - Configure detailed logging for key application events such as authentication
+      failures, configuration changes, or unusual activity.
+
+      - Integrate logs with a centralized monitoring solution, such as a SIEM.
+
+
+      Update and Patch Software Regularly:
+
+
+      - Ensure the software is kept up-to-date with the latest security patches to
+      address known vulnerabilities.
+
+      - Use automated patch management tools to streamline the update process.
+
+
+      Disable Unnecessary Features or Services:
+
+
+      - Turn off unused functionality or components that could introduce vulnerabilities,
+      such as debugging interfaces or deprecated APIs.
+
+
+      Test Configuration Changes:
+
+
+      - Perform configuration changes in a staging environment before applying them
+      in production.
+
+      - Conduct regular audits to ensure that settings remain aligned with security
+      policies.
+
+
+      *Tools for Implementation*
+
+
+      Configuration Management Tools:
+
+
+      - Ansible: Automates configuration changes across multiple applications and
+      environments.
+
+      - Chef: Ensures consistent application settings through code-based configuration
+      management.
+
+      - Puppet: Automates software configurations and audits changes for compliance.
+
+
+      Security Benchmarking Tools:
+
+
+      - CIS-CAT: Provides benchmarks and audits for secure software configurations.
+
+      - Aqua Security Trivy: Scans containerized applications for configuration issues.
+
+
+      Vulnerability Management Solutions:
+
+
+      - Nessus: Identifies misconfigurations and suggests corrective actions.
+
+
+      Logging and Monitoring Tools:
+
+
+      - Splunk: Aggregates and analyzes application logs to detect suspicious activity.'
     link: https://attack.mitre.org/mitigations/M1054
   - id: M1019
     name: Threat Intelligence Program
-    description: A threat intelligence program helps an organization generate their
-      own threat intelligence information and track trends to inform defensive priorities
-      to mitigate risk.
+    description: 'A Threat Intelligence Program enables organizations to proactively
+      identify, analyze, and act on cyber threats by leveraging internal and external
+      data sources. The program supports decision-making processes, prioritizes defenses,
+      and improves incident response by delivering actionable intelligence tailored
+      to the organization''s risk profile and operational environment. This mitigation
+      can be implemented through the following measures:
+
+
+      Establish a Threat Intelligence Team:
+
+
+      - Form a dedicated team or assign responsibility to existing security personnel
+      to collect, analyze, and act on threat intelligence.
+
+
+      Define Intelligence Requirements:
+
+
+      - Identify the organization’s critical assets and focus intelligence gathering
+      efforts on threats targeting these assets.
+
+
+      Leverage Internal and External Data Sources:
+
+
+      - Collect intelligence from internal sources such as logs, incidents, and alerts.
+
+      Subscribe to external threat intelligence feeds, participate in ISACs, and monitor
+      open-source intelligence (OSINT).
+
+
+      Implement Tools for Automation:
+
+
+      - Use threat intelligence platforms (TIPs) to automate the collection, enrichment,
+      and dissemination of threat data.
+
+      - Integrate threat intelligence with SIEMs to correlate IOCs with internal events.
+
+
+      Analyze and Act on Intelligence:
+
+
+      - Use frameworks like MITRE ATT&CK to map intelligence to adversary TTPs.
+
+      - Prioritize defensive measures, such as patching vulnerabilities or deploying
+      IOCs, based on analyzed threats.
+
+
+      Share and Collaborate:
+
+
+      - Share intelligence with industry peers through ISACs or threat-sharing platforms
+      to enhance collective defense.
+
+
+      Evaluate and Update the Program:
+
+
+      - Regularly assess the effectiveness of the threat intelligence program.
+
+      - Update intelligence priorities and capabilities as new threats emerge.
+
+
+      *Tools for Implementation*
+
+
+      Threat Intelligence Platforms (TIPs):
+
+
+      - OpenCTI: An open-source platform for structuring and sharing threat intelligence.
+
+      - MISP: A threat intelligence sharing platform for sharing structured threat
+      data.
+
+
+      Threat Intelligence Feeds:
+
+
+      - Open Threat Exchange (OTX): Provides free access to a large repository of
+      threat intelligence.
+
+      - CIRCL OSINT Feed: A free source for IOCs and threat information.
+
+
+      Automation and Enrichment Tools:
+
+
+      - TheHive: An open-source incident response platform with threat intelligence
+      integration.
+
+      - Yeti: A platform for managing and structuring knowledge about threats.
+
+
+      Analysis Frameworks:
+
+
+      - MITRE ATT&CK Navigator: A tool for mapping threat intelligence to adversary
+      behaviors.
+
+      - Cuckoo Sandbox: Analyzes malware to extract behavioral indicators.
+
+
+      Community and Collaboration Tools:
+
+
+      - ISAC Memberships: Join industry-specific ISACs for intelligence sharing.
+
+      - Slack/Discord Channels: Participate in threat intelligence communities for
+      real-time collaboration.'
     link: https://attack.mitre.org/mitigations/M1019
   - id: M1051
     name: Update Software
-    description: Perform regular software updates to mitigate exploitation risk.
+    description: 'Software updates ensure systems are protected against known vulnerabilities
+      by applying patches and upgrades provided by vendors. Regular updates reduce
+      the attack surface and prevent adversaries from exploiting known security gaps.
+      This includes patching operating systems, applications, drivers, and firmware.
+      This mitigation can be implemented through the following measures:
+
+
+      Regular Operating System Updates
+
+
+      - Implementation: Apply the latest Windows security updates monthly using WSUS
+      (Windows Server Update Services) or a similar patch management solution. Configure
+      systems to check for updates automatically and schedule reboots during maintenance
+      windows.
+
+      - Use Case: Prevents exploitation of OS vulnerabilities such as privilege escalation
+      or remote code execution.
+
+
+      Application Patching
+
+
+      - Implementation: Monitor Apache''s update release notes for security patches
+      addressing vulnerabilities. Schedule updates for off-peak hours to avoid downtime
+      while maintaining security compliance.
+
+      - Use Case: Prevents exploitation of web application vulnerabilities, such as
+      those leading to unauthorized access or data breaches.
+
+
+      Firmware Updates
+
+
+      - Implementation: Regularly check the vendor’s website for firmware updates
+      addressing vulnerabilities. Plan for update deployment during scheduled maintenance
+      to minimize business disruption.
+
+      - Use Case: Protects against vulnerabilities that adversaries could exploit
+      to gain access to network devices or inject malicious traffic.
+
+
+      Emergency Patch Deployment
+
+
+      - Implementation: Use the emergency patch deployment feature of the organization''s
+      patch management tool to apply updates to all affected Exchange servers within
+      24 hours.
+
+      - Use Case: Reduces the risk of exploitation by rapidly addressing critical
+      vulnerabilities.
+
+
+      Centralized Patch Management
+
+
+      - Implementation: Implement a centralized patch management system, such as SCCM
+      or ManageEngine, to automate and track patch deployment across all environments.
+      Generate regular compliance reports to ensure all systems are updated.
+
+      - Use Case: Streamlines patching processes and ensures no critical systems are
+      missed.
+
+
+      *Tools for Implementation*
+
+
+      Patch Management Tools:
+
+
+      - WSUS: Manage and deploy Microsoft updates across the organization.
+
+      - ManageEngine Patch Manager Plus: Automate patch deployment for OS and third-party
+      apps.
+
+      - Ansible: Automate updates across multiple platforms, including Linux and Windows.
+
+
+      Vulnerability Scanning Tools:
+
+
+      - OpenVAS: Open-source vulnerability scanning to identify missing patches.'
     link: https://attack.mitre.org/mitigations/M1051
   - id: M1052
     name: User Account Control
-    description: Configure Windows User Account Control to mitigate risk of adversaries
-      obtaining elevated process access.
+    description: 'User Account Control (UAC) is a security feature in Microsoft Windows
+      that prevents unauthorized changes to the operating system. UAC prompts users
+      to confirm or provide administrator credentials when an action requires elevated
+      privileges. Proper configuration of UAC reduces the risk of privilege escalation
+      attacks. This mitigation can be implemented through the following measures:
+
+
+      Enable UAC Globally:
+
+
+      - Ensure UAC is enabled through Group Policy by setting `User Account Control:
+      Run all administrators in Admin Approval Mode` to `Enabled`.
+
+
+      Require Credential Prompt:
+
+
+      - Use Group Policy to configure UAC to prompt for administrative credentials
+      instead of just confirmation (`User Account Control: Behavior of the elevation
+      prompt`).
+
+
+      Restrict Built-in Administrator Account:
+
+
+      Set `Admin Approval Mode` for the built-in Administrator account to `Enabled`
+      in Group Policy.
+
+
+      Secure the UAC Prompt:
+
+
+      - Configure UAC prompts to display on the secure desktop (`User Account Control:
+      Switch to the secure desktop when prompting for elevation`).
+
+
+      Prevent UAC Bypass:
+
+
+      - Block untrusted applications from triggering UAC prompts by configuring `User
+      Account Control: Only elevate executables that are signed and validated`.
+
+      - Use EDR tools to detect and block known UAC bypass techniques.
+
+
+      Monitor UAC-Related Events:
+
+
+      - Use Windows Event Viewer to monitor for event ID 4688 (process creation) and
+      look for suspicious processes attempting to invoke UAC elevation.
+
+
+      *Tools for Implementation*
+
+
+      Built-in Windows Tools:
+
+
+      - Group Policy Editor: Configure UAC settings centrally for enterprise environments.
+
+      - Registry Editor: Modify UAC-related settings directly, such as `EnableLUA`
+      and `ConsentPromptBehaviorAdmin`.
+
+
+      Endpoint Security Solutions:
+
+
+      - Microsoft Defender for Endpoint: Detects and blocks UAC bypass techniques.
+
+      - Sysmon: Logs process creations and monitors UAC elevation attempts for suspicious
+      activity.
+
+
+      Third-Party Security Tools:
+
+
+      - Process Monitor (Sysinternals): Tracks real-time processes interacting with
+      UAC.
+
+      - EventSentry: Monitors Windows Event Logs for UAC-related alerts.'
     link: https://attack.mitre.org/mitigations/M1052
   - id: M1018
     name: User Account Management
-    description: Manage the creation, modification, use, and permissions associated
-      to user accounts.
+    description: 'User Account Management involves implementing and enforcing policies
+      for the lifecycle of user accounts, including creation, modification, and deactivation.
+      Proper account management reduces the attack surface by limiting unauthorized
+      access, managing account privileges, and ensuring accounts are used according
+      to organizational policies. This mitigation can be implemented through the following
+      measures:
+
+
+      Enforcing the Principle of Least Privilege
+
+
+      - Implementation: Assign users only the minimum permissions required to perform
+      their job functions. Regularly audit accounts to ensure no excess permissions
+      are granted.
+
+      - Use Case: Reduces the risk of privilege escalation by ensuring accounts cannot
+      perform unauthorized actions.
+
+
+      Implementing Strong Password Policies
+
+
+      - Implementation: Enforce password complexity requirements (e.g., length, character
+      types). Require password expiration every 90 days and disallow password reuse.
+
+      - Use Case: Prevents adversaries from gaining unauthorized access through password
+      guessing or brute force attacks.
+
+
+      Managing Dormant and Orphaned Accounts
+
+
+      - Implementation: Implement automated workflows to disable accounts after a
+      set period of inactivity (e.g., 30 days). Remove orphaned accounts (e.g., accounts
+      without an assigned owner) during regular account audits.
+
+      - Use Case: Eliminates dormant accounts that could be exploited by attackers.
+
+
+      Account Lockout Policies
+
+
+      - Implementation: Configure account lockout thresholds (e.g., lock accounts
+      after five failed login attempts). Set lockout durations to a minimum of 15
+      minutes.
+
+      - Use Case: Mitigates automated attack techniques that rely on repeated login
+      attempts.
+
+
+      Multi-Factor Authentication (MFA) for High-Risk Accounts
+
+
+      - Implementation: Require MFA for all administrative accounts and high-risk
+      users. Use MFA mechanisms like hardware tokens, authenticator apps, or biometrics.
+
+      - Use Case: Prevents unauthorized access, even if credentials are stolen.
+
+
+      Restricting Interactive Logins
+
+
+      - Implementation: Restrict interactive logins for privileged accounts to specific
+      secure systems or management consoles. Use group policies to enforce logon restrictions.
+
+      - Use Case: Protects sensitive accounts from misuse or exploitation.
+
+
+      *Tools for Implementation*
+
+
+      Built-in Tools:
+
+
+      - Microsoft Active Directory (AD): Centralized account management and RBAC enforcement.
+
+      - Group Policy Object (GPO): Enforce password policies, logon restrictions,
+      and account lockout policies.
+
+
+      Identity and Access Management (IAM) Tools:
+
+
+      - Okta: Centralized user provisioning, MFA, and SSO integration.
+
+      - Microsoft Azure Active Directory: Provides advanced account lifecycle management,
+      role-based access, and conditional access policies.
+
+
+      Privileged Account Management (PAM):
+
+      - CyberArk, BeyondTrust, Thycotic: Manage and monitor privileged account usage,
+      enforce session recording, and JIT access.'
     link: https://attack.mitre.org/mitigations/M1018
   - id: M1017
     name: User Training
-    description: Train users to be aware of access or manipulation attempts by an
-      adversary to reduce the risk of successful spearphishing, social engineering,
-      and other techniques that involve user interaction.
+    description: 'User Training involves educating employees and contractors on recognizing,
+      reporting, and preventing cyber threats that rely on human interaction, such
+      as phishing, social engineering, and other manipulative techniques. Comprehensive
+      training programs create a human firewall by empowering users to be an active
+      component of the organization''s cybersecurity defenses. This mitigation can
+      be implemented through the following measures:
+
+
+      Create Comprehensive Training Programs:
+
+
+      - Design training modules tailored to the organization''s risk profile, covering
+      topics such as phishing, password management, and incident reporting.
+
+      - Provide role-specific training for high-risk employees, such as helpdesk staff
+      or executives.
+
+
+      Use Simulated Exercises:
+
+
+      - Conduct phishing simulations to measure user susceptibility and provide targeted
+      follow-up training.
+
+      - Run social engineering drills to evaluate employee responses and reinforce
+      protocols.
+
+
+      Leverage Gamification and Engagement:
+
+
+      - Introduce interactive learning methods such as quizzes, gamified challenges,
+      and rewards for successful detection and reporting of threats.
+
+
+      Incorporate Security Policies into Onboarding:
+
+
+      - Include cybersecurity training as part of the onboarding process for new employees.
+
+      - Provide easy-to-understand materials outlining acceptable use policies and
+      reporting procedures.
+
+
+      Regular Refresher Courses:
+
+
+      - Update training materials to include emerging threats and techniques used
+      by adversaries.
+
+      - Ensure all employees complete periodic refresher courses to stay informed.
+
+
+      Emphasize Real-World Scenarios:
+
+
+      - Use case studies of recent attacks to demonstrate the consequences of successful
+      phishing or social engineering.
+
+      - Discuss how specific employee actions can prevent or mitigate such attacks.'
     link: https://attack.mitre.org/mitigations/M1017
   - id: M1016
     name: Vulnerability Scanning
-    description: Vulnerability scanning is used to find potentially exploitable software
-      vulnerabilities to remediate them.
+    description: "Vulnerability scanning involves the automated or manual assessment\
+      \ of systems, applications, and networks to identify misconfigurations, unpatched\
+      \ software, or other security weaknesses. The process helps prioritize remediation\
+      \ efforts by classifying vulnerabilities based on risk and impact, reducing\
+      \ the likelihood of exploitation by adversaries. This mitigation can be implemented\
+      \ through the following measures: \n\nProactive Identification of Vulnerabilities\n\
+      \n- Implementation: Use tools like Nessus or OpenVAS to scan endpoints, servers,\
+      \ and applications for missing patches and configuration issues. Schedule regular\
+      \ scans to ensure timely identification of vulnerabilities introduced by new\
+      \ deployments or updates.\n- Use Case: A scan identifies unpatched software,\
+      \ such as outdated Apache servers, which could be exploited via CVE-XXXX-XXXX.\
+      \ The server is promptly patched, mitigating the risk.\n\nCloud Environment\
+      \ Scanning\n\n- Implementation: Use cloud-specific vulnerability management\
+      \ tools like AWS Inspector, Azure Security Center, or GCP Security Command Center\
+      \ to identify issues like open S3 buckets or overly permissive IAM roles.\n\
+      - Use Case: The scan detects a misconfigured S3 bucket with public read access,\
+      \ which is remediated to prevent potential data leakage.\n\nNetwork Device Scanning\n\
+      \n- Implementation: Use tools to scan network devices for vulnerabilities, such\
+      \ as weak SNMP strings or outdated firmware. Correlate scan results with vendor\
+      \ advisories to prioritize updates.\n- Use Case: Scanning detects a router running\
+      \ outdated firmware vulnerable to CVE-XXXX-YYYY. The firmware is updated to\
+      \ a secure version.\n\nWeb Application Scanning\n\n- Implementation: Use dynamic\
+      \ application security testing (DAST) tools such as OWASP ZAP or Burp Suite\
+      \ to scan for common vulnerabilities like SQL injection or cross-site scripting\
+      \ (XSS). Perform regular scans post-deployment to identify newly introduced\
+      \ vulnerabilities.\n- Use Case: A scan identifies a cross-site scripting vulnerability\
+      \ in a form input field, which is promptly remediated by developers.\n\nPrioritizing\
+      \ Vulnerabilities\n\n- Implementation: Use vulnerability scoring frameworks\
+      \ like CVSS to assess severity.\nIntegrate vulnerability scanning tools with\
+      \ ticketing systems to assign remediation tasks based on criticality.\n- Use\
+      \ Case: A critical vulnerability with a CVSS score of 9.8 affecting remote access\
+      \ servers is prioritized and patched first.\n\n*Tools for Implementation*\n\n\
+      Open Source Tools:\n\n- OpenVAS: Comprehensive network and system vulnerability\
+      \ scanning.\n- OWASP ZAP: Dynamic scanning of web applications for vulnerabilities.\n\
+      - Nmap with NSE Scripts: Network scanning with scripts to detect vulnerabilities."
     link: https://attack.mitre.org/mitigations/M1016
   - id: M1058
     name: 'Mobile : Antivirus/Antimalware'
@@ -271,9 +2643,41 @@ keys:
     link: https://attack.mitre.org/mitigations/M1058
   - id: M1013
     name: 'Mobile : Application Developer Guidance'
-    description: This mitigation describes any guidance or training given to developers
-      of applications to avoid introducing security weaknesses that an adversary may
-      be able to take advantage of.
+    description: "Application Developer Guidance focuses on providing developers with\
+      \ the knowledge, tools, and best practices needed to write secure code, reduce\
+      \ vulnerabilities, and implement secure design principles. By integrating security\
+      \ throughout the software development lifecycle (SDLC), this mitigation aims\
+      \ to prevent the introduction of exploitable weaknesses in applications, systems,\
+      \ and APIs. This mitigation can be implemented through the following measures:\n\
+      \ \nPreventing SQL Injection (Secure Coding Practice):\n\n- Implementation:\
+      \ Train developers to use parameterized queries or prepared statements instead\
+      \ of directly embedding user input into SQL queries.\n- Use Case: A web application\
+      \ accepts user input to search a database. By sanitizing and validating user\
+      \ inputs, developers can prevent attackers from injecting malicious SQL commands.\n\
+      \nCross-Site Scripting (XSS) Mitigation:\n\n- Implementation: Require developers\
+      \ to implement output encoding for all user-generated content displayed on a\
+      \ web page.\n- Use Case: An e-commerce site allows users to leave product reviews.\
+      \ Properly encoding and escaping user inputs prevents malicious scripts from\
+      \ being executed in other users’ browsers.\n\nSecure API Design:\n\n- Implementation:\
+      \ Train developers to authenticate all API endpoints and avoid exposing sensitive\
+      \ information in API responses.\n- Use Case: A mobile banking application uses\
+      \ APIs for account management. By enforcing token-based authentication for every\
+      \ API call, developers reduce the risk of unauthorized access.\n\nStatic Code\
+      \ Analysis in the Build Pipeline:\n\n- Implementation: Incorporate tools into\
+      \ CI/CD pipelines to automatically scan for vulnerabilities during the build\
+      \ process.\n- Use Case: A fintech company integrates static analysis tools to\
+      \ detect hardcoded credentials in their source code before deployment.\n\nThreat\
+      \ Modeling in the Design Phase:\n\n- Implementation: Use frameworks like STRIDE\
+      \ (Spoofing, Tampering, Repudiation, Information Disclosure, Denial of Service,\
+      \ Elevation of Privilege) to assess threats during application design.\n- Use\
+      \ Case: Before launching a customer portal, a SaaS company identifies potential\
+      \ abuse cases, such as session hijacking, and designs mitigations like secure\
+      \ session management.\n\n**Tools for Implementation**:\n\n- Static Code Analysis\
+      \ Tools: Use tools that can scan for known vulnerabilities in source code.\n\
+      - Dynamic Application Security Testing (DAST): Use tools like Burp Suite or\
+      \ OWASP ZAP to simulate runtime attacks and identify vulnerabilities.\n- Secure\
+      \ Frameworks: Recommend secure-by-default frameworks (e.g., Django for Python,\
+      \ Spring Security for Java) that enforce security best practices."
     link: https://attack.mitre.org/mitigations/M1013
   - id: M1002
     name: 'Mobile : Attestation'
@@ -377,7 +2781,7 @@ keys:
   - id: M0801
     name: 'Industrial : Access Management'
     description: 'Access Management technologies can be used to enforce authorization
-      polices and decisions, especially when existing field devices do not provided
+      polices and decisions, especially when existing field devices do not provide
       sufficient capabilities to support user identification and authentication. (Citation:
       McCarthy, J et al. July 2018) These technologies typically utilize an in-line
       network device or gateway system to prevent access to unauthenticated users,
@@ -738,9 +3142,41 @@ keys:
     link: https://attack.mitre.org/mitigations/M1058
   - id: M1013
     name: 'Mobile : Application Developer Guidance'
-    description: This mitigation describes any guidance or training given to developers
-      of applications to avoid introducing security weaknesses that an adversary may
-      be able to take advantage of.
+    description: "Application Developer Guidance focuses on providing developers with\
+      \ the knowledge, tools, and best practices needed to write secure code, reduce\
+      \ vulnerabilities, and implement secure design principles. By integrating security\
+      \ throughout the software development lifecycle (SDLC), this mitigation aims\
+      \ to prevent the introduction of exploitable weaknesses in applications, systems,\
+      \ and APIs. This mitigation can be implemented through the following measures:\n\
+      \ \nPreventing SQL Injection (Secure Coding Practice):\n\n- Implementation:\
+      \ Train developers to use parameterized queries or prepared statements instead\
+      \ of directly embedding user input into SQL queries.\n- Use Case: A web application\
+      \ accepts user input to search a database. By sanitizing and validating user\
+      \ inputs, developers can prevent attackers from injecting malicious SQL commands.\n\
+      \nCross-Site Scripting (XSS) Mitigation:\n\n- Implementation: Require developers\
+      \ to implement output encoding for all user-generated content displayed on a\
+      \ web page.\n- Use Case: An e-commerce site allows users to leave product reviews.\
+      \ Properly encoding and escaping user inputs prevents malicious scripts from\
+      \ being executed in other users’ browsers.\n\nSecure API Design:\n\n- Implementation:\
+      \ Train developers to authenticate all API endpoints and avoid exposing sensitive\
+      \ information in API responses.\n- Use Case: A mobile banking application uses\
+      \ APIs for account management. By enforcing token-based authentication for every\
+      \ API call, developers reduce the risk of unauthorized access.\n\nStatic Code\
+      \ Analysis in the Build Pipeline:\n\n- Implementation: Incorporate tools into\
+      \ CI/CD pipelines to automatically scan for vulnerabilities during the build\
+      \ process.\n- Use Case: A fintech company integrates static analysis tools to\
+      \ detect hardcoded credentials in their source code before deployment.\n\nThreat\
+      \ Modeling in the Design Phase:\n\n- Implementation: Use frameworks like STRIDE\
+      \ (Spoofing, Tampering, Repudiation, Information Disclosure, Denial of Service,\
+      \ Elevation of Privilege) to assess threats during application design.\n- Use\
+      \ Case: Before launching a customer portal, a SaaS company identifies potential\
+      \ abuse cases, such as session hijacking, and designs mitigations like secure\
+      \ session management.\n\n**Tools for Implementation**:\n\n- Static Code Analysis\
+      \ Tools: Use tools that can scan for known vulnerabilities in source code.\n\
+      - Dynamic Application Security Testing (DAST): Use tools like Burp Suite or\
+      \ OWASP ZAP to simulate runtime attacks and identify vulnerabilities.\n- Secure\
+      \ Frameworks: Recommend secure-by-default frameworks (e.g., Django for Python,\
+      \ Spring Security for Java) that enforce security best practices."
     link: https://attack.mitre.org/mitigations/M1013
   - id: M1002
     name: 'Mobile : Attestation'
@@ -844,7 +3280,7 @@ keys:
   - id: M0801
     name: 'Industrial : Access Management'
     description: 'Access Management technologies can be used to enforce authorization
-      polices and decisions, especially when existing field devices do not provided
+      polices and decisions, especially when existing field devices do not provide
       sufficient capabilities to support user identification and authentication. (Citation:
       McCarthy, J et al. July 2018) These technologies typically utilize an in-line
       network device or gateway system to prevent access to unauthenticated users,

@@ -2,25 +2,22 @@ import pandas as pd
 import os
 import git
 import shutil
-import time
 import sys
 from pathlib import Path
-
-start_time = time.time()
-
 
 sys.path.append(str(git.Repo(".", search_parent_directories=True).working_dir))
 
 from Engines.modules.documentation import get_icon, make_json_table
 from Engines.modules.tide import DataTide
 from Engines.modules.logs import log
+from Engines.modules.deployment import CIEnvironment
 from Engines.templates.models import VOCABS_DOC_TEMPLATE
 
 ROOT = Path(str(git.Repo(".", search_parent_directories=True).working_dir))
 
 VOCAB_INDEX = DataTide.Vocabularies.Index
 ICONS = DataTide.Configurations.Documentation.icons
-DOCUMENTATION_TARGET = DataTide.Configurations.Documentation.documentation_target
+DOCUMENTATION_TARGET = CIEnvironment()._check_ci_environment()
 VOCAB_DOCS_PATH = Path(DataTide.Configurations.Global.Paths.Core.vocabularies_docs)
 SKIP_VOCABS = DataTide.Configurations.Documentation.skip_vocabularies
 
@@ -105,11 +102,11 @@ def make_vocab_doc(vocab_field, vocabulary):
     df = df.replace("\n", ". ", regex=True)
     table = str()
 
-    if DOCUMENTATION_TARGET == "gitlab":
+    if DOCUMENTATION_TARGET is CIEnvironment.CIPlatforms.GitlabCI:
         title = ""
         table = make_json_table(df)
         
-    elif DOCUMENTATION_TARGET == "generic":
+    else:
         title = "# " + name
         table = df.to_markdown(index=False)
 
@@ -155,23 +152,12 @@ def run():
                     output_name = icon + " " + name + ".md"
                     output_path = VOCAB_DOCS_PATH / output_name
 
-                    if DOCUMENTATION_TARGET == "gitlab":
+                    if DOCUMENTATION_TARGET is CIEnvironment.CIPlatforms.GitlabCI:
                         output_path = Path(str(output_path).replace(" ", "-"))
 
                     with open(output_path, "w+", encoding="utf-8") as output:
                         output.write(documentation)
-
-    doc_format_log = str()
-    if DOCUMENTATION_TARGET == "gitlab":
-        doc_format_log = "🦊 Gitlab Flavored Markdown"
-    else:
-        doc_format_log = "✒️ standard markdown"
-
-    time_to_execute = "%.2f" % (time.time() - start_time)
-
-    print("\n⏱️ Generated documentation in {} seconds".format(time_to_execute))
-    print("✅ Successfully built vocabulary documentation in {}".format(doc_format_log))
-
+    log("SUCCESS", "Successfully built vocabulary documentation")
 
 if __name__ == "__main__":
     run()

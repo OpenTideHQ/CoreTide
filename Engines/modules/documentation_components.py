@@ -9,11 +9,12 @@ from typing import Tuple, Literal
 sys.path.append(str(git.Repo(".", search_parent_directories=True).working_dir))
 
 from Engines.modules.tide import DataTide, IndexTide
+from Engines.modules.deployment import CIEnvironment
 
 CONFIG = DataTide.Configurations
 INDEX = DataTide.Index
 SKIP_KEYS = DataTide.Configurations.Documentation.skip_model_keys
-DOCUMENTATION_TARGET = DataTide.Configurations.Documentation.documentation_target
+DOCUMENTATION_TARGET = CIEnvironment()._check_ci_environment()
 DEFINITIONS_INDEX = DataTide.TideSchemas.definitions
 
 from Engines.modules.framework import (
@@ -331,7 +332,7 @@ def cve_doc(cve_list: list[str]) -> str:
                 cve_doc_list.append(f"[💔 {broken_vuln}]({CVE_DB_LINK}{broken_vuln})")
 
             cve_error_banner = "⚠️ ERROR : Could not successfully retrieve CVE Details, double check the broken links below to confirm the CVE ID exists."
-            if DOCUMENTATION_TARGET == "gitlab":
+            if DOCUMENTATION_TARGET is CIEnvironment.CIPlatforms.GitlabCI:
                 cve_error_banner = GitlabMarkdown.negative_diff(cve_error_banner)
             cve_data = "- " + "\n- ".join(cve_doc_list)
             cve_data = cve_error_banner + "\n\n" + cve_data

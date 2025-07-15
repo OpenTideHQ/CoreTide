@@ -29,14 +29,10 @@ from Engines.modules.documentation import (
 from Engines.modules.logs import log
 from Engines.modules.tide import DataTide
 from Engines.modules.debug import DebugEnvironment
+from Engines.modules.deployment import CIEnvironment
 
-DOCUMENTATION_TARGET = DataTide.Configurations.Documentation.documentation_target
-COVER_PAGES_ENABLED = DataTide.Configurations.Documentation.gitlab.get("model_cover_pages", False)
-
-# For testing purposes, enabling this script to execute
-if DebugEnvironment.ENABLED:
-    DOCUMENTATION_TARGET = "gitlab"
-    COVER_PAGES_ENABLED = True
+DOCUMENTATION_TARGET = CIEnvironment()._check_ci_environment()
+COVER_PAGES_ENABLED = DataTide.Configurations.Documentation.model_cover_pages
 
 MODELS_INDEX = DataTide.Models.Index
 METASCHEMAS_INDEX = DataTide.TideSchemas.Index
@@ -367,19 +363,18 @@ def run():
         "Assembles tables exposing CoreTIDE data to make the dataset easier to navigate",
     )
 
-    if DOCUMENTATION_TARGET != "gitlab":
+    if DOCUMENTATION_TARGET not in [CIEnvironment.CIPlatforms.GitlabCI,
+                                    CIEnvironment.CIPlatforms.AzurePipeline] :
         log("SKIP",
-            "This is a Gitlab Wiki only feature",
-            f"documentation_target is currently set to : {DOCUMENTATION_TARGET}",
-            "If you are running OpenTIDE in Gitlab, we advise to change this configuration \
-                to 'gitlab' to enjoy all documentation features")
+            "This is a Gitlab Wiki or Azure Pipeline only feature",
+            f"documentation_target is currently set to : {DOCUMENTATION_TARGET}")
         return 
 
     if not COVER_PAGES_ENABLED:
         log("SKIP",
             "Disabled in configuration",
             "Not generating cover pages as set to false or missing key",
-            "You can enable this feature by setting gitlab.model_cover_pages to True in documentation.toml")
+            "You can enable this feature by setting model_cover_pages to True in documentation.toml")
         return
 
     if not os.path.exists(MODELS_DOCS_PATH):

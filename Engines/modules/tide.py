@@ -860,25 +860,20 @@ class DataTide:
 
 
             Index = dict(IndexTide.load()["configurations"]["documentation"])
-            documentation_target = str(Index.get("documentation_target"))
             scope = list(Index["scope"])
             skip_model_keys = list(Index["skip_model_keys"])
             skip_vocabularies = list(Index["skip_model_keys"])
             gitlab = dict(Index.get("gitlab", {}))
+            model_cover_pages:bool = Index.get("model_cover_pages", False)
             cve = dict(Index["cve"])
             wiki = dict(Index.get("wiki",{}))
             object_names = dict(Index["object_names"])
             titles = dict(Index["titles"])
             icons = dict(Index["icons"])
-            models_docs_folder: Path = Path(
+            models_docs_folder:Path = Path(
                 IndexTide.load()["configurations"]["global"]["paths"]["core"][
                     "models_docs_folder"
                 ]
-            )
-            models_docs_folder = (
-                Path(str(models_docs_folder).replace(" ", "-"))
-                if documentation_target == "gitlab"
-                else models_docs_folder
             )
 
         @dataclass(frozen=True)

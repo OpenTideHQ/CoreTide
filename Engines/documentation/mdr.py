@@ -32,12 +32,12 @@ from Engines.modules.documentation_components import (
 from Engines.modules.tide import DataTide
 from Engines.modules.logs import log
 from Engines.modules.graphs import relationships_graph
-from Engines.modules.deployment import enabled_systems
+from Engines.modules.deployment import enabled_systems, CIEnvironment
 
 ROOT = Path(str(git.Repo(".", search_parent_directories=True).working_dir))
 
-DOCUMENTATION_TARGET = DataTide.Configurations.Documentation.documentation_target
-if DOCUMENTATION_TARGET == "gitlab":
+DOCUMENTATION_TARGET = CIEnvironment()._check_ci_environment()
+if DOCUMENTATION_TARGET is CIEnvironment.CIPlatforms.GitlabCI:
     UUID_PERMALINKS = DataTide.Configurations.Documentation.gitlab.get("uuid_permalinks", False)
 else:
     UUID_PERMALINKS = False
@@ -78,7 +78,7 @@ for sub in SYSTEMS_SUBSCHEMAS.copy():
 
 
 
-if DOCUMENTATION_TARGET == "gitlab":
+if DOCUMENTATION_TARGET is CIEnvironment.CIPlatforms.GitlabCI:
     MDR_WIKI_PATH = Path(str(MDR_WIKI_PATH).replace(" ", "-"))
     print("🦊 Configured to use Gitlab Flavored Markdown")
 
@@ -92,13 +92,12 @@ def documentation(mdr):
     name = f"{MDR_ICON} {mdr['name']}"
     frontmatter = ""
 
-    if DOCUMENTATION_TARGET == "generic":
-        name = "# " + name
-
-    if DOCUMENTATION_TARGET == "gitlab":
+    if DOCUMENTATION_TARGET is CIEnvironment.CIPlatforms.GitlabCI:
         if UUID_PERMALINKS:
             frontmatter = f"---\ntitle: {name}\n---"
         name = ""    
+    else:
+        name = "# " + name
 
     uuid_data = mdr["metadata"]["uuid"]
     description = mdr.get("description", "").replace("\n", "\n> ")
@@ -116,7 +115,7 @@ def documentation(mdr):
 
     if not relation_graph:
         relations = "🚫 No related objects indexed."
-        if DOCUMENTATION_TARGET == "gitlab":
+        if DOCUMENTATION_TARGET is CIEnvironment.CIPlatforms.GitlabCI:
             GitlabMarkdown.negative_diff(relation_graph)
     else:
         relations = relation_graph + "\n\n" + relation_table
@@ -141,7 +140,7 @@ def documentation(mdr):
     playbook_col = get_field_title("playbook", MDR_METASCHEMA)
     if not playbook_data:
         playbook_data = "No playbook was defined for this detection rule"
-        if DOCUMENTATION_TARGET == "gitlab":
+        if DOCUMENTATION_TARGET is CIEnvironment.CIPlatforms.GitlabCI:
             playbook_data = f"[-{playbook_data}-]"
     else:
         playbook_name = playbook_data.split("/")[-1]
@@ -289,8 +288,8 @@ def documentation(mdr):
             system_name += "[DISABLED]"
             banner = "This system is not enabled in your System Configurations, "\
                 "this documentation is only informational"
-            if DOCUMENTATION_TARGET == "gitlab":
-                banner = f"[- {banner} -]"
+            if DOCUMENTATION_TARGET is CIEnvironment.CIPlatforms.GitlabCI:
+                banner = GitlabMarkdown.negative_diff(banner)
             table = banner + "\n\n" + table
                 
         fold = FOLD.format(system_name, table)
@@ -361,7 +360,7 @@ def run():
         document = documentation(mdr_data)
 
         # Replace whitespace in file name as it becomes a path in the Gitlab Wiki
-        if DOCUMENTATION_TARGET == "gitlab":
+        if DOCUMENTATION_TARGET is CIEnvironment.CIPlatforms.GitlabCI:
             doc_path = Path(str(doc_path).replace(" ", "-"))
 
         with open(doc_path, "w+", encoding="utf-8") as output:

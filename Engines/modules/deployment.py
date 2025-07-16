@@ -399,7 +399,7 @@ def diff_calculation(plan: DeploymentStrategy) -> list:
     diff = source_commit.diff(latest_commit)
 
     log(
-        "DEBUG",
+        "INFO",
         "Preliminary diff calculation completed, returned with",
         ", ".join([f.b_path for f in diff]),
     )

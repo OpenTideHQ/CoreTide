@@ -96,7 +96,7 @@ class SentinelDeploy(DeployMDR):
         if techniques:=configuration.alert.techniques:
             rule.techniques = techniques
         if tactics:=configuration.alert.tactics:
-            rule.techniques = tactics
+            rule.tactics = tactics
 
         # Custom Details
         if custom_details:=configuration.alert.custom_details:

@@ -1,6 +1,8 @@
 🚧 Staging Deployment:
   stage: 🚀 Deployment
-  environment: MDR Staging
+  environment:
+    name: MDR Staging
+    deployment_tier: staging
   script:
     - export DEPLOYMENT_PLAN=STAGING
     - cd $TIDE_CORE_REPO/Orchestration/
@@ -24,7 +26,9 @@
 
 ☄️ Production Deployment:
   stage: 🚀 Deployment
-  environment: MDR Production
+  environment:
+    name: MDR Production
+    deployment_tier: production
   script:
     - git rebase origin/$CI_DEFAULT_BRANCH 
     - export DEPLOYMENT_PLAN=PRODUCTION

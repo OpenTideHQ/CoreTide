@@ -22,6 +22,7 @@ runs:
     - name: MDR Promotion
       id: mdr_promotion
       shell: bash
+      if: ${{ inputs.deployment_plan }} == "PRODUCTION"
       env:
         CORETIDE_PATH: ${{ inputs.coretide_path }}
       run: |

@@ -196,6 +196,18 @@ def build_search(object_type, mdr_status:Optional[Literal["ACTIVE", "DEPRECATED"
                     actors_list = ", ".join(actors_list)
                     row[value] = actors_list
 
+            elif model_type == "cdm" and value == "vectors":
+                vectors = model_value_doc(entry, "vectors")
+                if vectors:
+                    vectors = [vectors] if type(vectors) is str else vectors
+                    vectors_links = []
+                    for vector in vectors:
+                        object_backlink = str(backlink_resolver(str(vector)))
+                        object_backlink = object_backlink.replace("../", "./")
+                        vectors_links.append(object_backlink)
+                    row[value] = ", ".join(vectors_links)
+                else:
+                    row[value] = "❔ No Object Mapped"
 
             elif model_type == "mdr":
 

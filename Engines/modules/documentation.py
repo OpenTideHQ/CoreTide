@@ -54,15 +54,8 @@ def sanitize_hover(hover: str) -> str:
     Removes forbidden characters from infobubbles/popovers on
     markdown formatted links
     """
-    hover = hover.replace("\n", " ")
-    hover = hover.replace("'", "")
-    hover = hover.replace('"', "")
-    hover = hover.replace("]", "")
-    hover = hover.replace("[", "")
-    hover = hover.replace("(", "")
-    hover = hover.replace(")", "")
-    hover = hover.replace("|", "")
-    return hover
+    ALLOWED_CHARACTERS = ["&", "#" ," ", ";", ",", "-", "_"]
+    return ''.join(ch for ch in hover if (ch.isalnum() or (ch in ALLOWED_CHARACTERS)))
 
 
 def object_name(key):
@@ -121,6 +114,8 @@ def make_json_table(dataframe: pd.DataFrame) -> str:
         "fields": sortable_columns,
         "items": optimized_items,
         "filter": "true",
+        "markdown": "true",
+        "sortable": "true"
     }
 
     # Dumps as an escaped string
@@ -187,7 +182,7 @@ def make_attack_link(
 
     if hover:
         technique_description = details["description"]
-        technique_link += f' "{sanitize_hover(technique_description)}"'
+        technique_link += f" '{sanitize_hover(technique_description)[:150]}'"
 
     link = f"[{link_title}]({technique_link})"
 
@@ -288,8 +283,8 @@ def backlink_resolver(object_uuid:str,
 
     hover = sanitize_hover(str(hover))
     if len(hover) > hover_length:
-        hover = hover[hover_length:] + "..."  
-    backlink = f'[{backlink_name}]({file_link} "{hover}")'
+        hover = hover[:hover_length] + "..."  
+    backlink = f"[{backlink_name}]({file_link} '{hover}')"
     
     if raw_link:
         if raw_hover:

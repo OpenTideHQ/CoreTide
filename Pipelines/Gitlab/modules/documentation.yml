@@ -5,7 +5,7 @@
     # > Paste the output to the Wiki 
     - git rebase origin/$CI_DEFAULT_BRANCH #Allows to pull latest mutation if there are
     - cd $TIDE_CORE_REPO
-    - git clone $TIDE_WIKI_ACCESS
+    - git clone $TIDE_WIKI_ACCESS --depth 1 # Shallow clone for performance reasons, no need to perform a deep clone
     - pwd 
 
     # Generate index. Stores a copy in wiki for Staging documentation
@@ -47,7 +47,7 @@
   stage: 📖 Documentation
   script:
     - cd $TIDE_CORE_REPO
-    - git clone $TIDE_WIKI_ACCESS
+    - git clone $TIDE_WIKI_ACCESS --depth 1 # Shallow clone for performance reasons, no need to perform a deep clone
     - pwd 
 
     # Extract the staging index to Core Root for reconciliation

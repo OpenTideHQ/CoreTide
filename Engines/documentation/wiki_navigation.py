@@ -23,6 +23,8 @@ from Engines.modules.documentation import (
     get_icon,
     get_field_title,
     make_json_table,
+    backlink_resolver,
+    rich_attack_links
 )
 from Engines.modules.logs import log
 from Engines.modules.tide import DataTide
@@ -152,8 +154,21 @@ def build_search(model_type, mdr_status:Optional[Literal["ACTIVE", "DEPRECATED"]
 
         
         for value in NAV_INDEX_FIELDS[model_type]:
-            
-            if value == "implementations":
+
+            if value == "name":
+                object_backlink = str(backlink_resolver(str(model_value_doc(entry, "uuid"))))
+                object_backlink = object_backlink.replace("../", "./")
+                row[value] = object_backlink
+
+            elif value == "att&ck":
+                techniques = techniques_resolver(entry)
+                if techniques:
+                    techniques = rich_attack_links(techniques)
+                    row[value] = techniques
+                else:
+                    "❔ No ATT&CK Technique Mapped"
+
+            elif value == "implementations":
                 relations = relations_list(entry, mode="count", direction="downstream")
                 implementations = []
 
@@ -183,9 +198,6 @@ def build_search(model_type, mdr_status:Optional[Literal["ACTIVE", "DEPRECATED"]
                 actors_list = ", ".join(actors_list)
                 row[value] = actors_list
 
-            elif model_type == "cdm" and value == "att&ck":
-                techniques = ", ".join(techniques_resolver(entry))
-                row[value] = techniques
 
             elif model_type == "mdr":
 
@@ -208,11 +220,6 @@ def build_search(model_type, mdr_status:Optional[Literal["ACTIVE", "DEPRECATED"]
                     )
                     row[mdr_statuses] = statuses
 
-                elif value == "name":
-                    mdr_name = model_value_doc(entry, "name")
-                    row[value] = mdr_name
-
-                # List
                 elif value == "att&ck":
                     model_value = (
                         techniques_resolver(str(model_value_doc(entry, "uuid")))
@@ -222,11 +229,20 @@ def build_search(model_type, mdr_status:Optional[Literal["ACTIVE", "DEPRECATED"]
                         model_value = ", ".join(model_value)
                     row[mdr_attack_technique] = model_value
 
+                elif value == "detection_model":
+                    model_value = model_value_doc(entry, "detection_model")
+                    if model_value:
+                        object_backlink = str(backlink_resolver(str(model_value)))
+                        object_backlink = object_backlink.replace("../", "./")
+                        row[value] = object_backlink
+                    else:
+                        row[value] = "❔ No Object Mapped"
+
                 else:
                     model_value = model_value_doc(
                         entry, value, with_icon=True, max_chars=CHARS_CLIP
                     )
-                    row[value] = model_value
+                    row[value] = str(model_value).replace("\n", " ").replace('"', "")
 
             else:
                 model_value = model_value_doc(
@@ -255,7 +271,7 @@ def build_search(model_type, mdr_status:Optional[Literal["ACTIVE", "DEPRECATED"]
                     else:
                         model_value = ""
 
-                row[value] = model_value
+                row[value] = str(model_value).replace("\n", " ").replace('"', "")
 
         index.append(row)
 

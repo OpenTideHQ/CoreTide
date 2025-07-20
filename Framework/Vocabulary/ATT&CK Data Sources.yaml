@@ -5,7 +5,7 @@ description: Data sources represent the various subjects/topics of information t
   identify specific properties/values of a data source relevant to detecting a given
   ATT&CK technique or sub-technique.
 reference: https://attack.mitre.org/datasources/
-icon: ðŸ“Š
+icon: 🗡️
 keys:
   - id: DS0026
     name: Active Directory

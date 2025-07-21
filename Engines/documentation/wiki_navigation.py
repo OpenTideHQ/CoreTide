@@ -164,6 +164,8 @@ def build_search(model_type, mdr_status:Optional[Literal["ACTIVE", "DEPRECATED"]
                 techniques = techniques_resolver(entry)
                 if techniques:
                     techniques = rich_attack_links(techniques)
+                    if model_type == "mdr":
+                        value = mdr_attack_technique
                     row[value] = techniques
                 else:
                     "❔ No ATT&CK Technique Mapped"

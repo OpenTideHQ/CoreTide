@@ -77,7 +77,7 @@ for sub in SYSTEMS_SUBSCHEMAS.copy():
 
 
 
-if DOCUMENTATION_TARGET is CIEnvironment.CIPlatforms.GitlabCI:
+if DOCUMENTATION_TARGET in TARGET_WITH_DASH_PATHS:
     MDR_WIKI_PATH = Path(str(MDR_WIKI_PATH).replace(" ", "-"))
     print("🦊 Configured to use Gitlab Flavored Markdown")
 
@@ -92,9 +92,7 @@ def documentation(mdr):
     frontmatter = ""
 
     if DOCUMENTATION_TARGET is CIEnvironment.CIPlatforms.GitlabCI:
-        log("INFO", "Generating for Gitlab", name)
         if UUID_PERMALINKS:
-            log("INFO", "UUID Permalinks enabled")
             frontmatter = f"---\ntitle: {name}\n---"
         name = ""    
     else:

@@ -205,7 +205,7 @@ def run():
             MODELS_DOCS_PATH
             / MODELS_NAME[model_type]
         )
-        if DOCUMENTATION_TARGET is CIEnvironment.CIPlatforms.GitlabCI:
+        if DOCUMENTATION_TARGET in TARGET_WITH_DASH_PATHS:
             doc_type_path = Path(str(doc_type_path).replace(" ", "-"))
 
         # Remove everything in the doc folder for the model

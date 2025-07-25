@@ -7,7 +7,12 @@ from pathlib import Path
 
 sys.path.append(str(git.Repo(".", search_parent_directories=True).working_dir))
 
-from Engines.modules.documentation import get_icon, make_json_table
+from Engines.modules.documentation import (
+    get_icon,
+    make_json_table,
+    DOCUMENTATION_TARGET,
+    TARGET_WITH_DASH_PATHS
+)
 from Engines.modules.tide import DataTide
 from Engines.modules.logs import log
 from Engines.modules.deployment import CIEnvironment
@@ -17,7 +22,6 @@ ROOT = Path(str(git.Repo(".", search_parent_directories=True).working_dir))
 
 VOCAB_INDEX = DataTide.Vocabularies.Index
 ICONS = DataTide.Configurations.Documentation.icons
-DOCUMENTATION_TARGET = CIEnvironment()._check_ci_environment()
 VOCAB_DOCS_PATH = Path(DataTide.Configurations.Global.Paths.Core.vocabularies_docs)
 SKIP_VOCABS = DataTide.Configurations.Documentation.skip_vocabularies
 
@@ -107,7 +111,10 @@ def make_vocab_doc(vocab_field, vocabulary):
         table = make_json_table(df)
         
     else:
-        title = "# " + name
+        if DOCUMENTATION_TARGET is CIEnvironment.CIPlatforms.AzurePipeline:
+            title = ""
+        else:
+            title = "# " + name
         table = df.to_markdown(index=False)
 
     documentation = VOCABS_DOC_TEMPLATE.format(
@@ -152,7 +159,7 @@ def run():
                     output_name = icon + " " + name + ".md"
                     output_path = VOCAB_DOCS_PATH / output_name
 
-                    if DOCUMENTATION_TARGET is CIEnvironment.CIPlatforms.GitlabCI:
+                    if DOCUMENTATION_TARGET in TARGET_WITH_DASH_PATHS:
                         output_path = Path(str(output_path).replace(" ", "-"))
 
                     with open(output_path, "w+", encoding="utf-8") as output:

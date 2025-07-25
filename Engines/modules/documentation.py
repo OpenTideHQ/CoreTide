@@ -14,13 +14,24 @@ from Engines.modules.framework import (
 )
 from Engines.modules.logs import log
 from Engines.modules.tide import DataTide
+from Engines.modules.deployment import CIEnvironment
+
+# Wiki Environments that require replacing all spaces in file names with
+# dashes
+TARGET_WITH_DASH_PATHS = [CIEnvironment.CIPlatforms.AzurePipeline,
+                            CIEnvironment.CIPlatforms.GitlabCI]
+
 
 VOCAB_INDEX = DataTide.Vocabularies.Index
-DOCUMENTATION_TARGET = DataTide.Configurations.Documentation.documentation_target
-if DOCUMENTATION_TARGET == "gitlab":
+DOCUMENTATION_TARGET = CIEnvironment()._check_ci_environment()
+log("INFO", "Identified CI Environment", str(DOCUMENTATION_TARGET.name))
+if DOCUMENTATION_TARGET is CIEnvironment.CIPlatforms.GitlabCI:
     UUID_PERMALINKS = DataTide.Configurations.Documentation.gitlab.get("uuid_permalinks", False)
+    log("INFO", "Enabling UUID Permalinking for Gitlab target")
 else:
+    log("INFO", "Disabling UUID Permalinking for Gitlab target")
     UUID_PERMALINKS = False
+
 ICONS = DataTide.Configurations.Documentation.icons
 DOCUMENTATION_CONFIG = DataTide.Configurations.Documentation
 CONFIG_INDEX = DataTide.Configurations.Index
@@ -272,14 +283,14 @@ def backlink_resolver(object_uuid:str,
         backlink_name = object_name
         file_link = f"{doc_path}{icon} {object_name}"
 
-    if DOCUMENTATION_TARGET == "generic":
-        file_link = file_link.replace(" ", "%20")
-        file_link += ".md"
-
-    elif DOCUMENTATION_TARGET == "gitlab":
+    if DOCUMENTATION_TARGET in TARGET_WITH_DASH_PATHS:
         if UUID_PERMALINKS:
             file_link = doc_path + object_data.get("metadata",{}).get("uuid")
         file_link = file_link.replace(" ", "-").replace("_", "-")
+    else:
+        file_link = file_link.replace(" ", "%20")
+        file_link += ".md"
+
 
     hover = sanitize_hover(str(hover))
     if len(hover) > hover_length:

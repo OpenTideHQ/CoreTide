@@ -1,6 +1,3 @@
-documentation_target = "gitlab" #generic: common features for markdown wikis
-                                #gitlab : enables gitlab wiki specific features
-
 scope = [ "tvm", "cdm", "bdr" ]
 skip_object_keys = ["description",
                     "guidelines",
@@ -17,6 +14,10 @@ skip_vocabularies = ["mitigation",
                     "logsources",
                     "nist",
                     "att&ck"]
+
+model_cover_pages = true #Creates a cover page for the Object sub-folder
+                         #only supported in Gitlab Wiki and Azure DevOps Wiki
+
 
 [gitlab]
 object_cover_pages = true #Creates a cover page for the model sub-folder

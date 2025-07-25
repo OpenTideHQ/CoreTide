@@ -1035,11 +1035,11 @@ class DataTide:
 
 
             Index = dict(IndexTide.load()["configurations"]["documentation"])
-            documentation_target = str(Index.get("documentation_target"))
             scope = list(Index["scope"])
             skip_object_keys = list(Index["skip_object_keys"])
             skip_vocabularies = list(Index["skip_vocabularies"])
             gitlab = dict(Index.get("gitlab", {}))
+            model_cover_pages:bool = Index.get("model_cover_pages", False)
             cve = dict(Index["cve"])
             wiki = dict(Index.get("wiki",{}))
             object_names = dict(Index["object_names"])

@@ -36,6 +36,7 @@ steps:
     displayName: Move Back Wiki Repo to resources
   - script: |
       cd $(OpenTide.Wiki.RepoName)
+      ls -lR
       [[ $(git status --porcelain) ]] || { echo "No changes to the Wiki, exiting"; exit 0; }
       echo "Updated files, commiting"
       git rebase origin/$(OpenTide.Wiki.BranchName)

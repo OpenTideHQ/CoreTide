@@ -24,7 +24,8 @@ from Engines.modules.documentation import (
     get_field_title,
     make_json_table,
     backlink_resolver,
-    rich_attack_links
+    rich_attack_links,
+    DOCUMENTATION_TARGET,
 )
 from Engines.modules.logs import log
 from Engines.modules.tide import DataTide
@@ -309,7 +310,10 @@ def build_search(object_type, mdr_status:Optional[Literal["ACTIVE", "DEPRECATED"
     }
     df = df.rename(columns=rename_mapping)
 
-    nav_index = make_json_table(df)
+    if DOCUMENTATION_TARGET is CIEnvironment.CIPlatforms.GitlabCI:
+        nav_index = make_json_table(df)
+    else:
+        nav_index = df.to_markdown(index=False)
 
     return nav_index
 
@@ -379,12 +383,11 @@ def run():
         "Assembles tables exposing CoreTIDE data to make the dataset easier to navigate",
     )
 
-    if DOCUMENTATION_TARGET != "gitlab":
+    if DOCUMENTATION_TARGET not in [CIEnvironment.CIPlatforms.GitlabCI,
+                                    CIEnvironment.CIPlatforms.AzurePipeline] :
         log("SKIP",
-            "This is a Gitlab Wiki only feature",
-            f"documentation_target is currently set to : {DOCUMENTATION_TARGET}",
-            "If you are running OpenTIDE in Gitlab, we advise to change this configuration \
-                to 'gitlab' to enjoy all documentation features")
+            "This is a Gitlab Wiki or Azure Pipeline only feature",
+            f"documentation_target is currently set to : {DOCUMENTATION_TARGET}")
         return 
 
     if not COVER_PAGES_ENABLED:

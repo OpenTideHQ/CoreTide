@@ -32,15 +32,14 @@ from Engines.modules.documentation_components import (
 from Engines.modules.tide import DataTide
 from Engines.modules.logs import log
 from Engines.modules.graphs import relationships_graph
-from Engines.modules.deployment import enabled_systems
+from Engines.modules.deployment import enabled_systems, CIEnvironment
+from Engines.modules.documentation import (
+    TARGET_WITH_DASH_PATHS,
+    DOCUMENTATION_TARGET,
+    UUID_PERMALINKS
+)
 
 ROOT = Path(str(git.Repo(".", search_parent_directories=True).working_dir))
-
-DOCUMENTATION_TARGET = DataTide.Configurations.Documentation.documentation_target
-if DOCUMENTATION_TARGET == "gitlab":
-    UUID_PERMALINKS = DataTide.Configurations.Documentation.gitlab.get("uuid_permalinks", False)
-else:
-    UUID_PERMALINKS = False
 
 DEFAULT_RESPONDERS = DataTide.Configurations.Deployment.default_responders
 SYSTEMS_CONFIG = DataTide.Configurations.Systems.Index
@@ -78,7 +77,7 @@ for sub in SYSTEMS_SUBSCHEMAS.copy():
 
 
 
-if DOCUMENTATION_TARGET == "gitlab":
+if DOCUMENTATION_TARGET in TARGET_WITH_DASH_PATHS:
     MDR_WIKI_PATH = Path(str(MDR_WIKI_PATH).replace(" ", "-"))
     print("🦊 Configured to use Gitlab Flavored Markdown")
 
@@ -92,13 +91,15 @@ def documentation(mdr):
     name = f"{MDR_ICON} {mdr['name']}"
     frontmatter = ""
 
-    if DOCUMENTATION_TARGET == "generic":
-        name = "# " + name
-
-    if DOCUMENTATION_TARGET == "gitlab":
+    # For some wikis, the file name is used as the page display name,
+    # in which case it is redundant to also have the name as an H1
+    if DOCUMENTATION_TARGET in [CIEnvironment.CIPlatforms.GitlabCI,
+                                CIEnvironment.CIPlatforms.AzurePipeline]:
         if UUID_PERMALINKS:
             frontmatter = f"---\ntitle: {name}\n---"
         name = ""    
+    else:
+        name = "# " + name
 
     uuid_data = mdr["metadata"]["uuid"]
     description = mdr.get("description", "").replace("\n", "\n> ")
@@ -116,7 +117,7 @@ def documentation(mdr):
 
     if not relation_graph:
         relations = "🚫 No related objects indexed."
-        if DOCUMENTATION_TARGET == "gitlab":
+        if DOCUMENTATION_TARGET is CIEnvironment.CIPlatforms.GitlabCI:
             GitlabMarkdown.negative_diff(relation_graph)
     else:
         relations = relation_graph + "\n\n" + relation_table
@@ -141,7 +142,7 @@ def documentation(mdr):
     playbook_col = get_field_title("playbook", MDR_METASCHEMA)
     if not playbook_data:
         playbook_data = "No playbook was defined for this detection rule"
-        if DOCUMENTATION_TARGET == "gitlab":
+        if DOCUMENTATION_TARGET is CIEnvironment.CIPlatforms.GitlabCI:
             playbook_data = f"[-{playbook_data}-]"
     else:
         playbook_name = playbook_data.split("/")[-1]
@@ -289,8 +290,8 @@ def documentation(mdr):
             system_name += "[DISABLED]"
             banner = "This system is not enabled in your System Configurations, "\
                 "this documentation is only informational"
-            if DOCUMENTATION_TARGET == "gitlab":
-                banner = f"[- {banner} -]"
+            if DOCUMENTATION_TARGET is CIEnvironment.CIPlatforms.GitlabCI:
+                banner = GitlabMarkdown.negative_diff(banner)
             table = banner + "\n\n" + table
                 
         fold = FOLD.format(system_name, table)
@@ -348,7 +349,9 @@ def run():
             mdr_uuid
             )
 
-        if UUID_PERMALINKS:
+        if DOCUMENTATION_TARGET is CIEnvironment.CIPlatforms.GitlabCI and UUID_PERMALINKS:
+            log("INFO", "Generating docs with UUID as file name")
+            log("INFO", "Target CI is", str(DOCUMENTATION_TARGET))
             doc_file_name = mdr_data.get("metadata").get("uuid")+ ".md"
         else:
             doc_name = mdr_data.get("name").replace("_", " ")
@@ -356,12 +359,11 @@ def run():
             doc_file_name = safe_file_name(doc_file_name)
             
         doc_path = MDR_WIKI_PATH / doc_file_name
-        
 
         document = documentation(mdr_data)
 
         # Replace whitespace in file name as it becomes a path in the Gitlab Wiki
-        if DOCUMENTATION_TARGET == "gitlab":
+        if DOCUMENTATION_TARGET in TARGET_WITH_DASH_PATHS:
             doc_path = Path(str(doc_path).replace(" ", "-"))
 
         with open(doc_path, "w+", encoding="utf-8") as output:

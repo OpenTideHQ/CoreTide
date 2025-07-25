@@ -66,7 +66,8 @@ def documentation(object):
     title = f"{get_icon(object_type)} {object['name']}"
     frontmatter = ""
     
-    if DOCUMENTATION_TARGET is CIEnvironment.CIPlatforms.GitlabCI:
+    if DOCUMENTATION_TARGET in [CIEnvironment.CIPlatforms.GitlabCI,
+                                CIEnvironment.CIPlatforms.AzurePipeline]:
         if UUID_PERMALINKS:
             frontmatter = f"---\ntitle: {title}\n---"            
         title = ""

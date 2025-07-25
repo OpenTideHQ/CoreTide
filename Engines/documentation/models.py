@@ -3,9 +3,6 @@ import git
 from pathlib import Path
 import sys
 import shutil
-import time
-
-start_time = time.time()
 
 sys.path.append(str(git.Repo(".", search_parent_directories=True).working_dir))
 from Engines.modules.framework import (
@@ -21,6 +18,9 @@ from Engines.modules.documentation import (
     GitlabMarkdown,
     sanitize_hover,
     FOLD,
+    DOCUMENTATION_TARGET,
+    UUID_PERMALINKS,
+    TARGET_WITH_DASH_PATHS
 )
 from Engines.modules.documentation_components import (
     criticality_doc,
@@ -37,19 +37,12 @@ from Engines.modules.files import safe_file_name
 from Engines.modules.graphs import relationships_graph, chaining_graph
 from Engines.modules.tide import DataTide
 from Engines.modules.logs import log
-from Engines.modules.deployment import Proxy
+from Engines.modules.deployment import Proxy, CIEnvironment
 from Engines.templates.models import MODEL_DOC_TEMPLATE
 
 ROOT = Path(str(git.Repo(".", search_parent_directories=True).working_dir))
 MODELS_DOCS_PATH = Path(DataTide.Configurations.Global.Paths.Core.models_docs_folder)
 MODELS_SCOPE = DataTide.Configurations.Documentation.scope
-
-DOCUMENTATION_TARGET = DataTide.Configurations.Documentation.documentation_target
-if DOCUMENTATION_TARGET == "gitlab":
-    UUID_PERMALINKS = DataTide.Configurations.Documentation.gitlab.get("uuid_permalinks", False)
-else:
-    UUID_PERMALINKS = False
-
 MODELS_INDEX = DataTide.Models.Index
 MODELS_NAME = DataTide.Configurations.Documentation.object_names
 
@@ -66,11 +59,11 @@ def documentation(model):
     title = f"{get_icon(model_type)} {model['name']}"
     frontmatter = ""
     
-    if DOCUMENTATION_TARGET == "gitlab":
+    if DOCUMENTATION_TARGET is CIEnvironment.CIPlatforms.GitlabCI:
         if UUID_PERMALINKS:
             frontmatter = f"---\ntitle: {title}\n---"            
         title = ""
-    elif DOCUMENTATION_TARGET == "generic":
+    else:
         title = "# " + title
         
     model_datafield = DataTide.Configurations.Global.data_fields[model_type]
@@ -84,9 +77,6 @@ def documentation(model):
     expand_graphs = ""
 
     actors_sightings = ""
-
-    if DOCUMENTATION_TARGET == "gitlab":
-        title = ""
 
     references = model.get("references")
     
@@ -132,7 +122,7 @@ def documentation(model):
 
     if not relation_graph and not relation_table:
         relation_graph = "🚫 No related OpenTide objects indexed."
-        if DOCUMENTATION_TARGET == "gitlab":
+        if DOCUMENTATION_TARGET is CIEnvironment.CIPlatforms.GitlabCI:
             GitlabMarkdown.negative_diff(relation_graph)
 
     if model_type == "bdr":
@@ -172,7 +162,7 @@ def documentation(model):
 
     data_table, tags = model_data_table(model[model_datafield], model_uuid)
 
-    if DOCUMENTATION_TARGET == "gitlab":
+    if DOCUMENTATION_TARGET is CIEnvironment.CIPlatforms.GitlabCI:
         tags = ""
     else:
         tags = "---\n\n#### 🏷️ Tags\n\n"
@@ -215,7 +205,7 @@ def run():
             MODELS_DOCS_PATH
             / MODELS_NAME[model_type]
         )
-        if DOCUMENTATION_TARGET== "gitlab":
+        if DOCUMENTATION_TARGET in TARGET_WITH_DASH_PATHS:
             doc_type_path = Path(str(doc_type_path).replace(" ", "-"))
 
         # Remove everything in the doc folder for the model
@@ -246,7 +236,7 @@ def run():
             doc_path = doc_type_path / doc_file_name
 
             # Replace whitespace in file name as it becomes a path in the Gitlab MODELS_DOCS_PATH
-            if DOCUMENTATION_TARGET == "gitlab":
+            if DOCUMENTATION_TARGET in TARGET_WITH_DASH_PATHS:
                 doc_path = Path(str(doc_path).replace(" ", "-"))
 
             log("ONGOING",
@@ -260,17 +250,7 @@ def run():
                 output.write(document)
                 doc_count += 1
 
-    if DOCUMENTATION_TARGET == "generic":
-        doc_format_log = "✒️ standard markdown"
-    elif DOCUMENTATION_TARGET == "gitlab":
-        doc_format_log = "🦊 Gitlab Flavored Markdown"
-    else:
-        doc_format_log = ""
-
-    time_to_execute = "%.2f" % (time.time() - start_time)
-
-    log("INFO", f"Generated {doc_count} documents in {time_to_execute} seconds")
-    log("SUCCESS", "Successfully built CoreTIDE documentation in format", doc_format_log)
+    log("SUCCESS", "Successfully built CoreTIDE documentation")
 
 
 if __name__ == "__main__":

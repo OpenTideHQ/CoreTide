@@ -49,6 +49,7 @@ class CIEnvironment:
         AzurePipeline = auto()
         GitlabCI = auto()
         GitHubActions = auto()
+        LocalDebug = auto()
 
     def _check_ci_environment(self) -> CIPlatforms:
         if os.getenv("TF_BUILD"):
@@ -60,12 +61,15 @@ class CIEnvironment:
         elif os.getenv("CI"):
             log("SUCCESS", "Discovered CI Environment to be Gitlab CI")
             return self.CIPlatforms.GitlabCI
+        elif HelperTide.is_debug():
+            log("SUCCESS", "Discover CI Environment to be Local")
+            return self.CIPlatforms.LocalDebug
         else:
             log(
                 "FATAL",
                 "CI Target environment variable is not implemented",
                 "Ensure that you have configured a variable OpenTide.TargetCi as part of your pipeline",
-                "Current supported values: GitlabCI, AzurePipelines",
+                "Current supported values: GitlabCI, AzurePipelines, GitlabActions, LocalDebug",
             )
             raise Exception
 
@@ -532,7 +536,6 @@ class ExternalIdHelper:
                 updated_content.append(line)
 
         with open(file_path, "w", encoding="utf-8") as mdr_file:
-            print("SHIT")
             print(updated_content)
             mdr_file.writelines(updated_content)
             log(
@@ -546,29 +549,29 @@ class TideDeployment:
     def __init__(self, deployment, system: DetectionSystems, strategy):
         match system:
             case DetectionSystems.SPLUNK:
-                self.rule_deployment: Sequence[TenantDeployment.Splunk] = (
+                self.rule_deployment: Sequence[TenantDeployment.Splunk] = ( # type:ignore
                     self.deployment_resolver(deployment, system, strategy)
-                )  # type:ignore
+                )  
             case DetectionSystems.SENTINEL:
-                self.rule_deployment: Sequence[TenantDeployment.Sentinel] = (
-                    self.deployment_resolver(deployment, system, strategy)
-                )  # type:ignore
+                self.rule_deployment: Sequence[TenantDeployment.Sentinel] = ( # type:ignore
+                    self.deployment_resolver(deployment, system, strategy) 
+                )
             case DetectionSystems.CARBON_BLACK_CLOUD:
-                self.rule_deployment: Sequence[TenantDeployment.CarbonBlackCloud] = (
+                self.rule_deployment: Sequence[TenantDeployment.CarbonBlackCloud] = ( # type:ignore
                     self.deployment_resolver(deployment, system, strategy)
-                )  # type:ignore
+                )
             case DetectionSystems.DEFENDER_FOR_ENDPOINT:
-                self.rule_deployment: Sequence[TenantDeployment.DefenderForEndpoint] = (
+                self.rule_deployment: Sequence[TenantDeployment.DefenderForEndpoint] = ( # type:ignore
                     self.deployment_resolver(deployment, system, strategy)
-                )  # type:ignore
+                )
             case DetectionSystems.SENTINEL_ONE:
-                self.rule_deployment: Sequence[TenantDeployment.SentinelOne] = (
+                self.rule_deployment: Sequence[TenantDeployment.SentinelOne] = ( # type:ignore
                     self.deployment_resolver(deployment, system, strategy)
-                )  # type:ignore
+                ) 
             case DetectionSystems.CROWDSTRIKE:
                 self.rule_deployment: Sequence[TenantDeployment.Crowdstrike] = (
-                    self.deployment_resolver(deployment, system, strategy)
-                )  # type:ignore
+                    self.deployment_resolver(deployment, system, strategy) # type:ignore
+                )
             case _:
                 raise NotImplementedError(
                     f"System {system} is not implemented by TideDeployment"
@@ -820,8 +823,8 @@ class TideDeployment:
                         str(mod.description or ""),
                     )
                     flatten_modifications = pd.json_normalize(
-                        mod.modifications
-                    ).to_dict(orient="records")[0]  # type: ignore
+                        mod.modifications # type: ignore
+                    ).to_dict(orient="records")[0] 
                     for modification in flatten_modifications:
                         new_value = flatten_modifications[modification]
                         new_value = None if new_value in [
@@ -831,8 +834,8 @@ class TideDeployment:
                                 pass
                             elif "::" in new_value:
                                 raw_mdr_config_flatten = pd.json_normalize(
-                                    raw_mdr_config
-                                ).to_dict(orient="records")[0]  # type: ignore
+                                    raw_mdr_config # type: ignore
+                                ).to_dict(orient="records")[0]  
                                 operator = new_value.split("::")[0]
                                 value = new_value.split("::")[1]
                                 log(
@@ -868,8 +871,8 @@ class TideDeployment:
                         )
                         if updated_config:
                             raw_mdr_config = self._deep_update(
-                                raw_mdr_config.copy(), updated_config
-                            )  # type: ignore
+                                raw_mdr_config.copy(), updated_config # type: ignore
+                            )  
 
         raw_data["configurations"].update({system_identifier: raw_mdr_config})
         log("INFO", "New recompiled modified deployment", str(raw_data))

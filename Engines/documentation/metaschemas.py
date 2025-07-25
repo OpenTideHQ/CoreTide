@@ -14,6 +14,7 @@ sys.path.append(str(git.Repo(".", search_parent_directories=True).working_dir))
 from Engines.modules.documentation import get_icon, name_subschema_doc
 from Engines.modules.logs import log
 from Engines.modules.tide import DataTide
+from Engines.modules.deployment import CIEnvironment
 
 ROOT = Path(str(git.Repo(".", search_parent_directories=True).working_dir))
 
@@ -25,8 +26,7 @@ TEMPLATES_INDEX = DataTide.Templates.Index
 SCHEMA_DOCS_PATH = Path(DataTide.Configurations.Global.Paths.Core.schemas_docs_folder)
 DOC_TITLES = DataTide.Configurations.Documentation.titles
 ICONS = DataTide.Configurations.Documentation.icons
-DOCUMENTATION_TARGET = DataTide.Configurations.Documentation.documentation_target
-
+DOCUMENTATION_TARGET = CIEnvironment()._check_ci_environment()
 
 # Columns of the dataframe which will constructs the table
 columns = ["Field", "Name", "Description", "Type", "Example"]
@@ -86,7 +86,7 @@ def gen_schema_md(metaschema, template, model_type=None):
                                                    template=template,
                                                    template_name=template_name)
     
-    if DOCUMENTATION_TARGET == "generic":
+    if DOCUMENTATION_TARGET is not CIEnvironment.CIPlatforms.GitlabCI:
         if title:
             documentation = f"# {title} \n\n" + documentation
 
@@ -184,7 +184,7 @@ def run():
             doc = gen_schema_md(meta, template, model)
             output_path = SCHEMA_DOCS_PATH / (icon + " " + DOC_TITLES[model] + ".md")
             
-            if DOCUMENTATION_TARGET == "gitlab":
+            if DOCUMENTATION_TARGET is CIEnvironment.CIPlatforms.GitlabCI:
                 output_path = Path(str(output_path).replace(" ", "-"))
             
             with open(output_path, "w+", encoding='utf-8') as output:
@@ -204,14 +204,14 @@ def run():
                 doc = gen_schema_md(subschema, sub_template)
                 output_path = SCHEMA_DOCS_PATH / (subschema_name + ".md")
             
-                if DOCUMENTATION_TARGET == "gitlab":
+                if DOCUMENTATION_TARGET is CIEnvironment.CIPlatforms.GitlabCI:
                     output_path = Path(str(output_path).replace(" ", "-"))
 
                 with open(output_path, "w+", encoding='utf-8') as output:
                     output.write(doc)
 
 
-    if DOCUMENTATION_TARGET == "gitlab":
+    if DOCUMENTATION_TARGET is CIEnvironment.CIPlatforms.GitlabCI:
         doc_format_log = "🦊 Gitlab Flavored Markdown"    
     else:
         doc_format_log = "✒️ Standard markdown"

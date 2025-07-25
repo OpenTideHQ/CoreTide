@@ -1,6 +1,3 @@
-documentation_target = "gitlab" #generic: common features for markdown wikis
-                                #gitlab : enables gitlab wiki specific features
-
 scope = [ "tvm", "cdm", "bdr" ]
 skip_model_keys = ["description",
                             "guidelines",
@@ -18,9 +15,11 @@ skip_vocabularies = ["mitigation",
                     "nist",
                     "att&ck"]
 
+model_cover_pages = true #Creates a cover page for the Object sub-folder
+                         #only supported in Gitlab Wiki and Azure DevOps Wiki
+
+
 [gitlab]
-model_cover_pages = true #Creates a cover page for the model sub-folder
-                         #using JSON Tables to facilitate searches
 uuid_permalinks = true   #All markdown files are named using UUIDs to create 
                          #a permanent URL link. YAML frontmatter is used for page titles.
 

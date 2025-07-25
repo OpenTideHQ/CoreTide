@@ -296,7 +296,7 @@ def build_search(model_type, mdr_status:Optional[Literal["ACTIVE", "DEPRECATED"]
     if DOCUMENTATION_TARGET is CIEnvironment.CIPlatforms.GitlabCI:
         nav_index = make_json_table(df)
     else:
-        nav_index = df.to_csv(index=False)
+        nav_index = df.to_markdown(index=False)
 
     return nav_index
 

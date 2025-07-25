@@ -91,7 +91,10 @@ def documentation(mdr):
     name = f"{MDR_ICON} {mdr['name']}"
     frontmatter = ""
 
-    if DOCUMENTATION_TARGET is CIEnvironment.CIPlatforms.GitlabCI:
+    # For some wikis, the file name is used as the page display name,
+    # in which case it is redundant to also have the name as an H1
+    if DOCUMENTATION_TARGET in [CIEnvironment.CIPlatforms.GitlabCI,
+                                CIEnvironment.CIPlatforms.AzurePipeline]:
         if UUID_PERMALINKS:
             frontmatter = f"---\ntitle: {name}\n---"
         name = ""    

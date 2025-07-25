@@ -96,7 +96,9 @@ def documentation(mdr):
     frontmatter = ""
 
     if DOCUMENTATION_TARGET is CIEnvironment.CIPlatforms.GitlabCI:
+        log("INFO", "Generating for Gitlab", name)
         if UUID_PERMALINKS:
+            log("INFO", "UUID Permalinks enabled")
             frontmatter = f"---\ntitle: {name}\n---"
         name = ""    
     else:
@@ -350,7 +352,9 @@ def run():
             mdr_uuid
             )
 
-        if UUID_PERMALINKS:
+        if DOCUMENTATION_TARGET is CIEnvironment.CIPlatforms.GitlabCI and UUID_PERMALINKS:
+            log("INFO", "Generating docs with UUID as file name")
+            log("INFO", "Target CI is", str(DOCUMENTATION_TARGET))
             doc_file_name = mdr_data.get("metadata").get("uuid")+ ".md"
         else:
             doc_name = mdr_data.get("name").replace("_", " ")

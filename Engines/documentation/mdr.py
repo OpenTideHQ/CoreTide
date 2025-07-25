@@ -37,6 +37,13 @@ from Engines.modules.deployment import enabled_systems, CIEnvironment
 ROOT = Path(str(git.Repo(".", search_parent_directories=True).working_dir))
 
 DOCUMENTATION_TARGET = CIEnvironment()._check_ci_environment()
+
+# Wiki Environments that require replacing all spaces in file names with
+# dashes
+
+TARGET_WITH_DASH_PATHS = [CIEnvironment.CIPlatforms.AzurePipeline,
+                          CIEnvironment.CIPlatforms.GitlabCI]
+
 log("INFO", "Identified CI Environment", str(DOCUMENTATION_TARGET.name))
 if DOCUMENTATION_TARGET is CIEnvironment.CIPlatforms.GitlabCI:
     UUID_PERMALINKS = DataTide.Configurations.Documentation.gitlab.get("uuid_permalinks", False)
@@ -362,12 +369,11 @@ def run():
             doc_file_name = safe_file_name(doc_file_name)
             
         doc_path = MDR_WIKI_PATH / doc_file_name
-        
 
         document = documentation(mdr_data)
 
         # Replace whitespace in file name as it becomes a path in the Gitlab Wiki
-        if DOCUMENTATION_TARGET is CIEnvironment.CIPlatforms.GitlabCI:
+        if DOCUMENTATION_TARGET in TARGET_WITH_DASH_PATHS:
             doc_path = Path(str(doc_path).replace(" ", "-"))
 
         with open(doc_path, "w+", encoding="utf-8") as output:

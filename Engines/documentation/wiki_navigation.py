@@ -263,8 +263,11 @@ def build_search(model_type, mdr_status:Optional[Literal["ACTIVE", "DEPRECATED"]
     }
     df = df.rename(columns=rename_mapping)
 
-    nav_index = make_json_table(df)
-
+    if DOCUMENTATION_TARGET is CIEnvironment.CIPlatforms.GitlabCI:
+        nav_index = make_json_table(df)
+    else:
+        nav_index = df.to_csv(index=False)
+        
     return nav_index
 
 

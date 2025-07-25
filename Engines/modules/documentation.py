@@ -16,12 +16,22 @@ from Engines.modules.logs import log
 from Engines.modules.tide import DataTide
 from Engines.modules.deployment import CIEnvironment
 
+# Wiki Environments that require replacing all spaces in file names with
+# dashes
+TARGET_WITH_DASH_PATHS = [CIEnvironment.CIPlatforms.AzurePipeline,
+                            CIEnvironment.CIPlatforms.GitlabCI]
+
+
 VOCAB_INDEX = DataTide.Vocabularies.Index
 DOCUMENTATION_TARGET = CIEnvironment()._check_ci_environment()
+log("INFO", "Identified CI Environment", str(DOCUMENTATION_TARGET.name))
 if DOCUMENTATION_TARGET is CIEnvironment.CIPlatforms.GitlabCI:
     UUID_PERMALINKS = DataTide.Configurations.Documentation.gitlab.get("uuid_permalinks", False)
+    log("INFO", "Enabling UUID Permalinking for Gitlab target")
 else:
+    log("INFO", "Disabling UUID Permalinking for Gitlab target")
     UUID_PERMALINKS = False
+
 ICONS = DataTide.Configurations.Documentation.icons
 DOCUMENTATION_CONFIG = DataTide.Configurations.Documentation
 CONFIG_INDEX = DataTide.Configurations.Index
@@ -273,7 +283,7 @@ def backlink_resolver(model_uuid:str,
         backlink_name = model_name
         file_link = f"{doc_path}{icon} {model_name}"
 
-    if DOCUMENTATION_TARGET is CIEnvironment.CIPlatforms.GitlabCI:
+    if DOCUMENTATION_TARGET in TARGET_WITH_DASH_PATHS:
         if UUID_PERMALINKS:
             file_link = doc_path + model_data.get("metadata",{}).get("uuid")
         file_link = file_link.replace(" ", "-").replace("_", "-")

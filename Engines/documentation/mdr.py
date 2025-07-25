@@ -33,24 +33,13 @@ from Engines.modules.tide import DataTide
 from Engines.modules.logs import log
 from Engines.modules.graphs import relationships_graph
 from Engines.modules.deployment import enabled_systems, CIEnvironment
+from Engines.modules.documentation import (
+    TARGET_WITH_DASH_PATHS,
+    DOCUMENTATION_TARGET,
+    UUID_PERMALINKS
+)
 
 ROOT = Path(str(git.Repo(".", search_parent_directories=True).working_dir))
-
-DOCUMENTATION_TARGET = CIEnvironment()._check_ci_environment()
-
-# Wiki Environments that require replacing all spaces in file names with
-# dashes
-
-TARGET_WITH_DASH_PATHS = [CIEnvironment.CIPlatforms.AzurePipeline,
-                          CIEnvironment.CIPlatforms.GitlabCI]
-
-log("INFO", "Identified CI Environment", str(DOCUMENTATION_TARGET.name))
-if DOCUMENTATION_TARGET is CIEnvironment.CIPlatforms.GitlabCI:
-    UUID_PERMALINKS = DataTide.Configurations.Documentation.gitlab.get("uuid_permalinks", False)
-    log("INFO", "Enabling UUID Permalinking for Gitlab target")
-else:
-    log("INFO", "Disabling UUID Permalinking for Gitlab target")
-    UUID_PERMALINKS = False
 
 DEFAULT_RESPONDERS = DataTide.Configurations.Deployment.default_responders
 SYSTEMS_CONFIG = DataTide.Configurations.Systems.Index

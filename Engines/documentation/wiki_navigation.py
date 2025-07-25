@@ -24,14 +24,14 @@ from Engines.modules.documentation import (
     get_field_title,
     make_json_table,
     backlink_resolver,
-    rich_attack_links
+    rich_attack_links,
+    DOCUMENTATION_TARGET,
 )
 from Engines.modules.logs import log
 from Engines.modules.tide import DataTide
 from Engines.modules.debug import DebugEnvironment
 from Engines.modules.deployment import CIEnvironment
 
-DOCUMENTATION_TARGET = CIEnvironment()._check_ci_environment()
 COVER_PAGES_ENABLED = DataTide.Configurations.Documentation.model_cover_pages
 
 MODELS_INDEX = DataTide.Models.Index
@@ -297,7 +297,7 @@ def build_search(model_type, mdr_status:Optional[Literal["ACTIVE", "DEPRECATED"]
         nav_index = make_json_table(df)
     else:
         nav_index = df.to_csv(index=False)
-        
+
     return nav_index
 
 

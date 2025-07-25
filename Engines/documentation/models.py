@@ -18,6 +18,9 @@ from Engines.modules.documentation import (
     GitlabMarkdown,
     sanitize_hover,
     FOLD,
+    DOCUMENTATION_TARGET,
+    UUID_PERMALINKS,
+    TARGET_WITH_DASH_PATHS
 )
 from Engines.modules.documentation_components import (
     criticality_doc,
@@ -34,20 +37,12 @@ from Engines.modules.files import safe_file_name
 from Engines.modules.graphs import relationships_graph, chaining_graph
 from Engines.modules.tide import DataTide
 from Engines.modules.logs import log
-from Engines.modules.deployment import Proxy
-from Engines.modules.deployment import CIEnvironment
+from Engines.modules.deployment import Proxy, CIEnvironment
 from Engines.templates.models import MODEL_DOC_TEMPLATE
 
 ROOT = Path(str(git.Repo(".", search_parent_directories=True).working_dir))
 MODELS_DOCS_PATH = Path(DataTide.Configurations.Global.Paths.Core.models_docs_folder)
 MODELS_SCOPE = DataTide.Configurations.Documentation.scope
-
-DOCUMENTATION_TARGET = CIEnvironment()._check_ci_environment()
-if DOCUMENTATION_TARGET is CIEnvironment.CIPlatforms.GitlabCI:
-    UUID_PERMALINKS = DataTide.Configurations.Documentation.gitlab.get("uuid_permalinks", False)
-else:
-    UUID_PERMALINKS = False
-
 MODELS_INDEX = DataTide.Models.Index
 MODELS_NAME = DataTide.Configurations.Documentation.object_names
 
@@ -241,7 +236,7 @@ def run():
             doc_path = doc_type_path / doc_file_name
 
             # Replace whitespace in file name as it becomes a path in the Gitlab MODELS_DOCS_PATH
-            if DOCUMENTATION_TARGET is CIEnvironment.CIPlatforms.GitlabCI:
+            if DOCUMENTATION_TARGET in TARGET_WITH_DASH_PATHS:
                 doc_path = Path(str(doc_path).replace(" ", "-"))
 
             log("ONGOING",

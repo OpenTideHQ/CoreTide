@@ -18,6 +18,8 @@ from Engines.modules.documentation import (
     object_name,
     backlink_resolver,
     rich_attack_links,
+    DOCUMENTATION_TARGET,
+    CIEnvironment
 )
 from Engines.modules.tide import DataTide
 
@@ -92,12 +94,23 @@ def relationships_graph(id):
     )
 
     graph_mermaid = f"""
-```mermaid
-mindmap
-    Root[{mermaid_sanitizer(object_name(id).strip())}]
-        {mindmap}
-```
-    """
+        mindmap
+            Root[{mermaid_sanitizer(object_name(id).strip())}]
+                {mindmap}
+        """
+
+    if DOCUMENTATION_TARGET is CIEnvironment.CIPlatforms.AzurePipeline:
+        graph_mermaid = f"""
+            ::: mermaid
+            {graph_mermaid}
+            :::
+            """
+    else:
+        graph_mermaid = f"""
+            ```mermaid
+            {graph_mermaid}
+            ```
+            """
 
     return graph_mermaid
 
@@ -295,6 +308,11 @@ def chaining_graph(tvm):
 
     vector_links = "\n".join(vector_links)
 
-    diagram = f"```mermaid\n\nflowchart LR\n\n{header_data}\n\n{killchain_subgraphs}\n\n{properties_graph}\n\n{vector_links}\n\n```"
+    diagram = f"flowchart LR\n\n{header_data}\n\n{killchain_subgraphs}\n\n{properties_graph}\n\n{vector_links}"
+
+    if DOCUMENTATION_TARGET is CIEnvironment.CIPlatforms.AzurePipeline:
+        diagram = f"::: mermaid\n\n{diagram}\n\n:::"
+    else:
+        diagram = f"```mermaid\n\n{diagram}\n\n```"
 
     return diagram, table

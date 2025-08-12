@@ -101,16 +101,16 @@ def relationships_graph(id):
 
     if DOCUMENTATION_TARGET is CIEnvironment.CIPlatforms.AzurePipeline:
         graph_mermaid = f"""
-            ::: mermaid
-            {graph_mermaid}
-            :::
-            """
+::: mermaid
+{graph_mermaid}
+:::
+"""
     else:
         graph_mermaid = f"""
-            ```mermaid
-            {graph_mermaid}
-            ```
-            """
+```mermaid
+{graph_mermaid}
+```
+"""
 
     return graph_mermaid
 

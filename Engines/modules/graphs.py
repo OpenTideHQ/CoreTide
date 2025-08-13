@@ -94,10 +94,10 @@ def relationships_graph(id):
     )
 
     graph_mermaid = f"""
-        mindmap
-            Root[{mermaid_sanitizer(object_name(id).strip())}]
-                {mindmap}
-        """
+mindmap
+Root[{mermaid_sanitizer(object_name(id).strip())}]
+    {mindmap}
+"""
 
     if DOCUMENTATION_TARGET is CIEnvironment.CIPlatforms.AzurePipeline:
         graph_mermaid = f"""

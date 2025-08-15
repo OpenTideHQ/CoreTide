@@ -36,7 +36,10 @@ class RevisionIndexer:
         self.OBJECT_SCOPE = DataTide.Configurations.Global.objects
         self.OBJECT_NAMES = DataTide.Configurations.Documentation.object_names
         self.INDEX_NAME = DataTide.Configurations.Global.indexes.revisions
-        self.RAW_REVISIONS_INDEX = json.load(open(self.TIDE_INDEXES_PATH / self.INDEX_NAME))
+        self.INDEX_PATH = self.TIDE_INDEXES_PATH / self.INDEX_NAME
+        if not os.path.exists(self.INDEX_PATH):
+            json.dump({}, open(self.INDEX_PATH, "w+"))
+        self.RAW_REVISIONS_INDEX = json.load(open(self.INDEX_PATH))
         self.REVISIONS_INDEX = self._load_revision_index(self.RAW_REVISIONS_INDEX)
 
     def run(self):
@@ -114,11 +117,9 @@ class RevisionIndexer:
 
         return updated_index
 
-    def _export(self, index:dict, file:str=""):
+    def _export(self, index:dict):
         
-        if not file:
-            file = self.INDEX_NAME
-        with open(self.TIDE_INDEXES_PATH / file, "w+", encoding="utf-8") as export:
+        with open(self.INDEX_PATH, "w+", encoding="utf-8") as export:
             export.write("")
             json.dump(index, export, indent=4)
 

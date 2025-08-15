@@ -34,6 +34,6 @@ templates.run()
 IndexTide.reload()
 from Engines.framework import json_schemas, vscode_snippets
 
-RevisionIndexer().create_index()
+RevisionIndexer().run()
 json_schemas.run()
 vscode_snippets.run()

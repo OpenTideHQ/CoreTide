@@ -12,7 +12,7 @@ properties:
 
   public:
     title: Publicly available resources
-    description: Resources freely available on internet
+    description: Resources freely available on internet with no sharing constraints
     icon: 🕊️
     type: object
     tide.template.spacer: False
@@ -27,29 +27,13 @@ properties:
     title: Private references
     icon: 🏦
     description: |
-      Propriatary, sensible and confidential data belonging to the owner of the CoreTIDE instance
+      Proprietary, sensible and confidential data belonging to the owner of the OpenTide instance
       where the object was modelled on, and which cannot be shared.
     type: object
     tide.template.spacer: False
     patternProperties:
       "^[a-z]$":
           example: a
-          type: string
-          format: uri
-    additionalProperties: False
-
-  restricted:
-    title: Restricted references
-    icon: 🔐
-    description: |
-      Properties propriatary to the owner of the CoreTIDE instance where the object was created,
-      but which may be shared with a defined list of approved counterparts.
-    type: object
-    tide.template.hide: True
-    tide.template.spacer: False
-    patternProperties:
-      "^[A-Z]$":
-          example: A
           type: string
           format: uri
     additionalProperties: False

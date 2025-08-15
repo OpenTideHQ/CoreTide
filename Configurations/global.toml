@@ -1,4 +1,4 @@
-models = [ "tvm", "cdm", "bdr", "mdr" ]
+objects = [ "tvm", "cdm", "bdr", "mdr" ]
 
 [paths.tide]
 tvm = "Objects/Threat Vectors/"
@@ -26,6 +26,10 @@ models_docs_folder = "wiki/Models/"
 schemas_docs_folder = "wiki/Framework/Schemas/"
 vocabularies_docs = "wiki/Framework/Vocabularies/"
 resources = "External/"
+
+[indexes]
+objects = "objects.json"
+revisions = "revisions.json"
 
 [metaschemas]
 tvm = "TVM Meta Schema.yaml"

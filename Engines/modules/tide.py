@@ -443,12 +443,13 @@ class SystemLoader:
                 response_actions = DefenderForEndpoint.ResponseActions(devices=devices,
                                                                         files=files,
                                                                         users=users)
-        exclusions = None
-        if mdr_config.get("exclusions"):
-            exclusions = []
-            for exclusion in mdr_config.pop("exclusions"):
-                exclusions.append(DefenderForEndpoint.Exclusion(**exclusion))
-
+        exclusions = mdr_config.pop("exclusions", None)
+        if exclusions:
+            exclusions_data = []
+            for exclusion in exclusions:
+                exclusions_data.append(DefenderForEndpoint.Exclusion(**exclusion))
+            exclusions = exclusions_data
+        
         return DefenderForEndpoint( **mdr_config,
                                     schema=base_config.schema,
                                     status=base_config.status,

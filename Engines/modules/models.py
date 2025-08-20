@@ -448,6 +448,7 @@ class TideModels:
 
                     title: Optional[str] = None
                     description: Optional[str] = None
+                    severity: Optional[str] = None
                     suppression: Union[str, bool] = False
                     create_incident: bool = True 
                     tactics: Optional[List[str]] = None

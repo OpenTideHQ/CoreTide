@@ -223,6 +223,16 @@ properties:
         example: rule {{columnName1}} display name
         tide.mdr.parameter: alertDetailsOverride.alertDescriptionFormat
       
+      severity:
+        title: Alert Severity
+        type: string
+        description: Severity the alert will be raised with. Overrides MDR Base Severity
+        enum:
+          - Informational
+          - Low
+          - Medium
+          - High
+
       tactics:
         title: MITRE ATT&CK Tactics
         type: array

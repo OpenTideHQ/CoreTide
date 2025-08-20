@@ -166,7 +166,7 @@ class SentinelDeploy(DeployMDR):
 
 
         # Assign severity, Capping at high which is the maximum in Sentinel
-        severity = data.response.alert_severity
+        severity = configuration.alert.severity or data.response.alert_severity
         if severity == "Critical":
             severity = "High"
         rule.severity = severity

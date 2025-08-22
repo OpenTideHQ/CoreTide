@@ -208,9 +208,12 @@ def indexer(write_index=False) -> dict:
     index["subschemas"] = subschemas_index
 
     # Objects Indexer
+    # Objects Indexer
 
     print("📊 Indexing Objects...")
+    print("📊 Indexing Objects...")
 
+    objects_index = dict()
     objects_index = dict()
     files_index = dict()
 
@@ -245,6 +248,7 @@ def indexer(write_index=False) -> dict:
             objects_index[meta_name] = object_cat_index
 
     index["objects"] = objects_index
+    index["objects"] = objects_index
     index["files"] = files_index
     
     # Tide Indexes retrieval (injected into )
@@ -252,10 +256,12 @@ def indexer(write_index=False) -> dict:
         "Injected onto vocabulary index to be retrieved in generation jobs")
     
     if not os.path.exists(TIDE_INDEXES_PATH/"objects.json"):
+        log("SKIP", "Not able to find a objects.json index in Tide instance")
+    if not os.path.exists(TIDE_INDEXES_PATH/"objects.json"):
         log("SKIP", "Not able to find a objects.json index in Tide instance",
             "Should be generated in the next Framework generation pipeline run")
     else:
-        tide_object_index = json.load(open(TIDE_INDEXES_PATH/"objects.json", encoding="utf-8"))
+        tide_model_index = json.load(open(TIDE_INDEXES_PATH/"objects.json", encoding="utf-8"))
 
         if tide_object_index:
             if ("cdm" in tide_object_index) and ("bdr" in tide_object_index):

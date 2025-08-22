@@ -169,13 +169,13 @@ class IndexTide:
         patch = Tide2Patching()
 
         for mdr in STG_INDEX:
-            if mdr not in RECONCILED_INDEX["models"]["mdr"]:
+            if mdr not in RECONCILED_INDEX["objects"]["mdr"]:
                 log("INFO", "Patching MDR in staging index", mdr)
-                RECONCILED_INDEX["models"]["mdr"][mdr] = patch.tide_1_patch(STG_INDEX[mdr], "mdr")
+                RECONCILED_INDEX["objects"]["mdr"][mdr] = patch.tide_1_patch(STG_INDEX[mdr], "mdr")
                 added_mdr.append(mdr)
             else:
                 main_mdr_metadata = (
-                    RECONCILED_INDEX["models"]["mdr"][mdr].get("meta") or RECONCILED_INDEX["models"]["mdr"][mdr]["metadata"]
+                    RECONCILED_INDEX["objects"]["mdr"][mdr].get("meta") or RECONCILED_INDEX["objects"]["mdr"][mdr]["metadata"]
                 )
                 main_version = main_mdr_metadata["version"]
                 stg_mdr_metadata = (
@@ -198,7 +198,7 @@ class IndexTide:
                     updated_mdr = list()
 
                     log("INFO", "Doing a safety patching to avoid edge cases")
-                    RECONCILED_INDEX["models"]["mdr"][mdr] = patch.tide_1_patch(STG_INDEX[mdr], "mdr")
+                    RECONCILED_INDEX["objects"]["mdr"][mdr] = patch.tide_1_patch(STG_INDEX[mdr], "mdr")
         
         log("SUCCESS", "Finalized Staging Reconciliation Routine")
         log("INFO", "Updated MDRs from Production Index with Staging Data", str(len(updated_mdr)))
@@ -637,7 +637,7 @@ class DataTide:
 
         Exposes all the configurations of the instance
         """
-        Index = dict(IndexTide.load()["models"])
+        Index = dict(IndexTide.load()["objects"])
         """Index containing model types"""
         tvm = dict(Index["tvm"])
         """Threat Vector Models Data Index"""

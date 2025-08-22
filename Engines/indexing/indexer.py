@@ -8,6 +8,7 @@ import toml
 import git
 import uuid
 from pprint import pprint
+from dataclasses import dataclass
 
 sys.path.append(str(git.Repo(".", search_parent_directories=True).working_dir))
 
@@ -42,7 +43,14 @@ def indexer(write_index=False) -> dict:
     TEMPLATES_PATH = PATHS["templates"]
     TEMPLATES = TIDE_CONFIG["templates"]
     LOOKUPS_PATH = PATHS["lookups"]
-    TIDE_INDEXES_PATH = PATHS["tide_indexes"]
+    
+    @dataclass
+    class IndexPaths:
+        TIDE_INDEXES_PATH = PATHS["tide_indexes"]
+        OBJECTS_INDEX_PATH = TIDE_INDEXES_PATH / "objects.json"
+        REVISIONS_INDEX_PATH = TIDE_INDEXES_PATH / "revisions.json"
+
+
     OUTPUT_PATH = PATHS["index_output"]
 
 
@@ -251,18 +259,28 @@ def indexer(write_index=False) -> dict:
     log("INFO", "Retrieving all Tide Indexes built on the Tide Instance",
         "Injected onto vocabulary index to be retrieved in generation jobs")
     
-    if not os.path.exists(TIDE_INDEXES_PATH/"objects.json"):
+    indexes_index = {}
+
+    if not os.path.exists(IndexPaths.OBJECTS_INDEX_PATH):
         log("SKIP", "Not able to find a objects.json index in Tide instance",
             "Should be generated in the next Framework generation pipeline run")
     else:
-        tide_model_index = json.load(open(TIDE_INDEXES_PATH/"objects.json", encoding="utf-8"))
-
-        if tide_model_index:
-            if ("cdm" in tide_model_index) and ("bdr" in tide_model_index):
+        objects_index = json.load(open(IndexPaths.OBJECTS_INDEX_PATH/"objects.json", encoding="utf-8"))
+        indexes_index["objects"] = objects_index
+        if objects_index:
+            if ("cdm" in objects_index) and ("bdr" in objects_index):
                 log("INFO", "Appending BDR to CDM in Model index as options")
-                tide_model_index["cdm"]["entries"].update(tide_model_index["bdr"]["entries"])
-            index["vocabs"].update(tide_model_index)
+                objects_index["cdm"]["entries"].update(objects_index["bdr"]["entries"])
+            index["vocabs"].update(objects_index)
     
+    if not os.path.exists(IndexPaths.REVISIONS_INDEX_PATH):
+        log("SKIP", "Not able to find a revisions.json index in Tide instance",
+            "Should be generated in the next Framework generation pipeline run")
+    else:
+        revisions_index = json.load(open(IndexPaths.REVISIONS_INDEX_PATH, encoding="utf-8"))
+        indexes_index["revisions"] = revisions_index
+
+    index["Indexes"] = indexes_index
     # Lookups indexer
 
     print("🔎 Indexing Lookups...")

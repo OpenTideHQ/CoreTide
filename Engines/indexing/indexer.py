@@ -43,10 +43,10 @@ def indexer(write_index=False) -> dict:
     TEMPLATES_PATH = PATHS["templates"]
     TEMPLATES = TIDE_CONFIG["templates"]
     LOOKUPS_PATH = PATHS["lookups"]
+    TIDE_INDEXES_PATH = PATHS["tide_indexes"]
     
     @dataclass
     class IndexPaths:
-        TIDE_INDEXES_PATH = PATHS["tide_indexes"]
         OBJECTS_INDEX_PATH = TIDE_INDEXES_PATH / "objects.json"
         REVISIONS_INDEX_PATH = TIDE_INDEXES_PATH / "revisions.json"
 

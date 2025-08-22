@@ -51,9 +51,9 @@ current_stg_index = dict()
 
 # In this context, the deployment give the absolute path to each modified files
 for mdr in mdr_to_index:
-    log("ONGOING", "Updating the staging index", mdr_name)
     mdr_data = yaml.safe_load(open(mdr, encoding="utf-8"))
     mdr_name = mdr_data.get("name") or mdr_data["title"]
+    log("ONGOING", "Updating the staging index", mdr_name)
     
     # TODO Backwards compatible with OpenTIDE 1.0, to deprecate at some point
     uuid = mdr_data.get("uuid") or mdr_data["metadata"]["uuid"]

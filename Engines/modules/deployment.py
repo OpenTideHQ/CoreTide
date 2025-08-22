@@ -239,7 +239,7 @@ def modified_mdr_files(plan: DeploymentStrategy) -> list[Path]:
     # Extracting only the file name so it can be appended to MDR_PATH
     # which is absolute, and thus more reliable
 
-    mdr_files = [(MDR_PATH / f) for f in mdr_files]
+    mdr_files = [(MDR_PATH / Path(f)) for f in mdr_files]
     log("INFO", "Computed modified MDR Files", str(mdr_files))
     return mdr_files
 

@@ -284,7 +284,7 @@ def indexer(write_index=False) -> dict:
         revisions_index = json.load(open(IndexPaths.REVISIONS_INDEX_PATH, encoding="utf-8"))
         indexes_index["revisions"] = revisions_index
 
-    index["Indexes"] = indexes_index
+    index["indexes"] = indexes_index
     # Lookups indexer
 
     print("🔎 Indexing Lookups...")

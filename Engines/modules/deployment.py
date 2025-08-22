@@ -22,7 +22,7 @@ import re
 from typing import MutableMapping, Sequence
 from enum import Enum, auto
 from pathlib import Path
-from dataclasses import asdict
+from dataclasses import asdict, dataclass
 
 
 sys.path.append(str(git.Repo(".", search_parent_directories=True).working_dir))
@@ -31,6 +31,51 @@ sys.path.append(str(git.Repo(".", search_parent_directories=True).working_dir))
 SYSTEMS_CONFIGS_INDEX = DataTide.Configurations.Systems.Index
 PRODUCTION_STATUS = DataTide.Configurations.Deployment.status["production"]
 SAFE_STATUS = DataTide.Configurations.Deployment.status["safe"]
+
+
+class TideRepo:
+
+    def __init__(self):
+        self.repository = self._initialize_repository()
+        self.last_commit_details = self._latest_commit_information()
+    
+    @dataclass
+    class LatestCommit:
+        message: str
+        author: str
+        sha: str
+
+    def _initialize_repository(self)->git.Repo:
+        TARGET_CI = CIEnvironment().environment
+        match TARGET_CI:
+            case CIEnvironment.CIPlatforms.GitHubActions:
+                log("INFO", "Identified GitHub Actions as the CI Runtime Platform")
+                REPO_DIR = os.getenv("GITHUB_WORKSPACE")
+            case CIEnvironment.CIPlatforms.GitlabCI:
+                log("INFO", "Identified Gitlab CI as the CI Runtime Platform")
+                REPO_DIR = os.getenv("CI_PROJECT_DIR")
+            case CIEnvironment.CIPlatforms.AzurePipeline:
+                log("INFO", "Identified Azure Pipeline as the CI Runtime Platform")
+                REPO_DIR = os.getenv("BUILD_SOURCESDIRECTORY")
+            case CIEnvironment.CIPlatforms.LocalDebug:
+                return None
+        log("INFO",
+            "Will initialize repository located on",
+            str(REPO_DIR))
+
+        return Repo(REPO_DIR)
+
+
+    def _latest_commit_information(self)->LatestCommit:
+        
+        if CIEnvironment().environment is CIEnvironment.CIPlatforms.LocalDebug:
+            return self.LatestCommit(message = "Sample Commit Message",
+                                    author = "Sample Commit Author",
+                                    sha = "Sample Commit SHA")
+        commit = self.repository.head.commit
+        return self.LatestCommit(message = str(commit.message.strip()),
+                                 author = str(commit.author.name),
+                                 sha = str(commit.hexsha))
 
 
 class CIEnvironment:
@@ -49,7 +94,10 @@ class CIEnvironment:
         AzurePipeline = auto()
         GitlabCI = auto()
         GitHubActions = auto()
-        LocalDebug = auto()
+        LocalDebug = auto()        
+
+
+
 
     def _check_ci_environment(self) -> CIPlatforms:
         if os.getenv("TF_BUILD"):
@@ -214,16 +262,13 @@ def diff_calculation(plan: DeploymentStrategy) -> list:
 
     TARGET_CI = CIEnvironment().environment
 
+    repo = TideRepo().repository
+
     match TARGET_CI:
         case CIEnvironment.CIPlatforms.GitHubActions:
             log("INFO", "Identified GitHub Actions as the CI Runtime Platform")
-            REPO_DIR = os.getenv("GITHUB_WORKSPACE")
             LATEST_COMMIT = os.getenv("GITHUB_SHA")
-            repo = Repo(REPO_DIR)
 
-            log("INFO",
-                "Will initialize repository located on",
-                str(REPO_DIR))
 
             if plan is DeploymentStrategy.PRODUCTION:
                 commits = list(repo.iter_commits("HEAD", max_count=2))
@@ -269,9 +314,7 @@ def diff_calculation(plan: DeploymentStrategy) -> list:
 
         case CIEnvironment.CIPlatforms.GitlabCI:
             log("INFO", "Identified Gitlab CI as the CI Runtime Platform")
-            REPO_DIR = os.getenv("CI_PROJECT_DIR")
             LATEST_COMMIT = os.getenv("CI_COMMIT_SHA")
-            repo = Repo(REPO_DIR, search_parent_directories=True)
 
             if plan is DeploymentStrategy.PRODUCTION:
                 BASE_COMMIT = os.getenv("CI_COMMIT_BEFORE_SHA")
@@ -304,10 +347,8 @@ def diff_calculation(plan: DeploymentStrategy) -> list:
 
         case CIEnvironment.CIPlatforms.AzurePipeline:
             log("INFO", "Identified Azure Pipeline as the CI Runtime Platform")
-            REPO_DIR = os.getenv("BUILD_SOURCESDIRECTORY")
             LATEST_COMMIT = os.getenv("BUILD_SOURCEVERSION")
-            log("INFO", "Will initialize repository located on", str(REPO_DIR))
-            repo = Repo(REPO_DIR)
+
             if plan is DeploymentStrategy.PRODUCTION:
                 commits = list(repo.iter_commits("HEAD", max_count=2))
                 if len(commits) > 1:

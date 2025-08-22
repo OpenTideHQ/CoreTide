@@ -28,6 +28,10 @@ schemas_docs_folder = "wiki/Framework/Schemas/"
 vocabularies_docs = "wiki/Framework/Vocabularies/"
 resources = "External/"
 
+[indexes]
+objects = "objects.json"
+revisions = "revisions.json"
+
 [metaschemas]
 tvm = "TVM Meta Schema.yaml"
 cdm = "CDM Meta Schema.yaml"

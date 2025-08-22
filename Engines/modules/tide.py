@@ -911,8 +911,15 @@ class DataTide:
         
         @dataclass(frozen=True)
         class Global:
+            
+            @dataclass
+            class Indexes:
+                objects: str
+                revisions: str
+
             Index = dict(IndexTide.load()["configurations"]["global"])
             objects = Index["objects"]
+            indexes = Indexes(**dict(Index["indexes"]))
             metaschemas = dict(Index["metaschemas"])
             recomposition = dict(Index["recomposition"])
             json_schemas = dict(Index["json_schemas"])

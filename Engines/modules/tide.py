@@ -825,6 +825,7 @@ class DataTide:
         FlatIndex =  tvm | cdm | mdr | bdr
         """Flat Key Value pair structure of all UUIDs in the index"""
         files = dict(IndexTide.load()["files"])
+    
     @dataclass(frozen=True)
     class Vocabularies:
         """TIDE Schema Interface.
@@ -833,6 +834,16 @@ class DataTide:
         """
 
         Index = dict(IndexTide.load()["vocabs"])
+
+    @dataclass(frozen=True)
+    class Indexes:
+        """
+        Interface to compiled indexes
+        """
+        Index = dict(IndexTide.load()["indexes"])
+        revisions = dict(Index.get("revisions", {})) #TODO Loader class for revisions
+        objects = dict(Index.get("objects", {}))
+
 
     @dataclass(frozen=True)
     class JsonSchemas:

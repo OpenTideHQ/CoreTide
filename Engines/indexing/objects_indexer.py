@@ -22,7 +22,8 @@ def run():
     OBJECT_SCOPE = DataTide.Configurations.Global.objects
     ICONS = DataTide.Configurations.Documentation.icons
     INDEX_NAME = DataTide.Configurations.Global.indexes.objects
-    object_index = json.load(open(TIDE_INDEXES_PATH / INDEX_NAME))
+    
+    object_index = {}
 
     for object_type in OBJECT_SCOPE:
 

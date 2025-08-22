@@ -18,7 +18,7 @@ ROOT = Path(str(git.Repo(".", search_parent_directories=True).working_dir))
 CONFIGURATIONS = resolve_configurations()
 PATHS = resolve_paths()
 TIDE_INDEXES_PATH = PATHS["tide_indexes"]
-MODELS_TYPES = CONFIGURATIONS["global"]["models"]
+MODELS_TYPES = CONFIGURATIONS["global"]["objects"]
 
 MAPPING_FILE = "legacy_uuid_mapping.json"
 

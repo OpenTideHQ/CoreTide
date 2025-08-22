@@ -265,7 +265,7 @@ def indexer(write_index=False) -> dict:
         log("SKIP", "Not able to find a objects.json index in Tide instance",
             "Should be generated in the next Framework generation pipeline run")
     else:
-        objects_index = json.load(open(IndexPaths.OBJECTS_INDEX_PATH/"objects.json", encoding="utf-8"))
+        objects_index = json.load(open(IndexPaths.OBJECTS_INDEX_PATH, encoding="utf-8"))
         indexes_index["objects"] = objects_index
         if objects_index:
             if ("cdm" in objects_index) and ("bdr" in objects_index):

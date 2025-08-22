@@ -12,7 +12,7 @@ from Engines.modules.files import resolve_configurations
 
 MODELS_INDEX = DataTide.Models.Index
 CONFIGURATIONS = resolve_configurations()
-MODELS_TYPES = CONFIGURATIONS["global"]["models"]
+MODELS_TYPES = CONFIGURATIONS["global"]["objects"]
 
 
 def run():

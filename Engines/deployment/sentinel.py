@@ -22,6 +22,7 @@ from Engines.modules.deployment import TideDeployment
 from Engines.modules.errors import TideErrors
 
 from azure.mgmt.securityinsight import SecurityInsights
+from azure.mgmt.securityinsight.models import EventGroupingAggregationKind
 
 
 class SentinelDeploy(DeployMDR):
@@ -107,7 +108,14 @@ class SentinelDeploy(DeployMDR):
             raise TideErrors.TideMDRDataModelErrors("Missing Grouping > Event")
         log("INFO", "Event grouping configuration", configuration.grouping.event)
         event_grouping = service.alert_rules.models.EventGroupingSettings()
-        event_grouping.aggregation_kind = configuration.grouping.event
+        
+        match configuration.grouping.event:
+            case "AlertPerResult":
+                event_grouping.aggregation_kind = EventGroupingAggregationKind.ALERT_PER_RESULT
+            case "SingleAlert":
+                event_grouping.aggregation_kind = EventGroupingAggregationKind.SINGLE_ALERT
+            case _:
+                raise TideErrors.TideMDRDataModelErrors("Event Grouping must be either SingleAlert or AlertPerResult")
 
         # Incident Configuration
         alert_enabled = configuration.alert.create_incident

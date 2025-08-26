@@ -197,6 +197,8 @@ class SentinelDeploy(DeployMDR):
             rule.tactics = tactics
             rule.techniques = techniques
 
+        log("INFO", "Compiled Rule", str(rule))
+
         return rule
 
     def deploy_mdr(self,

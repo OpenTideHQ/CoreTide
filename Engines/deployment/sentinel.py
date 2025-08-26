@@ -105,17 +105,20 @@ class SentinelDeploy(DeployMDR):
         # Event Grouping
         if not configuration.grouping:
             raise TideErrors.TideMDRDataModelErrors("Missing Grouping > Event")
+        log("INFO", "Event grouping configuration", configuration.grouping.event)
         event_grouping = service.alert_rules.models.EventGroupingSettings()
         event_grouping.aggregation_kind = configuration.grouping.event
 
         # Incident Configuration
         alert_enabled = configuration.alert.create_incident
+        log("INFO", "Alert Enabled", str(alert_enabled))
         incident_configuration = service.alert_rules.models.IncidentConfiguration(
             create_incident=alert_enabled
         )
 
         # Alert Grouping Configuration
         grouping_enabled = configuration.grouping.alert.enabled
+        log("INFO", "Alert Grouping Enabled", str(grouping_enabled))
         grouping_lookback = configuration.grouping.alert.grouping_lookback
         if grouping_enabled:
             if not grouping_lookback:

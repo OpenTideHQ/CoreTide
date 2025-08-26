@@ -22,7 +22,6 @@ from Engines.modules.deployment import TideDeployment
 from Engines.modules.errors import TideErrors
 
 from azure.mgmt.securityinsight import SecurityInsights
-from azure.mgmt.securityinsight.models import EventGroupingAggregationKind
 
 
 class SentinelDeploy(DeployMDR):
@@ -108,15 +107,9 @@ class SentinelDeploy(DeployMDR):
             raise TideErrors.TideMDRDataModelErrors("Missing Grouping > Event")
         log("INFO", "Event grouping configuration", configuration.grouping.event)
         event_grouping = service.alert_rules.models.EventGroupingSettings()
+        event_grouping.aggregation_kind = configuration.grouping.event
+        rule.event_grouping_settings = event_grouping
         
-        match configuration.grouping.event:
-            case "AlertPerResult":
-                event_grouping.aggregation_kind = EventGroupingAggregationKind.ALERT_PER_RESULT
-            case "SingleAlert":
-                event_grouping.aggregation_kind = EventGroupingAggregationKind.SINGLE_ALERT
-            case _:
-                raise TideErrors.TideMDRDataModelErrors("Event Grouping must be either SingleAlert or AlertPerResult")
-
         # Incident Configuration
         alert_enabled = configuration.alert.create_incident
         log("INFO", "Alert Enabled", str(alert_enabled))
@@ -127,6 +120,7 @@ class SentinelDeploy(DeployMDR):
         # Alert Grouping Configuration
         grouping_enabled = configuration.grouping.alert.enabled
         log("INFO", "Alert Grouping Enabled", str(grouping_enabled))
+
         grouping_lookback = configuration.grouping.alert.grouping_lookback
         if grouping_enabled:
             if not grouping_lookback:
@@ -137,6 +131,7 @@ class SentinelDeploy(DeployMDR):
         else:
             if not grouping_lookback:
                 grouping_lookback = iso_duration_timedelta("1h")
+        
         reopen_closed_incident = configuration.grouping.alert.reopen_closed_incidents or False
         matching_method = configuration.grouping.alert.matching or "AllEntities" #Sane default, needed for typing
         group_by_entities = configuration.grouping.alert.group_by_entities

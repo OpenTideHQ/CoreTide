@@ -271,6 +271,6 @@ class DefenderForEndpointService:
             log("SUCCESS", "Removed Detection Rule from MDE Tenant")
         else:
             log("FATAL",
-                f"Failed to create detection rule with id {rule_id} in tenant {self.tenant_config.name}",
+                f"Failed to delete detection rule with id {rule_id} in tenant {self.tenant_config.name}",
                 "Double check scope permissions, and whether the ID actually exists")
             raise TideErrors.DetectionRuleDeletionFailed

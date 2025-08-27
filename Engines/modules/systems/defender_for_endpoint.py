@@ -265,7 +265,7 @@ class DefenderForEndpointService:
             raise TideErrors.DetectionRuleUpdateFailed
 
     def delete_detection_rule(self, rule_id:int):
-        request = self.session.delete(url=self.GRAPH_API_ENDPOINT + f"/{rule_id}",
+        request = self.session.delete(url=self.DETECTION_RULES_ENDPOINT + f"/{rule_id}",
                                       verify=self.tenant_config.setup.ssl)
         if request.status_code == 204:
             log("SUCCESS", "Removed Detection Rule from MDE Tenant")

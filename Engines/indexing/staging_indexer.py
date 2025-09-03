@@ -73,7 +73,7 @@ else:
     stg_index.update(current_stg_index)
 
     with open(STG_INDEX_PATH, "w+") as out:
-        json.dump(stg_index, out, default=str)
+        json.dump(stg_index, out, default=str, indent=4)
 
 print("\n" + "Execution Report".center(80, "="))
 

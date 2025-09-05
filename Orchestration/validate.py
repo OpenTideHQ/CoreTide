@@ -17,19 +17,11 @@ from Engines.validation import (
 from Engines.modules.deployment import CIEnvironment
 
 print(coretide_intro())
-
-quickstream = rf"""
-{ANSI.Colors.ORANGE}  
-  ____  __  _____________ _______________  _______   __  ___  
- / __ \/ / / /  _/ ___/ //_/ __/_  __/ _ \/ __/ _ | /  |/  /  
-/ /_/ / /_/ // // /__/ ,< _\ \  / / / , _/ _// __ |/ /|_/ /   
-\___\_\____/___/\___/_/|_/___/ /_/ /_/|_/___/_/ |_/_/  /_/    
-{ANSI.Colors.BLUE}{ANSI.Formatting.ITALICS}{ANSI.Formatting.BOLD}CoreTIDE Object Data Validation Orchestration
-
+print(f"""
+{ANSI.Colors.BLUE}{ANSI.Formatting.ITALICS}{ANSI.Formatting.BOLD}
+CoreTide Object Data Validation
 {ANSI.Formatting.STOP}
-"""
-
-print(quickstream)
+""")
 
 os.environ["VALIDATION_ERROR_RAISED"] = ""
 os.environ["VALIDATION_WARNING_RAISED"] = ""

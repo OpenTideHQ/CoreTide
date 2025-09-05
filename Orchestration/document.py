@@ -19,16 +19,11 @@ from Engines.documentation import (
     )
 
 print(coretide_intro())
-
-vortex = rf"""
-{ANSI.Colors.ORANGE}
-  _   ______  ___  ___________  __  
- | | / / __ \/ _ \/_  __/ __/ |/_/  
- | |/ / /_/ / , _/ / / / _/_>  <    
- |___/\____/_/|_| /_/ /___/_/|_|    
-{ANSI.Colors.BLUE}{ANSI.Formatting.ITALICS}{ANSI.Formatting.BOLD}CoreTIDE Documentation Orchestration                                    
+print(f"""
+{ANSI.Colors.BLUE}{ANSI.Formatting.ITALICS}{ANSI.Formatting.BOLD}
+CoreTide Documentation
 {ANSI.Formatting.STOP}
-"""
+""")
 
 vocabularies.run()
 metaschemas.run()

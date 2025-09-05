@@ -21,20 +21,12 @@ MDR_METADATA_LOOKUPS_CONFIG = DataTide.Configurations.Deployment.metadata_lookup
 
 os.environ["INDEX_OUTPUT"] = "cache"
 
-
 print(coretide_intro())
-
-torrent = rf"""
-{ANSI.Colors.ORANGE}
- __________  ___  ___  _____  ________  
-/_  __/ __ \/ _ \/ _ \/ __/ |/ /_  __/  
- / / / /_/ / , _/ , _/ _//    / / /     
-/_/  \____/_/|_/_/|_/___/_/|_/ /_/      
-{ANSI.Colors.BLUE}{ANSI.Formatting.ITALICS}{ANSI.Formatting.BOLD}CoreTIDE MDR Deployment Orchestration
+print(f"""
+{ANSI.Colors.BLUE}{ANSI.Formatting.ITALICS}{ANSI.Formatting.BOLD}
+CoreTide Detection Deployment
 {ANSI.Formatting.STOP}
-"""
-
-print(torrent)
+""")
 
 DEPLOYMENT_PLAN = DeploymentStrategy.load_from_environment()
 

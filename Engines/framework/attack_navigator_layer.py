@@ -1,171 +1,150 @@
-import json
-import os
 import git
 import sys
+import json
+
+from dataclasses import dataclass, asdict
+from typing import Optional, Literal
 
 sys.path.append(str(git.Repo(".", search_parent_directories=True).working_dir))
 
 from Engines.modules.logs import log
 from Engines.modules.tide import DataTide
+from Engines.modules.framework import techniques_resolver
 
-ANALYTICS_PATH = DataTide.Configurations.Global.Paths.Tide.analytics
+@dataclass
+class LayerColor:
+    red:str= "#fc6b6b"
+    blue:str= "#6baed6"
+    green:str= "#74c476"
+    purple:str= "#9e9ac8"
 
+@dataclass
+class TechniqueLayer:
+    techniqueID: str
+    color:str
+    comment:str
+    enabled:bool = True
 
-def run():
+@dataclass
+class LegendEntry:
+    label:str
+    color:str
 
-    log("TITLE", "ATT&CK Navigator Layer")
-    log("INFO", "Generate mappings to MITRE ATT&CK as a Navigator Layer")
+@dataclass
+class NavigatorLayer:
+    versions:dict
+    techniques:list[TechniqueLayer]
+    name:str = "layer"
+    domain:str = "enterprise-attack"
+    hideDisabled:bool = False
+    legendItems:Optional[list[LegendEntry]] = None
 
-    complete_layer = ANALYTICS_PATH / "Complete Layer.json"
-    layer = {}
-    tvm_techniques = {}
-    cdm_techniques = {}
-    mdr_techniques = {}
+@dataclass
+class TechniqueIndexEntry:
+    objects_names:list[str]
+    objects_uuids:list[str]
 
-    def recursive_filter(item, *forbidden):
-        if isinstance(item, list):
-            return [
-                recursive_filter(entry, *forbidden)
-                for entry in item
-                if entry not in forbidden
-            ]
-        if isinstance(item, dict):
-            result = {}
-            for key, value in item.items():
-                value = recursive_filter(value, *forbidden)
-                if key not in forbidden and value not in forbidden:
-                    result[key] = value
-            return result
-        return item
+class AttackNavigatorLayer:
 
-    for tvm in DataTide.Models.tvm:
-        model_data = {}
-        model = DataTide.Models.tvm[tvm]
-        model_id = model.get("metadata",{}).get("uuid")
-        model_data["techniques"] = model["threat"]["att&ck"]
-        model_data["name"] = model["name"]
-        tvm_techniques[model_id] = model_data
+    def create_layer(self):
+        technique_layer = self.generate_technique_layer()
+        full_layer = self.assemble_full_layer(technique_layer=technique_layer)
+        self.export_layer(layer=full_layer)
 
-    # Pivoting tvm data to make comments easier
+    def map_objects_and_techniques(self, model_type:Literal["tvm", "cdm", "mdr"])->dict[str, TechniqueIndexEntry]:
 
-    for cdm in DataTide.Models.cdm:
-        model_data = {}
-        model = DataTide.Models.cdm[cdm]
-        model_id = model.get("metadata",{}).get("uuid")
-        model_data["name"] = model["name"]
+        match model_type:
+            case "tvm":
+                index = DataTide.Models.tvm
+            case "cdm":
+                index = DataTide.Models.cdm
+            case "mdr":
+                index = DataTide.Models.mdr
 
-        if "att&ck" in model["detection"].keys():
-            cdm_technique = []
-            cdm_technique.append(model["detection"]["att&ck"])
-            model_data["techniques"] = cdm_technique
+        technique_mapping:dict[str, TechniqueIndexEntry] = {}
 
-        else:
-            vec_techniques = []
-            vectors = model["detection"]["vectors"]
-            for v in vectors:
-                for tvm in DataTide.Models.tvm:
-                    vec = DataTide.Models.tvm[tvm]
-                    if vec.get("metadata",{}).get("uuid") == v:
-                        for t in vec["threat"]["att&ck"]:
-                            vec_techniques.append(t)
-            model_data["techniques"] = vec_techniques
+        for object in index:
+            techniques = techniques_resolver(object)
+            name = index[object]["name"]
+            uuid = index[object]["metadata"]["uuid"]
+            for technique in techniques:
+                if technique in technique_mapping:
+                    technique_mapping[technique].objects_names.append(f"[{model_type.upper()}] " + name)
+                    technique_mapping[technique].objects_uuids.append(uuid)
+                else:
+                    technique_mapping[technique] = TechniqueIndexEntry(objects_names=[f"[{model_type.upper()}] " + name], objects_uuids=[uuid])
 
-        cdm_techniques[model_id] = model_data
+        #log("ONGOING", "Compiled mapping index for object type", model_type, str(technique_mapping))
 
-    for mdr in DataTide.Models.mdr:
-        model_data = {}
-        model = DataTide.Models.mdr[mdr]
-        model_id = model["metadata"]["uuid"]
-        model_data["name"] = model["name"]
-        parent = model.get("detection_model")
+        return technique_mapping
+    
+    def generate_technique_layer(self)->list[TechniqueLayer]:
+        tvm_techniques = self.map_objects_and_techniques(model_type="tvm")
+        cdm_techniques = self.map_objects_and_techniques(model_type="cdm")
+        mdr_techniques = self.map_objects_and_techniques(model_type="mdr")
 
-        if parent and not parent.startswith("BDR"):
+        technique_layer:list[TechniqueLayer] = []
 
-            for cdm in DataTide.Models.cdm:
-                model = DataTide.Models.cdm[cdm]
-                if model.get("metadata",{}).get("uuid") == parent:
-
-                    if "att&ck" in model["detection"].keys():
-                        cdm_technique = []
-                        cdm_technique.append(model["detection"]["att&ck"])
-                        model_data["techniques"] = cdm_technique
-
-                    else:
-                        vec_techniques = []
-                        vectors = model["detection"]["vectors"]
-                        for v in vectors:
-                            for tvm in DataTide.Models.tvm:
-                                vec = DataTide.Models.tvm[tvm]
-                                if vec.get("metadata",{}).get("uuid") == v:
-                                    for t in vec["threat"]["att&ck"]:
-                                        vec_techniques.append(t)
-
-                        model_data["techniques"] = vec_techniques
-
-            mdr_techniques[model_id] = model_data
-
-    pivot = {}
-    for i in tvm_techniques:
-        for t in tvm_techniques[i]["techniques"]:
-            if t in pivot.keys():
-                pivot[t] += ", " + i + " " + tvm_techniques[i]["name"]
+        for technique in tvm_techniques:
+            mapping_detail = tvm_techniques[technique]
+            #Technique mapped by TVM, not downstream
+            if technique not in cdm_techniques:
+                log("INFO", f"{technique} only at TVM level, found in : ", str(mapping_detail.objects_names))
+                technique_layer.append(TechniqueLayer(techniqueID=technique,
+                                                      color=LayerColor.red,
+                                                      comment=", ".join(mapping_detail.objects_names)))
+            #Technique also mapped in CDMs
             else:
-                pivot[t] = i + " " + tvm_techniques[i]["name"]
+                cdm_mapping_detail = cdm_techniques[technique]
+                cdm_updated_mapping = TechniqueIndexEntry(objects_names= mapping_detail.objects_names + cdm_mapping_detail.objects_names,
+                                                        objects_uuids= mapping_detail.objects_uuids + cdm_mapping_detail.objects_uuids)
+                                   
+                #Technique also mapped by MDRs
+                if technique in mdr_techniques:
 
-    for r in cdm_techniques:
-        for c in cdm_techniques[r]["techniques"]:
-            if c in pivot.keys():
-                pivot[c] += ", " + r + " " + cdm_techniques[r]["name"]
-            else:
-                pivot[c] = r + " " + cdm_techniques[r]["name"]
+                    mdr_mapping_detail = mdr_techniques[technique]
+                    mdr_updated_mapping = TechniqueIndexEntry(objects_names= cdm_mapping_detail.objects_names + mdr_mapping_detail.objects_names,
+                                        objects_uuids= cdm_mapping_detail.objects_uuids + mdr_mapping_detail.objects_uuids)
+                    log("INFO", f"{technique} Fully Mapped, found in : ", str(mdr_updated_mapping.objects_names))
+                    technique_layer.append(TechniqueLayer(techniqueID=technique,
+                                                        color=LayerColor.green,
+                                                        comment=", ".join(mdr_updated_mapping.objects_names)))
+                #Stops at CDM level
+                else:
+                    log("INFO", f"{technique} mapped at TVM level and MDR level, found in : ", str(cdm_updated_mapping.objects_names))
+                    technique_layer.append(TechniqueLayer(techniqueID=technique,
+                                    color=LayerColor.purple,
+                                    comment=", ".join(cdm_updated_mapping.objects_names)))
 
-    for m in mdr_techniques:
-        for l in mdr_techniques[m]["techniques"]:
-            if l in pivot.keys():
-                pivot[l] += ", " + "MDR : " + mdr_techniques[m]["name"]
-            else:
-                pivot[l] = "MDR : " + mdr_techniques[m]["name"]
+        # Edge case, when CDM override TVM with new techniques
+        for technique in cdm_techniques:
+            if technique in tvm_techniques:
+                continue
 
-    # Creating layer compatible array
-    layer_techniques = []
+            cdm_mapping_detail = cdm_techniques[technique]
+            technique_layer.append(TechniqueLayer(techniqueID=technique,
+                            color=LayerColor.purple,
+                            comment=", ".join(cdm_mapping_detail.objects_names)))
 
-    legendItems = [
-        {"label": "TVM, CDM and MDR Coverage", "color": "#74c476"},
-        {"label": "TVM and CDM Coverage", "color": "#9e9ac8"},
-        {"label": "Only TVM Coverage", "color": "#fc6b6b"},
-        {"label": "Only CDM Coverage", "color": "#6baed6"},
-    ]
+        return technique_layer
 
-    for p in pivot:
-        temp = {}
-        temp["techniqueID"] = p
-        if "TVM" in pivot[p] and "CDM" in pivot[p] and "MDR" in pivot[p]:
-            temp["color"] = "#74c476"
 
-        elif "TVM" in pivot[p] and "CDM" in pivot[p]:
-            temp["color"] = "#9e9ac8"
+    def assemble_full_layer(self, technique_layer:list[TechniqueLayer])->NavigatorLayer:
+        legend = list()
+        legend.append(LegendEntry(label="TVM Only", color=LayerColor.red))
+        legend.append(LegendEntry(label="TVM + CDM", color=LayerColor.purple))
+        legend.append(LegendEntry(label="Full Coverage", color=LayerColor.green))
+        legend.append(LegendEntry(label="CDM Only - Needs to be checked", color=LayerColor.blue))
+        return NavigatorLayer(versions={"layer": "4.5"},
+                              techniques=technique_layer,
+                              legendItems=legend)
 
-        elif "CDM" in pivot[p] and "TVM" not in pivot[p]:
-            temp["color"] = "#6baed6"
-
-        else:
-            temp["color"] = "#fc6b6b"
-
-        temp["comment"] = pivot[p]
-        layer_techniques.append(temp)
-
-    layer["name"] = "CoreTIDE ATT&CK Coverage"
-    layer["description"] = (
-        "Automatically filled in by CoreTIDE Toolchain based on latest content"
-    )
-    layer["domain"] = "mitre-enterprise"
-    layer["techniques"] = layer_techniques
-    layer["legendItems"] = legendItems
-
-    with open(complete_layer, "w+") as out:
-        output = json.dumps(layer, indent=4, sort_keys=False, default=str)
-        out.write(output)
-
+    def export_layer(self, layer:NavigatorLayer):
+        ANALYTICS_PATH = DataTide.Configurations.Global.Paths.Tide.analytics
+        layer_path = ANALYTICS_PATH / "Complete Layer.json"
+        with open(layer_path, "w+") as out:
+            output = json.dumps(asdict(layer), indent=4, sort_keys=False, default=str)
+            out.write(output)
 
 if __name__ == "__main__":
-    run()
+    AttackNavigatorLayer().create_layer()

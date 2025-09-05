@@ -8,19 +8,13 @@ from Engines.modules.tide import IndexTide
 from Engines.indexing import objects_indexer
 from Engines.indexing.revisions import RevisionIndexer
 from Engines.framework import templates
+
 print(coretide_intro())
-
-riptide = rf"""
-{ANSI.Colors.ORANGE}
-   ___  _______  _____________  ____  
-  / _ \/  _/ _ \/_  __/  _/ _ \/ __/  
- / , _// // ___/ / / _/ // // / _/    
-/_/|_/___/_/    /_/ /___/____/___/    
-{ANSI.Colors.BLUE}{ANSI.Formatting.ITALICS}{ANSI.Formatting.BOLD}CoreTIDE Meta Model Compilation Orchestration
+print(f"""
+{ANSI.Colors.BLUE}{ANSI.Formatting.ITALICS}{ANSI.Formatting.BOLD}
+CoreTide Meta Model Compilation
 {ANSI.Formatting.STOP}
-"""
-
-print(riptide)
+""")
 
 log("TITLE", "TIDE Indexes Generation")
 log(
@@ -32,8 +26,9 @@ objects_indexer.run()
 templates.run()
 
 IndexTide.reload()
-from Engines.framework import json_schemas, vscode_snippets
+from Engines.framework import json_schemas, vscode_snippets, attack_navigator_layer
 
 RevisionIndexer().run()
 json_schemas.run()
 vscode_snippets.run()
+attack_navigator_layer.run()

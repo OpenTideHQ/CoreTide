@@ -16,16 +16,11 @@ from Engines.modules.tide import DataTide
 from typing import Literal
 
 print(coretide_intro())
-
-torrent = rf"""
-{ANSI.Colors.ORANGE}
-  ____  __  ___________  ____  __  _____
- / __ \/ / / /_  __/ _ \/ __ \/ / / / _ \
-/ /_/ / /_/ / / / / ___/ /_/ / /_/ / , _/
-\____/\____/ /_/ /_/   \____/\____/_/|_|
-{ANSI.Colors.BLUE}{ANSI.Formatting.ITALICS}{ANSI.Formatting.BOLD}CoreTIDE MDR Query Validation Orchestration
+print(f"""
+{ANSI.Colors.BLUE}{ANSI.Formatting.ITALICS}{ANSI.Formatting.BOLD}
+CoreTide Detection Rules Query Validation
 {ANSI.Formatting.STOP}
-"""
+""")
 
 DEPLOYMENT_PLAN = DeploymentStrategy.load_from_environment()
 

@@ -21,18 +21,11 @@ from Engines.mutation import (
 ROOT = Path(str(git.Repo(".", search_parent_directories=True).working_dir))
 
 print(coretide_intro())
-
-maelstrom = rf"""
-{ANSI.Colors.ORANGE}
-   __  ______   ______   _____________  ____  __  ___
-  /  |/  / _ | / __/ /  / __/_  __/ _ \/ __ \/  |/  /
- / /|_/ / __ |/ _// /___\ \  / / / , _/ /_/ / /|_/ / 
-/_/  /_/_/ |_/___/____/___/ /_/ /_/|_|\____/_/  /_/  
-{ANSI.Colors.BLUE}{ANSI.Formatting.ITALICS}{ANSI.Formatting.BOLD}CoreTIDE Data Mutation Orchestration   
+print(f"""
+{ANSI.Colors.BLUE}{ANSI.Formatting.ITALICS}{ANSI.Formatting.BOLD}
+CoreTide Data Mutation
 {ANSI.Formatting.STOP}
-"""
-
-print(maelstrom)
+""")
 
 file_name.run()
 remove_cdm_validation.run()

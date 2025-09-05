@@ -140,11 +140,14 @@ class AttackNavigatorLayer:
                               legendItems=legend)
 
     def export_layer(self, layer:NavigatorLayer):
-        ANALYTICS_PATH = DataTide.Configurations.Global.Paths.Tide.analytics
-        layer_path = ANALYTICS_PATH / "Complete Layer.json"
+        INDEXES_PATH = DataTide.Configurations.Global.Paths.Tide.tide_indexes
+        layer_path = INDEXES_PATH / "ATT&CK Navigator Layer.json"
         with open(layer_path, "w+") as out:
             output = json.dumps(asdict(layer), indent=4, sort_keys=False, default=str)
             out.write(output)
 
-if __name__ == "__main__":
+def run():
     AttackNavigatorLayer().create_layer()
+
+if __name__ == "__main__":
+    run()

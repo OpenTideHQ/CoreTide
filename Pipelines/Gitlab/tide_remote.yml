@@ -14,5 +14,4 @@ include:
   - remote: 'https://raw.githubusercontent.com/OpenTideHQ/CoreTide/refs/heads/development/Pipelines/Gitlab/modules/documentation.yml'
   - remote: 'https://raw.githubusercontent.com/OpenTideHQ/CoreTide/refs/heads/development/Pipelines/Gitlab/modules/framework.yml'
   - remote: 'https://raw.githubusercontent.com/OpenTideHQ/CoreTide/refs/heads/development/Pipelines/Gitlab/modules/mutation.yml'
-  - remote: 'https://raw.githubusercontent.com/OpenTideHQ/CoreTide/refs/heads/development/Pipelines/Gitlab/modules/reporting.yml'
   - remote: 'https://raw.githubusercontent.com/OpenTideHQ/CoreTide/refs/heads/development/Pipelines/Gitlab/modules/validation.yml'

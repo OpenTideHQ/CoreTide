@@ -430,7 +430,36 @@ def get_type(object_uuid:str, mute:bool=False):
         
     return schema.split("::")[0]
 
-def techniques_resolver(object_id: str, recursive=True) -> list:
+def keep_active_mdr(mdr_list:list[str])->list[str]:
+    """
+    Given a list of MDRs, only keep the ones considered Active,
+    which mean none of the system they configure are set with a
+    Deprecated status. 
+    """
+    DEPRECATED_STATUSES = ["DEPRECATED", "REMOVED"]
+    active_mdr = []
+    for mdr in mdr_list:
+        try:
+            mdr_data = DataTide.Models.Index["mdr"][mdr]
+        except:
+            log("FAILURE",
+                "Could not retrieve UUID in MDR Index",
+                mdr)
+            continue
+        deprecated = False
+        for system in mdr_data["configurations"]:
+            system_data = mdr_data["configurations"][system]
+            if system_data["status"] in DEPRECATED_STATUSES:
+                log("INFO",
+                    "Skipping MDR as is in a deprecated status",
+                    mdr)
+                deprecated = True
+        if deprecated is False:
+            active_mdr.append(mdr)
+    
+    return active_mdr
+
+def techniques_resolver(model_id: str, recursive=True) -> list:
     """
     Returns the relevant technique for any object, based on its own
     and its parent properties. WARNING : only works when index is loaded

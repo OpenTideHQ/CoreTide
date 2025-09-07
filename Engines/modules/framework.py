@@ -392,6 +392,7 @@ def childs(model_id: str) -> list:
             if model_id in CHILDS_INDEX[child].get(reference, []):
                 implementations.append(child)
 
+
     return implementations
 @overload
 def get_type(model_uuid:str)->str:
@@ -428,6 +429,32 @@ def get_type(model_uuid:str, mute:bool=False):
             raise Exception
         
     return schema.split("::")[0]
+
+def keep_active_mdr(mdr_list:list[str])->list[str]:
+    """
+    Given a list of MDRs, only keep the ones considered Active,
+    which mean none of the system they configure are set with a
+    Deprecated status. 
+    """
+    DEPRECATED_STATUSES = ["DEPRECATED", "REMOVED"]
+    active_mdr = []
+    for mdr in mdr_list:
+        try:
+            mdr_data = DataTide.Models.Index["mdr"][mdr]
+        except:
+            log("FAILURE",
+                "Could not retrieve UUID in MDR Index",
+                mdr)
+            continue
+        deprecated = False
+        for system in mdr_data["configurations"]:
+            system_data = mdr_data["configurations"][system]
+            if system_data["status"] in DEPRECATED_STATUSES:
+                deprecated = True
+        if deprecated is False:
+            active_mdr.append(mdr)
+    
+    return active_mdr
 
 def techniques_resolver(model_id: str, recursive=True) -> list:
     """
@@ -489,7 +516,7 @@ def relations_downstream(id):
     tree = {}
 
     if get_type(id) in ["cdm", "bdr"]:
-        tree = childs(id)
+        tree = keep_active_mdr(childs(id))
     else:
         for c in childs(id):
             tree[c] = relations_downstream(c)
@@ -561,6 +588,10 @@ def relations_list(
     for k, v in flat.items():
         flat[k] = list(set(v))
 
+    if mdr_list:=flat.get("mdr"):
+        active_mdr = keep_active_mdr(mdr_list)
+        flat["mdr"] = active_mdr
+    
     if mode == "count":
         for k, v in flat.items():
             flat[k] = len(v)

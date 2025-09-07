@@ -146,7 +146,6 @@ def relations_table(
                 branch_data = {}
                 for branch in sorted(trunk):
                     branch_type = get_type(branch)
-
                     if branch_data.get(branch_type):
                         branch_data[branch_type] = (
                             branch_data[branch_type]

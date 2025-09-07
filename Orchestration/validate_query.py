@@ -13,7 +13,7 @@ from Engines.modules.deployment import (
 from Engines.modules.logs import log, ANSI, coretide_intro
 from Engines.modules.plugins import DeployTide
 from Engines.modules.tide import DataTide
-from typing import Literal
+from Engines.modules.framework import keep_active_mdr
 
 print(coretide_intro())
 print(f"""
@@ -51,12 +51,12 @@ for system in deployment_list:
         log("ONGOING", f"Validating the query against {system_name}")
         try:
             DeployTide.query_validation[system].validate(
-                deployment=deployment_list[system]
+                deployment=keep_active_mdr(deployment_list[system])
             )
         except:
             log("WARNING", "Trying MDRv4 style method")
             DeployTide.query_validation[system].validate(
-                mdr_deployment=deployment_list[system], deployment_plan=DEPLOYMENT_PLAN
+                mdr_deployment=keep_active_mdr(deployment_list[system]), deployment_plan=DEPLOYMENT_PLAN
             )
 
     else:

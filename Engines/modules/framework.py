@@ -450,6 +450,9 @@ def keep_active_mdr(mdr_list:list[str])->list[str]:
         for system in mdr_data["configurations"]:
             system_data = mdr_data["configurations"][system]
             if system_data["status"] in DEPRECATED_STATUSES:
+                log("INFO",
+                    "Skipping MDR as is in a deprecated status",
+                    mdr)
                 deprecated = True
         if deprecated is False:
             active_mdr.append(mdr)

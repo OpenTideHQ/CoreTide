@@ -16,7 +16,8 @@ from Engines.modules.framework import (
     techniques_resolver,
     relations_list,
     get_type,
-    get_vocab_entry
+    get_vocab_entry,
+    keep_active_mdr
 )
 from Engines.modules.documentation import (
     object_value_doc,
@@ -135,24 +136,15 @@ def build_search(object_type, mdr_status:Optional[Literal["ACTIVE", "DEPRECATED"
         
         # Logic to retain only MDR in the correct status, to allow breaking
         # the table into two
-        if object_type == "mdr":
-            configurations = object_value_doc(entry, "configurations") or {}
-            status_check = list()
-
-            for system in configurations:
-                sys_status = configurations[system]["status"]  # type: ignore
-
-                if mdr_status == "ACTIVE":
-                    if sys_status not in DEPRECATED_STATUSES:
-                        status_check.append(system)
-
-                elif mdr_status == "DEPRECATED":
-                    if sys_status in DEPRECATED_STATUSES:
-                        status_check.append(system)
-
-            if not status_check:
-                continue
-
+        if model_type == "mdr":
+            active_mdr = True if keep_active_mdr([entry]) != [] else False
+            if mdr_status == "ACTIVE":
+                if not active_mdr:
+                    continue
+            
+            elif mdr_status == "DEPRECATED":
+                if active_mdr:
+                    continue
         
         for value in NAV_INDEX_FIELDS[object_type]:
 
@@ -334,17 +326,17 @@ def construct_navigation_index(object):
     def count_mdr_statuses()->Tuple[int,int]:
         active_mdr = dict()
         deprecated_mdr = dict()
-        for mdr in OBJECTS_INDEX["mdr"]:
-            for system in OBJECTS_INDEX["mdr"][mdr]["configurations"]:
-                if OBJECTS_INDEX["mdr"][mdr]["configurations"][system]["status"] in DEPRECATED_STATUSES:
-                    deprecated_mdr[mdr] = OBJECTS_INDEX["mdr"][mdr]
+        for mdr in MODELS_INDEX["mdr"]:
+            for system in MODELS_INDEX["mdr"][mdr]["configurations"]:
+                if MODELS_INDEX["mdr"][mdr]["configurations"][system]["status"] in DEPRECATED_STATUSES:
+                    deprecated_mdr[mdr] = MODELS_INDEX["mdr"][mdr]
                 else:
-                    active_mdr[mdr] = OBJECTS_INDEX["mdr"][mdr]
+                    active_mdr[mdr] = MODELS_INDEX["mdr"][mdr]
 
         return len(active_mdr), len(deprecated_mdr)
 
 
-    if object == "mdr":
+    if model == "mdr":
         active_mdr_count, deprecated_mdr_count = count_mdr_statuses()
         
         active_mdr_title = "Active " + object_title

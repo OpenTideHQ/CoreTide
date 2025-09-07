@@ -392,6 +392,7 @@ def childs(object_id: str) -> list:
             if object_id in CHILDS_INDEX[child].get(reference, []):
                 implementations.append(child)
 
+
     return implementations
 @overload
 def get_type(object_uuid:str)->str:
@@ -489,7 +490,7 @@ def relations_downstream(id):
     tree = {}
 
     if get_type(id) in ["cdm", "bdr"]:
-        tree = childs(id)
+        tree = keep_active_mdr(childs(id))
     else:
         for c in childs(id):
             tree[c] = relations_downstream(c)
@@ -561,6 +562,10 @@ def relations_list(
     for k, v in flat.items():
         flat[k] = list(set(v))
 
+    if mdr_list:=flat.get("mdr"):
+        active_mdr = keep_active_mdr(mdr_list)
+        flat["mdr"] = active_mdr
+    
     if mode == "count":
         for k, v in flat.items():
             flat[k] = len(v)

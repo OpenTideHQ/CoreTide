@@ -17,7 +17,8 @@ from Engines.modules.framework import (
     relations_list,
     get_type,
     get_vocab_entry,
-    keep_active_mdr
+    keep_active_mdr,
+    DEPRECATED_STATUSES
 )
 from Engines.modules.documentation import (
     model_value_doc,
@@ -44,8 +45,6 @@ PATHS_CONFIG = DataTide.Configurations.Global.Paths.Index
 MODELS_DOCS_PATH = Path(str(DataTide.Configurations.Global.Paths.Core.models_docs_folder).replace(" ", "-"))
 MODELS_SCOPE = DataTide.Configurations.Documentation.scope
 MODELS_NAME = DataTide.Configurations.Documentation.object_names
-
-DEPRECATED_STATUSES = ["DISABLED", "REMOVED"]
 
 CHARS_CLIP = 150
 NAV_INDEX_FIELDS = {

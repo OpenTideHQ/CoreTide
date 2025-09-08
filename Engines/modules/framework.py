@@ -14,6 +14,8 @@ VOCAB_INDEX = DataTide.Vocabularies.Index
 MODELS_INDEX = DataTide.Models.Index
 CHAINING_INDEX = DataTide.Models.chaining
 
+DEPRECATED_STATUSES = ["DISABLED", "REMOVED"]
+
 
 def unroll_dot_dict(dot_dict, separator="."):
     """
@@ -436,7 +438,6 @@ def keep_active_mdr(mdr_list:list[str])->list[str]:
     which mean none of the system they configure are set with a
     Deprecated status. 
     """
-    DEPRECATED_STATUSES = ["DEPRECATED", "REMOVED"]
     active_mdr = []
     for mdr in mdr_list:
         try:

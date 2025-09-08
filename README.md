@@ -24,3 +24,14 @@ CoreTide is a platform that has been built on thousands of manhours at the Europ
 - Object validation, Query Validation
 - Documentation Self-Generation, creates a collection of interconnected markdown files 
 - Full UUIDv4 Object system
+
+### Supported detection platforms (deployers)
+
+- Carbon Black Cloud EDR
+- Crowdstrike XDR
+- Microsoft Sentinel
+- Microsoft Defender for Endpoint XDR
+- Sentinel One
+- Splunk Enterprise and Splunk Enterprise Security (including advance metadata management allowing to use Splunk as an integration for all analytics and DaC alert workflow)
+
+> If you are interested by another platform, please introduce a feature request with documentation to the API endpoints allowing full management of the detections on the platform.

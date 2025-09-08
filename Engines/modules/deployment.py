@@ -1,6 +1,6 @@
 import pandas as pd
 from git.repo import Repo
-from Engines.modules.framework import unroll_dot_dict
+from Engines.modules.framework import unroll_dot_dict, DEPRECATED_STATUSES
 from Engines.modules.models import (
     TideDefinitionsModels,
     TideModels,
@@ -58,7 +58,7 @@ class TideRepo:
                 log("INFO", "Identified Azure Pipeline as the CI Runtime Platform")
                 REPO_DIR = os.getenv("BUILD_SOURCESDIRECTORY")
             case CIEnvironment.CIPlatforms.LocalDebug:
-                return None
+                return None #type: ignore
         log("INFO",
             "Will initialize repository located on",
             str(REPO_DIR))
@@ -123,7 +123,9 @@ class CIEnvironment:
 
 
 def make_deploy_plan(
-    plan: DeploymentStrategy, wide_scope=False
+    plan: DeploymentStrategy,
+    wide_scope=False,
+    keep_deprecated=True
 ) -> dict[str, list[str]]:
     """
     Algorithm which assembles the MDR to deploy, organized per system
@@ -171,7 +173,14 @@ def make_deploy_plan(
             platform_status = conf_data[system]["status"]
 
             if system in SYSTEMS_DEPLOYMENT:
-                if wide_scope:
+                if (
+                    keep_deprecated is False
+                    and platform_status in DEPRECATED_STATUSES
+                ):
+                    log("SKIP",
+                        f"Not keeping in deployment plan as {system} is set to a deprecated status",
+                        platform_status)
+                elif wide_scope:
                     deploy_mdr.setdefault(system, []).append(mdr_uuid)
                 else:
                     if plan is DeploymentStrategy.PRODUCTION:

@@ -27,7 +27,10 @@ DEPLOYMENT_PLAN = DeploymentStrategy.load_from_environment()
 # Refetches the deployment plan, so it can read the MDR after modification
 # and assess the correct latest status
 deployment_list = make_deploy_plan(
-    DEPLOYMENT_PLAN, wide_scope=True)  # type: ignore
+    DEPLOYMENT_PLAN,
+    wide_scope=True,
+    keep_deprecated=False
+    )  # type: ignore
 if len(deployment_list) == 0:  # In case of no deployments possible, fail graciously
     log(
         "WARNING",
@@ -51,12 +54,12 @@ for system in deployment_list:
         log("ONGOING", f"Validating the query against {system_name}")
         try:
             DeployTide.query_validation[system].validate(
-                deployment=keep_active_mdr(deployment_list[system])
+                deployment=deployment_list[system]
             )
         except:
             log("WARNING", "Trying MDRv4 style method")
             DeployTide.query_validation[system].validate(
-                mdr_deployment=keep_active_mdr(deployment_list[system]), deployment_plan=DEPLOYMENT_PLAN
+                mdr_deployment=deployment_list[system], deployment_plan=DEPLOYMENT_PLAN #type: ignore
             )
 
     else:

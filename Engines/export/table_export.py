@@ -21,7 +21,7 @@ class TableEntry:
     name:str
     type:str
     description:str
-    version:int
+    version:str
     created:str
     modified:str
     childs:str
@@ -87,7 +87,7 @@ class TableExporter:
         uuid = object
         name = object_data["name"]
         object_type_name = self.OBJECT_NAMES[object_type]
-        version = object_data["metadata"]["version"]
+        version = str(object_data["metadata"]["version"])
         created = object_data["metadata"]["created"]
         modified = object_data["metadata"]["modified"]
         

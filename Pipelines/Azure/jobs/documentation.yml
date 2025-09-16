@@ -39,7 +39,7 @@ steps:
       ls -lR
       [[ $(git status --porcelain) ]] || { echo "No changes to the Wiki, exiting"; exit 0; }
       echo "Updated files, commiting"
-      git rebase origin/$(OpenTide.Wiki.BranchName)
+      git pull origin $(OpenTide.Wiki.BranchName)
       git add -A
       git commit -m "CoreTide Staging Documentation Automation"
       git push origin HEAD:$(OpenTide.Wiki.BranchName)

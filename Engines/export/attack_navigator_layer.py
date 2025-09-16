@@ -140,8 +140,9 @@ class AttackNavigatorLayer:
                               legendItems=legend)
 
     def export_layer(self, layer:NavigatorLayer):
-        INDEXES_PATH = DataTide.Configurations.Global.Paths.Tide.tide_indexes
-        layer_path = INDEXES_PATH / "ATT&CK Navigator Layer.json"
+        EXPORT_PATH = DataTide.Configurations.Global.Paths.Tide.exports
+        EXPORT_FILE_NAME = DataTide.Configurations.Global.exports.attack_layer
+        layer_path = EXPORT_PATH / EXPORT_FILE_NAME
         with open(layer_path, "w+") as out:
             output = json.dumps(asdict(layer), indent=4, sort_keys=False, default=str)
             out.write(output)

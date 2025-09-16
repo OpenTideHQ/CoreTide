@@ -11,6 +11,7 @@ snippet_file = ".vscode/Model Templates.code-snippets"
 json_schemas = "Schemas/"
 templates = "Schemas/Templates/"
 tide_indexes = "Schemas/Indexes/"
+exports = "Schemas/Exports/"
 custom_configurations = "Configurations/"
 
 [paths.core]
@@ -30,6 +31,10 @@ resources = "External/"
 [indexes]
 objects = "objects.json"
 revisions = "revisions.json"
+
+[exports]
+attack_layer = "ATT&CK Navigator Layer.json"
+table = "Objects Table.csv"
 
 [metaschemas]
 tvm = "TVM Meta Schema.yaml"

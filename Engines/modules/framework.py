@@ -362,7 +362,7 @@ def childs(model_id: str) -> list:
     by performing a forward search.
 
     If the object can not have descendants, or in other word is a last-line
-    Object (such as MDRs), will return an empty dictionary
+    Object (such as MDRs), will return an empty list
     """
 
     implementations = []

@@ -929,9 +929,15 @@ class DataTide:
                 objects: str
                 revisions: str
 
+            @dataclass
+            class Exports:
+                attack_layer: str
+                table: str
+
             Index = dict(IndexTide.load()["configurations"]["global"])
             objects = Index["objects"]
             indexes = Indexes(**dict(Index["indexes"]))
+            exports = Exports(**dict(Index["exports"]))
             metaschemas = dict(Index["metaschemas"])
             recomposition = dict(Index["recomposition"])
             json_schemas = dict(Index["json_schemas"])
@@ -988,6 +994,7 @@ class DataTide:
                     json_schemas = Index["json_schemas"]
                     templates = Index["templates"]
                     tide_indexes = Index["tide_indexes"]
+                    exports = Index["exports"]
 
         @dataclass(frozen=True)
         class Systems:

@@ -1,5 +1,6 @@
 import git
 import sys
+import os
 import json
 
 from dataclasses import dataclass, asdict
@@ -46,6 +47,11 @@ class TechniqueIndexEntry:
 
 class AttackNavigatorLayer:
 
+    def __init__(self):
+        self.EXPORT_PATH = DataTide.Configurations.Global.Paths.Tide.exports
+        self.EXPORT_FILE_NAME = DataTide.Configurations.Global.exports.attack_layer
+        self.EXPORT_FILE_PATH = self.EXPORT_PATH / self.EXPORT_FILE_NAME
+
     def create_layer(self):
         technique_layer = self.generate_technique_layer()
         full_layer = self.assemble_full_layer(technique_layer=technique_layer)
@@ -79,6 +85,7 @@ class AttackNavigatorLayer:
         return technique_mapping
     
     def generate_technique_layer(self)->list[TechniqueLayer]:
+        
         tvm_techniques = self.map_objects_and_techniques(model_type="tvm")
         cdm_techniques = self.map_objects_and_techniques(model_type="cdm")
         mdr_techniques = self.map_objects_and_techniques(model_type="mdr")
@@ -130,6 +137,7 @@ class AttackNavigatorLayer:
 
 
     def assemble_full_layer(self, technique_layer:list[TechniqueLayer])->NavigatorLayer:
+        
         legend = list()
         legend.append(LegendEntry(label="TVM Only", color=LayerColor.red))
         legend.append(LegendEntry(label="TVM + CDM", color=LayerColor.purple))
@@ -140,12 +148,10 @@ class AttackNavigatorLayer:
                               legendItems=legend)
 
     def export_layer(self, layer:NavigatorLayer):
-        EXPORT_PATH = DataTide.Configurations.Global.Paths.Tide.exports
-        EXPORT_FILE_NAME = DataTide.Configurations.Global.exports.attack_layer
-        layer_path = EXPORT_PATH / EXPORT_FILE_NAME
-        with open(layer_path, "w+") as out:
-            output = json.dumps(asdict(layer), indent=4, sort_keys=False, default=str)
-            out.write(output)
+        
+        with open(self.EXPORT_FILE_PATH, "w+") as export:
+            json.dump(layer, export, indent=4, sort_keys=False, default=str)
+
 
 def run():
     AttackNavigatorLayer().create_layer()

@@ -26,9 +26,12 @@ objects_indexer.run()
 templates.run()
 
 IndexTide.reload()
-from Engines.framework import json_schemas, vscode_snippets, attack_navigator_layer
+from Engines.framework import json_schemas, vscode_snippets
+from Engines.export import attack_navigator_layer
+from Engines.export.table_export import TableExporter
 
 RevisionIndexer().run()
 json_schemas.run()
 vscode_snippets.run()
 attack_navigator_layer.run()
+TableExporter().run()

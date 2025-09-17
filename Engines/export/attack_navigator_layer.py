@@ -148,9 +148,9 @@ class AttackNavigatorLayer:
                               legendItems=legend)
 
     def export_layer(self, layer:NavigatorLayer):
-        
+
         with open(self.EXPORT_FILE_PATH, "w+") as export:
-            json.dump(layer, export, indent=4, sort_keys=False, default=str)
+            json.dump(asdict(layer), export, indent=4, sort_keys=False, default=str)
 
 
 def run():

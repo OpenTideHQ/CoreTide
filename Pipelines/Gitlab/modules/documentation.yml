@@ -28,12 +28,9 @@
     - cd $TIDE_WIKI
     - git add -A
     #Graceful exit when there is nothing to commit
-    - if ! git diff --quiet HEAD; then
-    -   git stash
-    -   git pull $TIDE_WIKI_ACCESS
-    -   git stash apply
-    -   git add -A
+    - if ! git diff-index --quiet HEAD; then
     -   git commit -m "$CI_COMMIT_MESSAGE"
+    -   git rebase
     -   git push $TIDE_WIKI_ACCESS
     - fi
     - cd ../ #Back if Tide Repo Root
@@ -80,12 +77,9 @@
     - cd $TIDE_WIKI
     - git add -A
     #Graceful exit when there is nothing to commit
-    - if ! git diff --quiet HEAD; then
-    -   git stash
-    -   git pull $TIDE_WIKI_ACCESS
-    -   git stash apply
-    -   git add -A
+    - if ! git diff-index --quiet HEAD; then
     -   git commit -m "$CI_COMMIT_MESSAGE"
+    -   git rebase
     -   git push $TIDE_WIKI_ACCESS
     - fi
     - cd ../ #Back if Tide Repo Root

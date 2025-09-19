@@ -7,12 +7,10 @@
     - cd ../../
     - pwd
     - rm -rf $TIDE_CORE_REPO #Delete injected Core
-    - if ! git diff --quiet HEAD; then
-    -   git stash
-    -   git pull $TIDE_REPO_ACCESS
-    -   git stash apply
-    -   git add -A
+    - git add -A
+    - if ! git diff-index --quiet HEAD; then
     -   git commit -m "[CoreTIDE] Framework Generation $CI_COMMIT_MESSAGE"
+    -   git rebase origin/$CI_DEFAULT_BRANCH
     -   git push $TIDE_REPO_ACCESS HEAD:$CI_COMMIT_REF_NAME
     - fi
   rules:

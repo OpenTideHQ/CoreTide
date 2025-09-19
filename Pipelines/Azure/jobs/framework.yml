@@ -21,9 +21,6 @@ steps:
       fi
 
       echo "Updated files, committing"
-      git stash
-      git pull origin $(Build.SourceBranchName)
-      git stash apply
       git add -- ':!$(Build.Repository.Name)' ':!CoreTide'
       git commit -m "CoreTide Framework Automation [skip ci]"
       git push origin "HEAD:$(Build.SourceBranchName)"

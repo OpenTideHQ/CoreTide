@@ -48,7 +48,9 @@ runs:
         fi
 
         echo "Updated files, committing"
+        git stash
         git pull origin ${{ github.ref }}
+        git stash apply
         git add -- . ':!${REPO_NAME}' ':!CoreTide' ':!coretide' ':!$CORETIDE_PATH'
         git commit -m "CoreTide MDR Promotion [skip ci]"
         git push origin HEAD:${{ github.ref }}

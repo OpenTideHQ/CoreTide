@@ -20,6 +20,7 @@ class TableEntry:
     uuid:str
     name:str
     type:str
+    tlp: str
     description:str
     version:str
     created:str
@@ -87,6 +88,7 @@ class TableExporter:
         uuid = object
         name = object_data["name"]
         object_type_name = self.OBJECT_NAMES[object_type]
+        tlp = object_data["metadata"]["tlp"]
         version = str(object_data["metadata"]["version"])
         created = object_data["metadata"]["created"]
         modified = object_data["metadata"]["modified"]
@@ -127,6 +129,7 @@ class TableExporter:
         return TableEntry(uuid=uuid,
                           name=name,
                           type=object_type_name,
+                          tlp=tlp,
                           description=description,
                           version=version,
                           created=created,

@@ -1,5 +1,5 @@
 import git
-import os
+import json
 import sys
 from typing import Sequence
 
@@ -203,7 +203,10 @@ class SentinelDeploy(DeployMDR):
             rule.tactics = tactics
             rule.techniques = techniques
 
-        log("INFO", "Compiled Rule", str(rule))
+        log("INFO", "Compiled Rule", json.dumps(rule,
+                                                default=lambda o: o.__dict__, 
+                                                sort_keys=True,
+                                                indent=4))
 
         return rule
 

@@ -204,7 +204,6 @@ class SentinelDeploy(DeployMDR):
             rule.techniques = techniques
 
         log("INFO", "Compiled Rule", json.dumps(rule,
-                                                default=lambda o: o.__dict__, 
                                                 sort_keys=True,
                                                 indent=4))
 

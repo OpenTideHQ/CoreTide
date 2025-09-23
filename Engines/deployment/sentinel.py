@@ -203,7 +203,7 @@ class SentinelDeploy(DeployMDR):
             rule.tactics = tactics
             rule.techniques = techniques
 
-        log("INFO", "Compiled Rule", json.dumps(rule,
+        log("INFO", "Compiled Rule", json.dumps(rule.__dict__,
                                                 sort_keys=True,
                                                 indent=4))
 

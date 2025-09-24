@@ -42,9 +42,7 @@ steps:
       ls -lR
       [[ $(git status --porcelain) ]] || { echo "No changes, exiting"; exit 0; }
       echo "Updated files, commiting"
-      git stash
       git pull origin $(OpenTide.Wiki.BranchName)
-      git stash apply
       git add -A
       git commit -m "CoreTide Staging Documentation Automation"
       git push origin HEAD:$(OpenTide.Wiki.BranchName)

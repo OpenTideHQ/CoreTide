@@ -13416,3 +13416,15 @@ keys:
     alias:
       - APT-Q-95
     tide.vocab.stages: misp
+  - id: 12503160-884d-40b8-b4cf-9a4d11a769cf
+    name: UNC6395
+    description: The actor systematically exported large volumes of data from numerous
+      corporate Salesforce instances. GTIG assesses the primary intent of the threat
+      actor is to harvest credentials. After the data was exfiltrated, the actor searched
+      through the data to look for secrets that could be potentially used to compromise
+      victim environments. GTIG observed UNC6395 targeting sensitive credentials such
+      as Amazon Web Services (AWS) access keys (AKIA), passwords, and Snowflake-related
+      access tokens. UNC6395 demonstrated operational security awareness by deleting
+      query jobs, however logs were not impacted and organizations should still review
+      relevant logs for evidence of data exposure.
+    tide.vocab.stages: misp

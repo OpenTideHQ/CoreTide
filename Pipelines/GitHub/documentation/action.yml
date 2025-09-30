@@ -15,7 +15,7 @@ runs:
       id: move_wiki
       shell: bash
       run: |
-        mv ${{ inputs.wiki_repo_name }} ./{{inputs.coretide_path}}
+        mv ${{ inputs.wiki_repo_name }} ./${{inputs.coretide_path}}
     - name: Generate Tide Index
       id: generate_index
       shell: bash

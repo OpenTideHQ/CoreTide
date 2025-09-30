@@ -13,7 +13,7 @@ runs:
       run: |
           # List files changed in the last commit
           CHANGED=$(git diff --name-only HEAD^ HEAD)
-
+          echo "Changed files: $CHANGED"
           # Grep for the directory with a leading ^ to avoid false positives
           if echo "$CHANGED" | grep -q '^Objects/Detection Rules/'; then
             echo "CHANGES=true" >> $GITHUB_OUTPUT

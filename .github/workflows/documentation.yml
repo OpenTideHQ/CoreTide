@@ -77,6 +77,7 @@ jobs:
         with:
           repository: ${{ inputs.wiki_repo_link}}
           ref: refs/heads/${{ inputs.wiki_repo_branch }}
+          path: ${{ inputs.wiki_repo_name }}
 
       - uses: ./coretide/Pipelines/GitHub/tide-setup
         name: Tide Setup
@@ -115,9 +116,10 @@ jobs:
         with:
           repository: ${{ inputs.wiki_repo_link}}
           ref: refs/heads/${{ inputs.wiki_repo_branch }}
+          path: ${{ inputs.wiki_repo_name }}
 
-      - uses: ./coretide/Pipelines/GitHub/tide-setup
-        name: Tide Setup
+      - name: Tide Setup
+        uses: ./coretide/Pipelines/GitHub/tide-setup
         id: tide_setup
         with:
           python_version: ${{ inputs.python_version }}

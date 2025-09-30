@@ -1,6 +1,6 @@
 name: Documentation Generation
 description: Generates Wiki during MDR changes in PRs
-input:s:
+inputs:
   coretide_path:
     description: "Path where coretide has been cloned"
   wiki_repo_name:
@@ -21,7 +21,7 @@ runs:
       shell: bash
       run:
         ls -lah
-        cd coretide
+        cd ${{inputs.coretide_path}}
         if [ -e ${{ inputs.wiki_repo_name }}/staging_index.json ]
           then cp ${{ inputs.wiki_repo_name }}/staging_index.json ./
         fi
@@ -30,32 +30,32 @@ runs:
       id: generate_index
       shell: bash
       run: |
-        cd coretide/Engines/indexing/
+        cd ${{inputs.coretide_path}}/Engines/indexing/
         python ./staging_indexer.py
     - name: Copy Index to Wiki
       id: copy_index
       shell: bash
       run: |
-        cd coretide
+        cd ${{inputs.coretide_path}}
         ls -lah
         cp staging_index.json ./${{ inputs.wiki_repo_name }}/
     - name: Documentation Toolchain
       id: documentation_toolchain
       shell: bash
       run: |
-        cd coretide/Orchestration
+        cd ${{inputs.coretide_path}}/Orchestration
         python document.py
     - name: Copy Documentation in Wiki 
       id: copy_documentation
       shell: bash
       run: |
-        cd coretide
+        cd ${{inputs.coretide_path}}
         cp -fr wiki/. ./${{ inputs.wiki_repo_name }}/
     - name: Move Back Wiki Repo to resources
       id: move_back_wiki
       shell: bash
       run: |
-        mv coretide/${{ inputs.wiki_repo_name }} ./${{ inputs.wiki_repo_name }}/
+        mv ${{inputs.coretide_path}}/${{ inputs.wiki_repo_name }} ./${{ inputs.wiki_repo_name }}/
     - name: Commit documentation
       id: commit_documentation
       shell: bash

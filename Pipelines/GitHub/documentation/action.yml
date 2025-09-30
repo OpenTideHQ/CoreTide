@@ -1,6 +1,6 @@
 name: Documentation
 description: Generates Wiki
-input:s:
+inputs:
   coretide_path:
     description: "Path where coretide has been cloned"
   wiki_repo_name:

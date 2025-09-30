@@ -76,7 +76,6 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: ${{ inputs.wiki_repo_link}}
-          path: ${{ inputs.coretide_path }}
           ref: refs/heads/${{ inputs.wiki_repo_branch }}
 
       - uses: ./coretide/Pipelines/GitHub/tide-setup
@@ -115,7 +114,6 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: ${{ inputs.wiki_repo_link}}
-          path: ${{ inputs.coretide_path }}
           ref: refs/heads/${{ inputs.wiki_repo_branch }}
 
       - uses: ./coretide/Pipelines/GitHub/tide-setup

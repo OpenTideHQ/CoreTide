@@ -11,6 +11,11 @@ input:s:
 runs:
   using: "composite"
   steps:
+    - name: Move Wiki to CoreTide
+      id: move_wiki
+      shell: bash
+      run: |
+        mv ./${{ inputs.wiki_repo_name }} coretide/${{ inputs.wiki_repo_name }}/
     - name: Generate Tide Index
       id: generate_index
       shell: bash

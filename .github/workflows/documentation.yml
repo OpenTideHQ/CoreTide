@@ -92,6 +92,8 @@ jobs:
         id: documentation_generation
         with:
           coretide_path: ${{ inputs.coretide_path }}
+          wiki_repo_name: ${{ inputs.wiki_repo_name }}
+          wiki_repo_branch: ${{ inputs.wiki_repo_branch }}
 
   ProductionDocumentation:
     name: Production Documentation Generation
@@ -131,3 +133,5 @@ jobs:
         id: documentation_generation
         with:
           coretide_path: ${{ inputs.coretide_path }}
+          wiki_repo_name: ${{ inputs.wiki_repo_name }}
+          wiki_repo_branch: ${{ inputs.wiki_repo_branch }}

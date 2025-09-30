@@ -14,7 +14,7 @@ steps:
         then cp $(OpenTide.Wiki.RepoName)/staging_index.json ./
       fi
       ls -lah
-    displayName: Extract Prod Index from Wiki for Reconcilitation
+    displayName: Extract Staging Index from Wiki for Reconcilitation
   - script: |
       cd coretide/Engines/indexing/
       python ./staging_indexer.py

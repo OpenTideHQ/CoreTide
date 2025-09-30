@@ -1,0 +1,65 @@
+name: Documentation Generation
+description: Generates Wiki during MDR changes in PRs
+input:s:
+  coretide_path:
+    description: "Path where coretide has been cloned"
+  wiki_repo_name:
+    description: "Name of the Wiki repository to push to"
+  wiki_repo_branch:
+    description: "Repo Branch of the Wiki repository to push to"
+
+runs:
+  using: "composite"
+  steps:
+    - name: Extract Staging Index from Wiki for Reconcilitation
+      id: reconciliate_staging_index
+      shell: bash
+      run:
+        ls -lah
+        cd coretide
+        if [ -e ${{ inputs.wiki_repo_name }}/staging_index.json ]
+          then cp ${{ inputs.wiki_repo_name }}/staging_index.json ./
+        fi
+        ls -lah
+    - name: Generate Tide Index
+      id: generate_index
+      shell: bash
+      run: |
+        cd coretide/Engines/indexing/
+        python ./staging_indexer.py
+    - name: Copy Index to Wiki
+      id: copy_index
+      shell: bash
+      run: |
+        cd coretide
+        ls -lah
+        cp staging_index.json ./${{ inputs.wiki_repo_name }}/
+    - name: Documentation Toolchain
+      id: documentation_toolchain
+      shell: bash
+      run: |
+        cd coretide/Orchestration
+        python document.py
+    - name: Copy Documentation in Wiki 
+      id: copy_documentation
+      shell: bash
+      run: |
+        cd coretide
+        cp -fr wiki/. ./${{ inputs.wiki_repo_name }}/
+    - name: Move Back Wiki Repo to resources
+      id: move_back_wiki
+      shell: bash
+      run: |
+        mv coretide/${{ inputs.wiki_repo_name }} ./${{ inputs.wiki_repo_name }}/
+    - name: Commit documentation
+      id: commit_documentation
+      shell: bash
+      run: |
+        cd ${{ inputs.wiki_repo_name }}
+        ls -lR
+        [[ $(git status --porcelain) ]] || { echo "No changes, exiting"; exit 0; }
+        echo "Updated files, commiting"
+        git pull origin ${{ inputs.wiki_repo_branch }}
+        git add -A
+        git commit -m "CoreTide Staging Documentation Automation [skip ci]"
+        git push origin HEAD:${{ inputs.wiki_repo_branch }}

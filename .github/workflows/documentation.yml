@@ -1,0 +1,133 @@
+name: Documentation Generation Pipeline
+
+on:
+  workflow_call:
+    inputs:
+      coretide_path:
+        type: string
+        description: "Path where CoreTide needs to be cloned into"
+        required: false
+        default: coretide
+      coretide_ref:
+        type: string
+        description: "Ref to clone CoreTide from"
+        required: false
+        default: development
+      python_version:
+        type: string
+        description: "Python version to use"
+        required: false
+        default: "3.12"
+      requirements_file:
+        type: string
+        description: "Requirements file path"
+        required: false
+        default: "coretide/Engines/requirements.txt"
+      opentide_secrets:
+        type: string
+        description: "Content of the OpenTide secrets file"
+        required: false
+      wiki_enabled:
+        type: boolean
+        description: "Whether to generate the wiki"
+        required: false
+        default: false
+      wiki_repo_link:
+        type: string
+        description: "Git URL of the Wiki repository to push to"
+        required: false
+        default: ""
+      wiki_repo_name:
+        type: string
+        description: "Name of the Wiki repository to push to"
+        required: false
+        default: ""
+      wiki_repo_branch:
+        type: string
+        description: "Repo Branch of the Wiki repository to push to"
+        required: false
+        default: ""
+      mdr_changes:
+        type: string
+        description: "Whether there are MDR changes in this run, returned from the Validation job"
+        required: false
+        default: "false"
+
+jobs:
+  StagingDocumentation:
+    name: Staging Documentation Generation
+    runs-on: ubuntu-latest
+    if: ${{ inputs.wiki_enabled == true && github.event_name == 'pull_request' && inputs.mdr_changes == 'true' }}
+    steps:
+      - name: Checkout Tide Instance
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 100
+          ref: ${{ github.ref }}
+
+      - name: Checkout CoreTide
+        uses: actions/checkout@v4
+        with:
+          repository: OpenTideHQ/CoreTide
+          path: ${{ inputs.coretide_path }}
+          ref: refs/heads/${{ inputs.coretide_ref }}
+
+      - name: Checkout Wiki
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ inputs.wiki_repo_link}}
+          path: ${{ inputs.coretide_path }}
+          ref: refs/heads/${{ inputs.wiki_repo_branch }}
+
+      - uses: ./coretide/Pipelines/GitHub/tide-setup
+        name: Tide Setup
+        id: tide_setup
+        with:
+          python_version: ${{ inputs.python_version }}
+          requirements_file: ${{ inputs.requirements_file }}
+          opentide_secrets: ${{ inputs.opentide_secrets }}
+
+      - uses: ./coretide/Pipelines/GitHub/documentation-staging
+        name: Documentation Generation
+        id: documentation_generation
+        with:
+          coretide_path: ${{ inputs.coretide_path }}
+
+  ProductionDocumentation:
+    name: Production Documentation Generation
+    runs-on: ubuntu-latest
+    if: ${{ inputs.wiki_enabled == true && github.ref == format('refs/heads/{0}', github.event.repository.default_branch) }}
+    steps:
+      - name: Checkout Tide Instance
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 100
+          ref: ${{ github.ref }}
+
+      - name: Checkout CoreTide
+        uses: actions/checkout@v4
+        with:
+          repository: OpenTideHQ/CoreTide
+          path: ${{ inputs.coretide_path }}
+          ref: refs/heads/${{ inputs.coretide_ref }}
+
+      - name: Checkout Wiki
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ inputs.wiki_repo_link}}
+          path: ${{ inputs.coretide_path }}
+          ref: refs/heads/${{ inputs.wiki_repo_branch }}
+
+      - uses: ./coretide/Pipelines/GitHub/tide-setup
+        name: Tide Setup
+        id: tide_setup
+        with:
+          python_version: ${{ inputs.python_version }}
+          requirements_file: ${{ inputs.requirements_file }}
+          opentide_secrets: ${{ inputs.opentide_secrets }}
+
+      - uses: ./coretide/Pipelines/GitHub/documentation-production
+        name: Documentation Generation
+        id: documentation_generation
+        with:
+          coretide_path: ${{ inputs.coretide_path }}

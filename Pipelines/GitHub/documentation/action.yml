@@ -15,26 +15,26 @@ runs:
       id: move_wiki
       shell: bash
       run: |
-        mv ${{ inputs.wiki_repo_name }} ./${{inputs.coretide_path}}
+        mv ${{inputs.wiki_repo_name}} ./${{inputs.coretide_path}}
     - name: Generate Tide Index
       id: generate_index
       shell: bash
       run: |
-        cd coretide/Engines/indexing/
+        cd ${{inputs.coretide_path}}/Engines/indexing/
         export GENERATE_INDEX_FILE=True
         python ./indexer.py
     - name: Copy Index to Wiki
       id: copy_index
       shell: bash
       run: |
-        cd coretide
+        cd ${{inputs.coretide_path}}
         cp index.json ./${{ inputs.wiki_repo_name }}/
     - name: Handle staging index
       id: reconciliate_staging_index
       shell: bash
-      run:
+      run: |
         ls -lah
-        cd coretide
+        cd ${{inputs.coretide_path}}
         if [ -e ${{ inputs.wiki_repo_name }}/staging_index.json ]
           then cp ${{ inputs.wiki_repo_name }}/staging_index.json ./
         fi
@@ -43,19 +43,19 @@ runs:
       id: documentation_toolchain
       shell: bash
       run: |
-        cd coretide/Orchestration
+        cd ${{inputs.coretide_path}}/Orchestration
         python document.py
     - name: Copy Documentation in Wiki 
       id: copy_documentation
       shell: bash
       run: |
-        cd coretide
+        cd ${{inputs.coretide_path}}
         cp -fr wiki/. ./${{ inputs.wiki_repo_name }}/
     - name: Move Back Wiki Repo to resources
       id: move_back_wiki
       shell: bash
       run: |
-        mv coretide/${{ inputs.wiki_repo_name }} ./${{ inputs.wiki_repo_name }}/
+        mv ${{inputs.coretide_path}}/${{ inputs.wiki_repo_name }} ./${{ inputs.wiki_repo_name }}/
     - name: Commit documentation
       id: commit_documentation
       shell: bash

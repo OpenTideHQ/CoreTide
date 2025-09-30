@@ -19,7 +19,7 @@ runs:
     - name: Extract Staging Index from Wiki for Reconcilitation
       id: reconciliate_staging_index
       shell: bash
-      run:
+      run: |
         ls -lah
         cd ${{inputs.coretide_path}}
         if [ -e ${{ inputs.wiki_repo_name }}/staging_index.json ]

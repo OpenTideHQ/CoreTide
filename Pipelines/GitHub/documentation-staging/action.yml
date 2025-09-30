@@ -15,7 +15,7 @@ runs:
       id: move_wiki
       shell: bash
       run: |
-        mv ./${{ inputs.wiki_repo_name }} coretide/${{ inputs.wiki_repo_name }}/
+        mv ${{ inputs.wiki_repo_name }} ./{{inputs.coretide_path}}
     - name: Extract Staging Index from Wiki for Reconcilitation
       id: reconciliate_staging_index
       shell: bash

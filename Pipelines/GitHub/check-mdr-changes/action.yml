@@ -11,11 +11,12 @@ runs:
       id: detect_mdr_changes
       shell: bash
       run: |
-        echo "Checking for changes in detection rules"
-        if git diff HEAD HEAD~ --name-only | grep -q '^Objects/Detection Rules' ; then
-          echo "Detection Rules file modified, will execute a deployment routine"
-          echo "CHANGES=true" >> $GITHUB_OUTPUT
-        else
-          echo "No Detection Rules file modified, will skip the deployment routine"
-          echo "CHANGES=false" >> $GITHUB_OUTPUT
-        fi
+          # List files changed in the last commit
+          CHANGED=$(git diff --name-only HEAD^ HEAD)
+
+          # Grep for the directory with a leading ^ to avoid false positives
+          if echo "$CHANGED" | grep -q '^Objects/Detection Rules/'; then
+            echo "CHANGES=true" >> $GITHUB_OUTPUT
+          else
+            echo "CHANGES=false" >> $GITHUB_OUTPUT
+          fi

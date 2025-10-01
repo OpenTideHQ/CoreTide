@@ -52,6 +52,10 @@ on:
         description: "Whether there are MDR changes in this run, returned from the Validation job"
         required: false
         default: "false"
+    secrets:
+      wiki_token:
+        description: "Personal Access Token to push to the Wiki repository"
+        required: false
 
 jobs:
   StagingDocumentation:
@@ -77,6 +81,7 @@ jobs:
         with:
           repository: ${{ inputs.wiki_repo_link}}
           ref: refs/heads/${{ inputs.wiki_repo_branch }}
+          token: ${{ secrets.wiki_token }}
           path: ${{ inputs.wiki_repo_name }}
 
       - uses: ./coretide/Pipelines/GitHub/tide-setup
@@ -119,6 +124,7 @@ jobs:
           repository: ${{ inputs.wiki_repo_link}}
           ref: refs/heads/${{ inputs.wiki_repo_branch }}
           path: ${{ inputs.wiki_repo_name }}
+          token: ${{ secrets.wiki_token }}
 
       - name: Tide Setup
         uses: ./coretide/Pipelines/GitHub/tide-setup

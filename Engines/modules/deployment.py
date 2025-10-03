@@ -710,11 +710,6 @@ class TideDeployment:
             raise Exception
 
         for tenant in tenants:
-            # If Deployment Plan is ALWAYS, we always target the tenant
-            if tenant.deployment is DeploymentStrategy.ALWAYS:
-                log("SUCCESS", "Assigned to tenant")
-                target_tenants.append(tenant)
-                continue
 
             # Resolve tenant deployments when they are specific or not in the MDR spec
             if mdr_tenants:
@@ -726,8 +721,10 @@ class TideDeployment:
                 )
 
                 if tenant.name in mdr_tenants:
-                    if (tenant.deployment is DeploymentStrategy.MANUAL) or (
-                        tenant.deployment is deployment_strategy
+                    if (
+                        (tenant.deployment is DeploymentStrategy.MANUAL) or
+                        (tenant.deployment is DeploymentStrategy.ALWAYS) or
+                        (tenant.deployment is deployment_strategy)
                     ):
                         target_tenants.append(tenant)
                         log(
@@ -775,7 +772,10 @@ class TideDeployment:
                     )
                     continue
 
-                elif tenant.deployment is deployment_strategy:
+                elif ( 
+                    (tenant.deployment is deployment_strategy) or
+                    (tenant.deployment is DeploymentStrategy.ALWAYS)
+                ):
                     target_tenants.append(tenant)
                     log(
                         "SUCCESS",

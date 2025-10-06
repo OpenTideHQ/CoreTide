@@ -852,7 +852,7 @@ class TideDeployment:
                         match = True
 
                 if mod.conditions.status:
-                    if mod.conditions.status == mdr_config.status:
+                    if mdr_config.status in mod.conditions.status:
                         match = True
                 if mod.conditions.tenants:
                     if target_tenant in mod.conditions.tenants:

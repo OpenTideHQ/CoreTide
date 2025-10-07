@@ -33,7 +33,7 @@ properties:
     title: Schema identifier and version
     type: string
     description: Identifier of the schema at its current version 
-    default: sentinel::2.1
+    default: sentinel::2.2
     tide.template.force-required: True
 
   status: 
@@ -66,6 +66,37 @@ properties:
     description: Flags allow to customize the rule behaviour using the modifiers framework
     type: array
     tide.config.parameter-list: systems.sentinel.platform.flags
+
+  template:
+    title: Template Information
+    type: object
+    description: | 
+      Optional metadata about the template this rule was created from. You
+      can find this information in the Sentinel GUI when viewing template rule.
+      This will enable tracking of rules created from templates in the Sentinel GUI
+    required:
+      - uuid
+      - version
+    properties:
+      uuid:
+        title: UUID of the template rule
+        type: string
+        regex: ^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$
+        description: |
+          The uuid of the alert rule template used to create this rule.
+          You can find this information in the Sentinel rule repository (https://github.com/Azure/Azure-Sentinel/),
+          or by browsing https://analyticsrules.exchange/
+        tide.mdr.parameter: alertRuleTemplateName
+
+      version:
+        title: Template Version
+        type: string
+        regex: ^\d\.\d\.\d$
+        description: |
+          The version of the alert rule template used to create
+          this rule - in format <a.b.c>, where all are numbers,
+          for example 1.0.2
+        tide.mdr.parameter: templateVersion
 
   trigger: 
     title: Alert Trigger
@@ -236,7 +267,6 @@ properties:
       tactics:
         title: MITRE ATT&CK Tactics
         type: array
-        tide.template.hide: true
         description: Mapping of relevant tactics
         items:
           type: string
@@ -260,7 +290,7 @@ properties:
             - ResourceDevelopment
 
       techniques:
-        title: MITRE ATT&CK Tactics
+        title: MITRE ATT&CK Techniques
         type: array
         tide.template.hide: true
         description: |

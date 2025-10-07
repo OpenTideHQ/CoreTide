@@ -1,4 +1,4 @@
-  schema: sentinel::2.1
+  schema: sentinel::2.2
   status: DEVELOPMENT
   #contributors:
     #-
@@ -6,6 +6,10 @@
     #-
   #flags:
     #-
+  
+  #template:
+    #uuid: 
+    #version: 
   
   trigger:
     operator: GreaterThan
@@ -22,6 +26,9 @@
     #title: 
     #description: |
       #...
+    #severity: 
+    #tactics:
+      #-
     #custom_details:
       #- key: 
         #column: 

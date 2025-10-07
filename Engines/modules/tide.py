@@ -271,12 +271,20 @@ class SystemLoader:
         mdr_config, base_config = SystemLoader._base_configuration(mdr_config)
 
         query = mdr_config.pop("query")
+
+        template = mdr_config.pop("template", None)
+        if template:
+            template = Sentinel.Template(**template)
+
         trigger = mdr_config.pop("trigger", None)
         if trigger:
             trigger = Sentinel.Trigger(**trigger)   
+        
         scheduling = Sentinel.Scheduling(**mdr_config.pop("scheduling", None))
-        alert = mdr_config.pop("alert", None)
+        
         custom_details = dynamic_properties = None
+        
+        alert = mdr_config.pop("alert", None)
         if alert:
             custom_details = alert.pop("custom_details", None)
             dynamic_properties = alert.pop("dynamic_properties", None)
@@ -320,6 +328,7 @@ class SystemLoader:
             tenants=base_config.tenants,
             flags=base_config.flags,
             query=query,
+            template=template,
             trigger=trigger,
             scheduling=scheduling,
             alert=alert,

@@ -32,9 +32,9 @@ on:
         description: "Whether to generate the wiki"
         required: false
         default: false
-      wiki_repo_link:
+      wiki_repo_owner:
         type: string
-        description: "Git URL of the Wiki repository to push to"
+        description: "Organisation or User that owns the Wiki repository to push to"
         required: false
         default: ""
       wiki_repo_name:
@@ -79,7 +79,7 @@ jobs:
       - name: Checkout Wiki
         uses: actions/checkout@v4
         with:
-          repository: ${{ inputs.wiki_repo_link}}
+          repository: ${{ inputs.wiki_repo_owner }}/${{ inputs.wiki_repo_name }}
           ref: refs/heads/${{ inputs.wiki_repo_branch }}
           token: ${{ secrets.wiki_token }}
           path: ${{ inputs.wiki_repo_name }}
@@ -121,7 +121,7 @@ jobs:
       - name: Checkout Wiki
         uses: actions/checkout@v4
         with:
-          repository: ${{ inputs.wiki_repo_link}}
+          repository: ${{ inputs.wiki_repo_owner }}/${{ inputs.wiki_repo_name }}
           ref: refs/heads/${{ inputs.wiki_repo_branch }}
           path: ${{ inputs.wiki_repo_name }}
           token: ${{ secrets.wiki_token }}

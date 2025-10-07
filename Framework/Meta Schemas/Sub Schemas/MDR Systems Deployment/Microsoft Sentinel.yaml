@@ -75,7 +75,7 @@ properties:
       can find this information in the Sentinel GUI when viewing template rule.
       This will enable tracking of rules created from templates in the Sentinel GUI
     required:
-      - name
+      - uuid
       - version
     properties:
       uuid:

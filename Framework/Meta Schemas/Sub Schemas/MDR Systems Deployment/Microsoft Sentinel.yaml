@@ -5,6 +5,7 @@ required:
   - scheduling
   - alert
   - grouping
+  - entities
 
 tide.template.force-required:
   - trigger
@@ -33,7 +34,7 @@ properties:
     title: Schema identifier and version
     type: string
     description: Identifier of the schema at its current version 
-    default: sentinel::2.2
+    default: sentinel::2.3
     tide.template.force-required: True
 
   status: 
@@ -519,6 +520,7 @@ properties:
     tide.mdr.parameter: entityMappings
     tide.mdr.parameter_nest: True # Will reproduce nested data structure before being added to the API request body (normally, flattening process would destroy this structure). 
     tide.template.spacer: true # Forces the template synthesis to add a space
+    minItems: 1
     maxItems: 10
     type: array
     items:
@@ -624,19 +626,6 @@ properties:
                           The AccountID in alerts from the CloudApp provider. Refers to account IDs in third-party apps that are not supported in other Microsoft products.
 
                           Required: **No**
-                      - const: IsAnonymized
-                        description: "Indicates whether the user name is anonymized. Optional. Default value: false."
-                        markdownDescription: |
-                          Indicates whether the user name is anonymized. Optional. Default value: `false`.
-                          
-                          Required: **No**
-                      - const: Stream
-                        description: The source of discovery logs related to the specific account. Optional.
-                        markdownDescription: |
-                          The source of discovery logs related to the specific account. Optional.
-                          
-                          Required: **No**
-
 
         - properties:
             entity:
@@ -780,20 +769,6 @@ properties:
                           The malware category by the vendor, e.g. Trojan.
 
                           Required: **No**
-                      - const: Files
-                        description: List of linked file entities on which the malware was found. Can contain the File entities inline or as reference. See the File entity for more details on structure.
-                        markdownDescription: |
-                          List of linked file entities on which the malware was found. Can contain the File entities inline or as reference.
-                          See the [File](https://learn.microsoft.com/en-us/azure/sentinel/entities-reference#file) entity for more details on structure.
-
-                          Required: **No**
-                      - const: Processes
-                        description: List of linked process entities on which the malware was found. This would often be used when the alert triggered on fileless activity. See the Process entity for more details on structure.
-                        markdownDescription: |
-                          List of linked process entities on which the malware was found. This would often be used when the alert triggered on fileless activity.
-                          See the [Processes](https://learn.microsoft.com/en-us/azure/sentinel/entities-reference#process) entity for more details on structure.
-
-                          Required: **No**
 
         - properties:
             entity:
@@ -811,12 +786,6 @@ properties:
                 properties:
                   identifier:
                     anyOf:
-                      - const: Type
-                        description: The type of the object.
-                        markdownDescription: |
-                          This should always be the string "file".
-
-                          Required: **Yes**
                       - const: Directory
                         description: The full path to the file.
                         markdownDescription: |
@@ -829,52 +798,7 @@ properties:
                           The file name without the path (some alerts might not include path).
 
                           Required: **Yes**
-                      - const: AlternateDataStreamName
-                        description: The file stream name in NTFS filesystem (null for the main stream).
-                        markdownDescription: |
-                          The alternate data stream name for the file in the NTFS filesystem.  
-                          If the file is using the main stream, this value will be null.
 
-                          Required: **No**
-                      - const: Host
-                        description: The host on which the file was stored.
-                        markdownDescription: |
-                          An entity representing the host where the file was stored.
-
-                          Required: **Yes**
-                      - const: HostUrl
-                        description: URL where the file was downloaded from (Mark of the Web).
-                        markdownDescription: |
-                          An entity representing the URL from which the file was downloaded  
-                          [Mark of the Web](https://learn.microsoft.com/en-us/deployedge/per-site-configuration-by-policy).
-
-                          Required: **No**
-                      - const: WindowsSecurityZoneType
-                        description: Windows Security Zone to which the URL belongs (Mark of the Web).
-                        markdownDescription: |
-                          Specifies the Windows Security Zone classification of the URL.
-
-                          Required: **No**
-                      - const: ReferrerUrl
-                        description: Referrer URL of the file download HTTP request (Mark of the Web).
-                        markdownDescription: |
-                          An entity representing the referrer URL of the file download request  
-                          [Mark of the Web](https://learn.microsoft.com/en-us/deployedge/per-site-configuration-by-policy).
-
-                          Required: **No**
-                      - const: SizeInBytes
-                        description: The size of the file in bytes.
-                        markdownDescription: |
-                          A long integer value representing the size of the file in bytes.
-
-                          Required: **No**
-                      - const: FileHashes
-                        description: The file hashes associated with this file.
-                        markdownDescription: |
-                          A list of entities (FileHash) associated with this file,  
-                          representing various hash values.
-
-                          Required: **No**
         - properties:
             entity:
               {type: string, enum: [Process]}
@@ -921,40 +845,6 @@ properties:
                           The time when the process started to run.
 
                           Required: **No**
-                      - const: ImageFile
-                        description: Can contain the File entity inline or as reference. See the File entity for more details on structure.
-                        markdownDescription: |
-                          Can contain the File entity inline or as reference.
-                          See the [File](https://learn.microsoft.com/en-us/azure/sentinel/entities-reference#file) entity for more details on structure.
-
-                          Required: **No**
-                      - const: Account
-                        description: The account running the processes. Can contain the Account entity inline or as reference. See the Account entity for more details on structure.
-                        markdownDescription: |
-                          The account running the processes. Can contain the Account entity inline or as reference.
-                          See the [Account](https://learn.microsoft.com/en-us/azure/sentinel/entities-reference#account) entity for more details on structure.
-
-                          Required: **No**
-                      - const: ParentProcess
-                        description: The parent process entity. Can contain partial data, for example, only the PID.
-
-                        markdownDescription: |
-                          The parent process entity. Can contain partial data, for example, only the PID.
-
-                          Required: **No**
-                      - const: Host
-                        description: The host on which the process was running.
-                        markdownDescription: |
-                          The host on which the process was running.
-
-                          Required: **No**
-                      - const: LogonSession
-                        description: The session in which the process was running.
-                        markdownDescription: |
-                          The session in which the process was running.
-
-                          Required: **No**
-
 
         - properties:
             entity:
@@ -1002,26 +892,6 @@ properties:
                           applications of the same type that a customer has.
 
                           Required: **No**
-                      - const: InstanceId
-                        description: The identifier of the specific session of the application. This is a zero-based running number. Value optional.
-                        markdownDescription: |
-                          The identifier of the specific session of the application.
-                          This is a zero-based running number. Value optional.
-
-                          Required: **No**
-                      - const: Risk
-                        description: Lets you filter apps by risk score so that you can focus on, for example, reviewing only highly risky apps. Possible values like Low, Medium, High or Unknown.
-                        markdownDescription: |
-                          Lets you filter apps by risk score so that you can focus on, for example, reviewing only highly risky apps.
-                          Possible values like Low, Medium, High or Unknown.
-
-                          Required: **No**
-                      - const: Stream
-                        description: The source of discovery logs related to the specific cloud app. Optional.
-                        markdownDescription: |
-                          The source of discovery logs related to the specific cloud app. Optional.
-
-                          Required: **No**
 
         - properties:
             entity:
@@ -1045,24 +915,6 @@ properties:
                           The name of the DNS record associated with the alert.
 
                           Required: **Yes**
-                      - const: IpAddress
-                        description: Entities corresponding to the resolved IP addresses.
-                        markdownDescription: |
-                          Entities corresponding to the resolved IP addresses.
-
-                          Required: **No**
-                      - const: DnsServerIp
-                        description: An entity representing the DNS server resolving the request.
-                        markdownDescription: |
-                          An entity representing the DNS server resolving the request.
-
-                          Required: **No**
-                      - const: HostIpAddress
-                        description: An entity representing the DNS request client.
-                        markdownDescription: |
-                          An entity representing the DNS request client.
-
-                          Required: **No**
 
         - properties:
             entity:
@@ -1086,30 +938,6 @@ properties:
                           The Azure resource ID of the resource.
 
                           Required: **Yes**
-                      - const: SubscriptionId
-                        description: The subscription ID of the resource.
-                        markdownDescription: |
-                          The subscription ID of the resource.
-
-                          Required: **No**
-                      - const: ActiveContacts
-                        description: Active contacts associated with the resource.
-                        markdownDescription: |
-                          Active contacts associated with the resource.
-
-                          Required: **No**
-                      - const: ResourceType
-                        description: The type of the resource.
-                        markdownDescription: |
-                          The type of the resource.
-
-                          Required: **No**
-                      - const: ResourceName
-                        description: The name of the resource.
-                        markdownDescription: |
-                          The name of the resource.
-
-                          Required: **No**
 
         - properties:
             entity:
@@ -1290,146 +1118,6 @@ properties:
                           A full URL the entity points to.
                           
                           Required: **Yes**
-
-        - properties:
-            entity:
-              {type: string, enum: [IoTDevice]}
-            mappings:
-              type: array
-              maxItems: 3
-              contains:
-                type: object
-                properties:
-                  identifier:
-                    enum: [DeviceId]
-              items:
-                type: object
-                properties:
-                  identifier:
-                    anyOf:
-                      - const: DeviceId
-                        description: The ID of the device in the context of the IoT Hub.
-                        markdownDescription: |
-                          The ID of the device in the context of the IoT Hub.
-
-                          Required: **Yes**
-                      - const: DeviceName
-                        description: The friendly name of the device.
-                        markdownDescription: |
-                          The friendly name of the device.
-
-                          Required: **No**
-                      - const: IoTSecurityAgentId
-                        description: The ID of the Defender for IoT agent running on the device.
-                        markdownDescription: |
-                          The ID of the _Defender for IoT_ agent running on the device.
-
-                          Required: **No**
-                      - const: DeviceType
-                        description: The type of the device ('temperature sensor', 'freezer', 'wind turbine' etc.).
-                        markdownDescription: |
-                          The type of the device ('temperature sensor', 'freezer', 'wind turbine' etc.).
-
-                          Required: **No**
-                      - const: Source
-                        description: The source (Microsoft/Vendor) of the device entity.
-                        markdownDescription: |
-                          The source (Microsoft/Vendor) of the device entity.
-
-                          Required: **No**
-                      - const: Manufacturer
-                        description: The manufacturer of the device.
-                        markdownDescription: |
-                          The manufacturer of the device.
-
-                          Required: **No**
-                      - const: Model
-                        description: The model of the device.
-                        markdownDescription: |
-                          The model of the device.
-
-                          Required: **No**
-                      - const: OperatingSystem
-                        description: The operating system the device is running.
-                        markdownDescription: |
-                          The operating system the device is running.
-
-                          Required: **No**
-                      - const: MacAddress
-                        description: The MAC address of the device.
-                        markdownDescription: |
-                          The MAC address of the device.
-
-                          Required: **No**
-                      - const: Protocols
-                        description: A list of protocols that the device supports.
-                        markdownDescription: |
-                          A list of protocols that the device supports.
-                          
-                          Required: **No**
-                      - const: SerialNumber
-                        description: The MAC address of the device.
-                        markdownDescription: |
-                          The MAC address of the device.
-
-                          Required: **No**
-                      - const: Site
-                        description: The site location of the device.
-                        markdownDescription: |
-                          The site location of the device.
-
-                          Required: **No**
-                      - const: Zone
-                        description: The zone location of the device.
-                        markdownDescription: |
-                          The zone location of the device.
-
-                          Required: **No**
-                      - const: Importance
-                        description: "One of the following values: Low, Normal, High"
-                        markdownDescription: |
-                          One of the following values:
-                          - Low
-                          - Normal
-                          - High
-
-                          Required: **No**
-                      - const: PurdueLayer
-                        description: The Purdue Layer of the device.
-                        markdownDescription: |
-                          The Purdue Layer of the device.
-
-                          Required: **No**
-                      - const: IsProgramming
-                        description: Indicates whether the device classified as programming device.
-                        markdownDescription: |
-                          Indicates whether the device classified as programming device.
-
-                          Required: **No**
-                      - const: IsAuthorized
-                        description: Indicates whether the device classified as authorized device.
-                        markdownDescription: |
-                          Indicates whether the device classified as authorized device.
-
-                          Required: **No**
-                      - const: IsScanner
-                        description: Indicates whether the device classified as a scanner device.
-                        markdownDescription: |
-                          Indicates whether the device classified as a scanner device.
-
-                          Required: **No**
-                      - const: DevicePageLink
-                        description: A URL to the device page in Defender for IoT portal.
-                        markdownDescription: |
-                          A URL to the device page in Defender for IoT portal.
-
-                          Required: **No**
-                      - const: DeviceSubType
-                        description: The name of the device subtype.
-                        markdownDescription: |
-                          The name of the device subtype.
-
-                          Required: **No**
 
         - properties:
             entity:
@@ -2016,28 +1704,11 @@ properties:
                   - NetBiosName + DnsDomain
                   - AzureID
                   - OMSAgentID
-                  - IoTDevice (not supported for entity mapping)
 
                   **Weak identifiers of a host entity:**
 
                   - HostName
                   - NetBiosName
-              - const: IoTDevice
-                description: IoT device entity type
-                markdownDescription: |
-                  ### 🖲️ IoT device
-
-                  _IoT device entity type_
-
-                  Required identifiers : _DeviceId_
-
-                  **Strong identifiers of an IoT device entity:**
-
-                  - IoTHub + DeviceId
-
-                  **Weak identifiers of a IoT device entity:** 
-
-                  - DeviceId (without IoTHub)
               - const: IP
                 description: IP address entity type
                 markdownDescription: |

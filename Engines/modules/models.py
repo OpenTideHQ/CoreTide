@@ -415,6 +415,11 @@ class TideModels:
             class Sentinel(TideDefinitionsModels.SystemConfigurationModel):
                 
                 @dataclass
+                class Template:
+                    uuid: str
+                    version: str
+
+                @dataclass
                 class Trigger:
                     operator: str
                     threshold: int
@@ -482,6 +487,7 @@ class TideModels:
                 query: str
                 scheduling: Scheduling
                 alert: Alert
+                template: Optional[Template] = None
                 trigger: Optional[Trigger] = None
                 grouping: Optional[Grouping] = None
                 entities: Optional[Sequence[EntityMapping]] = None

@@ -78,11 +78,14 @@ properties:
       - name
       - version
     properties:
-      name:
-        title: Template Name
+      uuid:
+        title: UUID of the template rule
         type: string
+        regex: ^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$
         description: |
-          The Name of the alert rule template used to create this rule.
+          The uuid of the alert rule template used to create this rule.
+          You can find this information in the Sentinel rule repository (https://github.com/Azure/Azure-Sentinel/),
+          or by browsing https://analyticsrules.exchange/
         tide.mdr.parameter: alertRuleTemplateName
 
       version:

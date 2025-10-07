@@ -45,7 +45,7 @@ class SentinelDeploy(DeployMDR):
 
         # Handle Template Metadata
         if configuration.template:
-            rule.alert_rule_template_name = configuration.template.name
+            rule.alert_rule_template_name = configuration.template.uuid
             rule.template_version = configuration.template.version
 
         suppression = configuration.alert.suppression

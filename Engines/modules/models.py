@@ -424,7 +424,7 @@ class TideModels:
                 
                 @dataclass
                 class Template:
-                    name: str
+                    uuid: str
                     version: str
 
                 @dataclass

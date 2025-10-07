@@ -33,7 +33,7 @@ properties:
     title: Schema identifier and version
     type: string
     description: Identifier of the schema at its current version 
-    default: sentinel::2.1
+    default: sentinel::2.2
     tide.template.force-required: True
 
   status: 

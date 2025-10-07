@@ -67,6 +67,34 @@ properties:
     type: array
     tide.config.parameter-list: systems.sentinel.platform.flags
 
+  template:
+    title: Template Information
+    type: object
+    description: | 
+      Optional metadata about the template this rule was created from. You
+      can find this information in the Sentinel GUI when viewing template rule.
+      This will enable tracking of rules created from templates in the Sentinel GUI
+    required:
+      - name
+      - version
+    properties:
+      name:
+        title: Template Name
+        type: string
+        description: |
+          The Name of the alert rule template used to create this rule.
+        tide.mdr.parameter: alertRuleTemplateName
+
+      version:
+        title: Template Version
+        type: string
+        regex: ^\d\.\d\.\d$
+        description: |
+          The version of the alert rule template used to create
+          this rule - in format <a.b.c>, where all are numbers,
+          for example 1.0.2
+        tide.mdr.parameter: templateVersion
+
   trigger: 
     title: Alert Trigger
     type: object
@@ -236,7 +264,6 @@ properties:
       tactics:
         title: MITRE ATT&CK Tactics
         type: array
-        tide.template.hide: true
         description: Mapping of relevant tactics
         items:
           type: string
@@ -260,7 +287,7 @@ properties:
             - ResourceDevelopment
 
       techniques:
-        title: MITRE ATT&CK Tactics
+        title: MITRE ATT&CK Techniques
         type: array
         tide.template.hide: true
         description: |

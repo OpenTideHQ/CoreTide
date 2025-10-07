@@ -42,8 +42,13 @@ class SentinelDeploy(DeployMDR):
         if status in ["DISABLED"]:
             rule.enabled = False
 
-        suppression = configuration.alert.suppression
 
+        # Handle Template Metadata
+        if configuration.template:
+            rule.alert_rule_template_name = configuration.template.name
+            rule.template_version = configuration.template.version
+
+        suppression = configuration.alert.suppression
         # Handle suppression setting
         if type(suppression) is str:
             rule.suppression_enabled = True

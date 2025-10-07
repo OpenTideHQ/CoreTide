@@ -7,6 +7,10 @@
   #flags:
     #-
   
+  #template:
+    #name: 
+    #version: 
+  
   trigger:
     operator: GreaterThan
     threshold: 0
@@ -22,6 +26,9 @@
     #title: 
     #description: |
       #...
+    #severity: 
+    #tactics:
+      #-
     #custom_details:
       #- key: 
         #column: 

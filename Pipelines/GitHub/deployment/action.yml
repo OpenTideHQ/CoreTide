@@ -47,6 +47,10 @@ runs:
           exit 0
         fi
 
+        echo "Syncing remote trunk and rebasing"
+        git fetch origin ${{ github.ref }}
+        git rebase origin/${{ github.ref }}
+
         echo "Updated files, committing"
         git pull origin ${{ github.ref }}
         git add -- . ':!${REPO_NAME}' ':!CoreTide' ':!coretide' ':!$CORETIDE_PATH'

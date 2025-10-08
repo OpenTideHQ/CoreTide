@@ -301,7 +301,7 @@ properties:
           You must check on the GUI what techniques are available and replicate here.
         items:
           type: string
-          pattern: ^T\d{4}(\.\d{3})?$
+          pattern: ^T\d{4}?$
 
       custom_details:
         title: Custom Details

@@ -46,12 +46,6 @@ name = "REMOVED"
 description = "Rule is fully deprecated, and only flagged under this status for archival purposes"
 strategy = "DELETION"
 
-[[statuses]]
-name = "CUSTOM STATUS BABY"
-description = "Stonks - Sun Tzu"
-strategy = "DELETION"
-
-
 [promotion]
 enabled = true
 promotion_target = "PRODUCTION"

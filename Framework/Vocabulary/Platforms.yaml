@@ -182,3 +182,79 @@ keys:
     name: Bamboo
     description: Bamboo is a continuous integration and deployment tool that ties automated builds, tests and releases together in a single workflow
     link: https://support.atlassian.com/bamboo/
+  - id: PFM0052
+    name: Active Directory Certificate Services
+    description: Active Directory Certificate Services (AD CS) is a Windows Server role that provides a platform for issuing and managing public key infrastructure (PKI) certificates. These certificates are essential for secure communication and authentication protocols.
+    link: https://learn.microsoft.com/en-us/windows-server/identity/ad-cs/active-directory-certificate-services-overview
+  - id: PFM0053
+    name: Microsoft Intune
+    description: Microsoft Intune is a cloud-based endpoint management solution that helps organizations manage user access to resources while simplifying app and device management across various platforms.
+    link: https://learn.microsoft.com/en-us/intune/intune-service/fundamentals/what-is-intune
+  - id: PFM0054
+    name: Microsoft Azure Information Protection
+    description: Azure Information Protection (AIP) provides the encryption service, Azure Rights Management, that's used by Microsoft Purview Information Protection.
+    link: https://learn.microsoft.com/en-us/azure/information-protection/what-is-information-protection
+  - id: PFM0055
+    name: Microsoft Exchange Online
+    description: Exchange Online is a cloud-based email service that offers advanced security, reliability, and access from anywhere.
+    link: https://www.microsoft.com/en-us/microsoft-365/exchange/exchange-online
+  - id: PFM0056
+    name: Microsoft OneDrive
+    description: Microsoft OneDrive is a cloud storage service provided by Microsoft that allows users to store, sync, and share files across multiple devices.
+    link: https://www.microsoft.com/nl-be/microsoft-365/onedrive/online-cloud-storage
+  - id: PFM0057
+    name: Microsoft Security and Compliance Center
+    description: The Microsoft Security Compliance Center provides organizations with a centralized platform to manage security and compliance across Microsoft 365 services, ensuring data protection and regulatory adherence.
+    link: https://techcommunity.microsoft.com/blog/microsoft-security-blog/introducing-the-microsoft-365-security-and-compliance-center/178468
+  - id: PFM0058
+    name: Microsoft Defender Antivirus
+    description: Microsoft Defender Antivirus is a major component of your next-generation protection in Microsoft Defender for Endpoint. This protection brings together machine learning, big-data analysis, in-depth threat resistance research, and the Microsoft cloud infrastructure to protect devices (or endpoints) in your organization.
+    link: https://learn.microsoft.com/en-us/defender-endpoint/microsoft-defender-antivirus-windows?view=o365-worldwide
+  - id: PFM0059
+    name: Microsoft Defender for Endpoint
+    description: Microsoft Defender for Endpoint is a cloud-native endpoint security platform that provides comprehensive protection across various devices, including Windows, macOS, Linux, Android, iOS, and IoT. It integrates traditional antivirus capabilities with advanced threat detection, response, and analytics, creating a multi-layered defense strategy for modern IT environments. 
+    link: https://www.microsoft.com/en-us/security/business/endpoint-security/microsoft-defender-endpoint
+  - id: PFM0060
+    name: Microsoft Defender for Cloud
+    description: Microsoft Defender for Cloud is a comprehensive cloud-native application protection platform (CNAPP) that secures hybrid and multicloud environments, providing unified security management and advanced threat protection.
+    link: https://learn.microsoft.com/en-us/azure/defender-for-cloud/defender-for-cloud-introduction
+  - id: PFM0061
+    name: Microsoft Defender for Cloud Apps
+    description: Microsoft Defender for Cloud Apps is a Cloud Access Security Broker (CASB) that helps organizations monitor and protect their SaaS applications, enhancing security and compliance across cloud environments.
+    link: https://learn.microsoft.com/en-us/defender-cloud-apps/what-is-defender-for-cloud-apps
+  - id: PFM0062
+    name: Microsoft Defender EASM
+    description: Microsoft Defender EASM continuously discovers and maps your digital attack surface, providing essential visibility to identify risks and eliminate threats beyond the firewall.
+    link: https://learn.microsoft.com/en-us/azure/external-attack-surface-management/overview
+  - id: PFM0063
+    name: Microsoft Defender XDR
+    description: Microsoft Defender XDR is a unified pre- and post-breach enterprise defense suite that natively coordinates detection, prevention, investigation, and response across endpoints, identities, email, and applications to provide integrated protection against sophisticated attacks.
+    link: https://learn.microsoft.com/en-us/defender-xdr/microsoft-365-defender
+  - id: PFM0064
+    name: Microsoft Entra ID Protection
+    description: Microsoft Entra ID Protection is part of the Microsoft Entra suite, which focuses on identity and access management. It leverages advanced algorithms and machine learning to identify and mitigate identity risks in real time.
+    link: https://learn.microsoft.com/en-us/entra/id-protection/overview-identity-protection
+  - id: PFM0065
+    name: Microsoft Entra Domain Services
+    description: Microsoft Entra Domain Services provides managed domain services like domain join, group policy, and authentication without the need to manage domain controllers.
+    link: https://learn.microsoft.com/en-us/entra/identity/domain-services/overview
+  - id: PFM0066
+    name: Microsoft Sentinel
+    description: Microsoft Sentinel is a scalable, cloud-native security information and event management (SIEM) that delivers scalable, cost-efficient security across multicloud and multi-platform environments with built-in AI, automation, threat intelligence, and a modern data lake architecture.
+    link: https://learn.microsoft.com/en-us/azure/sentinel/overview?tabs=defender-portal
+  - id: PFM0067
+    name: Microsoft Entra Privileged Identity Management
+    description: Privileged Identity Management (PIM) is a service in Microsoft Entra ID that enables you to manage, control, and monitor access to important resources in your organization.
+    link: https://learn.microsoft.com/en-us/entra/id-governance/privileged-identity-management/pim-configure
+  - id: PFM0068
+    name: Azure WAF
+    description: Azure Web Application Firewall provides centralized protection of your web applications from common exploits and vulnerabilities.
+    link: https://learn.microsoft.com/en-us/azure/web-application-firewall/ag/ag-overview
+  - id: PFM0069
+    name: Microsoft Purview
+    description: Microsoft Purview is a comprehensive set of solutions that helps your organization govern, protect, and manage data wherever it lives. Microsoft Purview solutions provide integrated coverage and help address the fragmentation of data across organizations, the lack of visibility that hampers data protection and governance, and the blurring of traditional IT management roles.
+    link: https://learn.microsoft.com/en-us/purview/purview
+  - id: PFM0070
+    name: Sysdiagnose
+    description: You can use sysdiagnose to research general iOS and iPadOS issues before you troubleshoot or report them to AppleCare. Sysdiagnose extracts information from iPhone and iPad devices and captures it in a log file. You or AppleCare can then read the file to understand software or network issues. 
+    link: https://it-training.apple.com/tutorials/support/sup075/    

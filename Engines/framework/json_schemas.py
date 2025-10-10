@@ -137,11 +137,11 @@ def fetch_config_system_tenants_list(system:str)->Tuple[list[str], list[str]]:
     
     for tenant_config in tenants:
         tenant_name = tenant_config.get("name")
-        tenant_description = tenant_config.get("description", "")
+        tenant_description = tenant_config.get("description", "No Description")
         if tenant_name:
             log("INFO",
                 f"Discovered tenant definition {tenant_name}",
-                tenant_config.get("description", "No description"))
+                tenant_config.get("description", ""))
             tenants_descriptions.append(tenant_description)
             tenants_list.append(tenant_name)            
         else:
@@ -577,7 +577,7 @@ def gen_json_schema(dictionary):
                         dictionary[field]["items"] = {}
                         dictionary[field]["items"]["enum"] = values_list
                         dictionary[field]["items"]["uniqueItems"] = True
-                        dictionary[field]["markdownEnumDescriptions"] = descriptions_list
+                        dictionary[field]["items"]["markdownEnumDescriptions"] = descriptions_list
 
                 # Special handling to specifically get the available statuses
                 if system:=dict_foo[field].get("tide.config.statuses"):

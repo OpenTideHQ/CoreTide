@@ -1,6 +1,6 @@
 import pandas as pd
 from git.repo import Repo
-from Engines.modules.framework import unroll_dot_dict, DEPRECATED_STATUSES
+from Engines.modules.framework import unroll_dot_dict
 from Engines.modules.models import (
     TideDefinitionsModels,
     TideModels,
@@ -30,9 +30,9 @@ sys.path.append(str(git.Repo(".", search_parent_directories=True).working_dir))
 
 
 SYSTEMS_CONFIGS_INDEX = DataTide.Configurations.Systems.Index
-PRODUCTION_STATUS = DataTide.Configurations.Deployment.status["production"]
-SAFE_STATUS = DataTide.Configurations.Deployment.status["safe"]
 
+DEPRECATED_STATUSES = (StatusStrategy.DELETION,
+                        StatusStrategy.DISABLEMENT)
 
 class TideRepo:
 
@@ -195,7 +195,7 @@ def make_deploy_plan(
             if system in SYSTEMS_DEPLOYMENT:
                 if (
                     keep_deprecated is False
-                    and platform_status in DEPRECATED_STATUSES
+                    and check_status(platform_status) in DEPRECATED_STATUSES
                 ):
                     log("SKIP",
                         f"Not keeping in deployment plan as {system} is set to a deprecated status",
@@ -204,7 +204,7 @@ def make_deploy_plan(
                     deploy_mdr.setdefault(system, []).append(mdr_uuid)
                 else:
                     if plan is DeploymentStrategy.PRODUCTION:
-                        if platform_status in PRODUCTION_STATUS:
+                        if check_status(platform_status) is StatusStrategy.PRODUCTION:
                             deploy_mdr.setdefault(system, []).append(mdr_uuid)
                             log(
                                 "SUCCESS",
@@ -224,8 +224,7 @@ def make_deploy_plan(
 
                     elif plan is DeploymentStrategy.STAGING:
                         if (
-                            platform_status not in PRODUCTION_STATUS
-                            and platform_status not in SAFE_STATUS
+                            check_status(platform_status) not in (StatusStrategy.PRODUCTION, StatusStrategy.INERT) 
                         ):
                             deploy_mdr.setdefault(system, []).append(mdr_uuid)
                             log(

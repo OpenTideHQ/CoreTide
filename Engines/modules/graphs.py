@@ -71,9 +71,9 @@ def relationships_graph(id):
 
     if childs:
         if type(childs) is list:
-            graph.update({c: [] for c in childs})
+            graph.update({c: [] for c in childs}) #type: ignore
         else:
-            graph.update(childs)
+            graph.update(childs)  #type: ignore
 
     if parents:
         if type(parents) is list:

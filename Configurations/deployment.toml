@@ -1,9 +1,5 @@
 default_responders = ""
 
-[status]
-production = [ "PRODUCTION", "DISABLED", "REMOVED" ]
-safe = [ "DESIGN" ]
-
 # New-style statuses mapped from Framework Vocabulary `MDR Status`
 [[statuses]]
 name = "DESIGN"

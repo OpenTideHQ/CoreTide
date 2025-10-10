@@ -9,22 +9,22 @@ strategy = "INERT"
 [[statuses]]
 name = "DEVELOPMENT"
 description = "Under active technical implementation, going in exploratory rounds"
-strategy = "STAGING"
+strategy = "PREVIEW"
 
 [[statuses]]
 name = "IMPROVING"
 description = "Rule is qualified functionally, but is undergoing refinement rounds"
-strategy = "STAGING"
+strategy = "PREVIEW"
 
 [[statuses]]
 name = "STAGING"
 description = "Deployed in staging environment for operational testing"
-strategy = "STAGING"
+strategy = "PREVIEW"
 
 [[statuses]]
 name = "PRODUCTION"
 description = "Deployed in active production environment, potentially raising alerts"
-strategy = "PRODUCTION"
+strategy = "RELEASE"
 
 [[statuses]]
 name = "ACCEPTANCE"

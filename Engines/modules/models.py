@@ -31,8 +31,8 @@ class BaseModels:
 
 class StatusStrategy(Enum):
     INERT = "Does not interact with deployment"
-    PRODUCTION = "Deployment from the mainline/trunk/default branch"
-    STAGING = "Deployment from PR/MRs"
+    RELEASE = "Deployment from the mainline/trunk/default branch"
+    PREVIEW = "Deployment from PR/MRs"
     DISABLEMENT = "Deployment from the mainline/trunk/default branch, but only disables the rule. If the target system does not have a concept of disabling rules, then defaults to deleting them."
     DELETION = "Deployment from the mainline/trunk/default branch, but removes the rule from the target system."
 
@@ -45,11 +45,11 @@ class DetectionSystems(Enum):
     CROWDSTRIKE = auto()
 
 class DeploymentStrategy(Enum):
-    STAGING = auto()
-    PRODUCTION = auto()
+    STAGING = "Deployment allowed during a Pull (or Merge) Request Pipeline"
+    PRODUCTION = "Deployment allowed during a Default Branch Pipeline"
     FULL = auto()
-    ALWAYS = auto()
-    MANUAL = auto()
+    ALWAYS = "Deployment allowed during both Pull (or Merge) Request Pipeline and Default Branch Pipeline"
+    MANUAL = "Deployment allowed during both Pull (or Merge) Request Pipeline and Default Branch Pipeline, but only when explictely specified under tenants"
     DEBUG = auto()
 
     @staticmethod

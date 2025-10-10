@@ -204,7 +204,7 @@ def make_deploy_plan(
                     deploy_mdr.setdefault(system, []).append(mdr_uuid)
                 else:
                     if plan is DeploymentStrategy.PRODUCTION:
-                        if check_status(platform_status) is StatusStrategy.PRODUCTION:
+                        if check_status(platform_status) is StatusStrategy.RELEASE:
                             deploy_mdr.setdefault(system, []).append(mdr_uuid)
                             log(
                                 "SUCCESS",
@@ -224,7 +224,7 @@ def make_deploy_plan(
 
                     elif plan is DeploymentStrategy.STAGING:
                         if (
-                            check_status(platform_status) not in (StatusStrategy.PRODUCTION, StatusStrategy.INERT) 
+                            check_status(platform_status) is StatusStrategy.PREVIEW 
                         ):
                             deploy_mdr.setdefault(system, []).append(mdr_uuid)
                             log(

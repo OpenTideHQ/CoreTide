@@ -17,8 +17,9 @@ from Engines.modules.tide import DataTide, DetectionSystems
 from Engines.modules.plugins import DeployMDR
 from Engines.modules.models import (TideModels,
                                     TideConfigs,TenantDeployment,
-                                    DeploymentStrategy) 
-from Engines.modules.deployment import TideDeployment
+                                    DeploymentStrategy,
+                                    StatusStrategy) 
+from Engines.modules.deployment import TideDeployment, check_status
 from Engines.modules.errors import TideErrors
 
 from azure.mgmt.securityinsight import SecurityInsights
@@ -39,7 +40,7 @@ class SentinelDeploy(DeployMDR):
         rule.enabled = True
         rule.query = configuration.query
 
-        if status in ["DISABLED"]:
+        if check_status(status) is StatusStrategy.DISABLEMENT:
             rule.enabled = False
 
 
@@ -230,7 +231,7 @@ class SentinelDeploy(DeployMDR):
         mdr_name = data.name
         mdr_uuid = data.metadata.uuid
 
-        if data.configurations.sentinel.status == "REMOVED":
+        if check_status(data.configurations.sentinel.status) is StatusStrategy.DELETION:
             log(
                 "WARNING",
                 "The rule will be removed from the Sentinel Workspace",

@@ -4,6 +4,54 @@ default_responders = ""
 production = [ "PRODUCTION", "DISABLED", "REMOVED" ]
 safe = [ "DESIGN" ]
 
+# New-style statuses mapped from Framework Vocabulary `MDR Status`
+[[statuses]]
+name = "DESIGN"
+description = "Under active functional design, without technical translation yet"
+strategy = "INERT"
+
+[[statuses]]
+name = "DEVELOPMENT"
+description = "Under active technical implementation, going in exploratory rounds"
+strategy = "STAGING"
+
+[[statuses]]
+name = "IMPROVING"
+description = "Rule is qualified functionally, but is undergoing refinement rounds"
+strategy = "STAGING"
+
+[[statuses]]
+name = "STAGING"
+description = "Deployed in staging environment for operational testing"
+strategy = "STAGING"
+
+[[statuses]]
+name = "PRODUCTION"
+description = "Deployed in active production environment, potentially raising alerts"
+strategy = "PRODUCTION"
+
+[[statuses]]
+name = "ACCEPTANCE"
+description = '''A MDR is ready to go for PRODUCTION for CSIRC team. During ACCEPTANCE a CSIRC
+analyst will handle the alert and will ensure the CSOC ticket and playbook are correct.'''
+strategy = "STAGING"
+
+[[statuses]]
+name = "DISABLED"
+description = "Rule is still accessible, but not active in any environment"
+strategy = "DISABLEMENT"
+
+[[statuses]]
+name = "REMOVED"
+description = "Rule is fully deprecated, and only flagged under this status for archival purposes"
+strategy = "DELETION"
+
+[[statuses]]
+name = "CUSTOM STATUS BABY"
+description = "Stonks - Sun Tzu"
+strategy = "DELETION"
+
+
 [promotion]
 enabled = true
 promotion_target = "PRODUCTION"

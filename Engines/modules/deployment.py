@@ -6,6 +6,7 @@ from Engines.modules.models import (
     TideModels,
     SystemConfig,
     DeploymentStrategy,
+    StatusStrategy,
     TenantDeployment,
     TenantDeploymentModel,
 )
@@ -96,9 +97,6 @@ class CIEnvironment:
         GitHubActions = auto()
         LocalDebug = auto()        
 
-
-
-
     def _check_ci_environment(self) -> CIPlatforms:
         if os.getenv("TF_BUILD"):
             log("SUCCESS", "Discovered CI Environment to be Azure Pipeline")
@@ -121,6 +119,28 @@ class CIEnvironment:
             )
             raise Exception
 
+
+
+
+def check_status(status_name:str)->StatusStrategy:
+    statuses = DataTide.Configurations.Deployment.statuses
+    for status in statuses:
+        if status.name == status_name:
+            if status.strategy is str:
+                return StatusStrategy[status.name]
+            elif status.strategy is StatusStrategy:
+                return status.strategy
+            else:
+                log("FATAL",
+                    "Could not return status strategy",
+                    str(status))
+                raise Exception
+
+    log("FATAL",
+        "Could not look up requested status in existing statuses",
+        f"Requested status : {status_name}",
+        f"Available statuses in deployment.toml : {statuses}")
+    raise Exception
 
 def make_deploy_plan(
     plan: DeploymentStrategy,

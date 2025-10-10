@@ -10,8 +10,9 @@ from Engines.modules.debug import DebugEnvironment
 from Engines.modules.tide import DataTide, DetectionSystems, TideLoader
 from Engines.modules.plugins import DeployMDR
 from Engines.modules.models import (TideModels,
-                                    DeploymentStrategy) 
-from Engines.modules.deployment import TideDeployment
+                                    DeploymentStrategy,
+                                    StatusStrategy) 
+from Engines.modules.deployment import TideDeployment, check_status
 from Engines.modules.logs import log
 
 from Engines.modules.systems.defender_for_endpoint import (DetectionRule,
@@ -137,7 +138,7 @@ class DefenderForEndpointDeploy(DeployMDR):
 
         scheduling = mdr_config.scheduling if mdr_config.scheduling != "NRT" else "0"
         
-        is_enabled = False if mdr_config.status == "DISABLED" else True
+        is_enabled = False if check_status(mdr_config.status) is StatusStrategy.DISABLEMENT else True
         
         # Handle Query and Exclusions
         query = mdr_config.query
@@ -172,7 +173,7 @@ class DefenderForEndpointDeploy(DeployMDR):
 
             rule_id = None
             
-        if mdr_config.status == "REMOVED":
+        if check_status(mdr_config.status) is StatusStrategy.DELETION:
             if not rule_id:
                 log("FATAL",
                     "Cannot remove the rule as a rule_id could not be found in the file",

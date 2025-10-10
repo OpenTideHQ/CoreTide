@@ -29,6 +29,13 @@ class BaseModels:
     class Deployment:
         ...
 
+class StatusStrategy(Enum):
+    INERT = "Does not interact with deployment"
+    PRODUCTION = "Deployment from the mainline/trunk/default branch"
+    STAGING = "Deployment from PR/MRs"
+    DISABLEMENT = "Deployment from the mainline/trunk/default branch, but only disables the rule. If the target system does not have a concept of disabling rules, then defaults to deleting them."
+    DELETION = "Deployment from the mainline/trunk/default branch, but removes the rule from the target system."
+
 class DetectionSystems(Enum):
     DEFENDER_FOR_ENDPOINT = auto()
     CARBON_BLACK_CLOUD = auto()
@@ -129,6 +136,21 @@ class SystemConfig:
 
 @dataclass
 class TideConfigs:
+
+    @dataclass
+    class Deployment:
+        
+        @dataclass
+        class Status:
+            name: str
+            description: str
+            strategy: Union[StatusStrategy, str]
+
+            def __post_init__(self):
+                if type(self.strategy) is str:
+                    self.strategy = StatusStrategy[self.strategy]
+
+        statuses = Sequence[Status]
 
     @dataclass
     class Systems:

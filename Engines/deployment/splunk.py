@@ -23,7 +23,8 @@ from Engines.modules.framework import (
 from Engines.modules.logs import log
 from Engines.modules.debug import DebugEnvironment
 from Engines.modules.tide import DataTide
-
+from Engines.modules.models import StatusStrategy
+from Engines.modules.deployment import check_status
 from Engines.modules.plugins import DeployMDR
 
 
@@ -103,7 +104,7 @@ class SplunkDeploy(SplunkEngineInit, DeployMDR):
 
         # Disabled Check
         status = mdr_splunk["status"]
-        if status == "DISABLED":
+        if check_status(status) is StatusStrategy.DISABLEMENT:
             config["disabled"] = "true"
             log("INFO", "🔕 Configuring saved search as disabled")
 
@@ -332,7 +333,7 @@ class SplunkDeploy(SplunkEngineInit, DeployMDR):
             log("INFO", "Found existing saved search", name)
         except:
             # Special case for removed rules, do not bother with recreating
-            if status == "REMOVED":
+            if check_status(status) is StatusStrategy.DELETION:
                 log(
                     "SKIP",
                     f"Saved search was already non existent, no action required",
@@ -346,7 +347,7 @@ class SplunkDeploy(SplunkEngineInit, DeployMDR):
                 selected_search = service.saved_searches.create(name, search=query)
 
         # Steps to handle REMOVED rules
-        if status == "REMOVED":
+        if check_status(status) is StatusStrategy.DELETION:
             service.saved_searches.delete(name)
             log("WARNING", f"Deleted splunk alert", name)
             return None

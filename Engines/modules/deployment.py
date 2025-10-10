@@ -30,9 +30,9 @@ sys.path.append(str(git.Repo(".", search_parent_directories=True).working_dir))
 
 
 SYSTEMS_CONFIGS_INDEX = DataTide.Configurations.Systems.Index
-
 DEPRECATED_STATUSES = (StatusStrategy.DELETION,
                         StatusStrategy.DISABLEMENT)
+
 
 class TideRepo:
 

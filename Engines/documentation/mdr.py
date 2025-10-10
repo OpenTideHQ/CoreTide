@@ -27,7 +27,8 @@ from Engines.modules.documentation_components import (
     tlp_doc,
     metadata_doc,
     relations_table,
-    reference_doc
+    reference_doc,
+    status_enriched
 )
 from Engines.modules.tide import DataTide
 from Engines.modules.logs import log
@@ -207,7 +208,6 @@ def documentation(mdr):
     for s in mdr_configs:
         config_data = list()
         status_name = mdr_configs[s]["status"]
-        status_name = f"{get_icon(status_name, 'status')} {status_name}"
         
         # Allows to handle transition to MDRv4 new configurations
         try:
@@ -221,12 +221,15 @@ def documentation(mdr):
             orient="records"
         )[0]
         
-        
         query = system_data.pop("query").strip()
         expander = f"Expand to view {system_name} query"
         queries += QUERY_FOLD.format(expander, query)
 
         for key in system_data.copy():  # Avoids dict mutation errors
+            
+            if key == "status":
+                continue
+
             buffer = dict()
 
             cleaned_key = str(key).split("|")[
@@ -293,7 +296,10 @@ def documentation(mdr):
             if DOCUMENTATION_TARGET is CIEnvironment.CIPlatforms.GitlabCI:
                 banner = GitlabMarkdown.negative_diff(banner)
             table = banner + "\n\n" + table
-                
+
+
+        banner = status_enriched(status_name)
+        table = banner + "\n\n" + table
         fold = FOLD.format(system_name, table)
 
         configurations += fold

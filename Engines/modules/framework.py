@@ -8,13 +8,13 @@ sys.path.append(str(git.Repo(".", search_parent_directories=True).working_dir))
 
 from Engines.modules.tide import DataTide
 from Engines.modules.logs import log
-from Engines.modules.deployment import check_status, DEPRECATED_STATUSES
 from Engines.modules.models import StatusStrategy
 
 DEFINITIONS_INDEX = DataTide.TideSchemas.definitions
 VOCAB_INDEX = DataTide.Vocabularies.Index
 MODELS_INDEX = DataTide.Models.Index
 CHAINING_INDEX = DataTide.Models.chaining
+
 
 
 def unroll_dot_dict(dot_dict, separator="."):
@@ -438,6 +438,8 @@ def keep_active_mdr(mdr_list:list[str])->list[str]:
     which mean none of the system they configure are set with a
     Deprecated status. 
     """
+    from Engines.modules.deployment import check_status, DEPRECATED_STATUSES
+
     active_mdr = []
     for mdr in mdr_list:
         try:

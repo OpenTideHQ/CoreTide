@@ -33,12 +33,29 @@ from Engines.modules.documentation import (
     make_vocab_link,
     GitlabMarkdown,
 )
+from Engines.modules.models import StatusStrategy
 from Engines.modules.logs import log
+
 
 GET_CVE_DETAILS = CONFIG.Documentation.cve["retrieve_details"]
 CVE_DB_LINK = CONFIG.Documentation.cve["default_db_link"]
 FOOTER_CAPTION = "Generated from CoreTIDE Indexed Data @ "
 
+
+def status_enriched(status_name:str)->str:
+    statuses = DataTide.Configurations.Deployment.statuses
+    for status in statuses:
+        if status_name == status.name:
+            strategy = status.strategy.name #type: ignore
+            description = f">**Status** : `{status_name}` - _{status.description}_"
+            description += f"\n>**Strategy** : `{strategy}` - _{StatusStrategy[strategy].value}_"
+            return description
+    
+    log("FATAL",
+        "Could not look up requested status in existing statuses",
+        f"Requested status : {status_name}",
+        f"Available statuses in deployment.toml : {statuses}")
+    raise Exception
 
 def actors_doc(actors:list[dict])->str:
     data = []

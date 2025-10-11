@@ -22,15 +22,15 @@ description = "Deployed in staging environment for operational testing"
 strategy = "PREVIEW"
 
 [[statuses]]
+name = "ACCEPTANCE"
+description = '''A MDR is ready to go for PRODUCTION for responding team. During ACCEPTANCE an
+analyst will handle the alert and will ensure the alert ticket and playbook are correct.'''
+strategy = "PREVIEW"
+
+[[statuses]]
 name = "PRODUCTION"
 description = "Deployed in active production environment, potentially raising alerts"
 strategy = "RELEASE"
-
-[[statuses]]
-name = "ACCEPTANCE"
-description = '''A MDR is ready to go for PRODUCTION for CSIRC team. During ACCEPTANCE a CSIRC
-analyst will handle the alert and will ensure the CSOC ticket and playbook are correct.'''
-strategy = "STAGING"
 
 [[statuses]]
 name = "DISABLED"

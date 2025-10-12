@@ -1,0 +1,123 @@
+title: Deployment Configuration Schema
+description: Schema for deployment configuration file
+
+$schema: https://json-schema.org/draft-07/schema
+
+type: object
+additionalProperties: false
+
+properties:
+  default_responders:
+    type: string
+    description: Default responders for deployment operations
+
+  statuses:
+    type: array
+    description: List of deployment statuses with their strategies
+    items:
+      type: object
+      required: [name, description, strategy]
+      additionalProperties: false
+      properties:
+        name:
+          type: string
+          description: Status identifier
+        description:
+          type: string
+          description: Detailed description of the status
+        strategy:
+          type: string
+          oneOf:
+            - const: INERT
+              description: "Does not interact with deployment. Use this when you want a status that has no effect on deployment behavior."
+            - const: PREVIEW
+              description: "Deployment from Pull Requests (PRs) or Merge Requests (MRs). This strategy is used for testing changes before they reach the main branch."
+            - const: RELEASE
+              description: "Deployment from the mainline/trunk/default branch. This is the standard deployment strategy for production-ready rules."
+            - const: UNIVERSAL
+              description: "Deployment strategy that applies universally across all contexts. Use this when the rule should be applied consistently everywhere."
+            - const: EXPLICIT
+              description: "Deployment requiring explicit authorization. Use this when manual approval or specific conditions must be met before deployment."
+            - const: DISABLEMENT
+              description: "Deployment from the mainline/trunk/default branch, but only disables the rule. If the target system does not have a concept of disabling rules, then defaults to deleting them. Use this for graceful deprecation of rules."
+            - const: DELETION
+              description: "Deployment from the mainline/trunk/default branch, but removes the rule from the target system. Use this when you want to completely remove a rule from deployment."
+          description: Deployment strategy for this status
+
+  promotion:
+    type: object
+    description: Promotion configuration settings
+    additionalProperties: false
+    required: [enabled, promotion_target]
+    properties:
+      enabled:
+        type: boolean
+        description: Whether promotion is enabled
+      promotion_target:
+        type: string
+        description: Target status for promotion
+
+  proxy:
+    type: object
+    description: Proxy configuration settings
+    additionalProperties: false
+    required: [proxy_user, proxy_password, proxy_host, proxy_port]
+    properties:
+      proxy_user:
+        type: string
+        description: Proxy user credential
+      proxy_password:
+        type: string
+        description: Proxy password credential
+      proxy_host:
+        type: string
+        description: Proxy host address
+      proxy_port:
+        type: string
+        description: Proxy port number
+
+  metadata_lookup:
+    type: object
+    description: Metadata lookup configuration
+    additionalProperties: false
+    required: [enabled]
+    properties:
+      enabled:
+        type: boolean
+        description: Whether metadata lookup is enabled
+      name:
+        type: string
+        description: Name for metadata lookup
+      systems:
+        type: array
+        items:
+          type: string
+        description: List of systems for metadata lookup
+
+  debug:
+    type: object
+    description: Debug configuration settings
+    additionalProperties: false
+    required: [proxy_enabled, ssl_enabled]
+    properties:
+      mdr_test_uuids:
+        type: array
+        items:
+          type: string
+        description: UUIDs of MDRs used for debugging
+      lookup_test_files:
+        type: array
+        items:
+          type: string
+        description: File names of MDRs used for debugging
+      metadata_lookup_test_file:
+        type: array
+        items:
+          type: string
+        description: Test files for metadata lookup
+      proxy_enabled:
+        type: boolean
+        description: Global flag to enable/disable proxy in debug mode
+      ssl_enabled:
+        type: boolean
+        description: Global flag to enable/disable SSL in debug mode

@@ -1,12 +1,22 @@
-title: Crowdstrike Falcon Configuration
-description: Validates and Documents the Defender for Endpoint Configuration file
+title: CrowdStrike Configuration
+description: Validates and Documents the CrowdStrike Configuration file
 
-$schema: https://json-schema.org/draft/2020-12/schema
+$schema: https://json-schema.org/draft-07/schema
 additionalProperties: false
 
 required:
   - platform
-  - tenants
+
+allOf:
+  - if:
+      properties:
+        platform:
+          properties:
+            enabled:
+              const: true
+    then:
+      required:
+        - tenants
 
 properties:
 

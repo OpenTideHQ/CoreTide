@@ -41,9 +41,7 @@ properties:
     title: Status of the use-case
     type: string
     description: Define the status according to use case development life cycle process
-    tide.vocab: true
-    example: STAGING
-    default: DEVELOPMENT
+    tide.config.statuses: True
 
   contributors:
     title: Development Contributors

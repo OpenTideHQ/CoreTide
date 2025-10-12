@@ -12,7 +12,8 @@ from Engines.modules.debug import DebugEnvironment
 from Engines.modules.tide import DataTide
 from Engines.modules.plugins import DeployMDR
 from Engines.modules.carbon_black_cloud import CarbonBlackCloudEngineInit
-
+from Engines.modules.deployment import check_status
+from Engines.modules.models import StatusStrategy
 
 class CarbonBlackCloudDeploy(CarbonBlackCloudEngineInit, DeployMDR):
 
@@ -99,7 +100,7 @@ class CarbonBlackCloudDeploy(CarbonBlackCloudEngineInit, DeployMDR):
             deployment = False
             removal = False
 
-            if status in ["DISABLED", "REMOVED"]:
+            if check_status(status) in (StatusStrategy.DISABLEMENT, StatusStrategy.DELETION):
                 removal = True
             else:
                 deployment = True

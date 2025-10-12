@@ -10,13 +10,12 @@ from Engines.modules.tide import DataTide, DetectionSystems
 from Engines.modules.plugins import DeployMDR
 from Engines.modules.models import (TideModels,
                                     DeploymentStrategy) 
-from Engines.modules.deployment import TideDeployment, ExternalIdHelper
+from Engines.modules.deployment import TideDeployment, ExternalIdHelper, check_status
 from Engines.modules.logs import log
-from Engines.modules.models import TideConfigs
+from Engines.modules.models import TideConfigs, StatusStrategy
 from Engines.modules.errors import TideErrors
 
 from Engines.modules.systems.crowdstrike import CrowdstrikeService, DetectionRule
-
 
 
 class CrowdstrikeDeploy(DeployMDR):
@@ -57,7 +56,7 @@ class CrowdstrikeDeploy(DeployMDR):
         customer_id = tenant_config.setup.customer_id.split("-")[0].lower()
         tactic = configuration.details.tactic
         technique = configuration.details.technique
-        status = "active" if configuration.status != "DISABLED" else "inactive"
+        status = "active" if check_status(configuration.status) is StatusStrategy.DISABLEMENT else "inactive"
         severity = configuration.details.severity or data.response.alert_severity
         severity = map_severity(severity)
         
@@ -164,7 +163,7 @@ class CrowdstrikeDeploy(DeployMDR):
                 "Will create a new rule, and write back the ID to the file")
             rule_id = None
 
-        if mdr_config.status == "REMOVED":
+        if check_status(mdr_config.status) is StatusStrategy.DELETION:
             if not rule_id:
                 log("FATAL",
                     "Cannot remove the rule as a rule_id could not be found in the file",

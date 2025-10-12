@@ -11,9 +11,9 @@ from Engines.modules.tide import DataTide, DetectionSystems, TideLoader
 from Engines.modules.plugins import DeployMDR
 from Engines.modules.models import (TideModels,
                                     DeploymentStrategy) 
-from Engines.modules.deployment import TideDeployment, ExternalIdHelper
+from Engines.modules.deployment import TideDeployment, ExternalIdHelper, check_status
 from Engines.modules.logs import log
-from Engines.modules.models import TideConfigs
+from Engines.modules.models import TideConfigs, StatusStrategy
 
 from Engines.modules.systems.sentinel_one import SentinelOneService, DetectionRule, SeverityMapping
 
@@ -47,7 +47,7 @@ class SentinelOneDeploy(DeployMDR):
         rule_expiration_mode = "Permanent"
         rule_severity = SeverityMapping[data.response.alert_severity].value
         rule_expiration = None
-        rule_status = "Disabled" if mdr_config.status == "DISABLED" else "Active"
+        rule_status = "Disabled" if check_status(mdr_config.status) is StatusStrategy.DISABLEMENT else "Active"
         
         # Details Section
         if details:=mdr_config.details:
@@ -178,7 +178,7 @@ class SentinelOneDeploy(DeployMDR):
             rule_id = None
 
         
-        if mdr_config.status == "REMOVED":
+        if check_status(mdr_config.status) is StatusStrategy.DELETION:
             if not rule_id:
                 log("FATAL",
                     "Cannot remove the rule as a rule_id could not be found in the file",

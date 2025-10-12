@@ -43,8 +43,30 @@ class HelperTide:
 
     @staticmethod
     def fetch_config_envvar(config_secrets: dict[str,str]) -> dict[str, Any]:
-        """
-        Replace placeholder variables with environment
+        """Resolve and replace environment-variable placeholders in a config mapping.
+
+        Many configuration files in TIDE use strings that begin with ``$`` to indicate
+        that the real value should be read from an environment variable. This
+        function walks the provided mapping and replaces any such placeholders
+        with the corresponding environment value. It also prints debug guidance
+        when running in debug mode and logs missing values.
+
+        Args:
+            config_secrets: A mapping of configuration keys to values. Values that
+                are strings beginning with ``$`` will be treated as environment
+                variable references and replaced with the variable's value.
+
+        Returns:
+            The same mapping (mutated in place) with placeholders replaced by
+            environment values where applicable.
+
+        Notes:
+            - If a referenced environment variable is missing and the runtime is
+              not in debug mode, a fatal log entry will be emitted and the
+              function will mark that an environment variable error occurred.
+            - When running in debug mode, a local helper module
+              ``Engines.modules.local_secrets`` is imported (if present) to help
+              set environment variables for local development.
         """
         #Allows to print all errors at once before raising exception
         missing_envvar_error = False
@@ -102,16 +124,18 @@ class IndexTide:
     """
     @staticmethod
     def reload():
-        """
-        Due to the execution model of DataTide, the dataclass gets initialized 
-        immediately with current index, and the class can't be updated dynamically
-        with index changes.
+        """Force a re-import of the tide module to refresh the in-memory index.
 
-        Calling this function hard removes the module from `sys.modules` and reimports
-        it in the execution context calling the module. This is intended to be used in 
-        Orchestration chains where the index has to be updated at some point between two steps,
-        for example as framework elements gets updated, and should be reinjected in a later
-        toolchain stage.
+        DataTide is implemented as a self-initializing dataclass that captures
+        the repository index at import time and then remains static. When the
+        underlying index changes during a long-running process (for example
+        during orchestration), calling this function removes the module from
+        ``sys.modules`` so a subsequent import will re-run the module top-level
+        code and create a fresh DataTide instance using the updated index.
+
+        This method has the side effect of re-executing module import-time
+        actions; callers should ensure that it is safe to reload the module in
+        their runtime environment.
         """
         log("WARNING", "DataTide re-indexation")
         log("INFO", "The repository will be reindexed to update DataTide")
@@ -121,12 +145,20 @@ class IndexTide:
     @cache #Memoization as load() is called multiple times as DataTide initializes
     @staticmethod
     def load() -> Dict[str, dict]:
-        """
-        Resolves the current index from a local index json or dynamically. 
-        
-        Once DataTide is initialized, it becomes a static object containing all
-        of the Tide Instance data at the time the object is created. To update DataTide,
-        call `IndexTide.reload()` to return the latest DataTide object.
+        """Load the TIDE repository index from disk or generate it in memory.
+
+        The loader will first attempt to read an index JSON file from the path
+        defined by the ``INDEX_PATH`` environment variable or the default
+        ``index.json`` at the repository root. If that file is absent, the
+        function calls the project's indexer to build an index in memory.
+
+        Returns:
+            A dictionary representing the full TIDE index structure. The
+            dictionary layout follows the project's index schema (keys such as
+            ``objects``, ``files``, ``paths``, etc.).
+
+        Raises:
+            Exception: If the index cannot be loaded or generated in memory.
         """
         EXPECTED_INDEX_PATH = ROOT / "index.json"
         INDEX_PATH = Path(os.getenv("INDEX_PATH") or EXPECTED_INDEX_PATH)
@@ -147,9 +179,20 @@ class IndexTide:
 
     @staticmethod
     def reconcile_staging(index):
-        """
-        Helper function of `IndexTide.load()` designed to seek a staging index
-        and dynamically reconcile in flight.
+        """Merge a staging index into the provided production index.
+
+        If a staging index file exists (``staging_index.json`` by default or as
+        specified by ``STAGING_INDEX_PATH``), this routine will load it and
+        merge changes into the provided ``index``. New MDRs (Managed Detection
+        Rules) from staging are added and staging MDRs with a higher version
+        replace their production counterparts after a safety patch operation.
+
+        Args:
+            index: The production index dictionary to reconcile against.
+
+        Returns:
+            A new index dictionary that contains reconciled data with staging
+            updates applied when appropriate.
         """
 
         log("INFO", "Entering staging index reconciliation routine")
@@ -207,6 +250,22 @@ class IndexTide:
 
     @staticmethod
     def compute_chains(tvm_index: dict) -> dict:
+        """Compute chaining relationships between threat vector models (TVMs).
+
+        This function inspects the provided TVM index and builds a mapping of
+        TVM UUIDs to their chaining relations. The returned structure maps each
+        TVM to another mapping where keys are relation names and values are
+        lists of vectors (UUIDs) that are linked under that relation.
+
+        Args:
+            tvm_index: A dictionary where keys are TVM identifiers and values
+                contain a ``threat`` key which may include a ``chaining`` list.
+
+        Returns:
+            A dictionary of the form {tvm_id: {relation: [vector_id, ...]}}
+            only for TVMs that include chaining definitions.
+        """
+
         chain = dict()
         for tvm in (n := tvm_index):
             if "chaining" in n[tvm]["threat"]:
@@ -222,6 +281,18 @@ class IndexTide:
 
     @staticmethod
     def return_paths(tier: Literal["all", "core", "tide"]) -> dict[str, Path]:
+        """Return pre-computed path mappings from the index for the requested tier.
+
+        Args:
+            tier: One of ``"all"``, ``"core"``, or ``"tide"`` specifying the
+                scope of paths to return.
+
+        Returns:
+            A dict mapping logical path names to Path objects for the requested
+            tier. ``"all"`` returns the full paths mapping, while ``"core"``
+            and ``"tide"`` return the respective sub-mapping.
+        """
+
         if tier == "all":
             return IndexTide.load()["paths"]
         if tier == "core":
@@ -235,6 +306,25 @@ class SystemLoader:
 
     @staticmethod
     def _base_configuration(mdr_config:dict[str, Any])->Tuple[dict[str, Any], TideDefinitionsModels.SystemConfigurationModel]:
+        """Extract common top-level configuration fields from an MDR config.
+
+        Many MDR system-specific configuration blocks share a small set of
+        common keys: ``schema``, ``status``, ``tenants``, ``flags`` and
+        ``contributors``. This helper pops those values from the provided
+        mapping and returns a tuple containing the remaining mapping and a
+        populated SystemConfigurationModel instance.
+
+        Args:
+            mdr_config: A mutable mapping with MDR configuration fields. The
+                common keys will be popped from this mapping.
+
+        Returns:
+            A tuple (remaining_config, BaseConfigModel) where ``remaining_config``
+            is the original mapping with the common fields removed and
+            ``BaseConfigModel`` is a TideDefinitionsModels.SystemConfigurationModel
+            constructed from the popped values.
+        """
+
         BaseConfigModel = TideDefinitionsModels.SystemConfigurationModel
         schema = mdr_config.pop("schema", None)
         status = mdr_config.pop("status", None)
@@ -250,6 +340,23 @@ class SystemLoader:
 
     @staticmethod
     def _external_rule_id(mdr_config:dict[str, Any])->Tuple[dict[str, Any], Union[Mapping[str, int], Mapping[str,str]]]:
+        """Collect external rule id mappings from an MDR configuration.
+
+        Some configurations store rule identifiers per-tenant using keys of the
+        form ``"rule_id::<tenant>"`` or using a pre-built ``rule_id_bundle``
+        mapping. This helper normalizes both formats and returns the cleaned
+        configuration and the resolved rule id mapping.
+
+        Args:
+            mdr_config: The MDR configuration mapping to process. The function
+                will pop any ``rule_id::...`` keys it finds.
+
+        Returns:
+            A tuple (remaining_config, rule_id_bundle) where ``rule_id_bundle``
+            is a mapping from tenant to rule id (or an empty dict if none
+            present).
+        """
+
         rule_id_bundle = {}
         
         # In case was already parsed into bundle
@@ -266,6 +373,25 @@ class SystemLoader:
 
     @staticmethod
     def sentinel(mdr_config: dict[str, Any]) -> TideModels.MDR.Configurations.Sentinel:
+        """Build a Sentinel system configuration object from raw MDR config.
+
+        This function maps the dictionary structure used in the index/TOML
+        files into a strongly-typed ``TideModels.MDR.Configurations.Sentinel``
+        instance. It extracts shared base configuration values, converts any
+        nested structures (template, trigger, scheduling, alert, grouping,
+        entities) to their corresponding dataclass representations and returns
+        the populated Sentinel configuration object.
+
+        Args:
+            mdr_config: A mapping containing the sentinel configuration as
+                produced by the indexer or TOML loader. The mapping will be
+                mutated (popped) while the function extracts nested fields.
+
+        Returns:
+            A ``TideModels.MDR.Configurations.Sentinel`` instance populated
+            from the provided configuration mapping.
+        """
+
         Sentinel = TideModels.MDR.Configurations.Sentinel
 
         mdr_config, base_config = SystemLoader._base_configuration(mdr_config)
@@ -338,6 +464,19 @@ class SystemLoader:
 
     @staticmethod
     def crowdstrike(mdr_config:dict[str, Any])->TideModels.MDR.Configurations.Crowdstrike:
+        """Build a Crowdstrike system configuration object from raw MDR config.
+
+        Transforms the provided mapping into a ``TideModels.MDR.Configurations.Crowdstrike``
+        instance by extracting the base configuration values, resolving any
+        external rule id bundle, and converting nested detail and schedule
+        structures.
+
+        Args:
+            mdr_config: A mapping containing crowdstrike configuration fields.
+
+        Returns:
+            A ``TideModels.MDR.Configurations.Crowdstrike`` instance.
+        """
 
         Crowdstrike = TideModels.MDR.Configurations.Crowdstrike
 
@@ -360,6 +499,19 @@ class SystemLoader:
 
     @staticmethod
     def sentinel_one(mdr_config:dict[str, Any])->TideModels.MDR.Configurations.SentinelOne:
+        """Build a SentinelOne system configuration object from raw MDR config.
+
+        Parses details, condition (including single_event and correlation
+        subqueries), optional cool-off settings and response information, and
+        returns a populated ``TideModels.MDR.Configurations.SentinelOne``
+        instance.
+
+        Args:
+            mdr_config: A mapping containing sentinel_one configuration fields.
+
+        Returns:
+            A ``TideModels.MDR.Configurations.SentinelOne`` instance.
+        """
 
         SentinelOne = TideModels.MDR.Configurations.SentinelOne
         
@@ -403,7 +555,22 @@ class SystemLoader:
 
     @staticmethod
     def defender_for_endpoint(mdr_config:dict[str, Any])->TideModels.MDR.Configurations.DefenderForEndpoint:
-    
+        """Build a Defender for Endpoint system configuration from raw MDR config.
+
+        Converts the dictionary representation into a
+        ``TideModels.MDR.Configurations.DefenderForEndpoint`` instance. This
+        includes parsing nested alert, impacted_entities, scope and response
+        actions structures. The function supports legacy per-tenant ``rule_id::``
+        keys and will assemble a rule id bundle if present.
+
+        Args:
+            mdr_config: A mapping containing defender_for_endpoint configuration
+                fields.
+
+        Returns:
+            A ``TideModels.MDR.Configurations.DefenderForEndpoint`` instance.
+        """
+
         DefenderForEndpoint = TideModels.MDR.Configurations.DefenderForEndpoint
 
         mdr_config, base_config = SystemLoader._base_configuration(mdr_config)
@@ -475,7 +642,43 @@ class SystemLoader:
 class TideLoader:
 
     @staticmethod
+    def load_statuses(statuses_configuration:list[dict])->Sequence[TideConfigs.Deployment.Status]:
+        """
+        Converts a list of status configuration dictionaries into a sequence of TideConfigs.Deployment.Status objects.
+        Args:
+            statuses_configuration (list[dict]): A list of dictionaries where each dictionary contains the parameters 
+                                                   to instantiate a TideConfigs.Deployment.Status object.
+        Returns:
+            Sequence[TideConfigs.Deployment.Status]: A sequence of TideConfigs.Deployment.Status instances created 
+                                                       from the provided configuration dictionaries.
+        """
+        Status = TideConfigs.Deployment.Status
+        parsed_configuration = list()
+        for status_configuration in statuses_configuration:
+            parsed_configuration.append(Status(**status_configuration))
+
+        return parsed_configuration
+
+    @staticmethod
     def load_mdr(mdr:dict)->TideModels.MDR:
+        """Convert a raw MDR mapping from the index into a TideModels.MDR object.
+
+        This function takes the raw dictionary representation of a Managed
+        Detection Rule (MDR) as produced by the indexer or loaded from TOML
+        files and transforms nested fields into the project's typed model
+        classes. It handles metadata, optional organisation metadata,
+        response/procedure/searches conversion, references and per-system
+        configurations by delegating to the SystemLoader helpers.
+
+        Args:
+            mdr: A dictionary representing an MDR entry from the index. The
+                mapping is copied internally to avoid mutating the original.
+
+        Returns:
+            A ``TideModels.MDR`` instance populated with parsed nested
+            structures and typed sub-objects.
+        """
+
         mdr = deepcopy(mdr)
 
         metadata = mdr.pop("metadata")
@@ -535,6 +738,28 @@ class TideLoader:
     def load_platform_config(platform_config:dict, system:Literal[DetectionSystems.DEFENDER_FOR_ENDPOINT])->TideConfigs.Systems.DefenderForEndpoint.Platform: ...
     @staticmethod
     def load_platform_config(platform_config:dict, system:DetectionSystems):
+        """Load and type a platform configuration for a given detection system.
+
+        The function validates that a platform configuration mapping is
+        present and returns a typed platform configuration object specific to
+        the requested detection system. It supports Sentinel, Crowdstrike,
+        Defender for Endpoint and SentinelOne; unknown systems fall back to the
+        generic ``SystemConfig.Platform`` type.
+
+        Args:
+            platform_config: Mapping containing platform-specific configuration
+                values.
+            system: A ``DetectionSystems`` enum value identifying the target
+                system for which the platform configuration should be loaded.
+
+        Returns:
+            An instance of the platform configuration dataclass appropriate to
+            the requested system.
+
+        Raises:
+            NotImplementedError: If ``platform_config`` is falsy or missing.
+        """
+
         if not platform_config:
             log("FATAL", f"Could not find any platform configuration for platform f{system.name}",
             "Ensure that the platform configuration section is present")
@@ -558,7 +783,25 @@ class TideLoader:
     
     @staticmethod
     def load_modifiers_config(modifiers_config:list[dict])->Sequence[SystemConfig.Modifiers] | list[Never]:
-        
+        """Parse a list of modifier configuration mappings into typed objects.
+
+        Modifiers are runtime configuration units that describe conditional
+        modifications to platform behavior. Each entry must contain
+        ``conditions`` and ``modifications`` keys. This function validates the
+        presence of required keys, constructs typed ``SystemConfig.Modifiers``
+        instances and returns the sequence.
+
+        Args:
+            modifiers_config: A list of mappings describing modifiers.
+
+        Returns:
+            A sequence of ``SystemConfig.Modifiers`` instances. If the input
+            is falsy, an empty list is returned.
+
+        Raises:
+            Exception: If any modifier mapping is missing required keys.
+        """
+
         if not modifiers_config:
             log("SKIP", "No modifiers configuration could be found")
             return []
@@ -586,6 +829,29 @@ class TideLoader:
 
     @staticmethod
     def load_tenants_config(tenants_config:Sequence[dict], platform:DetectionSystems):
+        """Load tenant configurations for a specific detection system.
+
+        Each tenant mapping must contain a ``setup`` section which may include
+        environment-variable placeholders. This helper resolves secrets via
+        ``HelperTide.fetch_config_envvar``, converts system-specific setup and
+        parameter blocks into typed dataclasses and returns a list of
+        ``SystemConfig.Tenant`` instances.
+
+        Args:
+            tenants_config: Sequence of tenant mappings from the platform
+                configuration.
+            platform: A ``DetectionSystems`` enum value indicating how to parse
+                each tenant's setup block.
+
+        Returns:
+            A list of ``SystemConfig.Tenant`` instances suitable for runtime
+            usage.
+
+        Raises:
+            NotImplementedError: If tenants_config is empty or a tenant lacks
+                the required ``setup`` key.
+        """
+
         if not tenants_config:
             log("FATAL", f"Could not find any tenant information for platform f{platform.name}",
                 "Ensure that at least one tenant is present in the platform configuration TOML file")
@@ -927,7 +1193,7 @@ class DataTide:
             """Generic deployment parameters."""
 
             Index = dict(IndexTide.load()["configurations"]["deployment"])
-            status = dict(Index["status"])
+            statuses = TideLoader.load_statuses(Index["statuses"])
             promotion = dict(Index["promotion"])
             default_responders = str(Index["default_responders"])
             proxy = dict(Index["proxy"])

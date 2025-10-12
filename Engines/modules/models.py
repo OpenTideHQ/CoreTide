@@ -29,6 +29,14 @@ class BaseModels:
     class Deployment:
         ...
 
+class StatusStrategy(Enum):
+    INERT = "Does not interact with deployment"
+    RELEASE = "Deployment from the default branch (also called trunk, or main branch)"
+    PREVIEW = "Deployment from Pull/Merge Requests"
+    DISABLEMENT = "Deployment from the default branch, but only to disable an existing rule. If the target system does not have a concept of disabling rules, then defaults to deleting them."
+    DELETION = "Deployment from the default branch, but removes the rule from the target system."
+    UNIVERSAL = "Deployment from both Pull/Merge Requests, and default branch pipelines."
+
 class DetectionSystems(Enum):
     DEFENDER_FOR_ENDPOINT = auto()
     CARBON_BLACK_CLOUD = auto()
@@ -38,11 +46,11 @@ class DetectionSystems(Enum):
     CROWDSTRIKE = auto()
 
 class DeploymentStrategy(Enum):
-    STAGING = auto()
-    PRODUCTION = auto()
+    STAGING = "Deployment allowed during a Pull (or Merge) Request Pipeline"
+    PRODUCTION = "Deployment allowed during a Default Branch Pipeline"
     FULL = auto()
-    ALWAYS = auto()
-    MANUAL = auto()
+    ALWAYS = "Deployment allowed during both Pull (or Merge) Request Pipeline and Default Branch Pipeline"
+    MANUAL = "Deployment allowed during both Pull (or Merge) Request Pipeline and Default Branch Pipeline, but only when explictely specified under tenants"
     DEBUG = auto()
 
     @staticmethod
@@ -129,6 +137,21 @@ class SystemConfig:
 
 @dataclass
 class TideConfigs:
+
+    @dataclass
+    class Deployment:
+        
+        @dataclass
+        class Status:
+            name: str
+            description: str
+            strategy: Union[StatusStrategy, str]
+
+            def __post_init__(self):
+                if type(self.strategy) is str:
+                    self.strategy = StatusStrategy[self.strategy]
+
+        statuses = Sequence[Status]
 
     @dataclass
     class Systems:

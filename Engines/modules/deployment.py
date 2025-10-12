@@ -1,11 +1,12 @@
 import pandas as pd
 from git.repo import Repo
-from Engines.modules.framework import unroll_dot_dict, DEPRECATED_STATUSES
+from Engines.modules.framework import unroll_dot_dict
 from Engines.modules.models import (
     TideDefinitionsModels,
     TideModels,
     SystemConfig,
     DeploymentStrategy,
+    StatusStrategy,
     TenantDeployment,
     TenantDeploymentModel,
 )
@@ -29,8 +30,8 @@ sys.path.append(str(git.Repo(".", search_parent_directories=True).working_dir))
 
 
 SYSTEMS_CONFIGS_INDEX = DataTide.Configurations.Systems.Index
-PRODUCTION_STATUS = DataTide.Configurations.Deployment.status["production"]
-SAFE_STATUS = DataTide.Configurations.Deployment.status["safe"]
+DEPRECATED_STATUSES = (StatusStrategy.DELETION,
+                        StatusStrategy.DISABLEMENT)
 
 
 class TideRepo:
@@ -96,9 +97,6 @@ class CIEnvironment:
         GitHubActions = auto()
         LocalDebug = auto()        
 
-
-
-
     def _check_ci_environment(self) -> CIPlatforms:
         if os.getenv("TF_BUILD"):
             log("SUCCESS", "Discovered CI Environment to be Azure Pipeline")
@@ -121,6 +119,28 @@ class CIEnvironment:
             )
             raise Exception
 
+
+
+
+def check_status(status_name:str)->StatusStrategy:
+    statuses = DataTide.Configurations.Deployment.statuses
+    for status in statuses:
+        if status.name == status_name:
+            if status.strategy is str:
+                return StatusStrategy[status.name]
+            elif status.strategy is StatusStrategy:
+                return status.strategy
+            else:
+                log("FATAL",
+                    "Could not return status strategy",
+                    str(status))
+                raise Exception
+
+    log("FATAL",
+        "Could not look up requested status in existing statuses",
+        f"Requested status : {status_name}",
+        f"Available statuses in deployment.toml : {statuses}")
+    raise Exception
 
 def make_deploy_plan(
     plan: DeploymentStrategy,
@@ -175,7 +195,7 @@ def make_deploy_plan(
             if system in SYSTEMS_DEPLOYMENT:
                 if (
                     keep_deprecated is False
-                    and platform_status in DEPRECATED_STATUSES
+                    and check_status(platform_status) in DEPRECATED_STATUSES
                 ):
                     log("SKIP",
                         f"Not keeping in deployment plan as {system} is set to a deprecated status",
@@ -184,7 +204,7 @@ def make_deploy_plan(
                     deploy_mdr.setdefault(system, []).append(mdr_uuid)
                 else:
                     if plan is DeploymentStrategy.PRODUCTION:
-                        if platform_status in PRODUCTION_STATUS:
+                        if check_status(platform_status) is StatusStrategy.RELEASE:
                             deploy_mdr.setdefault(system, []).append(mdr_uuid)
                             log(
                                 "SUCCESS",
@@ -204,8 +224,7 @@ def make_deploy_plan(
 
                     elif plan is DeploymentStrategy.STAGING:
                         if (
-                            platform_status not in PRODUCTION_STATUS
-                            and platform_status not in SAFE_STATUS
+                            check_status(platform_status) is StatusStrategy.PREVIEW 
                         ):
                             deploy_mdr.setdefault(system, []).append(mdr_uuid)
                             log(

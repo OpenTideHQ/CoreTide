@@ -14,6 +14,7 @@ from Engines.modules.framework import get_vocab_entry, get_type
 from Engines.modules.documentation import get_icon
 from Engines.modules.logs import log
 from Engines.modules.tide import DataTide
+from Engines.modules.models import StatusStrategy
 from Engines.modules.files import resolve_paths
 from Engines.modules.deployment import enabled_systems
 
@@ -71,6 +72,21 @@ FOLDABLE = """
 """.strip()
     
 
+def fetch_statuses()->Tuple[list[str], list[str]]:
+    status_config = DataTide.Configurations.Deployment.statuses
+    statuses = list()
+    statuses_descriptions = list()
+
+    for status in status_config:
+        statuses.append(status.name)
+        strategy = status.strategy.name #type: ignore
+        description = f"**Strategy** : `{strategy}` - _{StatusStrategy[strategy].value}_"
+        description += f"\n\n{status.description}"
+        statuses_descriptions.append(description)
+
+    return statuses, statuses_descriptions
+
+
 def fetch_config_parameter_list(dot_path:str)->list:
     config_index = DataTide.Configurations.Index
     config_path = dot_path.split(".")
@@ -98,7 +114,7 @@ def fetch_config_parameter_list(dot_path:str)->list:
     else:
         raise ValueError(f"Config path {dot_path} must be a valid path to a list parameter")
 
-def fetch_config_system_tenants_list(system:str)->list:
+def fetch_config_system_tenants_list(system:str)->Tuple[list[str], list[str]]:
     system_config_index = DataTide.Configurations.Index
     system_config = system_config_index.get("systems", {}).get(system)
     
@@ -117,12 +133,16 @@ def fetch_config_system_tenants_list(system:str)->list:
         raise ValueError(f"System Configuration for {system} does not contain a tenants section")
     
     tenants_list = list()
+    tenants_descriptions = list()
+    
     for tenant_config in tenants:
         tenant_name = tenant_config.get("name")
+        tenant_description = tenant_config.get("description", "No Description")
         if tenant_name:
             log("INFO",
                 f"Discovered tenant definition {tenant_name}",
-                tenant_config.get("description", "No description"))
+                tenant_config.get("description", ""))
+            tenants_descriptions.append(tenant_description)
             tenants_list.append(tenant_name)            
         else:
             log("FATAL",
@@ -130,7 +150,7 @@ def fetch_config_system_tenants_list(system:str)->list:
             str(tenant_config))
             raise ValueError(f"Missing name field in tenant definition")
 
-    return tenants_list
+    return tenants_list, tenants_descriptions
 
 def stage_documentation(field: str, stages: str | list) -> str:
 
@@ -549,14 +569,28 @@ def gen_json_schema(dictionary):
 
                 # Special handling to specifically get the available tenants
                 if system:=dict_foo[field].get("tide.config.system.tenants"):
-                    values_list = fetch_config_system_tenants_list(system)
+                    values_list, descriptions_list = fetch_config_system_tenants_list(system)
                     if dict_foo[field].get("type") == "string":
                         dictionary[field]["enum"] = values_list
+                        dictionary[field]["markdownEnumDescriptions"] = descriptions_list
                     elif dict_foo[field].get("type") == "array":
                         dictionary[field]["items"] = {}
                         dictionary[field]["items"]["enum"] = values_list
                         dictionary[field]["items"]["uniqueItems"] = True
-                
+                        dictionary[field]["items"]["markdownEnumDescriptions"] = descriptions_list
+
+                # Special handling to specifically get the available statuses
+                if system:=dict_foo[field].get("tide.config.statuses"):
+                    values_list, descriptions_list = fetch_statuses()
+                    if dict_foo[field].get("type") == "string":
+                        dictionary[field]["enum"] = values_list
+                        dictionary[field]["markdownEnumDescriptions"] = descriptions_list
+                    elif dict_foo[field].get("type") == "array":
+                        dictionary[field]["items"] = {}
+                        dictionary[field]["items"]["enum"] = values_list
+                        dictionary[field]["items"]["uniqueItems"] = True
+                        dictionary[field]["markdownEnumDescriptions"] = descriptions_list
+
                 if dict_foo[field].get("tide.vocab"):
                     if type(dict_foo[field]["tide.vocab"]) is str:
                         query = dict_foo[field]["tide.vocab"]

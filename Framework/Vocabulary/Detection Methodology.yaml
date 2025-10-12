@@ -1,6 +1,14 @@
 name: Detection Methodology
 field: detection.methodology
-description: Technical approach of the Detection 
+description: |
+  Defines the technical approaches and methods used to implement detection logic.
+  These methodologies help categorize how a detection rule processes and analyzes data
+  to identify potential security threats, suspicious activities, or malicious behavior.
+
+  Tracking which methodology is used helps understanding if there are any potential gaps in
+  how signals are implemented, understand which ones are not getting implemented due to
+  complexity, or even track which types of approach results in the best outcomes.  
+
 keys:
   - id: 43c1bb4d-b74e-4bbd-be22-aae3d301ee51
     name: Artifacts
@@ -35,3 +43,25 @@ keys:
     description: |
       Identifies deviations from established baselines or expected patterns in data, 
       which may indicate malicious or suspicious activity.
+  - id: 04c9fabc-1f9c-4526-a523-a4c020a8e145
+    name: Machine Learning
+    description: |
+      Leverages machine learning algorithms to analyze data patterns and identify
+      potential malicious or anomalous behavior that traditional methods might overlook.\
+  - id: 7862439c-3358-4efd-a90a-b142a90bffa3
+    name: Heuristic
+    description: |
+      Uses a set of predefined rules or criteria to identify potentially malicious 
+      activity based on known indicators or characteristics of threats, without 
+      requiring exact matches.
+  - id: fb643a20-e3b4-4ed5-a017-87bd6e884bc9
+    name: Threat Intelligence
+    description: |
+      Leverages external threat intelligence feeds and indicators to identify known 
+      malicious activity, including IOCs, TTPs, and threat actor behaviors.
+  - id: bb978737-10f4-4873-9c44-140452d003b0
+    name: Frequency Analysis
+    description: |
+      Monitors the frequency of specific events or patterns over time to identify 
+      unusual spikes or changes that may indicate malicious activity, such as 
+      brute force attempts or data exfiltration.

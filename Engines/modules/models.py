@@ -11,14 +11,6 @@ sys.path.append(str(git.Repo(".", search_parent_directories=True).working_dir))
 
 from Engines.modules.logs import log
 
-# TODO - Re-Architect Uber Class by merging this and DataTide
-
-# OpenTide.Models. #DataModels
-# OpenTide.Objects. #Returning Models
-# OpenTide.Configurations.
-# OpenTide.Deployment. #Returns Initialized deployment classes
-# OpenTide.Vocabularies.
-# OpenTide.Schemas.Json / OpenTide.Schemas.Yaml
 
 class BaseModels:
 
@@ -74,19 +66,6 @@ class DeploymentStrategy(Enum):
                 raise AttributeError("UNSUPPORTED DEPLOYMENT PLAN")
 
         return DEPLOYMENT_PLAN
-
-@dataclass
-class Configurations:
-
-    @dataclass
-    class Logsource:
-        name: str
-        description: str
-        system: str
-        tenants: Optional[Sequence[str]] = None
-        references: Optional[Sequence[str]] = None
-        scopes: Optional[Sequence[str]] = None
-        events: Optional[Sequence[str]] = None
 
 
 @dataclass

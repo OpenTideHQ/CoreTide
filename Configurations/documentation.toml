@@ -3,15 +3,15 @@ documentation_target = "gitlab" #generic: common features for markdown wikis
 
 scope = [ "tvm", "cdm", "bdr" ]
 skip_object_keys = ["description",
-                            "guidelines",
-                            "terrain",
-                            "tuning",
-                            "att&ck",
-                            "actors",
-                            "vectors",
-                            "justification",
-                            "chaining",
-                            "cve"]
+                    "guidelines",
+                    "terrain",
+                    "tuning",
+                    "att&ck",
+                    "actors",
+                    "vectors",
+                    "justification",
+                    "chaining",
+                    "cve"]
 
 skip_vocabularies = ["mitigation",
                     "logsources",

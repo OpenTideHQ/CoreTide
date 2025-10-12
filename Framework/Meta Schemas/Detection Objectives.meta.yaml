@@ -7,14 +7,13 @@ $schema: http://json-schema.org/draft-07/schema#
 additionalProperties: false
 
 tide.placeholders:
-  SCHEMA_VERSION: dom::2.1
+  SCHEMA_VERSION: dom::1.0
 
 required:
   - name
   - metadata
   - objective
-  - correlation
-
+  - composition
 
 properties:
 
@@ -86,7 +85,26 @@ properties:
         tide.vocab: tvm
         items:
           type: string 
-        
+      
+      investment:
+        title: Expected investment into the objective
+        description: |
+          How much overall investment is expected in developing the detection objective
+          capabilities. This may take in account larger problematics than the effort to implement
+          signals using the `effort` keyword, for example when new log sources, tooling,
+          or infrastructure is required.
+        type: string
+        enum:
+          - Minor
+          - Moderate
+          - Significant
+          - Major
+        markdownEnumDescriptions:
+          - Existing infrastructure and logs, minimal development needed
+          - Some additional tooling, log enrichment required, or resource allocation required
+          - Substantial infrastructure changes or R&D effort needed
+          - Complex infrastructure changes, new systems, or extensive development
+
       description: 
         title: Objective Description
         description: |
@@ -95,6 +113,33 @@ properties:
           be done under signals. 
         type: string
         tide.template.multiline: True 
+
+      composition:
+        title: Signal Composition
+        description: |
+          Models how the signals described should be used as part of a final
+          detection implementation
+        type: object
+
+        required:
+          - strategy
+          - description 
+        
+        properties:
+
+          strategy:
+            title: Signal Correlation Strategy
+            description: |
+              Describes how signals should be used - from fully synergetic, to fully separate
+            type: string 
+            tide.vocab: detection.composition
+          
+          description:
+            title: Correlation Strategy
+            description: |
+              Technical details about the recommended strategy
+            type: string
+            tide.template.multiline: True
 
       signals:
         title: Detection Signals
@@ -152,6 +197,17 @@ properties:
                 - High
                 - Critical
             
+            effort:
+              title: Signal Implement Effort
+              description: |
+                Rough estimate of the technical effort required. This is usually environment
+                dependent based.
+                
+                From 1 to 10, 1 being a very quick action, 10 taking resources across several cycles. 
+              type: number
+              minimum: 1
+              maximum: 10
+
             methodology:
               title: Detection Methodology
               description: |
@@ -296,30 +352,3 @@ properties:
                     description: |
                       When relevant, the detection query that was shared in the community
                     tide.template.multiline: True
-
-      correlation:
-        title: Signal Correlation
-        description: |
-          Models how the signals described should be used as part of a final
-          detection implementation
-        type: object
-
-        required:
-          - strategy
-          - description 
-        
-        properties:
-
-          strategy:
-            title: Signal Correlation Strategy
-            description: |
-              Describes how signals should be used - from fully synergetic, to fully separate
-            type: string 
-            tide.vocab: detection.correlation.strategy
-          
-          description:
-            title: Correlation Strategy
-            description: |
-              Technical details about the recommended strategy
-            type: string
-            tide.template.multiline: True

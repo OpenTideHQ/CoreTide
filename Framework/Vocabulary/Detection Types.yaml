@@ -17,4 +17,9 @@ keys:
     description: |
       Searches and other mechanisms meant to support different processes
       not directly related to threat detection, for example to move data
-      from one source to another.      
+      from one source to another or detect log source anomalies.
+  - id: 5c8b9be3-ef99-4e75-ba7a-706f43bdfb05
+    name: Supportive
+    description: |
+      Objective not directly related to threat detection capabilities, but
+      which may support another objective.

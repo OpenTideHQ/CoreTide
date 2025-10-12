@@ -60,28 +60,88 @@ FOLDABLE = """
 </details>
 """.strip()
     
-def fetch_logsources()->None|dict[str, str]:
+def fetch_logsources() -> None | tuple[list[str], list[str]]:
+    """Retrieve formatted log source entries from the TIDE configuration with rich descriptions.
+    
+    This function processes the configured log sources and formats them into two parallel lists:
+    1. A list of identifiers (enum values)
+    2. A list of rich markdown descriptions including asset details
+    
+    The identifiers are constructed based on the following patterns:
+    With tenants: "{system}::{tenant}::{name}"
+    Without tenants: "{system}{name}"
+    
+    The markdown descriptions include:
+    - Log source name and description
+    - System and tenant information
+    - Associated assets with their criticality levels
+    - Custom details for assets when available
+        
+    Returns:
+        tuple[list[str], list[str]]: A tuple containing:
+            - List of log source identifiers (enums)
+            - List of rich markdown descriptions
+        None: If no log sources are configured in the system.
+        
+    Example:
+        >>> fetch_logsources()
+        (
+            ['splunk::tenant1::windows_logs', 'splunk::tenant2::windows_logs'],
+            ['### Windows Event Logs\n**System**: Splunk\n**Tenant**: tenant1\n...']
+        )
+    """
+    # Early return if no configuration exists
     logsources = DataTide.Configurations.Logsources.logsources
     if not logsources:
         return None 
-    logsources_entries = {}
-    for logsource in logsources:
-        base_logsource = {}
-        events_logsource = {}
-        if tenants:=logsource.tenants:
-            for tenant in tenants:
-                base_logsource[logsource.system + "::" + tenant + "::" + logsource.name] = logsource.description
-        else:
-            base_logsource[logsource.system + logsource.name] = logsource.description
-        if events:=logsource.events:
-            for event in events:
-                for base in base_logsource:
-                    events_logsource[base + "::" + event] = logsource.description
-
-        logsources_entries.update(base_logsource)
-        logsources_entries.update(events_logsource)
     
-    return logsources_entries
+    # Initialize our return lists
+    enums = []
+    descriptions = []
+    
+    # Build a mapping of asset names to their details for quick lookup
+    asset_map = {asset.name: asset for asset in logsources.assets}
+    
+    for logsource in logsources.logsources:
+        # Format base markdown template for this log source
+        base_description = f"""### {logsource.name}
+**System**: {logsource.system}
+**Description**: {logsource.description}
+
+"""
+        # Add asset information if available
+        if logsource.assets:
+            base_description += "### Associated Assets:\n"
+            for asset_name in logsource.assets:
+                if asset := asset_map.get(asset_name):
+                    base_description += f"""
+- **{asset.name}**
+  - _Criticality_: {asset.criticality}
+  - _Description_: {asset.description}"""
+                    if asset.custom_details:
+                        base_description += "\n  - _Custom Details_:"
+                        for key, value in asset.custom_details.items():
+                            base_description += f"\n    - {key}: {value}"
+                    base_description += "\n"
+                else:
+                    base_description += f"""
+- ⚠️ **{asset_name}**
+  - _Warning_: Asset not found in configuration
+  - _Action Required_: Define this asset in the assets section"""
+        
+        # Generate entries for each tenant if specified, otherwise just one entry
+        if tenants := logsource.tenants:
+            for tenant in tenants:
+                enum = f"{logsource.system}::{tenant}::{logsource.name}"
+                description = base_description.replace("**System**:", f"**System**: {logsource.system}\n**Tenant**: {tenant}")
+                enums.append(enum)
+                descriptions.append(description)
+        else:
+            enum = f"{logsource.system}{logsource.name}"
+            enums.append(enum)
+            descriptions.append(base_description)
+    
+    return enums, descriptions
 
 def fetch_config_parameter_list(dot_path:str)->list:
     config_index = DataTide.Configurations.Index
@@ -530,11 +590,12 @@ def gen_json_schema(dictionary):
                 # Handles the case when a list of values has to be fetched from
                 # the configuration files.
                 if dict_foo[field].get("tide.config.logsources"):
-                    values_list = fetch_logsources()
-                    if values_list:
+                    logsources_result = fetch_logsources()
+                    if logsources_result:
+                        enums, descriptions = logsources_result
                         dictionary[field]["items"] = {}
-                        dictionary[field]["items"]["enum"] = [log for log in values_list.keys()]
-                        dictionary[field]["items"]["markdownEnumDescriptions"] = [description for description in values_list.values()]
+                        dictionary[field]["items"]["enum"] = enums
+                        dictionary[field]["items"]["markdownEnumDescriptions"] = descriptions
                         dictionary[field]["items"]["uniqueItems"] = True
 
                 if config_fetch:=dict_foo[field].get("tide.config.parameter-list"):

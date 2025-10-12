@@ -31,10 +31,11 @@ class BaseModels:
 
 class StatusStrategy(Enum):
     INERT = "Does not interact with deployment"
-    RELEASE = "Deployment from the mainline/trunk/default branch"
-    PREVIEW = "Deployment from PR/MRs"
-    DISABLEMENT = "Deployment from the mainline/trunk/default branch, but only disables the rule. If the target system does not have a concept of disabling rules, then defaults to deleting them."
-    DELETION = "Deployment from the mainline/trunk/default branch, but removes the rule from the target system."
+    RELEASE = "Deployment from the default branch (also called trunk, or main branch)"
+    PREVIEW = "Deployment from Pull/Merge Requests"
+    DISABLEMENT = "Deployment from the default branch, but only to disable an existing rule. If the target system does not have a concept of disabling rules, then defaults to deleting them."
+    DELETION = "Deployment from the default branch, but removes the rule from the target system."
+    UNIVERSAL = "Deployment from both Pull/Merge Requests, and default branch pipelines."
 
 class DetectionSystems(Enum):
     DEFENDER_FOR_ENDPOINT = auto()

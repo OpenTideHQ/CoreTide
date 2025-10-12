@@ -29,19 +29,17 @@ properties:
           type: string
           oneOf:
             - const: INERT
-              description: "Does not interact with deployment. Use this when you want a status that has no effect on deployment behavior."
+              description: "Does not interact with deployment"
             - const: PREVIEW
-              description: "Deployment from Pull Requests (PRs) or Merge Requests (MRs). This strategy is used for testing changes before they reach the main branch."
+              description: "Deployment from Pull/Merge Requests"
             - const: RELEASE
-              description: "Deployment from the mainline/trunk/default branch. This is the standard deployment strategy for production-ready rules."
+              description: "Deployment from the default branch (also called trunk, or main branch)"
             - const: UNIVERSAL
-              description: "Deployment strategy that applies universally across all contexts. Use this when the rule should be applied consistently everywhere."
-            - const: EXPLICIT
-              description: "Deployment requiring explicit authorization. Use this when manual approval or specific conditions must be met before deployment."
+              description: "Deployment from both Pull/Merge Requests, and default branch pipelines."
             - const: DISABLEMENT
-              description: "Deployment from the mainline/trunk/default branch, but only disables the rule. If the target system does not have a concept of disabling rules, then defaults to deleting them. Use this for graceful deprecation of rules."
+              description: "Deployment from the default branch, but only to disable an existing rule. If the target system does not have a concept of disabling rules, then defaults to deleting them."
             - const: DELETION
-              description: "Deployment from the mainline/trunk/default branch, but removes the rule from the target system. Use this when you want to completely remove a rule from deployment."
+              description: "Deployment from the default branch, but removes the rule from the target system."
           description: Deployment strategy for this status
 
   promotion:

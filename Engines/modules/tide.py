@@ -731,7 +731,7 @@ class DataTide:
         """Cyber Detection Models Data Index"""
         mdr = dict(Index["mdr"])
         """Managed Detection Rules Data Index"""
-        DOM = {uuid:TideLoader.load_dom(deepcopy(data)) for (uuid, data) in dict(Index.copy()["mdr"]).items()}
+        DOM = {uuid:TideLoader.load_dom(deepcopy(data)) for (uuid, data) in dict(Index.copy()["dom"]).items()}
         # We need to do a deepcopy to ensure that loading steps aren't modifying the original data
         MDR = {uuid:TideLoader.load_mdr(deepcopy(data)) for (uuid, data) in dict(Index.copy()["mdr"]).items()} 
         """Model Mapped Managed Detection Rules Data Index"""

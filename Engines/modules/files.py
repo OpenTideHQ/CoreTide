@@ -37,9 +37,12 @@ def resolve_configurations() -> dict[str, dict]:
         for entry in os.listdir(configuration_path):
             # If there are loose top level files, indexes them
             if os.path.isfile(configuration_path / entry):
-                config_index[entry.removesuffix(".toml")] = toml.load(
-                    open(configuration_path / entry, encoding="utf-8")
-                )
+                try:
+                    config_index[entry.removesuffix(".toml")] = toml.load(
+                        open(configuration_path / entry, encoding="utf-8")
+                    )
+                except:
+                    raise ValueError(f"Failed to open configuration file {configuration_path}/{entry}")
             # Some configurations, especially for recomposition, are namespaced within folders.
             elif os.path.isdir(configuration_path / entry):
                 config_index[entry] = dict()

@@ -18,7 +18,6 @@ from Engines.modules.framework import (
     get_type,
     get_vocab_entry,
     keep_active_mdr,
-    DEPRECATED_STATUSES
 )
 from Engines.modules.documentation import (
     model_value_doc,
@@ -32,7 +31,7 @@ from Engines.modules.documentation import (
 from Engines.modules.logs import log
 from Engines.modules.tide import DataTide
 from Engines.modules.debug import DebugEnvironment
-from Engines.modules.deployment import CIEnvironment
+from Engines.modules.deployment import CIEnvironment, DEPRECATED_STATUSES
 
 COVER_PAGES_ENABLED = DataTide.Configurations.Documentation.model_cover_pages
 

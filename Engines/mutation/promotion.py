@@ -21,10 +21,7 @@ DEPLOYMENT_CONFIG = CONFIGURATIONS["deployment"]
 
 PROMOTION_ENABLED = DEPLOYMENT_CONFIG["promotion"].get("enabled")
 PROMOTION_TARGET = DEPLOYMENT_CONFIG["promotion"].get("promotion_target")
-STATUS_VOCAB = yaml.safe_load(
-    open(PATHS["vocabularies"] / "MDR Status.yaml", encoding="utf-8")
-)
-VALID_STATUSES = [k["id"] for k in STATUS_VOCAB["keys"]]
+
 if (os.environ.get("DEBUG") == True or os.environ.get("TERM_PROGRAM") == "vscode"):
     DEBUG = True
 else:
@@ -32,7 +29,41 @@ else:
 
 
 #TODO Rework Promotion to consume from DataTide
-def get_raw_non_promotable_statuses()->list[str]:
+def get_valid_statuses() -> list[str]:
+    """
+    Retrieve a list of all valid status names from the deployment configuration.
+    
+    This function parses the deployment status configurations and returns a list
+    of all defined status names, regardless of their strategy.
+    
+    Returns:
+        list[str]: A list of all valid status names defined in the configuration.
+        
+    Raises:
+        Exception: If the "statuses" configuration cannot be resolved from the deployment
+                  configuration.
+        Exception: If a status definition is missing the "name" field.
+    
+    Note:
+        This function depends on a global CONFIGURATIONS dictionary containing deployment
+        configuration with a "statuses" key that holds a list of status definitions.
+        Each status definition must contain a "name" field.
+    """
+    statuses_config = CONFIGURATIONS["deployment"].get("statuses")
+    if not statuses_config:
+        raise Exception("Could not resolve status definitions")
+    
+    valid_statuses = []
+    for status in statuses_config:
+        name = status.get("name")
+        if not name:
+            raise Exception(f"Missing name in status definition: {str(status)}")
+        valid_statuses.append(name)
+        log("INFO", "Found valid status", name)
+    
+    return valid_statuses
+
+def get_non_promotable_statuses()->list[str]:
     """
     Retrieve a list of status names that are considered non-promotable based on their strategy.
     This function parses the deployment status configurations and identifies statuses
@@ -72,7 +103,11 @@ def get_raw_non_promotable_statuses()->list[str]:
 
     return non_editable_statuses
 
-NON_PROMOTABLE_STATUSES = get_raw_non_promotable_statuses()
+# Get list of all valid statuses from configuration
+VALID_STATUSES = get_valid_statuses()
+
+# Get list of statuses that cannot be promoted
+NON_PROMOTABLE_STATUSES = get_non_promotable_statuses()
 
 class PromoteMDR:
     """
@@ -120,7 +155,7 @@ class PromoteMDR:
                     "FAILURE",
                     "The target status defined in the config is not a valid status",
                     PROMOTION_TARGET,
-                    f"Valid statuses are in the MDR Status vocabulary file : {', '.join(VALID_STATUSES)}",
+                    f"Valid statuses are in the statuses definitions : {', '.join(VALID_STATUSES)}",
                 )
                 exit()
 

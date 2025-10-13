@@ -133,7 +133,8 @@ def check_status(status_name:str)->StatusStrategy:
             else:
                 log("FATAL",
                     "Could not return status strategy",
-                    str(status))
+                    str(status.strategy),
+                    str(type(status.strategy)))
                 raise Exception
 
     log("FATAL",

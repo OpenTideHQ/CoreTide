@@ -145,17 +145,15 @@ class IndexTide:
     @cache #Memoization as load() is called multiple times as DataTide initializes
     @staticmethod
     def load() -> Dict[str, dict]:
-        """Load the TIDE repository index from disk or generate it in memory.
+        """Load the OpenTide instance index from disk or generate it in memory.
 
-        The loader will first attempt to read an index JSON file from the path
-        defined by the ``INDEX_PATH`` environment variable or the default
-        ``index.json`` at the repository root. If that file is absent, the
-        function calls the project's indexer to build an index in memory.
+        The loader will:
+        1. Load or generate the base index
+        2. Reconcile with staging index if present and load fresh configurations
 
         Returns:
-            A dictionary representing the full TIDE index structure. The
-            dictionary layout follows the project's index schema (keys such as
-            ``objects``, ``files``, ``paths``, etc.).
+            A dictionary representing the full TIDE index structure with fresh 
+            configurations from staging reconciliation.
 
         Raises:
             Exception: If the index cannot be loaded or generated in memory.
@@ -166,35 +164,37 @@ class IndexTide:
         print("📂 Index not found in memory, first seeking index file...")
         if os.path.isfile(INDEX_PATH):
             _tide_index = json.load(open(INDEX_PATH))
-            _tide_index = IndexTide.reconcile_staging(_tide_index)
-            return _tide_index
         else:
             # Generate index in memory
             print("💽 Could not find index file, generating it in memory")
             _tide_index = indexer()
-            _tide_index = IndexTide.reconcile_staging(_tide_index)
             if not _tide_index:
                 raise Exception("INDEX COULD NOT BE LOADED IN MEMORY")
-            return _tide_index
+        
+        # Reconcile with staging index if present
+        _tide_index = IndexTide.reconcile_staging(_tide_index)
+        return _tide_index
 
     @staticmethod
     def reconcile_staging(index):
-        """Merge a staging index into the provided production index.
+        """Merge staging index model data into the provided production index.
 
-        If a staging index file exists (``staging_index.json`` by default or as
-        specified by ``STAGING_INDEX_PATH``), this routine will load it and
-        merge changes into the provided ``index``. New MDRs (Managed Detection
-        Rules) from staging are added and staging MDRs with a higher version
-        replace their production counterparts after a safety patch operation.
+        If a staging index exists (``staging_index.json`` by default or as
+        specified by ``STAGING_INDEX_PATH``), this routine will:
+        
+        1. Load the staging index
+        2. Merge model data (MDRs) from staging into production, where:
+           - New MDRs from staging are added
+           - MDRs with higher version in staging replace production versions
+        3. Load fresh configurations from TOML files
 
         Args:
             index: The production index dictionary to reconcile against.
 
         Returns:
-            A new index dictionary that contains reconciled data with staging
-            updates applied when appropriate.
+            A new index dictionary that contains reconciled model data and fresh
+            configurations.
         """
-
         log("INFO", "Entering staging index reconciliation routine")
         EXPECTED_STAGING_INDEX_PATH = ROOT / "staging_index.json"
         STAGING_INDEX_PATH = os.getenv("STAGING_INDEX_PATH") or EXPECTED_STAGING_INDEX_PATH
@@ -203,9 +203,9 @@ class IndexTide:
             log("SKIP", "No Staging Index to reconcile")
             return index
 
+        from Engines.modules.files import resolve_configurations
         RECONCILED_INDEX = index.copy()
         STG_INDEX = json.load(open(Path(STAGING_INDEX_PATH)))
-        BANNER_MESSAGE = "⚠️ This documentation reflects the latest staging deployment from this MDR. Production status on mainline is, but staging deployment is currently overriding it"
         added_mdr = list()
         updated_mdr = list()
 
@@ -237,11 +237,13 @@ class IndexTide:
                         f" staging data, as version is higher (main : v{main_version}"
                         f" staging : v{stg_version})"
                     )
-
-                    updated_mdr = list()
-
                     log("INFO", "Doing a safety patching to avoid edge cases")
                     RECONCILED_INDEX["objects"]["mdr"][mdr] = patch.tide_1_patch(STG_INDEX[mdr], "mdr")
+                    updated_mdr.append(mdr)
+        
+        # Always load fresh configurations after model data reconciliation
+        log("INFO", "Loading fresh configurations from TOML files")
+        RECONCILED_INDEX["configurations"] = resolve_configurations()
         
         log("SUCCESS", "Finalized Staging Reconciliation Routine")
         log("INFO", "Updated MDRs from Production Index with Staging Data", str(len(updated_mdr)))
@@ -1194,7 +1196,7 @@ class DataTide:
 
             Index = dict(IndexTide.load()["configurations"]["deployment"])
             print(Index)
-            statuses = TideLoader.load_statuses(deepcopy(Index["statuses"]))
+            statuses = TideLoader.load_statuses(Index["statuses"])
             promotion = dict(Index["promotion"])
             default_responders = str(Index["default_responders"])
             proxy = dict(Index["proxy"])

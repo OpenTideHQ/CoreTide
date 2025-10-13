@@ -1193,6 +1193,7 @@ class DataTide:
             """Generic deployment parameters."""
 
             Index = dict(IndexTide.load()["configurations"]["deployment"])
+            print(Index)
             statuses = TideLoader.load_statuses(deepcopy(Index["statuses"]))
             promotion = dict(Index["promotion"])
             default_responders = str(Index["default_responders"])

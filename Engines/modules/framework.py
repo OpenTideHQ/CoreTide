@@ -8,13 +8,11 @@ sys.path.append(str(git.Repo(".", search_parent_directories=True).working_dir))
 
 from Engines.modules.tide import DataTide
 from Engines.modules.logs import log
-from Engines.modules.models import StatusStrategy
 
 DEFINITIONS_INDEX = DataTide.TideSchemas.definitions
 VOCAB_INDEX = DataTide.Vocabularies.Index
 MODELS_INDEX = DataTide.Models.Index
 CHAINING_INDEX = DataTide.Models.chaining
-
 
 
 def unroll_dot_dict(dot_dict, separator="."):

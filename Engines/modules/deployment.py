@@ -126,14 +126,14 @@ def check_status(status_name:str)->StatusStrategy:
     statuses = DataTide.Configurations.Deployment.statuses
     for status in statuses:
         if status.name == status_name:
-            if status.strategy is str:
+            if type(status.strategy) is str:
                 return StatusStrategy[status.name]
-            elif status.strategy is StatusStrategy:
+            elif type(status.strategy) is StatusStrategy:
                 return status.strategy
             else:
                 log("FATAL",
                     "Could not return status strategy",
-                    str(status.strategy),
+                    str(status),
                     str(type(status.strategy)))
                 raise Exception
 

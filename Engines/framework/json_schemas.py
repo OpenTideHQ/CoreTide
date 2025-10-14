@@ -85,18 +85,20 @@ class FetchEnums:
             )
         """
         # Early return if no configuration exists
-        logsources = DataTide.Configurations.Logsources.logsources
-        if not logsources:
+        logsources_data = DataTide.Configurations.Logsources.logsources
+        if not logsources_data or not logsources_data.logsources:
             return None 
         
         # Initialize our return lists
         enums = []
         descriptions = []
         
-        # Build a mapping of asset names to their details for quick lookup
-        asset_map = {asset.name: asset for asset in logsources.assets}
+        # Build a mapping of asset names to their details for quick lookup (assets are optional)
+        asset_map = {}
+        if logsources_data.assets:
+            asset_map = {asset.name: asset for asset in logsources_data.assets}
         
-        for logsource in logsources.logsources:
+        for logsource in logsources_data.logsources:
             # Format base markdown template for this log source
             base_description = f"""### {logsource.name}
 **System**: {logsource.system}

@@ -1,7 +1,8 @@
-objects = [ "tvm", "cdm", "bdr", "mdr" ]
+objects = [ "tvm", "cdm", "dom", "bdr", "mdr" ]
 
 [paths.tide]
 tvm = "Objects/Threat Vectors/"
+dom = "Objects/Detection Objectives/"
 cdm = "Objects/Detection Models/"
 mdr = "Objects/Detection Rules/"
 bdr = "Objects/Business Detections/"
@@ -38,6 +39,7 @@ table = "Objects Table.csv"
 
 [metaschemas]
 tvm = "TVM Meta Schema.yaml"
+dom = "Detection Objective.metaschema.yaml"
 cdm = "CDM Meta Schema.yaml"
 mdr = "MDR Meta Schema.yaml"
 bdr = "BDR Meta Schema.yaml"
@@ -48,6 +50,7 @@ systems = "MDR Systems Deployment"
 
 [json_schemas]
 tvm = "TVM Schema.json"
+dom = "Detection Objective.schema.json"
 cdm = "CDM Schema.json"
 mdr = "MDR Schema.json"
 bdr = "BDR Schema.json"
@@ -55,12 +58,14 @@ lookup_metadata = "Lookup Metadata Schema.json"
 
 [data_fields]
 tvm = "threat"
+dom = "objective"
 cdm = "detection"
 mdr = "rule"
 bdr = "request"
 
 [templates]
 tvm = "TVM TEMPLATE.yaml"
+dom = "Detection Objective.template.yaml"
 cdm = "CDM TEMPLATE.yaml"
 mdr = "MDR TEMPLATE.yaml"
 bdr = "BDR TEMPLATE.yaml"

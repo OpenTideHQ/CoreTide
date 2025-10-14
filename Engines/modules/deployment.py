@@ -33,7 +33,6 @@ SYSTEMS_CONFIGS_INDEX = DataTide.Configurations.Systems.Index
 DEPRECATED_STATUSES = (StatusStrategy.DELETION,
                         StatusStrategy.DISABLEMENT)
 
-
 class TideRepo:
 
     def __init__(self):
@@ -123,8 +122,8 @@ class CIEnvironment:
 
 
 def check_status(status_name:str)->StatusStrategy:
-    statuses = DataTide.Configurations.Deployment.statuses
-    for status in statuses:
+    statuses_definitions = DataTide.Configurations.Deployment.statuses
+    for status in statuses_definitions:
         if status.name == status_name:
             if type(status.strategy) is str:
                 return StatusStrategy[status.name]
@@ -140,7 +139,7 @@ def check_status(status_name:str)->StatusStrategy:
     log("FATAL",
         "Could not look up requested status in existing statuses",
         f"Requested status : {status_name}",
-        f"Available statuses in deployment.toml : {statuses}")
+        f"Available statuses in deployment.toml : {statuses_definitions}")
     raise Exception
 
 def make_deploy_plan(
@@ -205,7 +204,12 @@ def make_deploy_plan(
                     deploy_mdr.setdefault(system, []).append(mdr_uuid)
                 else:
                     if plan is DeploymentStrategy.PRODUCTION:
-                        if check_status(platform_status) is StatusStrategy.RELEASE:
+                        if (
+                            (check_status(platform_status) is StatusStrategy.RELEASE) or 
+                            (check_status(platform_status) is StatusStrategy.UNIVERSAL) or
+                            (check_status(platform_status) is StatusStrategy.DISABLEMENT) or  
+                            (check_status(platform_status) is StatusStrategy.DELETION)  
+                        ):
                             deploy_mdr.setdefault(system, []).append(mdr_uuid)
                             log(
                                 "SUCCESS",
@@ -225,7 +229,8 @@ def make_deploy_plan(
 
                     elif plan is DeploymentStrategy.STAGING:
                         if (
-                            check_status(platform_status) is StatusStrategy.PREVIEW 
+                            (check_status(platform_status) is StatusStrategy.PREVIEW) or 
+                            (check_status(platform_status) is StatusStrategy.UNIVERSAL)
                         ):
                             deploy_mdr.setdefault(system, []).append(mdr_uuid)
                             log(

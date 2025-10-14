@@ -1,5 +1,5 @@
 name: Detection Composition Strategy
-field: detection.composition.strategy
+field: detection.composition
 description: Describes how signals should be used in conjuntion, or separated 
 keys:
   - id: 9fd1e42c-ff0d-468c-988c-8f0571d8f0f9

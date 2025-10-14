@@ -254,6 +254,7 @@ def gen_template(metaschema, required):
                     local_required = False
                     if key in required:
                         local_required = True
+
                     if config:=metaschema[key].get("tide.template.config.required"):
                         enabled = fetch_config_template(config)
                         if enabled == "True":
@@ -276,6 +277,12 @@ def gen_template(metaschema, required):
                                         content = "\n".join(["#" + line for line in content.split("\n")])
 
                                     content = "|\n'" + content
+
+                    if metaschema[key].get("tide.template.required") is True:
+                        local_required = True
+
+                    if metaschema[key].get("tide.template.required") is False:
+                        local_required = False
 
                     elif metaschema[key].get("format") == "date":
                         content = "YYYY-MM-DD"

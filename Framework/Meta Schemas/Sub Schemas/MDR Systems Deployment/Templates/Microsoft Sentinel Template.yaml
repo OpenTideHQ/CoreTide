@@ -1,5 +1,5 @@
-  schema: sentinel::2.2
-  status: DEVELOPMENT
+  schema: sentinel::2.3
+  status: 
   #contributors:
     #-
   #tenants:
@@ -45,11 +45,11 @@
       #grouping_lookback: 
       #matching: AllEntities
   
-  #entities:
-    #- entity: 
-      #mappings:
-        #- identifier: 
-          #column: 
+  entities:
+    - entity: 
+      mappings:
+        - identifier: 
+          column: 
   
   query: |
     ...

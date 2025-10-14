@@ -1,5 +1,5 @@
   schema: splunk::2.1
-  status: DEVELOPMENT
+  status: 
   #contributors:
     #-
   #threshold: 0

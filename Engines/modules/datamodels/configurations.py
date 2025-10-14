@@ -49,7 +49,7 @@ class Configurations:
             system: str
             """The system or platform that generates/collects these logs"""
 
-            assets: Optional[Sequence[str]]
+            assets: Optional[Sequence[str]] = None
             """List of asset names (references) that this log source monitors"""
 
             tenants: Optional[Sequence[str]] = None
@@ -57,9 +57,9 @@ class Configurations:
 
             references: Optional[Sequence[str]] = None
             """Optional external references or documentation"""
-
-        assets: Optional[Sequence[Asset]]
-        """List of assets that generate logs in the environment"""
         
         logsources: Sequence[LogSource]
         """Log sources that collect and provide log data"""
+
+        assets: Optional[Sequence[Asset]] = None
+        """List of assets that generate logs in the environment"""

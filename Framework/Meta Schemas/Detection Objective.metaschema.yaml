@@ -221,7 +221,6 @@ properties:
                 Modelling of the required data to implement the signal 
               type: object
               tide.template.spacer: False
-
               required:
                 - availability
                 - requirements

@@ -698,12 +698,14 @@ class ConfigurationsLoader:
             
         try:
             # Process assets section first to build reference set
-            assets = []
+            assets = None
             asset_names = set()
-            for asset_config in config.get("assets", []):
-                asset = Configurations.LogSources.Asset(**asset_config)
-                assets.append(asset)
-                asset_names.add(asset.name)
+            if asset_configuration:=config.get("assets"):
+                assets = []
+                for asset_config in asset_configuration:
+                    asset = Configurations.LogSources.Asset(**asset_config)
+                    assets.append(asset)
+                    asset_names.add(asset.name)
                 
             # Process log sources section and validate asset references
             logsources = []
@@ -722,8 +724,8 @@ class ConfigurationsLoader:
                 
             # Create and return the complete configuration
             return Configurations.LogSources(
-                assets=assets,
-                logsources=logsources
+                logsources=logsources,
+                assets=assets
             )
             
         except (KeyError, TypeError) as e:

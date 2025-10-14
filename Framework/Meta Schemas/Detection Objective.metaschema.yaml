@@ -13,7 +13,6 @@ required:
   - name
   - metadata
   - objective
-  - composition
 
 properties:
 

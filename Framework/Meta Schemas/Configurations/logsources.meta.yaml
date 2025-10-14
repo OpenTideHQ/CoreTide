@@ -1,0 +1,194 @@
+title: OpenTide Log Sources Configuration
+description: Configuration specification for log sources and assets in the TIDE framework
+
+$schema: http://json-schema.org/draft-07/schema#
+additionalProperties: false
+
+required:
+  - assets
+  - logsources
+
+properties:
+  assets:
+    type: array
+    title: Assets
+    description: List of assets that generate logs in the environment
+    items:
+      type: object
+      title: Asset
+      description: Defines a business or technical asset that generates logs
+      required:
+        - name
+        - description
+        - criticality
+      properties:
+        name:
+          title: Asset Name
+          type: string
+          description: Unique identifier for the asset, typically in format 'Organization::AssetName'
+        description:
+          title: Asset Description
+          type: string
+          description: Detailed description of what the asset does or represents
+        criticality:
+          title: Asset Criticality
+          type: string
+          description: Business criticality level indicating the asset's importance and potential impact
+          oneOf:
+            - const: Crown Jewel
+              title: Crown Jewel
+              description: |
+                ### Crown Jewel
+                Systems or assets that are critical to both business operations and security posture.
+
+                **Business Impact:**
+                - Immediate and severe impact on core operations
+                - No acceptable downtime
+                - Direct financial/reputational damage
+
+                **Security Impact:**
+                - Breach could lead to organization-wide compromise
+                - High-value target for advanced threats
+                - Subject to regulatory/compliance requirements
+                - Could impact multiple downstream systems
+
+                *Examples:* Active Directory infrastructure, primary authentication systems, key management systems, security orchestration platforms
+
+            - const: High Value
+              title: High Value
+              description: |
+                ### High Value
+                Systems or assets with significant business value and security implications.
+
+                **Business Impact:**
+                - Major disruption to business functions
+                - Limited downtime tolerance (hours)
+                - Significant operational impact
+
+                **Security Impact:**
+                - Potential for lateral movement
+                - Contains sensitive data/credentials
+                - Security control dependencies
+                - Incident response capabilities affected
+
+                *Examples:* SIEM systems, EDR infrastructure, privileged access management systems, critical data stores
+
+            - const: Operational
+              title: Operational
+              description: |
+                ### Operational
+                Systems or assets essential for day-to-day security operations.
+
+                **Business Impact:**
+                - Moderate business disruption
+                - Defined recovery time objectives
+                - Limited scope of impact
+
+                **Security Impact:**
+                - Security monitoring degradation
+                - Detection capability reduction
+                - Potential visibility gaps
+                - Limited exposure of sensitive data
+
+                *Examples:* Log collection systems, network monitoring tools, vulnerability scanners
+
+            - const: Supporting
+              title: Supporting
+              description: |
+                ### Supporting
+                Systems or assets that enhance security posture but aren't primary controls.
+
+                **Business Impact:**
+                - Minor business disruption
+                - Extended recovery time acceptable
+                - Isolated impact
+
+                **Security Impact:**
+                - Redundant security controls
+                - Non-critical security data
+                - Limited attack surface
+                - Supplementary monitoring
+
+                *Examples:* Secondary log sources, backup monitoring systems, test security tools
+
+            - const: Non Essential
+              title: Non Essential
+              description: |
+                ### Non-Essential
+                Systems or assets with minimal security significance.
+
+                **Business Impact:**
+                - Minimal operational impact
+                - No direct business disruption
+                - Fully redundant systems
+
+                **Security Impact:**
+                - No sensitive data exposure
+                - Isolated from critical systems
+                - No direct security control function
+                - Low risk if compromised
+
+                *Examples:* Development test systems, isolated lab environments, non-production monitoring tools
+
+        custom_details:
+          title: Custom Details
+          type: array
+          description: Optional array of custom key-value pairs for asset-specific metadata
+          items:
+            title: Custom Detail
+            type: object
+            additionalProperties: true
+  
+  logsources:
+    type: array
+    title: Log Sources
+    description: List of available log sources across all detection systems
+    items:
+      type: object
+      title: Log Source
+      description: Defines a specific log source that can be queried for detection purposes
+      required:
+        - name
+        - description
+        - system
+      properties:
+        name:
+          title: Log Source Name
+          type: string
+          description: Human-readable name of the log source
+        description:
+          title: Log Source Description
+          type: string
+          description: Detailed description of what kind of data this log source provides
+        system:
+          title: Detection System
+          type: string
+          description: The system where this log source can be queried
+          enum:
+            - splunk
+            - defender_for_endpoint
+            - sentinel
+            - sentinel_one
+            - crowdstrike
+            - carbon_black_cloud
+        tenants:
+          title: Tenants
+          type: array
+          description: List of environments/tenants where this log source is available
+          items:
+            title: Tenant
+            type: string
+        references:
+          title: References
+          type: array
+          description: List of URLs to documentation or relevant resources about this log source
+          items:
+            title: Reference URL
+            type: string
+        assets:
+          title: Associated Assets
+          type: array
+          description: References to asset names that generate these logs, MUST correspond to assets entered under the [[assets]] section
+          items:
+            title: Asset Reference
+            type: string

@@ -35,22 +35,13 @@ RECOMPOSITION = GLOBAL_CONFIG.recomposition
 
 STAGE_DESCRIPTION_LIMIT = 300
 
-# Mitigation for broken anyOf subschema validation in array values
-# from vscode-yaml extension from 1.10. Also fixes a glitch where
-# the first const would be displayed as if assigned instead of key description
-#
-# When set to True, it uses undocumented internal VSCode json extensions
-# to add Enum descriptions, which is not possible with vanilla json schema
-# Set to False if using another IDE, as it may lead to unpredicatable results,
-# and the validation there may not suffer from the same defect.
-VOCAB_GENERATION_ENUM = True
-
-
 
 DROPDOWN_TEMPLATE = """
 ### {icon} {name}
 
 {id_icon} **Identifier** : `{identifier}`
+
+_Vocabulary_ : `{source_vocab}`
 
 {criticality} {tlp}
 
@@ -71,86 +62,163 @@ FOLDABLE = """
 </details>
 """.strip()
     
+class FetchEnums:
+    """Utility class for fetching configuration data and formatting it for JSON schemas.
+    
+    Provides static methods to retrieve log sources and statuses from TIDE configuration,
+    returning them as tuples of (enum_values, markdown_descriptions).
+    """
 
-def fetch_statuses()->Tuple[list[str], list[str]]:
-    status_config = DataTide.Configurations.Deployment.statuses
-    statuses = list()
-    statuses_descriptions = list()
-
-    for status in status_config:
-        statuses.append(status.name)
-        strategy = status.strategy.name #type: ignore
-        description = f"**Strategy** : `{strategy}` - _{StatusStrategy[strategy].value}_"
-        description += f"\n\n{status.description}"
-        statuses_descriptions.append(description)
-
-    return statuses, statuses_descriptions
-
-
-def fetch_config_parameter_list(dot_path:str)->list:
-    config_index = DataTide.Configurations.Index
-    config_path = dot_path.split(".")
-    key = config_path[0]
-    while key != config_path[-1]:
+    @staticmethod
+    def logsources() -> None | tuple[list[str], list[str]]:
+        """Retrieve log source entries with formatted descriptions.
         
-        if key == "tenants":
-            print(config_index)
-            parameter_list = []
-            parameter_key = config_path[config_path.index(key) + 1] 
-            for tenant in config_index["tenants"]:
-                tenant_name = tenant.get("name").strip()                
-                if parameter_key in tenant.get("parameters"):
-                    parameter_list.extend([tenant_name + "::" + item.strip() for item in tenant["parameters"][parameter_key]])
-            return parameter_list
+        Returns:
+            tuple[list[str], list[str]]: (identifiers, markdown_descriptions)
+            None: If no log sources are configured.
+            
+        Example:
+            >>> fetch_logsources()
+            (
+                ['splunk::tenant1::windows_logs', 'splunk::tenant2::windows_logs'],
+                ['### Windows Event Logs\n**System**: Splunk\n**Tenant**: tenant1\n...']
+            )
+        """
+        # Early return if no configuration exists
+        logsources = DataTide.Configurations.Logsources.logsources
+        if not logsources:
+            return None 
         
-        if key in config_index:
-            config_index = config_index[key]
-            key = config_path[config_path.index(key) + 1]
-        else:
-            raise ValueError(f"Key : {key} could not be found in path {dot_path}")
-    
-    if type(config_index[key]) is list:
-        return config_index[key]
-    else:
-        raise ValueError(f"Config path {dot_path} must be a valid path to a list parameter")
+        # Initialize our return lists
+        enums = []
+        descriptions = []
+        
+        # Build a mapping of asset names to their details for quick lookup
+        asset_map = {asset.name: asset for asset in logsources.assets}
+        
+        for logsource in logsources.logsources:
+            # Format base markdown template for this log source
+            base_description = f"""### {logsource.name}
+**System**: {logsource.system}
+**Description**: {logsource.description}
 
-def fetch_config_system_tenants_list(system:str)->Tuple[list[str], list[str]]:
-    system_config_index = DataTide.Configurations.Index
-    system_config = system_config_index.get("systems", {}).get(system)
-    
-    if not system_config:
-        log("FATAL",
-            f"Could not retrieve an available configuration for system {system}",
-            f"Indexed Configurations : {str(system_config_index.keys())}")
-        raise ValueError(f"Missing configuration for system {system}")
-    
-    tenants:list[dict] = system_config.get("tenants")
-    
-    if not tenants:
-        log("FATAL",
-            "Cannot retrieve a tenants section within the system configuration",
-            str(system_config))
-        raise ValueError(f"System Configuration for {system} does not contain a tenants section")
-    
-    tenants_list = list()
-    tenants_descriptions = list()
-    
-    for tenant_config in tenants:
-        tenant_name = tenant_config.get("name")
-        tenant_description = tenant_config.get("description", "No Description")
-        if tenant_name:
-            log("INFO",
-                f"Discovered tenant definition {tenant_name}",
-                tenant_config.get("description", ""))
-            tenants_descriptions.append(tenant_description)
-            tenants_list.append(tenant_name)            
+"""
+            # Add asset information if available
+            if logsource.assets:
+                base_description += "### Associated Assets:\n"
+                for asset_name in logsource.assets:
+                    if asset := asset_map.get(asset_name):
+                        base_description += f"""
+- **{asset.name}**
+- _Criticality_: {asset.criticality}
+- _Description_: {asset.description}"""
+                        
+                        if asset.custom_details:
+                            base_description += "\n  - _Custom Details_:"
+                            for key, value in asset.custom_details.items():
+                                base_description += f"\n    - {key}: {value}"
+                        base_description += "\n"
+                    else:
+                        base_description += f"""
+- ⚠️ **{asset_name}**
+- _Warning_: Asset not found in configuration
+- _Action Required_: Define this asset in the assets section"""
+            
+            # Generate entries for each tenant if specified, otherwise just one entry
+            if tenants := logsource.tenants:
+                for tenant in tenants:
+                    enum = f"{logsource.system}::{tenant}::{logsource.name}"
+                    description = base_description.replace("**System**:", f"**System**: {logsource.system}\n**Tenant**: {tenant}")
+                    enums.append(enum)
+                    descriptions.append(description)
+            else:
+                enum = f"{logsource.system}{logsource.name}"
+                enums.append(enum)
+                descriptions.append(base_description)
+        
+        return enums, descriptions
+
+    @staticmethod
+    def statuses()->Tuple[list[str], list[str]]:
+        status_config = DataTide.Configurations.Deployment.statuses
+        statuses = list()
+        statuses_descriptions = list()
+
+        for status in status_config:
+            statuses.append(status.name)
+            strategy = status.strategy.name #type: ignore
+            description = f"**Strategy** : `{strategy}` - _{StatusStrategy[strategy].value}_"
+            description += f"\n\n{status.description}"
+            statuses_descriptions.append(description)
+
+        return statuses, statuses_descriptions
+
+    @staticmethod
+    def config_parameter_list(dot_path:str)->list:
+        config_index = DataTide.Configurations.Index
+        config_path = dot_path.split(".")
+        key = config_path[0]
+        while key != config_path[-1]:
+            
+            if key == "tenants":
+                print(config_index)
+                parameter_list = []
+                parameter_key = config_path[config_path.index(key) + 1] 
+                for tenant in config_index["tenants"]:
+                    tenant_name = tenant.get("name").strip()                
+                    if parameter_key in tenant.get("parameters"):
+                        parameter_list.extend([tenant_name + "::" + item.strip() for item in tenant["parameters"][parameter_key]])
+                return parameter_list
+            
+            if key in config_index:
+                config_index = config_index[key]
+                key = config_path[config_path.index(key) + 1]
+            else:
+                raise ValueError(f"Key : {key} could not be found in path {dot_path}")
+        
+        if type(config_index[key]) is list:
+            return config_index[key]
         else:
+            raise ValueError(f"Config path {dot_path} must be a valid path to a list parameter")
+
+    @staticmethod
+    def config_system_tenants_list(system:str)->Tuple[list[str], list[str]]:
+        system_config_index = DataTide.Configurations.Index
+        system_config = system_config_index.get("systems", {}).get(system)
+        
+        if not system_config:
             log("FATAL",
-            "Cannot retrieve a tenant name in tenant definition",
-            str(tenant_config))
-            raise ValueError(f"Missing name field in tenant definition")
+                f"Could not retrieve an available configuration for system {system}",
+                f"Indexed Configurations : {str(system_config_index.keys())}")
+            raise ValueError(f"Missing configuration for system {system}")
+        
+        tenants:list[dict] = system_config.get("tenants")
+        
+        if not tenants:
+            log("FATAL",
+                "Cannot retrieve a tenants section within the system configuration",
+                str(system_config))
+            raise ValueError(f"System Configuration for {system} does not contain a tenants section")
+        
+        tenants_list = list()
+        tenants_descriptions = list()
+        
+        for tenant_config in tenants:
+            tenant_name = tenant_config.get("name")
+            tenant_description = tenant_config.get("description", "No Description")
+            if tenant_name:
+                log("INFO",
+                    f"Discovered tenant definition {tenant_name}",
+                    tenant_config.get("description", ""))
+                tenants_descriptions.append(tenant_description)
+                tenants_list.append(tenant_name)            
+            else:
+                log("FATAL",
+                "Cannot retrieve a tenant name in tenant definition",
+                str(tenant_config))
+                raise ValueError(f"Missing name field in tenant definition")
 
-    return tenants_list, tenants_descriptions
+        return tenants_list, tenants_descriptions
 
 def stage_documentation(field: str, stages: str | list) -> str:
 
@@ -201,6 +269,7 @@ def make_markdown_dropdown(name, key, field=""):
         or ""
     )
 
+    source_vocab = VOCAB_INDEX.get(field, {}).get("metadata", {}).get("name")
     link = key.get("link") or ""
 
     stage = key.get("tide.vocab.stages") or ""
@@ -231,14 +300,24 @@ def make_markdown_dropdown(name, key, field=""):
                 stage = ", ".join(stage)
             stage = "`{}`".format(stage)
 
-    dropdown = DROPDOWN_TEMPLATE.format(**locals())
+    dropdown = DROPDOWN_TEMPLATE.format(
+        icon=icon,
+        name=name,
+        id_icon=id_icon,
+        identifier=identifier,
+        source_vocab=source_vocab,
+        criticality=criticality,
+        tlp=tlp,
+        stage=stage,
+        link=link,
+        description=description
+    )
 
     return dropdown
 
 
 def gen_lib_schema(
     vocab: str,
-    mode: Literal["anyOf", "enum", "const"] = "anyOf",
     stages: str | list | None = None,
     no_wrap: bool = False,
     scoped: bool = False,
@@ -284,10 +363,8 @@ def gen_lib_schema(
                 buffer["const"] = value
 
                 dropdown = make_markdown_dropdown(key, key_data, field=vocab)
-                if mode != "const":
-                    buffer["description"] = key_data.get("description") or ""
-                    # buffer["type"] = "string"
-                    buffer["markdownDescription"] = dropdown
+                buffer["description"] = key_data.get("description") or ""
+                buffer["markdownDescription"] = dropdown
 
                 # Handle if scoped
                 if scoped:
@@ -360,9 +437,8 @@ def gen_lib_schema(
 
                     dropdown = make_markdown_dropdown(key, key_data, field=vocab)
 
-                    if mode != "const":
-                        buffer["description"] = key_data.get("description") or ""
-                        buffer["markdownDescription"] = dropdown
+                    buffer["description"] = key_data.get("description") or ""
+                    buffer["markdownDescription"] = dropdown
 
                     copied = buffer.copy()
                     array.append(copied)
@@ -410,19 +486,14 @@ def gen_lib_schema(
                                 value,
                             )
 
-    if mode in ["anyOf", "const"]:
-        return array
+    if not enum:
+        enum = [""]
+    if enum_helper and search_hints:
+        enum.extend(enum_helper)
+        enum_description.extend(enum_description)
 
-    elif mode == "enum":
-        if not enum:
-            enum = [""]
-        if enum_helper and search_hints:
-            enum.extend(enum_helper)
-            enum_description.extend(enum_description)
+    return enum, enum_description
 
-        return enum, enum_description
-    else:
-        return array
 
 
 def remove_tide_keywords(dictionary:dict)->dict:
@@ -545,10 +616,20 @@ def gen_json_schema(dictionary):
                     temp = recomposition_handler(dict_foo[field]["recomposition"])
                     dictionary[field]["properties"] = temp
 
+                # Handles retrieval of logsources
+                if dict_foo[field].get("tide.config.logsources"):
+                    logsources_result = FetchEnums.logsources()
+                    if logsources_result:
+                        enums, descriptions = logsources_result
+                        dictionary[field]["items"] = {}
+                        dictionary[field]["items"]["enum"] = enums
+                        dictionary[field]["items"]["markdownEnumDescriptions"] = descriptions
+                        dictionary[field]["items"]["uniqueItems"] = True
+
                 # Handles the case when a list of values has to be fetched from
                 # the configuration files.
                 if config_fetch:=dict_foo[field].get("tide.config.parameter-list"):
-                    values_list = fetch_config_parameter_list(config_fetch)
+                    values_list = FetchEnums.config_parameter_list(config_fetch)
                     if dict_foo[field].get("type") == "string":
                         dictionary[field]["enum"] = values_list
                     elif dict_foo[field].get("type") == "array":
@@ -569,7 +650,7 @@ def gen_json_schema(dictionary):
 
                 # Special handling to specifically get the available tenants
                 if system:=dict_foo[field].get("tide.config.system.tenants"):
-                    values_list, descriptions_list = fetch_config_system_tenants_list(system)
+                    values_list, descriptions_list = FetchEnums.config_system_tenants_list(system)
                     if dict_foo[field].get("type") == "string":
                         dictionary[field]["enum"] = values_list
                         dictionary[field]["markdownEnumDescriptions"] = descriptions_list
@@ -581,7 +662,7 @@ def gen_json_schema(dictionary):
 
                 # Special handling to specifically get the available statuses
                 if system:=dict_foo[field].get("tide.config.statuses"):
-                    values_list, descriptions_list = fetch_statuses()
+                    values_list, descriptions_list = FetchEnums.statuses()
                     if dict_foo[field].get("type") == "string":
                         dictionary[field]["enum"] = values_list
                         dictionary[field]["markdownEnumDescriptions"] = descriptions_list
@@ -591,54 +672,45 @@ def gen_json_schema(dictionary):
                         dictionary[field]["items"]["uniqueItems"] = True
                         dictionary[field]["markdownEnumDescriptions"] = descriptions_list
 
-                if dict_foo[field].get("tide.vocab"):
-                    if type(dict_foo[field]["tide.vocab"]) is str:
-                        query = dict_foo[field]["tide.vocab"]
-                    elif type(dict_foo[field]["tide.vocab"]) is bool:
-                        query = field
-
-                    title = VOCAB_INDEX[query]["metadata"]["name"]
-                    dictionary[field]["description"] = VOCAB_INDEX[query]["metadata"][
-                        "description"
-                    ]
-
-                    icon = get_icon(field)
+                # Handles vocabularies
+                if vocab:=dict_foo[field].get("tide.vocab"):
+                    if type(vocab) is str:
+                        # Add icon if available to title
+                        icon = get_icon(query)
+                        if icon:
+                            dictionary[field]["title"] = icon + " " + dictionary[field]["title"]
+                    if type(vocab) is bool:
+                        vocab = field
                     scoped = dict_foo[field].get("tide.vocab.scoped")
                     hint_no_wrap = dict_foo[field].get("tide.vocab.hints.no-wrap")
                     stages = dict_foo[field].get("tide.vocab.stages")
+        
+                    # Normalize vocabs to list to support all variants
+                    vocabs = [vocab] if type(vocab) is not list else vocab
+                    
+                    temp = {}
+                    enum = []
+                    markdown_enum = []
+                    for vocab in vocabs:
+                        new_enum, new_markdown_enum = gen_lib_schema(
+                            vocab=vocab,
+                            no_wrap=hint_no_wrap,
+                            stages=stages,
+                            scoped=scoped,
+                        )
+                        enum.extend(new_enum)
+                        markdown_enum.extend(new_markdown_enum)
+                    temp["enum"] = enum
+                    temp["markdownEnumDescriptions"] = markdown_enum
 
+                    # When no field type is present, assume it's a direct string
                     # When the type is set to string, oneOf allows only one value
                     # to be selected
-                    if "type" in dict_foo[field]:
-                        field_types = dict_foo[field]["type"]
+                    field_types =dict_foo[field].get("type")
+                    if field_types:
                         field_types = (
                             [field_types] if type(field_types) is str() else field_types
                         )
-                    else:
-                        field_types = None
-
-                    temp = {}
-                    if VOCAB_GENERATION_ENUM:
-                        enum, markdown_enum = gen_lib_schema(
-                            vocab=query,
-                            mode="enum",
-                            no_wrap=hint_no_wrap,
-                            stages=stages,
-                            scoped=scoped,
-                        )
-                        temp["enum"] = enum
-                        temp["markdownEnumDescriptions"] = markdown_enum
-
-                    else:
-                        temp["anyOf"] = gen_lib_schema(
-                            vocab=query,
-                            mode="anyOf",
-                            no_wrap=hint_no_wrap,
-                            stages=stages,
-                            scoped=scoped,
-                        )
-
-                    # When no field type is present, assume it's a direct string
                     if field_types is None:
                         dictionary[field].update(temp)
                     elif "string" in field_types:
@@ -646,12 +718,6 @@ def gen_json_schema(dictionary):
                     elif "array" in field_types:
                         dictionary[field]["items"] = temp
                         dictionary[field]["uniqueItems"] = True
-
-                    if title:
-                        if icon:
-                            dictionary[field]["title"] = f"{icon} {title}"
-                        else:
-                            dictionary[field]["title"] = title
 
                 else:
                     gen_json_schema(dictionary[field])
@@ -682,14 +748,14 @@ def run():
             placeholders = parsing.get("tide.placeholders") or {}
 
             log("ONGOING", "Generating json schema for : " + str(yaml_input))
-            # Generate coretide fields
+            
+            # Generate Schema
             generated = gen_json_schema(parsing)
 
-            # Removes the extra keys represented in the metaschema
+            # Removes the OpenTide reserved schema keys
             cleaned = remove_tide_keywords(generated)
 
-            # Export to json and pretty-print to file
-
+            # Export JSON Schemas
             log("ONGOING", "Exporting generated schema to : " + str(json_output))
             output = json.dumps(cleaned, indent=4, sort_keys=False, default=str)
             for placeholder in placeholders:

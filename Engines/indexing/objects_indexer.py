@@ -38,9 +38,9 @@ def run():
         entries = {}
         registry = DataTide.Models.Index[object_type]
 
-        for model in registry:
+        for object in registry:
 
-            object_data = registry[model]
+            object_data = registry[object]
 
             entry = {}
             entry["name"] = object_data["name"]
@@ -54,6 +54,9 @@ def run():
             match object_type:
                 case "tvm":
                     description = object_data.get("threat", {}).get("description")
+                case "dom":
+                    description = object_data.get("objective", {}).get("description")
+                    entry["criticality"] = object_data.get("objective", {}).get("priority")
                 case "cdm":
                     description = object_data.get("detection", {}).get("guidelines")
                 case "bdr":
@@ -71,7 +74,28 @@ def run():
                 for k, v in entry.items()
             }
 
-            entries[model] = entry
+            entries[object] = entry
+
+        #Handles inserting signals as part of the object index under the same object type
+        if object_type == "dom":
+            for signal in object_data["objective"]["signals"]:
+                entry = {}
+                signal_uuid = signal["uuid"]
+                entry["name"] = object_data["name"] + "::" + signal["name"]
+                entry["object"] = True  # Allows certain switches when generating json schema
+                entry["tide.object.parent"] = object
+                entry["tlp"] = object_data["metadata"]["tlp"]
+                entry["criticality"] = signal["severity"]
+                entry["description"] = signal["description"]
+                # Filter out None values
+                entry = {k: v for k, v in entry.items() if v is not None}
+                # Replace newlines to improve display
+                entry = {
+                    k: v.replace("\n ", " ") if type(v) is str else v
+                    for k, v in entry.items()
+                }
+
+                entries[signal_uuid] = entry
 
         object_index[object_type] = {}
         object_index[object_type]["metadata"] = metadata

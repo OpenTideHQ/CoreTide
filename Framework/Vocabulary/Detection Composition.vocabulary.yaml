@@ -1,0 +1,41 @@
+name: Detection Composition Strategy
+field: detection.composition.strategy
+description: Describes how signals should be used in conjuntion, or separated 
+keys:
+  - id: 9fd1e42c-ff0d-468c-988c-8f0571d8f0f9
+    name: Independent
+    description: |
+      No composition performed, each signal can be treated as
+      independent, unrelated alerts. 
+  - id: 975b9fb7-b08e-40c2-b637-d099535c4029
+    name: Combined
+    description: |
+      All signals triggered for any entity can be grouped in a single signal.
+      This may be extremely useful to identify pan-environment compromises.
+  - id: 9fd1e42c-ff0d-468c-988c-8f0571d8f0f9
+    name: Threshold
+    description: |
+      Each signal must be considered separately - but only when a certain amount
+      of repeated alerts triggers within a span on time.
+  - id: e9e5a900-8f5a-4c60-9986-055886d22738
+    name: Entity
+    description: |
+      When the same entity is appearing across alerts raised by signals, 
+      they should be grouped around the entity into a single incident, case,
+      or higher-order alert (alert of alert)
+  - id: 0812b927-9eee-439f-879c-b7cdc6c1bfc5
+    name: Sequence
+    description: |
+      Signals must be tracked across time, and correlated based on a succession of events.
+      Particularly useful for weak signals, but which assembled over time with reinforcing
+      signal provide a high fidelity detection - for example, anomalous logons.
+  - id: c5a6f86a-410e-4f98-91b3-ef366101ff7e
+    name: Risk
+    description: |
+      Advanced strategy where signals contribute a risk score over time to entities
+      in a permanent risk store. This allows weak and strong signals to coexist, while
+      response switches from processing alerts to process a bundle of contributing signals
+      around a high risk entity. This is essentially an evolution of the `Entity` and
+      `Threshold` strategy, and adds a layer of risk calculation around entities using 
+      repeated signals as risk contributors. Different signals may contribute differentially,
+      and also include decaying factors.

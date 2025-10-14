@@ -494,6 +494,17 @@ def techniques_resolver(model_id: str, recursive=True) -> list:
             else:
                 return techniques
 
+    if model_type == "dom":
+        if "att&ck" in model_body["objective"]:
+            techniques = [model_body["objective"]["att&ck"]]
+        else:
+            parent_ids = model_body["objective"]["threats"]
+            if recursive:
+                for parent_id in parent_ids:
+                    techniques.extend(techniques_resolver(parent_id))
+            else:
+                return techniques
+
     if model_type == "cdm":
         if "att&ck" in model_body["detection"]:
             techniques = [model_body["detection"]["att&ck"]]

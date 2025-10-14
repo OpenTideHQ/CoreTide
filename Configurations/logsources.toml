@@ -1,0 +1,4 @@
+[[logsources]]
+name = "Placeholder Logsource"
+description = "Customize this field by adding logsources and assets entries under logsources.toml"
+system = "splunk"

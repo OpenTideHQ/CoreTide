@@ -228,6 +228,15 @@ def indexer(write_index=False) -> dict:
     for meta_name in METASCHEMAS:
         if meta_name not in SKIPS:
             model_cat_index = dict()
+            
+            if not os.path.exists(PATHS[meta_name]):
+                log("FAILURE",
+                    "Could not find the folder at the expected location",
+                    str(PATHS[meta_name]),
+                    "Ensure that your repository and configuration files are aligned")
+                objects_index[meta_name] = {}
+                continue
+
             for model in os.listdir(PATHS[meta_name]):
                 
                 #Skips for empty InitTide repositories

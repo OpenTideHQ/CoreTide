@@ -73,7 +73,7 @@ def run():
         if model in (t := DataTide.Configurations.Global.templates):
             # Extracts parameters from dictionaries, that will be represented in snippet
             # description = CONFIG["artifacts"]["snippets"]["models"][model]["description"]
-            model_icon = ICONS[model]
+            model_icon = ICONS.get(model, "")
 
             full_name = DataTide.Configurations.Documentation.object_names[model]
             keyword = f"{model_icon} {full_name} Template"

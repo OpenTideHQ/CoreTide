@@ -36,7 +36,12 @@ def run():
             "model": True,
         }
         entries = {}
-        registry = DataTide.Models.Index[object_type]
+        registry = DataTide.Models.Index.get(object_type)
+        if not registry:
+            log("FAILURE",
+                "Could not find a current indexable set of OpenTide object for the type",
+                object_type)
+            continue
 
         for object in registry:
 

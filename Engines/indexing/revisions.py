@@ -112,7 +112,14 @@ class RevisionIndexer:
         
         updated_index = dict()
         for object_type in self.OBJECT_SCOPE:
-            for object in DataTide.Models.Index[object_type]:
+            object_index = DataTide.Models.Index.get(object_type)
+            if not object_index:
+                log("FAILURE",
+                    "Could not find a current indexable set of OpenTide object for the type",
+                    object_type)
+                continue
+
+            for object in object_index:
                 updated_index[object] = self._create_entry(object, object_type)
 
         return updated_index

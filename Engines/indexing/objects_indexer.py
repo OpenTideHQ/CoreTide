@@ -30,7 +30,7 @@ def run():
         index_name = DataTide.Configurations.Documentation.object_names[object_type]
         metadata = {
             "field": object_type,
-            "icon": ICONS[object_type],
+            "icon": ICONS.get(object_type, ""),
             "name": index_name,
             "description": index_name,
             "model": True,

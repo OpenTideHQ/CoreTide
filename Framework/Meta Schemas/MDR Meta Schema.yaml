@@ -52,7 +52,7 @@ properties:
 
   detection_model: 
     title: CoreTIDE Cyber Detection Model
-    tide.vocab: cdm
+    tide.vocab: dom
     description: CDM that this detection rule is implementing.
     example: "0486fc80-bf0f-4bef-a3b2-471e2ce58b03 # Detect Execution of XYZ"
 

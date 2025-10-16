@@ -367,6 +367,7 @@ def childs(model_id: str) -> list:
 
     mappings = {
         "tvm": {"child_type": "cdm", "data": "detection", "reference": "vectors"},
+        "dom": {"child_type": "mdr", "reference": "detection_model"},
         "cdm": {"child_type": "mdr", "reference": "detection_model"},
         "bdr": {"child_type": "mdr", "reference": "detection_model"},
     }
@@ -394,6 +395,7 @@ def childs(model_id: str) -> list:
 
 
     return implementations
+
 @overload
 def get_type(model_uuid:str)->str:
     ...
@@ -496,7 +498,7 @@ def techniques_resolver(model_id: str, recursive=True) -> list:
 
     if model_type == "dom":
         if "att&ck" in model_body["objective"]:
-            techniques = [model_body["objective"]["att&ck"]]
+            techniques = model_body["objective"]["att&ck"]
         else:
             parent_ids = model_body["objective"]["threats"]
             if recursive:

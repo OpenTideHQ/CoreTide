@@ -114,8 +114,8 @@ def run():
 
     # This allows us to merge existing CDM and BDR indexes with the new DOM to allow
     # MDRs to refer to both during the transitional period
-    object_index["dom"]["entries"].update(object_index.get("cdm", {}).get("entries"))
-    object_index["dom"]["entries"].update(object_index.get("bdr", {}).get("entries"))
+    object_index["dom"]["entries"].update(object_index.get("cdm", {}).get("entries", {}))
+    object_index["dom"]["entries"].update(object_index.get("bdr", {}).get("entries", {}))
 
     with open(TIDE_INDEXES_PATH / INDEX_NAME, "w+", encoding="utf-8") as export:
         export.write("")

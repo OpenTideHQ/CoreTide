@@ -41,7 +41,7 @@ ROOT = Path(str(git.Repo(".", search_parent_directories=True).working_dir))
 # Configuration Models. Used to facilitate type hinting
 class HelperTide:
     @staticmethod
-    def is_debug()->bool:
+    def is_debug() -> bool:
         """
         Provides an interface to discover whether the current execution
         context is considered to be in a debugging scenario.
@@ -781,13 +781,15 @@ class TideLoader:
                 log("FATAL", "Empty objective section")
                 raise ValueError("Objective section cannot be empty")
             
+            attack = objective_data.pop("att&ck", None)
+
             # Process signals with error handling
             if "signals" not in objective_data:
                 log("FATAL", "Missing signals section in objective")
                 raise KeyError("Required 'signals' field missing from objective")
                 
             signals = []
-            for signal in objective_data["signals"]:
+            for signal in objective_data.pop("signals"):
                 try:
                     # Process data field - required
                     if "data" not in signal:
@@ -825,6 +827,7 @@ class TideLoader:
             objective = Objects.DetectionObjective.Objective(
                 signals=signals,
                 composition=composition,
+                attack=attack,
                 **objective_data
             )
             
@@ -1102,6 +1105,12 @@ class DataTide:
         """Index containing model types"""
         tvm = dict(Index["tvm"])
         """Threat Vector Models Data Index"""
+        dom = dict(Index["dom"])
+        """Detection Objectives Models Data Index"""
+        DOM = {uuid:TideLoader.load_dom(deepcopy(data)) for (uuid, data) in dict(Index.copy()["dom"]).items()} 
+        """Model Mapped Managed Detection Rules Data Index"""
+        bdr = dict(Index["bdr"])
+        """Business Detection Rules Data Index"""
         cdm = dict(Index["cdm"])
         """Cyber Detection Models Data Index"""
         mdr = dict(Index["mdr"])
@@ -1109,11 +1118,9 @@ class DataTide:
         # We need to do a deepcopy to ensure that loading steps aren't modifying the original data
         MDR = {uuid:TideLoader.load_mdr(deepcopy(data)) for (uuid, data) in dict(Index.copy()["mdr"]).items()} 
         """Model Mapped Managed Detection Rules Data Index"""
-        bdr = dict(Index["bdr"])
-        """Business Detection Rules Data Index"""
         chaining = IndexTide.compute_chains(tvm)
         """Index of all chaining relationships"""
-        FlatIndex =  tvm | cdm | mdr | bdr
+        FlatIndex =  tvm | dom | cdm | mdr | bdr
         """Flat Key Value pair structure of all UUIDs in the index"""
         files = dict(IndexTide.load()["files"])
     

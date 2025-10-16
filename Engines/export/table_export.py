@@ -116,6 +116,11 @@ class TableExporter:
                 attack = object_data["threat"]["att&ck"]
                 attack = ", ".join(attack)
 
+            case "dom":
+                description = object_data["objective"].get("description")
+                if techniques:=object_data["objective"].get("att&ck"):
+                    attack = ", ".join(techniques)
+
             case "cdm":
                 description = object_data["detection"].get("guidelines")
                 if techniques:=object_data["detection"].get("att&ck"):
@@ -144,7 +149,7 @@ class TableExporter:
         
         dataset = list()
         for object_type in self.OBJECT_SCOPE:
-            
+
             object_index = DataTide.Models.Index.get(object_type)
             if not object_index:
                 log("FAILURE",

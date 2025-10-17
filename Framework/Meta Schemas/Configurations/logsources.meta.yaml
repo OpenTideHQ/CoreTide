@@ -131,12 +131,9 @@ properties:
 
         custom_details:
           title: Custom Details
-          type: array
-          description: Optional array of custom key-value pairs for asset-specific metadata
-          items:
-            title: Custom Detail
-            type: object
-            additionalProperties: true
+          type: object
+          description: Optional open-ended dictionary for asset-specific metadata with custom key-value pairs
+          additionalProperties: true
   
   logsources:
     type: array

@@ -106,8 +106,6 @@ class Objects:
             """How important the detection objective is to implement"""
             type: str
             """Purpose of the Detection Objective"""
-            threats: List[str]
-            """OpenTide Threat Vectors which are covered by this Detection Objective"""
             description: str
             """High Level description of the Detection Objective goal and key concept.
             Technical description of different detection methodologies/signals must
@@ -121,6 +119,9 @@ class Objects:
             or infrastructure is required."""
             composition: Composition
             """Strategy for composing multiple signals together"""
+            threats: Optional[List[str]] = None
+            """OpenTide Threat Vectors which are covered by this Detection Objective.
+            Required when the objective type is "Threat", optional otherwise."""
             attack: Optional[List[str]] = None  # T\d{4} pattern
             """Optional, allows a more precise mapping of the ATT&CK techniques
             associated with the detection objectives. If not precised, the ATT&CK

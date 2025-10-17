@@ -39,9 +39,17 @@ properties:
     required:
       - priority
       - type
-      - threats
       - description
       - signals
+    
+    allOf:
+      - if:
+          properties:
+            type:
+              const: Threat
+        then:
+          required:
+            - threats
     
     properties:
 
@@ -75,11 +83,13 @@ properties:
         description: |
           Purpose of the Detection Objective
         tide.vocab: detection.types
+        default: Threat
       
       threats:
         title: Threat Vectors Coverage
         description: |
-          OpenTide Threat Vectors which are covered by this Detection Objective
+          OpenTide Threat Vectors which are covered by this Detection Objective.
+          Required when the objective type is "Threat", forbidden otherwise.
         type: array
         tide.vocab: tvm
         items:

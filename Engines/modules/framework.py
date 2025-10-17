@@ -500,10 +500,11 @@ def techniques_resolver(model_id: str, recursive=True) -> list:
         if "att&ck" in model_body["objective"]:
             techniques = model_body["objective"]["att&ck"]
         else:
-            parent_ids = model_body["objective"]["threats"]
+            parent_ids = model_body["objective"].get("threats")
             if recursive:
-                for parent_id in parent_ids:
-                    techniques.extend(techniques_resolver(parent_id))
+                if parent_ids:
+                    for parent_id in parent_ids:
+                        techniques.extend(techniques_resolver(parent_id))
             else:
                 return techniques
 

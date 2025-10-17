@@ -3,7 +3,7 @@ field: detection.types
 description: Purpose of different Detection Objectives
 keys:
   - id: d86e629b-df0f-45ae-b851-3fa21e0cd9c1
-    name: Threat Detection
+    name: Threat
     description: |
       Alerts meant for detection cybersecurity threats, and which should 
       eventually trigger Incident Response  

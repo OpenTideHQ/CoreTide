@@ -311,10 +311,11 @@ properties:
                     description: |
                       Link to relevant docs, if available, for the external detection
 
-            community:
-              title:  Community Detections
+            examples:
+              title: Detection Examples
               description: |
-                When available, relevant queries/detection rules already shared in the community
+                When available, relevant queries/detection rules already shared in open-source
+                repositories or vendor detection libraries
               type: array 
 
               items:
@@ -326,16 +327,16 @@ properties:
                 properties:
 
                   description: 
-                    title: Community Detection Description
+                    title: Detection Example Description
                     description: |
-                      High level overview over the community detection capabilities
+                      High level overview of the detection example and its approach
                     type: string
                     tide.template.multiline: True 
 
                   link:
                     title: Community Detection Link
                     description: |
-                      Link to the shared detection (github, blog post...)
+                      Link to the shared detection (github, blog post, vendor repository...)
                     type: string
                   
                   language:
@@ -348,5 +349,5 @@ properties:
                     title: Detection Query
                     type: string
                     description: |
-                      When relevant, the detection query that was shared in the community
+                      When relevant, the detection query that was shared
                     tide.template.multiline: True

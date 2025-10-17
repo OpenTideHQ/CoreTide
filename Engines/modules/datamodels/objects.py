@@ -55,16 +55,17 @@ class Objects:
                     """Link to relevant docs, if available, for the external detection"""
 
                 @dataclass
-                class Community:
-                    """When available, relevant queries/detection rules already shared in the community"""
+                class Example:
+                    """When available, relevant queries/detection rules already shared in open-source
+                    repositories or vendor detection libraries"""
                     description: str
-                    """High level overview over the community detection capabilities"""
+                    """High level overview of the detection example and its approach"""
                     link: str
-                    """Link to the shared detection (github, blog post...)"""
+                    """Link to the shared detection (github, blog post, vendor repository...)"""
                     language: Optional[str] = None
                     """When relevant, the language of the shared detection query"""
                     query: Optional[str] = None
-                    """When relevant, the detection query that was shared in the community"""
+                    """When relevant, the detection query that was shared"""
 
                 name: str
                 """Name of the Detection Signal - in general, this should be a good name
@@ -89,8 +90,8 @@ class Objects:
                 dependent based. From 1 to 10, 1 being a very quick action, 10 taking resources across several cycles."""
                 detectors: Optional[List[Detector]] = None
                 """References to external detection capabilities"""
-                community: Optional[List[Community]] = None
-                """References to community shared detections"""
+                examples: Optional[List[Example]] = None
+                """References to detection examples from open-source or vendor repositories"""
 
             @dataclass
             class Composition:

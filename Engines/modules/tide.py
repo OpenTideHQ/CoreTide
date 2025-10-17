@@ -674,19 +674,20 @@ class ConfigurationsLoader:
         return parsed_configuration
 
     @staticmethod
-    def load_logsources(config: dict) -> Optional[Configurations.LogSources]:
-        """Load log sources configuration from a dictionary into a strongly-typed dataclass.
+    def load_visibility(config: dict) -> Optional[Configurations.Visibility]:
+        """Load visibility configuration from a dictionary into a strongly-typed dataclass.
         
-        This method processes the log sources configuration which consists of two main components:
+        This method processes the visibility configuration which consists of three main components:
         1. Assets - Business or technical assets that generate logs
         2. Log Sources - Specific sources that can be queried for detection purposes
+        3. Detectors - External detection capabilities from third-party tools and platforms
         
         Args:
-            config: Dictionary containing the log sources configuration with 'assets' and 'logsources' sections
+            config: Dictionary containing the visibility configuration with 'assets', 'logsources', and 'detectors' sections
             
         Returns:
-            Configurations.LogSources: Populated dataclass if configuration exists
-            None: If no log sources configuration is found
+            Configurations.Visibility: Populated dataclass if configuration exists
+            None: If no visibility configuration is found
             
         Raises:
             ValueError: If the configuration is malformed, missing required fields,
@@ -703,7 +704,7 @@ class ConfigurationsLoader:
             if asset_configuration:=config.get("assets"):
                 assets = []
                 for asset_config in asset_configuration:
-                    asset = Configurations.LogSources.Asset(**asset_config)
+                    asset = Configurations.Visibility.Asset(**asset_config)
                     assets.append(asset)
                     asset_names.add(asset.name)
                 
@@ -720,21 +721,37 @@ class ConfigurationsLoader:
                             "These assets must be defined in the assets section",
                             "Configuration will load but may be incomplete")
                 
-                logsources.append(Configurations.LogSources.LogSource(**source_config))
+                logsources.append(Configurations.Visibility.LogSource(**source_config))
+                
+            # Process detectors section and validate asset references
+            detectors = []
+            for detector_config in config.get("detectors", []):
+                # Validate asset references before creating Detector
+                if detector_assets := detector_config.get("assets"):
+                    invalid_assets = [asset for asset in detector_assets if asset not in asset_names]
+                    if invalid_assets:
+                        log("FAILURE", 
+                            f"Detector '{detector_config.get('name')}' references non-existent assets",
+                            f"Invalid assets: {', '.join(invalid_assets)}",
+                            "These assets must be defined in the assets section",
+                            "Configuration will load but may be incomplete")
+                
+                detectors.append(Configurations.Visibility.Detector(**detector_config))
                 
             # Create and return the complete configuration
-            return Configurations.LogSources(
-                logsources=logsources,
-                assets=assets
+            return Configurations.Visibility(
+                logsources=logsources if logsources else None,
+                assets=assets if assets else None,
+                detectors=detectors if detectors else None
             )
             
         except (KeyError, TypeError) as e:
             log("FATAL",
-                "Failed to load log sources configuration",
+                "Failed to load visibility configuration",
                 f"Error details: {str(e)}",
                 "Ensure all required fields are present and properly formatted",
                 "Check the schema documentation for complete requirements")
-            raise ValueError(f"Failed to load log sources configuration: {str(e)}")
+            raise ValueError(f"Failed to load visibility configuration: {str(e)}")
 
 
 class TideLoader:
@@ -799,15 +816,15 @@ class TideLoader:
                     data = Objects.DetectionObjective.Objective.Signal.Data(**signal.pop("data"))
                     
                     # Process optional lists
-                    external = [Objects.DetectionObjective.Objective.Signal.External(**ext) 
-                              for ext in signal.pop("external", [])]
+                    detectors = [Objects.DetectionObjective.Objective.Signal.Detector(**ext) 
+                              for ext in signal.pop("detectors", [])]
                     community = [Objects.DetectionObjective.Objective.Signal.Community(**comm) 
                                for comm in signal.pop("community", [])]
                     
                     # Create signal with remaining fields
                     signals.append(Objects.DetectionObjective.Objective.Signal(
                         data=data,
-                        external=external if external else None,
+                        detectors=detectors if detectors else None,
                         community=community if community else None,
                         **signal
                     ))
@@ -1401,10 +1418,10 @@ class DataTide:
             debug = dict(Index["debug"])
 
         @dataclass(frozen=True)
-        class Logsources:
-            """OpenTide instance logsource definition"""
-            Index = dict(IndexTide.load()["configurations"]["logsources"])
-            logsources = ConfigurationsLoader.load_logsources(Index)
+        class Visibility:
+            """OpenTide instance visibility configuration including logsources, assets, and detectors"""
+            Index = dict(IndexTide.load()["configurations"]["visibility"])
+            visibility = ConfigurationsLoader.load_visibility(Index)
 
         @dataclass(frozen=True)
         class Lookups:

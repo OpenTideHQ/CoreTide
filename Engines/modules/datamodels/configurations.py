@@ -10,15 +10,34 @@ class Configurations:
     """Root configuration class for the TIDE framework."""
 
     @dataclass
-    class LogSources:
+    class Visibility:
         """Configuration specification for log sources and assets in the TIDE framework."""
+
+        @dataclass
+        class Detector:
+            """Defines an external detection capability from third-party tools and platforms."""
+            
+            name: str
+            """Name of the external detector or finding"""
+
+            description: str
+            """Detailed description of what this detector identifies or monitors"""
+
+            references: Optional[Sequence[str]] = None
+            """List of URLs to documentation or relevant resources about this detector"""
+
+            assets: Optional[Sequence[str]] = None
+            """References to asset names that this detector monitors"""
+
+
+
 
         @dataclass
         class Asset:
             """Defines a business or technical asset that generates logs."""
             
             name: str
-            """Unique identifier for the asset, typically in format 'Organization::AssetName'"""
+            """Unique identifier for the asset. For multi-tenant or complex exnvironment, you may use a format like 'Organization::AssetName'"""
 
             description: str
             """Detailed description of what the asset does or represents"""
@@ -58,7 +77,10 @@ class Configurations:
             references: Optional[Sequence[str]] = None
             """Optional external references or documentation"""
         
-        logsources: Sequence[LogSource]
+        detectors: Optional[Sequence[Detector]] = None
+        """External detection capabilities from third-party tools and platforms"""
+
+        logsources: Optional[Sequence[LogSource]] = None
         """Log sources that collect and provide log data"""
 
         assets: Optional[Sequence[Asset]] = None

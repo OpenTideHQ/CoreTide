@@ -1,5 +1,5 @@
-title: OpenTide Log Sources Configuration
-description: Configuration specification for log sources and assets in the TIDE framework
+title: OpenTide Visibility Configuration
+description: Configuration specification for security visibility including log sources, assets, and external detectors in the TIDE framework
 
 $schema: http://json-schema.org/draft-07/schema#
 additionalProperties: false
@@ -134,6 +134,41 @@ properties:
           type: object
           description: Optional open-ended dictionary for asset-specific metadata with custom key-value pairs
           additionalProperties: true
+
+  detectors:
+    type: array
+    title: External Detectors
+    description: List of external detection capabilities from third-party tools and platforms
+    items:
+      type: object
+      title: External Detector
+      description: Defines an external detection capability (e.g., GuardDuty findings, vendor alerts)
+      required:
+        - name
+        - description
+      properties:
+        name:
+          title: Detector Name
+          type: string
+          description: Name of the external detector or finding
+        description:
+          title: Detector Description
+          type: string
+          description: Detailed description of what this detector identifies or monitors
+        references:
+          title: References
+          type: array
+          description: List of URLs to documentation or relevant resources about this detector
+          items:
+            title: Reference URL
+            type: string
+        assets:
+          title: Associated Assets
+          type: array
+          description: References to asset names that this detector monitors, MUST correspond to assets entered under the [[assets]] section
+          items:
+            title: Asset Reference
+            type: string
   
   logsources:
     type: array

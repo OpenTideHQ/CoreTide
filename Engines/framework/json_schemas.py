@@ -85,8 +85,8 @@ class FetchEnums:
             )
         """
         # Early return if no configuration exists
-        logsources_data = DataTide.Configurations.Logsources.logsources
-        if not logsources_data or not logsources_data.logsources:
+        visibility_data = DataTide.Configurations.Visibility.visibility
+        if not visibility_data or not visibility_data.logsources:
             return None 
         
         # Initialize our return lists
@@ -95,10 +95,10 @@ class FetchEnums:
         
         # Build a mapping of asset names to their details for quick lookup (assets are optional)
         asset_map = {}
-        if logsources_data.assets:
-            asset_map = {asset.name: asset for asset in logsources_data.assets}
+        if visibility_data.assets:
+            asset_map = {asset.name: asset for asset in visibility_data.assets}
         
-        for logsource in logsources_data.logsources:
+        for logsource in visibility_data.logsources:
             # Format base markdown template for this log source
             base_description = f"""### {logsource.name}
 **System**: {logsource.system}
@@ -137,6 +137,75 @@ class FetchEnums:
                 enum = f"{logsource.system}{logsource.name}"
                 enums.append(enum)
                 descriptions.append(base_description)
+        
+        return enums, descriptions
+
+    @staticmethod
+    def detectors() -> None | tuple[list[str], list[str]]:
+        """Retrieve external detector entries with formatted descriptions.
+        
+        Returns:
+            tuple[list[str], list[str]]: (identifiers, markdown_descriptions)
+            None: If no detectors are configured.
+            
+        Example:
+            >>> fetch_detectors()
+            (
+                ['guardduty::unauthorized_access', 'sentinel::suspicious_login'],
+                ['### GuardDuty Finding\n**Name**: UnauthorizedAccess...\n']
+            )
+        """
+        # Early return if no configuration exists
+        visibility_data = DataTide.Configurations.Visibility.visibility
+        if not visibility_data or not visibility_data.detectors:
+            return None 
+        
+        # Initialize our return lists
+        enums = []
+        descriptions = []
+        
+        # Build a mapping of asset names to their details for quick lookup (assets are optional)
+        asset_map = {}
+        if visibility_data.assets:
+            asset_map = {asset.name: asset for asset in visibility_data.assets}
+        
+        for detector in visibility_data.detectors:
+            # Format base markdown template for this detector
+            base_description = f"""### {detector.name}
+**Description**: {detector.description}
+
+"""
+            # Add references if available
+            if detector.references:
+                base_description += "### References:\n"
+                for ref in detector.references:
+                    base_description += f"- {ref}\n"
+                base_description += "\n"
+            
+            # Add asset information if available
+            if detector.assets:
+                base_description += "### Monitored Assets:\n"
+                for asset_name in detector.assets:
+                    if asset := asset_map.get(asset_name):
+                        base_description += f"""
+- **{asset.name}**
+  - _Criticality_: {asset.criticality}
+  - _Description_: {asset.description}"""
+                        
+                        if asset.custom_details:
+                            base_description += "\n  - _Custom Details_:"
+                            for key, value in asset.custom_details.items():
+                                base_description += f"\n    - {key}: {value}"
+                        base_description += "\n"
+                    else:
+                        base_description += f"""
+- ⚠️ **{asset_name}**
+  - _Warning_: Asset not found in configuration
+  - _Action Required_: Define this asset in the assets section
+"""
+            
+            enums.append(detector.name)
+            descriptions.append(base_description)
         
         return enums, descriptions
 
@@ -619,7 +688,7 @@ def gen_json_schema(dictionary):
                     dictionary[field]["properties"] = temp
 
                 # Handles retrieval of logsources
-                if dict_foo[field].get("tide.config.logsources"):
+                if dict_foo[field].get("tide.config.visibility.logsources"):
                     logsources_result = FetchEnums.logsources()
                     if logsources_result:
                         enums, descriptions = logsources_result
@@ -627,6 +696,20 @@ def gen_json_schema(dictionary):
                         dictionary[field]["items"]["enum"] = enums
                         dictionary[field]["items"]["markdownEnumDescriptions"] = descriptions
                         dictionary[field]["items"]["uniqueItems"] = True
+                
+                # Handles retrieval of detectors
+                if dict_foo[field].get("tide.config.visibility.detectors"):
+                    detectors_result = FetchEnums.detectors()
+                    if detectors_result:
+                        enums, descriptions = detectors_result
+                        if dict_foo[field].get("type") == "string":
+                            dictionary[field]["enum"] = enums
+                            dictionary[field]["markdownEnumDescriptions"] = descriptions
+                        elif dict_foo[field].get("type") == "array":
+                            dictionary[field]["items"] = {}
+                            dictionary[field]["items"]["enum"] = enums
+                            dictionary[field]["items"]["markdownEnumDescriptions"] = descriptions
+                            dictionary[field]["items"]["uniqueItems"] = True
 
                 # Handles the case when a list of values has to be fetched from
                 # the configuration files.

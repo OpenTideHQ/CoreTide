@@ -17,7 +17,7 @@ from Engines.modules.logs import log
 from Engines.modules.patching import Tide2Patching
 
 def indexer(write_index=False) -> dict:
-    SKIPS = ["logsources", "ram", "mdrv2", "lookup_metadata"]
+    SKIPS = ["ram", "mdrv2", "lookup_metadata"]
     RESOLVED_CONFIGURATIONS = resolve_configurations()
 
     TIDE_CONFIG = RESOLVED_CONFIGURATIONS["global"]

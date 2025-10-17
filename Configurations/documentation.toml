@@ -38,6 +38,7 @@ lookup_metadata = "Lookup Metadata"
 
 [titles]
 tvm = "Threat Vector Schema"
+cdm = "Detection Model Schema"
 dom = "Detection Objective Schema"
 mdr = "Detection Rules Schema"
 bdr = "Business Detection Schema"

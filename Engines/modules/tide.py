@@ -818,14 +818,14 @@ class TideLoader:
                     # Process optional lists
                     detectors = [Objects.DetectionObjective.Objective.Signal.Detector(**ext) 
                               for ext in signal.pop("detectors", [])]
-                    community = [Objects.DetectionObjective.Objective.Signal.Community(**comm) 
-                               for comm in signal.pop("community", [])]
+                    examples = [Objects.DetectionObjective.Objective.Signal.Example(**comm) 
+                               for comm in signal.pop("examples", [])]
                     
                     # Create signal with remaining fields
                     signals.append(Objects.DetectionObjective.Objective.Signal(
                         data=data,
                         detectors=detectors if detectors else None,
-                        community=community if community else None,
+                        examples=examples if examples else None,
                         **signal
                     ))
                     

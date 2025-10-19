@@ -10,6 +10,8 @@ sys.path.append(str(git.Repo(".", search_parent_directories=True).working_dir))
 
 from Engines.modules.tide import DataTide, IndexTide
 from Engines.modules.deployment import CIEnvironment
+from Engines.modules.framework import techniques_resolver
+from Engines.modules.documentation import rich_attack_links
 
 CONFIG = DataTide.Configurations
 INDEX = DataTide.Index
@@ -78,6 +80,45 @@ def actors_doc(actors:list[dict])->str:
 
     return pd.DataFrame(data).to_markdown(index=False)
 
+def attack_techniques(uuid:str) -> str:
+    """
+    Generate a formatted string of ATT&CK techniques for a given UUID.
+    Manages inheritance and technique overwriting.
+    Args:
+        uuid (str): The unique identifier for which to retrieve ATT&CK techniques.
+    Returns:
+        str: A formatted string containing ATT&CK techniques with icons and links,
+             or an empty string if no techniques are found.
+    """
+    
+    techniques = techniques_resolver(uuid)
+    if techniques:
+        techniques = rich_attack_links(techniques, output="string")
+        return f"{get_icon('att&ck')} **ATT&CK Techniques** :  {techniques}"
+    else:
+        return ""
+
+
+
+def frontmatter_doc(object_name:str)->str:
+    """
+    Generate YAML frontmatter for wiki pages.
+    
+    Args:
+        wiki_target: Target CI environment platform
+        object_name: Page title
+    
+    Returns:
+        YAML frontmatter string or empty string if not applicable
+    """
+    
+    if CIEnvironment()._check_ci_environment() is not CIEnvironment.CIPlatforms.GitlabCI:
+        return ""    
+    if DataTide.Configurations.Documentation.gitlab.get("uuid_permalinks", False):
+        return f"---\ntitle: {object_name}\n---"
+    else:
+        return ""
+
 def criticality_doc(criticality_data: str) -> str:
     criticality_icon = get_icon("criticality")
     criticality_data_icon = get_icon(criticality_data, vocab="criticality")
@@ -97,6 +138,8 @@ def metadata_doc(metadata: dict, model_type: str) -> str:
     schema = dict()
 
     for key, value in metadata.items():
+        if key == "tlp":
+            continue
         meta_title = get_field_title(key, metaschema)
         if meta_title:
             # Push schema at the end of the line
@@ -121,10 +164,14 @@ def metadata_doc(metadata: dict, model_type: str) -> str:
 def reference_doc(references: dict) -> str:
     if not references:
         return ""
-
+    print(references)
     reference_doc_markdown = str()
     reference_labels = list()
     for scope in references:
+        
+        if not references[scope]:
+            continue
+        
         scope_title = get_field_title(
             scope, DEFINITIONS_INDEX["references"]["properties"]
         )

@@ -1422,6 +1422,9 @@ class DataTide:
             """OpenTide instance visibility configuration including logsources, assets, and detectors"""
             Index = dict(IndexTide.load()["configurations"]["visibility"])
             visibility = ConfigurationsLoader.load_visibility(Index)
+            assets = visibility.assets if visibility else None
+            detectors = visibility.detectors if visibility else None
+            logsources = visibility.logsources if visibility else None
 
         @dataclass(frozen=True)
         class Lookups:

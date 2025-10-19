@@ -2,7 +2,7 @@ import os
 import git
 import uuid
 import sys
-from typing import Literal, overload
+from typing import Literal, overload, Tuple
 
 sys.path.append(str(git.Repo(".", search_parent_directories=True).working_dir))
 
@@ -242,6 +242,33 @@ def vocab_metadata(vocab: str, field=None) -> str | dict:
     else:
         return vocab_data
 
+def get_vocab_stage_details(vocabulary:str, stage_identifier:str)->None|Tuple[str,str]:
+    """
+    Return a tuple of the name and description for a particular stage of a vocabulary.
+    If no stage correspond, or the vocabulary has no stages, returns nothing. 
+    """
+    if vocabulary not in VOCAB_INDEX:
+        log("FAILURE",
+            "The requested vocabulary does not exist in the index space",
+            vocabulary)
+        return None
+
+    stages_section = VOCAB_INDEX[vocabulary]["metadata"].get("stages")
+    if not stages_section:
+        log("FAILURE",
+            "The requested vocabulary does not contain a stage section",
+            vocabulary)
+        return None
+    
+    for stage in stages_section:
+        if stage.get("id") == stage_identifier:
+            log("INFO",
+                f"Found corresponding stage in the requested vocabulary {vocabulary}",
+                stage_identifier,
+                str(stage))
+            return stage.get("name"), stage.get("description")
+    
+    return None
 
 def get_vocab_entry(vocab, identifier, field=None, newlines=False):
     """
@@ -253,6 +280,8 @@ def get_vocab_entry(vocab, identifier, field=None, newlines=False):
 
     if vocab not in VOCAB_INDEX.keys():
         return ""
+
+    identifier = identifier.split("::")[-1] if "::" in identifier else identifier
 
     if identifier in VOCAB_INDEX[vocab]["entries"].keys():
         entry_data = VOCAB_INDEX[vocab]["entries"][identifier]

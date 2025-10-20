@@ -48,10 +48,10 @@ runs:
         fi
 
         echo "Syncing remote trunk and rebasing"
-        git fetch origin ${{ github.ref }}
-        git rebase origin/${{ github.ref }}
+        git fetch origin ${{ github.ref_name }}
+        git rebase origin/${{ github.ref_name }}
 
         echo "Updated files, committing"
         git add -- . ':!${REPO_NAME}' ':!CoreTide' ':!coretide' ':!$CORETIDE_PATH'
         git commit -m "CoreTide MDR Promotion [skip ci]"
-        git push origin HEAD:${{ github.ref }}
+        git push origin HEAD:${{ github.ref_name }}

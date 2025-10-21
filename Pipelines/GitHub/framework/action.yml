@@ -41,11 +41,13 @@ runs:
           exit 0
         fi
 
-        echo "Syncing remote trunk and rebasing"
+        echo "Committing changes"
         git add -- . ':!${REPO_NAME}' ':!CoreTide' ':!coretide' ':!$CORETIDE_PATH'
+        git commit -m "CoreTide Framework Automation [skip ci]"
+
+        echo "Syncing remote trunk and rebasing"
         git fetch origin ${{ github.ref_name }}
         git rebase origin/${{ github.ref_name }}
 
-        echo "Updated files, committing"
-        git commit -m "CoreTide Framework Automation [skip ci]"
+        echo "Pushing changes"
         git push origin HEAD:${{ github.ref_name }}

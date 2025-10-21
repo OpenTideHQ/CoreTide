@@ -196,6 +196,8 @@ def relations_table(
     tree = None
     model_type = get_type(id)
 
+    current_page = "dom" if model_type == "dom" else None
+
     if direction == "downstream":
         tree = relations_downstream(id)
         print(tree)
@@ -216,10 +218,10 @@ def relations_table(
                         branch_data[branch_type] = (
                             branch_data[branch_type]
                             + "<br>"
-                            + (backlink_resolver(branch))
+                            + (backlink_resolver(branch, current_page=current_page))
                         )
                     else:
-                        branch_data[branch_type] = backlink_resolver(branch)
+                        branch_data[branch_type] = backlink_resolver(branch, current_page=current_page)
 
                     if trunk[branch]:
                         unfold = unfold_trunk(trunk[branch]) or {}
@@ -231,7 +233,7 @@ def relations_table(
             if trunk:
                 branch_data = {}
                 branch_data[get_type(trunk[0])] = "<br>".join(
-                    [backlink_resolver(b) for b in trunk if b != "Unknown"] #type: ignore
+                    [backlink_resolver(b, current_page=current_page) for b in trunk if b != "Unknown"] #type: ignore
                 ) #type: ignore
                 return branch_data
 

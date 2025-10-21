@@ -397,7 +397,7 @@ def childs(model_id: str) -> list:
     implementations = []
 
     mappings = {
-        "tvm": {"child_types": ["cdm"], "data": "detection", "references": ["vectors"]},
+        "tvm": {"child_types": ["cdm", "dom"], "data_sections": ["detection", "objective"], "references": ["vectors", "threats"]},
         "dom": {"child_types": ["signal", "mdr"], "references": ["detection_model", "parent"]},
         "signal": {"child_types": ["mdr"], "references": ["detection_model"]},
         "cdm": {"child_types": ["mdr"], "references": ["detection_model"]},
@@ -405,33 +405,31 @@ def childs(model_id: str) -> list:
     }
 
     model_type = get_type(model_id)
-
     if model_type not in mappings.keys():
         return []
 
     child_types = mappings[model_type]["child_types"]
     child_types = [child_types] if type(child_types) is str else child_types
-    data = mappings[model_type].get("data", None)
+    data_sections = mappings[model_type].get("data_sections", None)
     references = mappings[model_type]["references"]
 
 
     for child_type in child_types:
         CHILDS_INDEX = MODELS_INDEX[child_type]
-        for child in CHILDS_INDEX:
-            if child_type == "mdr":
-                data = None
-            
-            if data:
-                for reference in references:
-                    if model_id in CHILDS_INDEX[child].get(data, {}).get(reference, []):
-                        implementations.append(child)
+        for child in CHILDS_INDEX:            
+            if data_sections:
+                for section in data_sections:
+                    for reference in references:
+                        if model_id in CHILDS_INDEX[child].get(section, {}).get(reference, []):
+                            implementations.append(child)
             else:
                 for reference in references:
                     if model_id in CHILDS_INDEX[child].get(reference, []):
                         implementations.append(child)
 
-    print("HERE...")
+    print(f"PROCESSING DIRECT CHILDS {model_id} : {model_type}")
     print(implementations)
+
     return implementations
 
 @overload
@@ -573,15 +571,22 @@ def techniques_resolver(model_id: str, recursive=True) -> list:
 def relations_downstream(id):
 
     tree = {}
-
-    if get_type(id) in ["dom", "signal", "cdm", "bdr"]:
+    
+    if get_type(id) in ["signal", "cdm", "bdr"]:
         tree = keep_active_mdr(childs(id))
+    elif get_type(id) == "dom":
+        for child in childs(id):
+            if get_type(child) == "signal":
+                tree[child] = relations_downstream(child)
+            elif get_type(child) == "mdr":
+                tree[child] = None
     else:
         for c in childs(id):
+            print("PROCESSING : ", c)
+            print(c)
             tree[c] = relations_downstream(c)
 
     return tree
-
 
 def relations_upstream(id):
 

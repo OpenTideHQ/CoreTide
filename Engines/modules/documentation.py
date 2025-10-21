@@ -2,7 +2,7 @@ import pandas as pd
 import git
 import sys
 import json
-from typing import Literal
+from typing import Literal, Union, Optional
 
 sys.path.append(str(git.Repo(".", search_parent_directories=True).working_dir))
 
@@ -236,7 +236,8 @@ def rich_attack_links(
 def backlink_resolver(model_uuid:str,
                         raw_link:bool=False,
                         raw_hover:bool=False,
-                        hover_length:int=150):
+                        hover_length:int=150,
+                        current_page:Optional[str]=None):
     """
     Formats a markdown link to the model, using localized paths.
 
@@ -278,11 +279,19 @@ def backlink_resolver(model_uuid:str,
     if model_type == "signal":
         signal_data = DataTide.Models.Signal[model_uuid]
         objective_data = DataTide.Models.DOM[signal_data.parent]
-        backlink_name = objective_data.name + "::" + signal_data.name
-        hover = signal_data.description
-        file_link = objective_data.name # We point to the parent objective wiki page
+        if current_page:
+            # If we're on the current DOM page, we should just do an anchor and no need to add
+            # the full context
+            backlink_name = signal_data.name
+            hover = signal_data.description
+            file_link = f"#{signal_data.name.replace(" ", "-").lower()}"
 
-    if model_type == "mdr":
+        else:
+            backlink_name = objective_data.name + "::" + signal_data.name
+            hover = signal_data.description
+            # We point to the parent objective wiki page with an anchor to the signal name
+            file_link = objective_data.name + f"#{signal_data.name.replace(" ", "-").lower()}"
+    elif model_type == "mdr":
         model_name = model_data["name"]
 
         backlink_name = model_name.replace("_", " ")
@@ -309,7 +318,8 @@ def backlink_resolver(model_uuid:str,
         file_link = file_link.replace(" ", "-").replace("_", "-")
     else:
         file_link = file_link.replace(" ", "%20")
-        file_link += ".md"
+        if not current_page:
+            file_link += ".md"
 
 
     hover = sanitize_hover(str(hover))

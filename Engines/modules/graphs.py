@@ -62,13 +62,7 @@ def relationships_graph(id):
     remove = ["{", "}", "'", '"', "[", "]", ",", ":", "(", ")", "-"]
 
     childs = relations_downstream(id)
-    print("RECEIVED DOWNSTREAM")
-    print("Processing ", id)
-    print(childs)
     parents = relations_upstream(id)
-    print("RECEIVED UPSTREAM")
-    print("Processing ", id)
-    print(parents)
 
     if not childs and not parents:
         return ""

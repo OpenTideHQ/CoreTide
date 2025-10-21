@@ -387,7 +387,7 @@ def parents(id: str) -> list:
 
 def childs(model_id: str) -> list:
     """
-    Returns the list of direct descendants for any given CoreTIDE Object,
+    Returns the list of direct descendants for any given OpenTide Object,
     by performing a forward search.
 
     If the object can not have descendants, or in other word is a last-line
@@ -426,9 +426,6 @@ def childs(model_id: str) -> list:
                 for reference in references:
                     if model_id in CHILDS_INDEX[child].get(reference, []):
                         implementations.append(child)
-
-    print(f"PROCESSING DIRECT CHILDS {model_id} : {model_type}")
-    print(implementations)
 
     return implementations
 
@@ -582,8 +579,6 @@ def relations_downstream(id):
                 tree[child] = None
     else:
         for c in childs(id):
-            print("PROCESSING : ", c)
-            print(c)
             tree[c] = relations_downstream(c)
 
     return tree

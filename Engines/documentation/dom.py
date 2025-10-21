@@ -36,7 +36,8 @@ from Engines.modules.datamodels.configurations import Configurations
 from Engines.modules.documentation import (
     TARGET_WITH_DASH_PATHS,
     DOCUMENTATION_TARGET,
-    UUID_PERMALINKS
+    UUID_PERMALINKS,
+    get_icon
 )
 
 class DetectionObjectivesWiki:
@@ -66,7 +67,7 @@ class DetectionObjectivesWiki:
 
     def _create_wiki_page(self, objective:Objects.DetectionObjective)->str:
         
-        frontmatter = frontmatter_doc(objective.name)
+        frontmatter = frontmatter_doc(objective.name, objective.metadata.uuid)
         tlp = tlp_doc(objective.metadata.tlp)
         techniques = attack_techniques(objective.metadata.uuid)
         metadata = metadata_doc(asdict(objective.metadata), model_type="dom")
@@ -81,7 +82,7 @@ class DetectionObjectivesWiki:
 
         return DETECTION_OBJECTIVE_TEMPLATE.format(
             frontmatter=frontmatter,
-            name="# 💡" + objective.name if not UUID_PERMALINKS else "",
+            name=f"# {get_icon("dom")} " + objective.name if not UUID_PERMALINKS else "",
             priority=objective.objective.priority,
             tlp=tlp,
             techniques=techniques,
@@ -273,7 +274,8 @@ class DetectionObjectivesWiki:
             log("INFO", "Generating docs with UUID as file name")
             file_name = objective.metadata.uuid + ".md"
         else:
-            file_name = objective.name + ".md"
+            objective_icon = get_icon("dom")
+            file_name = objective_icon + " " + objective.name + ".md"
             file_name = safe_file_name(file_name)
 
         export_path = self.DOCUMENTATION_PATH / file_name

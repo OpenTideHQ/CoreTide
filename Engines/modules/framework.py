@@ -175,7 +175,6 @@ def get_value_metaschema(
 
 
 def rename_param_nest(nest, schema, scope=None):
-    print("SCOPE ", scope)
     nest_copy = nest.copy()
 
     for item in nest_copy:
@@ -456,7 +455,6 @@ def get_type(model_uuid:str, mute:bool=False):
     if not schema:
         #TODO For backwards compatibility with MDR still on 1.0. To be deprecated.
         if model_uuid in DataTide.Models.signal:
-            print(model_uuid, "IDENTIFIED AS SIGNAL")
             return "signal"
         if model_body.get("configurations"):
             return "mdr"

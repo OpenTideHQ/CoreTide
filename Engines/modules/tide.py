@@ -88,7 +88,7 @@ class HelperTide:
             try:
                 import_module("Engines.modules.local_secrets")
             except:
-                print("[FAILURE]",
+                log("FAILURE",
                     "Could not find local python file at `Engines.modules.local_secrets` to set secret environment variables",
                     "Parts of this module may not work properly",
                     "Refer to the relevant TOML conguration file to find which variables may be necessary")
@@ -1418,7 +1418,6 @@ class DataTide:
             """Generic deployment parameters."""
 
             Index = dict(IndexTide.load()["configurations"]["deployment"])
-            print(Index)
             statuses = ConfigurationsLoader.load_statuses(Index["statuses"])
             promotion = dict(Index["promotion"])
             default_responders = str(Index["default_responders"])

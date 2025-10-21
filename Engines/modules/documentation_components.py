@@ -100,13 +100,14 @@ def attack_techniques(uuid:str) -> str:
 
 
 
-def frontmatter_doc(object_name:str)->str:
+def frontmatter_doc(object_name:str, object_uuid:str)->str:
     """
     Generate YAML frontmatter for wiki pages.
     
     Args:
         wiki_target: Target CI environment platform
         object_name: Page title
+        object_uuid: UUID of the object
     
     Returns:
         YAML frontmatter string or empty string if not applicable
@@ -115,7 +116,7 @@ def frontmatter_doc(object_name:str)->str:
     if CIEnvironment()._check_ci_environment() is not CIEnvironment.CIPlatforms.GitlabCI:
         return ""    
     if DataTide.Configurations.Documentation.gitlab.get("uuid_permalinks", False):
-        return f"---\ntitle: {object_name}\n---"
+        return f"---\ntitle:{get_icon(get_type(object_uuid))} {object_name}\n---"
     else:
         return ""
 

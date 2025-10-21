@@ -32,6 +32,9 @@ jobs:
   Framework:
     name: Framework Generation
     runs-on: ubuntu-latest
+    concurrency:
+      group: framework
+      cancel-in-progress: false
     if: ${{ github.ref_name == github.event.repository.default_branch }}
     steps:
       - name: Checkout Tide Instance

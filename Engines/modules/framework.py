@@ -361,6 +361,7 @@ def parents(id: str) -> list:
     model_type = get_type(id)
     parents = []
     parent_mappings = {
+        "dom": {"data": "objective", "parent": "threats"},
         "cdm": {"data": "detection", "parent": "vectors"},
         "mdr": {"parent": "detection_model"},
     }
@@ -562,7 +563,7 @@ def relations_downstream(id):
 
     tree = {}
 
-    if get_type(id) in ["cdm", "bdr"]:
+    if get_type(id) in ["dom", "cdm", "bdr"]:
         tree = keep_active_mdr(childs(id))
     else:
         for c in childs(id):

@@ -26,8 +26,13 @@ DETECTION_OBJECTIVE_TEMPLATE = '''{frontmatter}
 
 {relation_graph}
 
-{relation_table}
+**Threats**
 
+{related_threat_vectors}
+
+**Rules**
+
+{related_detection_rules}
 
 ## 📡 Signals
 

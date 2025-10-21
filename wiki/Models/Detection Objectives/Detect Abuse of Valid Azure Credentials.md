@@ -49,10 +49,25 @@ provides the most effective detection posture.
 
 ### 🌊 Related OpenTide Objects
 
-WIP
 
-WIP
+```mermaid
 
+mindmap
+Root[🎯 Detect Abuse of Valid Azure Credentials]
+    
+      ☣️ Azure  Valid Credentials 
+
+
+```
+
+
+**Threats**
+| ☣️ Threat Vectors                                                                                                                                                                                                                                    |
+|:-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| [Azure - Valid Credentials](../Threat%20Vectors/☣️%20Azure%20-%20Valid%20Credentials.md 'This threat vector within the Initial Access phase represents a significant risk in Azure environments This attack techniqueformally designated around...') |
+
+**Rules**
+_❌ No related detection rules_
 
 ## 📡 Signals
 

@@ -72,8 +72,9 @@ class DetectionObjectivesWiki:
         metadata = metadata_doc(asdict(objective.metadata), model_type="dom")
         objective_type_description = get_vocab_description("detection.types", objective.objective.type)
         strategy_description = get_vocab_description("detection.composition", objective.objective.composition.strategy)
-        relation_graph = "WIP"
-        relation_table = "WIP"
+        relation_graph = relationships_graph(objective.metadata.uuid) 
+        related_threat_vectors = relations_table(objective.metadata.uuid, direction="upstream") or "_❌ No related threat vector_"
+        related_detection_rules = relations_table(objective.metadata.uuid, direction="downstream") or "_❌ No related detection rules_"
         signals_list = [self._create_signal_content(signal) for signal in objective.objective.signals]
         signals_list = "\n\n".join(signals_list)
         references = reference_doc(asdict(objective.references)) if objective.references else "_❌ No references_"
@@ -92,7 +93,8 @@ class DetectionObjectivesWiki:
             strategy_description=strategy_description,
             composition_description=objective.objective.composition.description,
             relation_graph=relation_graph,
-            relation_table=relation_table,
+            related_threat_vectors=related_threat_vectors,
+            related_detection_rules=related_detection_rules,
             signals_list=signals_list,
             references=references
         )

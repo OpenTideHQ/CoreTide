@@ -37,10 +37,27 @@ comprehensive coverage of the attack chain.
 
 ### 🌊 Related OpenTide Objects
 
-WIP
 
-WIP
+```mermaid
 
+mindmap
+Root[🎯 Detect Suspicious SMB Connections from Applications]
+    
+      ☣️ NTLM credentials dumping via SMB connection 
+      ☣️ Files retrieved via SMB connection 
+
+
+```
+
+
+**Threats**
+| ☣️ Threat Vectors (2)                                                                                                                                                                                                                                                                        |
+|:---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| [NTLM credentials dumping via SMB connection](../Threat%20Vectors/☣️%20NTLM%20credentials%20dumping%20via%20SMB%20connection.md '### Attack vector related to Outlook vulnerability CVE-2023-23397key point no user interaction  An attacker sends an email message with an extended MA...') |
+| [Files retrieved via SMB connection](../Threat%20Vectors/☣️%20Files%20retrieved%20via%20SMB%20connection.md '### The SMB ProtocolSMB stands for Server Message Block It is a network protocol used to share data between computers and devices on a local or wide a...')                     |
+
+**Rules**
+_❌ No related detection rules_
 
 ## 📡 Signals
 

@@ -45,6 +45,7 @@ bdr = "Business Detection Schema"
 
 [icons]
 tvm = "☣️"
+dom = "🎯"
 cdm = "🛡️"
 mdr = "🚨"
 bdr = "🏛️"

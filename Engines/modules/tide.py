@@ -757,6 +757,35 @@ class ConfigurationsLoader:
 class TideLoader:
 
     @staticmethod
+    def load_signal(signal: dict) -> Objects.DetectionObjective.Objective.Signal:
+        try:
+            # Process data field - required
+            if "data" not in signal:
+                log("FATAL", "Missing required data field for signal", str(signal))
+                raise KeyError(f"Required 'data' field missing from signal")
+            
+            data = Objects.DetectionObjective.Objective.Signal.Data(**signal.pop("data"))
+            
+            # Process optional lists
+            detectors = [Objects.DetectionObjective.Objective.Signal.Detector(**ext) 
+                        for ext in signal.pop("detectors", [])]
+            examples = [Objects.DetectionObjective.Objective.Signal.Example(**comm) 
+                        for comm in signal.pop("examples", [])]
+            
+            # Create signal with remaining fields
+            return Objects.DetectionObjective.Objective.Signal(
+                data=data,
+                detectors=detectors if detectors else None,
+                examples=examples if examples else None,
+                **signal
+                )
+            
+        except (KeyError, TypeError) as e:
+            log("FATAL", "Failed to process signal", str(e))
+            raise ValueError("Invalid signal configuration")
+
+
+    @staticmethod
     def load_dom(dom: dict) -> Objects.DetectionObjective:
         """Transform a raw Detection Objective dictionary into a strongly-typed dataclass.
         
@@ -807,32 +836,8 @@ class TideLoader:
                 
             signals = []
             for signal in objective_data.pop("signals"):
-                try:
-                    # Process data field - required
-                    if "data" not in signal:
-                        log("FATAL", "Missing required data field for signal", str(signal))
-                        raise KeyError(f"Required 'data' field missing from signal")
-                    
-                    data = Objects.DetectionObjective.Objective.Signal.Data(**signal.pop("data"))
-                    
-                    # Process optional lists
-                    detectors = [Objects.DetectionObjective.Objective.Signal.Detector(**ext) 
-                              for ext in signal.pop("detectors", [])]
-                    examples = [Objects.DetectionObjective.Objective.Signal.Example(**comm) 
-                               for comm in signal.pop("examples", [])]
-                    
-                    # Create signal with remaining fields
-                    signals.append(Objects.DetectionObjective.Objective.Signal(
-                        data=data,
-                        detectors=detectors if detectors else None,
-                        examples=examples if examples else None,
-                        **signal
-                    ))
-                    
-                except (KeyError, TypeError) as e:
-                    log("FATAL", "Failed to process signal", str(e))
-                    raise ValueError("Invalid signal configuration")
-
+                signals.append(TideLoader.load_signal(signal))
+                
             # Process composition - required
             if "composition" not in objective_data:
                 log("FATAL", "Missing composition section in objective")
@@ -1123,9 +1128,13 @@ class DataTide:
         tvm = dict(Index["tvm"])
         """Threat Vector Models Data Index"""
         dom = dict(Index["dom"])
-        """Detection Objectives Models Data Index"""
+        """Detection Objectives Raw Index"""
         DOM = {uuid:TideLoader.load_dom(deepcopy(data)) for (uuid, data) in dict(Index.copy()["dom"]).items()} 
-        """Model Mapped Managed Detection Rules Data Index"""
+        """Detection Objectives Pre-Loaded Index"""
+        signal = dict(Index["signal"])
+        """Detection Objectives Signals Raw Index"""
+        Signal = {uuid:TideLoader.load_signal(deepcopy(data)) for (uuid, data) in dict(Index.copy()["signal"]).items()} 
+        """Detection Objectives Signals Pre-Loaded Index"""
         bdr = dict(Index["bdr"])
         """Business Detection Rules Data Index"""
         cdm = dict(Index["cdm"])
@@ -1137,7 +1146,7 @@ class DataTide:
         """Model Mapped Managed Detection Rules Data Index"""
         chaining = IndexTide.compute_chains(tvm)
         """Index of all chaining relationships"""
-        FlatIndex =  tvm | dom | cdm | mdr | bdr
+        FlatIndex =  tvm | dom | signal | cdm | mdr | bdr
         """Flat Key Value pair structure of all UUIDs in the index"""
         files = dict(IndexTide.load()["files"])
     

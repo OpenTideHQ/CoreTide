@@ -198,8 +198,10 @@ def relations_table(
 
     if direction == "downstream":
         tree = relations_downstream(id)
+        print(tree)
     elif direction == "upstream":
         tree = relations_upstream(id)
+        print(tree)
 
     if not tree:
         return ""
@@ -250,10 +252,17 @@ def relations_table(
                 trunk_data["dom"] = (
                     None if "dom" not in trunk_data else trunk_data["dom"]
                 )
+
             if model_type in ["tvm", "dom", "cdm", "bdr"]:
                 trunk_data["mdr"] = (
                     None if "mdr" not in trunk_data else trunk_data["mdr"]
                 )
+
+            if model_type == "dom":
+                    trunk_data["signal"] = (
+                    None if "signal" not in trunk_data else trunk_data["signal"]
+                )
+
 
         elif direction == "upstream":
             if "bdr" not in trunk_data:
@@ -261,12 +270,20 @@ def relations_table(
                     trunk_data["tvm"] = (
                         None if "tvm" not in trunk_data else trunk_data["tvm"]
                     )
+                if model_type == "signal":
+                    trunk_data["dom"] = (
+                    None if "dom" not in trunk_data else trunk_data["dom"]
+                    )
+
                 if model_type in ["mdr"]:
                     trunk_data["cdm"] = (
                         None if "cdm" not in trunk_data else trunk_data["cdm"]
                     )
                     trunk_data["dom"] = (
                         None if "dom" not in trunk_data else trunk_data["dom"]
+                    )
+                    trunk_data["signal"] = (
+                        None if "signal" not in trunk_data else trunk_data["signal"]
                     )
 
         data.append(trunk_data)

@@ -362,6 +362,7 @@ def parents(id: str) -> list:
     parents = []
     parent_mappings = {
         "dom": {"data": "objective", "parent": "threats"},
+        "signal": {"parent": "parent"},
         "cdm": {"data": "detection", "parent": "vectors"},
         "mdr": {"parent": "detection_model"},
     }
@@ -396,10 +397,11 @@ def childs(model_id: str) -> list:
     implementations = []
 
     mappings = {
-        "tvm": {"child_type": "cdm", "data": "detection", "reference": "vectors"},
-        "dom": {"child_type": "mdr", "reference": "detection_model"},
-        "cdm": {"child_type": "mdr", "reference": "detection_model"},
-        "bdr": {"child_type": "mdr", "reference": "detection_model"},
+        "tvm": {"child_types": ["cdm"], "data": "detection", "references": ["vectors"]},
+        "dom": {"child_types": ["signal", "mdr"], "references": ["detection_model", "parent"]},
+        "signal": {"child_types": ["mdr"], "references": ["detection_model"]},
+        "cdm": {"child_types": ["mdr"], "references": ["detection_model"]},
+        "bdr": {"child_types": ["mdr"], "references": ["detection_model"]},
     }
 
     model_type = get_type(model_id)
@@ -407,23 +409,29 @@ def childs(model_id: str) -> list:
     if model_type not in mappings.keys():
         return []
 
-    child_type = mappings[model_type]["child_type"]
+    child_types = mappings[model_type]["child_types"]
+    child_types = [child_types] if type(child_types) is str else child_types
     data = mappings[model_type].get("data", None)
-    reference = mappings[model_type]["reference"]
-
-    CHILDS_INDEX = MODELS_INDEX[child_type]
-    for child in CHILDS_INDEX:
-        if child_type == "mdr":
-            data = None
-        
-        if data:
-            if model_id in CHILDS_INDEX[child].get(data, {}).get(reference, []):
-                implementations.append(child)
-        else:
-            if model_id in CHILDS_INDEX[child].get(reference, []):
-                implementations.append(child)
+    references = mappings[model_type]["references"]
 
 
+    for child_type in child_types:
+        CHILDS_INDEX = MODELS_INDEX[child_type]
+        for child in CHILDS_INDEX:
+            if child_type == "mdr":
+                data = None
+            
+            if data:
+                for reference in references:
+                    if model_id in CHILDS_INDEX[child].get(data, {}).get(reference, []):
+                        implementations.append(child)
+            else:
+                for reference in references:
+                    if model_id in CHILDS_INDEX[child].get(reference, []):
+                        implementations.append(child)
+
+    print("HERE...")
+    print(implementations)
     return implementations
 
 @overload
@@ -452,6 +460,9 @@ def get_type(model_uuid:str, mute:bool=False):
     schema = model_body.get("metadata", {}).get("schema")
     if not schema:
         #TODO For backwards compatibility with MDR still on 1.0. To be deprecated.
+        if model_uuid in DataTide.Models.signal:
+            print(model_uuid, "IDENTIFIED AS SIGNAL")
+            return "signal"
         if model_body.get("configurations"):
             return "mdr"
         if mute:
@@ -563,7 +574,7 @@ def relations_downstream(id):
 
     tree = {}
 
-    if get_type(id) in ["dom", "cdm", "bdr"]:
+    if get_type(id) in ["dom", "signal", "cdm", "bdr"]:
         tree = keep_active_mdr(childs(id))
     else:
         for c in childs(id):

@@ -221,10 +221,10 @@ def indexer(write_index=False) -> dict:
 
     objects_index = dict()
     files_index = dict()
+    objects_index["signal"] = dict() #Preassigning 
 
     #TODO Backward compatibility measure. To remove.
     patch = Tide2Patching()
-
     for meta_name in METASCHEMAS:
         if meta_name not in SKIPS:
             model_cat_index = dict()
@@ -259,6 +259,15 @@ def indexer(write_index=False) -> dict:
                         else:
                             model_cat_index[identifier] = model_body
                             files_index[identifier] = model
+
+                            # Creating a sub-index for signals so we can more easily search in them through DataTide
+                            if meta_name == "dom":
+                                signals = model_body.get("objective",{})["signals"]
+                                for signal in signals:
+                                    signal.update({"parent":identifier})
+                                    objects_index["signal"][signal["uuid"]] = signal
+
+            print(objects_index["signal"])
             objects_index[meta_name] = model_cat_index
 
     index["objects"] = objects_index

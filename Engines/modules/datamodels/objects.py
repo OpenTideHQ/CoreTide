@@ -92,6 +92,8 @@ class Objects:
                 """References to external detection capabilities"""
                 examples: Optional[List[Example]] = None
                 """References to detection examples from open-source or vendor repositories"""
+                parent: Optional[str] = None
+                """Internal string which may be used to understand to which detection objective this signal ties into. Only used within index to keep track of sub objects."""
 
             @dataclass
             class Composition:

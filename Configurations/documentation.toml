@@ -31,6 +31,7 @@ proxy = false
 [object_names]
 tvm = "Threat Vectors"
 dom = "Detection Objectives"
+signal = "Detection Objective Signals"
 cdm = "Detection Models"
 mdr = "Detection Rules"
 bdr = "Business Requests"
@@ -46,6 +47,7 @@ bdr = "Business Detection Schema"
 [icons]
 tvm = "☣️"
 dom = "🎯"
+signal = "📡"
 cdm = "🛡️"
 mdr = "🚨"
 bdr = "🏛️"

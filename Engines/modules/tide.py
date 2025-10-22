@@ -1127,13 +1127,13 @@ class DataTide:
         """Index containing model types"""
         tvm = dict(Index["tvm"])
         """Threat Vector Models Data Index"""
-        dom = dict(Index["dom"])
+        dom = dict(Index.get("dom"))
         """Detection Objectives Raw Index"""
-        DOM = {uuid:TideLoader.load_dom(deepcopy(data)) for (uuid, data) in dict(Index.copy()["dom"]).items()} 
+        DOM = {uuid:TideLoader.load_dom(deepcopy(data)) for (uuid, data) in dict(Index.copy().get("dom")).items()} if dom else None
         """Detection Objectives Pre-Loaded Index"""
         signal = dict(Index["signal"])
         """Detection Objectives Signals Raw Index"""
-        Signal = {uuid:TideLoader.load_signal(deepcopy(data)) for (uuid, data) in dict(Index.copy()["signal"]).items()} 
+        Signal = {uuid:TideLoader.load_signal(deepcopy(data)) for (uuid, data) in dict(Index.copy().get("signal")).items()} if signal else None 
         """Detection Objectives Signals Pre-Loaded Index"""
         bdr = dict(Index["bdr"])
         """Business Detection Rules Data Index"""
@@ -1218,7 +1218,7 @@ class DataTide:
         templates = dict(IndexTide.load()["templates"])
         tvm = dict(Index["tvm"])
         """Threat Vector Model Tide Schema"""
-        dom = dict(Index["dom"])
+        dom = dict(Index.get("dom"))
         """Detection Objective Model Tide Schema"""
         cdm = dict(Index["cdm"])
         """Cyber Detection Model Tide Schema"""
@@ -1309,7 +1309,7 @@ class DataTide:
                     the other attributes which are precomputed"""
                     
                     tvm = Index["tvm"]
-                    dom = Index["dom"]
+                    dom = Index.get("dom")
                     cdm = Index["cdm"]
                     mdr = Index["mdr"]
                     bdr = Index["bdr"]

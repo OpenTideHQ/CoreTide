@@ -22,7 +22,8 @@ properties:
     title: Schema identifier and version
     type: string
     description: Identifier of the schema at its current version 
-    const: defender_for_endpoint::2.0
+    default: defender_for_endpoint::2.1
+    tide.template.force-required: True
 
   status: 
     title: Status of the use-case
@@ -505,8 +506,22 @@ properties:
           tide.template.multiline: true
           tide.template.config.default: schema.templates.mdr::exclusions::reason
 
+        let:
+          title: KQL let bindings
+          description: |
+            Optional map of KQL variables to be declared for this exclusion. Each
+            key will be emitted as a `let` statement and can be referenced in the
+            `query` field. Values must be strings and will be inserted verbatim.
+          type: object
+          tide.template.spacer: False
+          patternProperties:
+            "^[A-Za-z0-9_-]+$":
+              example: variable
+              type: string
+          additionalProperties: False
+
         query:
-          title: Exclusion Query 
+          title: Exclusion KQL 
           type: string
           description: |
             Write here the exclusion query, that will be appended to the base query

@@ -267,7 +267,6 @@ def indexer(write_index=False) -> dict:
                                     signal.update({"parent":identifier})
                                     objects_index["signal"][signal["uuid"]] = signal
 
-            print(objects_index["signal"])
             objects_index[meta_name] = model_cat_index
 
     index["objects"] = objects_index

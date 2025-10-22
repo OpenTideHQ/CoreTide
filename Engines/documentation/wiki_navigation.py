@@ -360,7 +360,7 @@ def construct_navigation_index(model):
         nav_index += "\n\n---\n" + deprecated_mdr_summary + "\n\n" + deprecated_mdr_details
 
     else:
-        count = len(MODELS_INDEX[model])
+        count = len(MODELS_INDEX.get(model, []))
         summary = CENTER_TEXT.format(icon=icon,
                                     count=count,
                                     model_title=model_title)

@@ -29,7 +29,8 @@ class SentinelDeploy(DeployMDR):
 
     def compile_deployment(self,
                            service: SecurityInsights,
-                           data:TideModels.MDR):
+                           data:TideModels.MDR,
+                           tenant:str):
 
         rule = service.alert_rules.models.ScheduledAlertRule()
         
@@ -38,7 +39,40 @@ class SentinelDeploy(DeployMDR):
             raise Exception
         status = configuration.status
         rule.enabled = True
-        rule.query = configuration.query
+
+        # Handle Query and Exclusions
+        let_statements = []
+        exclusions_queries = []
+
+        if exclusions:=configuration.exclusions:
+            for exclusion in exclusions:
+                # Applies exclusion if scoped tenant is matching with ongoing deployment
+                # or if no tenant is specified
+                if (exclusion.tenant == tenant) or (not exclusion.tenant):
+                    log("INFO", "Applying exclusion", exclusion.query)
+                    exclusions_queries.append(exclusion.query)
+
+                    # Handles adding additional let statements
+                    if exclusion.let:
+                        for variable, value in exclusion.let.items():
+                            statement = f"let {variable} = {value};"
+                            log("INFO", "Applying let statement", statement)
+                            let_statements.append(statement)
+                            
+        
+        let_block = "\n".join(let_statements)
+        exclusions_block = "\n".join(exclusions_queries)
+        query = configuration.query
+        
+        if let_statements:
+            query = let_block + "\n" + query
+        if exclusions_queries:
+            query = query + "\n" + exclusions_block
+        
+        log("INFO", "Final compiled query")
+        print(query)
+        
+        rule.query = query
 
         if check_status(status) is StatusStrategy.DISABLEMENT:
             rule.enabled = False
@@ -248,7 +282,8 @@ class SentinelDeploy(DeployMDR):
 
         log("ONGOING", "Compiling Scheduled Alert Object")
         alert_rule = self.compile_deployment(data=data,
-                                             service=service)
+                                             service=service,
+                                             tenant=tenant_config.name)
 
         log("INFO", "Deploying rule to Sentinel")
         service.alert_rules.create_or_update(

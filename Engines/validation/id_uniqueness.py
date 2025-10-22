@@ -40,6 +40,7 @@ def run():
                     "Could not find the folder at the expected location",
                     str(PATHS[meta_name]),
                     "Ensure that your repository and configuration files are aligned")
+                continue
 
             for model in os.listdir(PATHS[meta_name]):
                 #Skips for empty InitTide repositories

@@ -2,7 +2,7 @@ import pandas as pd
 import git
 import sys
 import json
-from typing import Literal
+from typing import Literal, Union, Optional
 
 sys.path.append(str(git.Repo(".", search_parent_directories=True).working_dir))
 
@@ -236,7 +236,8 @@ def rich_attack_links(
 def backlink_resolver(model_uuid:str,
                         raw_link:bool=False,
                         raw_hover:bool=False,
-                        hover_length:int=150):
+                        hover_length:int=150,
+                        current_page:Optional[str]=None):
     """
     Formats a markdown link to the model, using localized paths.
 
@@ -246,11 +247,16 @@ def backlink_resolver(model_uuid:str,
     model_type = get_type(model_uuid)
     file_link = backlink_name = icon = str()
 
+        
+
     model_data:dict = MODELS_INDEX[model_type][model_uuid]
     icon = ICONS[model_type]
 
-    doc_path = "../" + DOCUMENTATION_CONFIG.object_names[model_type] + "/"
-    hover = ""
+    if model_type == "signal":
+        doc_path = "../" + DOCUMENTATION_CONFIG.object_names["dom"] + "/"
+    else:
+        doc_path = "../" + DOCUMENTATION_CONFIG.object_names[model_type] + "/"
+        hover = ""
 
     def mdr_statuses(mdr_id):
         mdr_configs = MODELS_INDEX["mdr"][mdr_id]["configurations"]
@@ -266,8 +272,26 @@ def backlink_resolver(model_uuid:str,
         hover = model_value(model_uuid, "description")
     if model_type == "cdm":
         hover = model_value(model_uuid, "guidelines")
-    
-    if model_type == "mdr":
+    if model_type == "dom":
+        objective_data = DataTide.Models.DOM[model_uuid]
+        hover = objective_data.objective.description
+
+    if model_type == "signal":
+        signal_data = DataTide.Models.Signal[model_uuid]
+        objective_data = DataTide.Models.DOM[signal_data.parent]
+        if current_page:
+            # If we're on the current DOM page, we should just do an anchor and no need to add
+            # the full context
+            backlink_name = signal_data.name
+            hover = signal_data.description
+            file_link = f"#{signal_data.name.replace(" ", "-").lower()}"
+
+        else:
+            backlink_name = objective_data.name + "::" + signal_data.name
+            hover = signal_data.description
+            # We point to the parent objective wiki page with an anchor to the signal name
+            file_link = objective_data.name + f"#{signal_data.name.replace(" ", "-").lower()}"
+    elif model_type == "mdr":
         model_name = model_data["name"]
 
         backlink_name = model_name.replace("_", " ")
@@ -285,11 +309,17 @@ def backlink_resolver(model_uuid:str,
 
     if DOCUMENTATION_TARGET in TARGET_WITH_DASH_PATHS:
         if UUID_PERMALINKS:
-            file_link = doc_path + model_data.get("metadata",{}).get("uuid")
+            if model_type == "signal":
+                signal_data = DataTide.Models.Signal[model_uuid]
+                parent_uuid = signal_data.parent
+                file_link = doc_path + parent_uuid
+            else:
+                file_link = doc_path + model_data.get("metadata",{}).get("uuid")
         file_link = file_link.replace(" ", "-").replace("_", "-")
     else:
         file_link = file_link.replace(" ", "%20")
-        file_link += ".md"
+        if not current_page:
+            file_link += ".md"
 
 
     hover = sanitize_hover(str(hover))

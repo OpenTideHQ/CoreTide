@@ -1,0 +1,25 @@
+name: Detection Types
+field: detection.types
+description: Purpose of different Detection Objectives
+keys:
+  - id: d86e629b-df0f-45ae-b851-3fa21e0cd9c1
+    name: Threat
+    description: |
+      Alerts meant for detection cybersecurity threats, and which should 
+      eventually trigger Incident Response  
+  - id: 0be140ac-c651-4d8f-9282-09eba94b52a1
+    name: Compliance
+    description: 
+      Alerts/Alarms which are relevant from a Business Operation compliance
+      standpoint, for example to monitor that processes are respected
+  - id: fcbcf010-a9e4-4714-b22d-a745e6c35896
+    name: Utility
+    description: |
+      Searches and other mechanisms meant to support different processes
+      not directly related to threat detection, for example to move data
+      from one source to another or detect log source anomalies.
+  - id: 5c8b9be3-ef99-4e75-ba7a-706f43bdfb05
+    name: Supportive
+    description: |
+      Objective not directly related to threat detection capabilities, but
+      which may support another objective.

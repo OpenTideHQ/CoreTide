@@ -250,7 +250,7 @@ class TideDefinitionsModels:
         created: str
         modified: str
         tlp: str
-        author: str
+        author: Optional[str] = None
         contributors: Optional[Sequence[str]] = None
         organisation: Optional[Organisation] = None
 

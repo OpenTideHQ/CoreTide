@@ -64,6 +64,17 @@ NAV_INDEX_FIELDS = {
         "impact",
         "leverage",
     ],
+    "dom": [
+        "uuid",
+        "name",
+        "priority",
+        "tlp",
+        "att&ck",
+        "objective",
+        "modified",
+        "threats",
+        "implementations"
+    ],
     "cdm": [
         "uuid",
         "name",
@@ -141,6 +152,7 @@ def build_search(model_type, mdr_status:Optional[Literal["ACTIVE", "DEPRECATED"]
         
         for value in NAV_INDEX_FIELDS[model_type]:
 
+
             if value == "name":
                 object_backlink = str(backlink_resolver(str(model_value_doc(entry, "uuid"))))
                 object_backlink = object_backlink.replace("../", "./")
@@ -199,6 +211,26 @@ def build_search(model_type, mdr_status:Optional[Literal["ACTIVE", "DEPRECATED"]
                 else:
                     row[value] = "❔ No Object Mapped"
 
+            elif model_type == "dom" and value == "threats":
+                vectors = model_value_doc(entry, "threats")
+                if vectors:
+                    vectors = [vectors] if type(vectors) is str else vectors
+                    vectors_links = []
+                    for vector in vectors:
+                        object_backlink = str(backlink_resolver(str(vector)))
+                        object_backlink = object_backlink.replace("../", "./")
+                        vectors_links.append(object_backlink)
+                    row[value] = ", ".join(vectors_links)
+                else:
+                    row[value] = "❔ No Object Mapped"
+
+            elif model_type == "dom" and value == "objective":
+                objective_section:dict = model_value_doc(entry, "objective") #type: ignore
+                objective_description = objective_section.get("description") or ""
+                objective_description = objective_description.replace("\n", " ")
+                row[value] = objective_description
+
+
             elif model_type == "mdr":
 
                 if value == "statuses":
@@ -248,6 +280,8 @@ def build_search(model_type, mdr_status:Optional[Literal["ACTIVE", "DEPRECATED"]
                 model_value = model_value_doc(
                     entry, value, with_icon=True, max_chars=CHARS_CLIP
                 )
+
+                model_value = f"`{model_value}`" if value == "uuid" else model_value
 
                 if type(model_value) == list:
                     if model_value != [None]:
@@ -345,13 +379,6 @@ def run():
         "INFO",
         "Assembles tables exposing CoreTIDE data to make the dataset easier to navigate",
     )
-
-    if DOCUMENTATION_TARGET not in [CIEnvironment.CIPlatforms.GitlabCI,
-                                    CIEnvironment.CIPlatforms.AzurePipeline] :
-        log("SKIP",
-            "This is a Gitlab Wiki or Azure Pipeline only feature",
-            f"documentation_target is currently set to : {DOCUMENTATION_TARGET}")
-        return 
 
     if not COVER_PAGES_ENABLED:
         log("SKIP",

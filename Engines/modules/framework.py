@@ -2,7 +2,7 @@ import os
 import git
 import uuid
 import sys
-from typing import Literal, overload
+from typing import Literal, overload, Tuple
 
 sys.path.append(str(git.Repo(".", search_parent_directories=True).working_dir))
 
@@ -175,7 +175,6 @@ def get_value_metaschema(
 
 
 def rename_param_nest(nest, schema, scope=None):
-    print("SCOPE ", scope)
     nest_copy = nest.copy()
 
     for item in nest_copy:
@@ -242,6 +241,33 @@ def vocab_metadata(vocab: str, field=None) -> str | dict:
     else:
         return vocab_data
 
+def get_vocab_stage_details(vocabulary:str, stage_identifier:str)->None|Tuple[str,str]:
+    """
+    Return a tuple of the name and description for a particular stage of a vocabulary.
+    If no stage correspond, or the vocabulary has no stages, returns nothing. 
+    """
+    if vocabulary not in VOCAB_INDEX:
+        log("FAILURE",
+            "The requested vocabulary does not exist in the index space",
+            vocabulary)
+        return None
+
+    stages_section = VOCAB_INDEX[vocabulary]["metadata"].get("stages")
+    if not stages_section:
+        log("FAILURE",
+            "The requested vocabulary does not contain a stage section",
+            vocabulary)
+        return None
+    
+    for stage in stages_section:
+        if stage.get("id") == stage_identifier:
+            log("INFO",
+                f"Found corresponding stage in the requested vocabulary {vocabulary}",
+                stage_identifier,
+                str(stage))
+            return stage.get("name"), stage.get("description")
+    
+    return None
 
 def get_vocab_entry(vocab, identifier, field=None, newlines=False):
     """
@@ -253,6 +279,8 @@ def get_vocab_entry(vocab, identifier, field=None, newlines=False):
 
     if vocab not in VOCAB_INDEX.keys():
         return ""
+
+    identifier = identifier.split("::")[-1] if "::" in identifier else identifier
 
     if identifier in VOCAB_INDEX[vocab]["entries"].keys():
         entry_data = VOCAB_INDEX[vocab]["entries"][identifier]
@@ -332,6 +360,8 @@ def parents(id: str) -> list:
     model_type = get_type(id)
     parents = []
     parent_mappings = {
+        "dom": {"data": "objective", "parent": "threats"},
+        "signal": {"parent": "parent"},
         "cdm": {"data": "detection", "parent": "vectors"},
         "mdr": {"parent": "detection_model"},
     }
@@ -356,7 +386,7 @@ def parents(id: str) -> list:
 
 def childs(model_id: str) -> list:
     """
-    Returns the list of direct descendants for any given CoreTIDE Object,
+    Returns the list of direct descendants for any given OpenTide Object,
     by performing a forward search.
 
     If the object can not have descendants, or in other word is a last-line
@@ -366,34 +396,38 @@ def childs(model_id: str) -> list:
     implementations = []
 
     mappings = {
-        "tvm": {"child_type": "cdm", "data": "detection", "reference": "vectors"},
-        "cdm": {"child_type": "mdr", "reference": "detection_model"},
-        "bdr": {"child_type": "mdr", "reference": "detection_model"},
+        "tvm": {"child_types": ["cdm", "dom"], "data_sections": ["detection", "objective"], "references": ["vectors", "threats"]},
+        "dom": {"child_types": ["signal", "mdr"], "references": ["detection_model", "parent"]},
+        "signal": {"child_types": ["mdr"], "references": ["detection_model"]},
+        "cdm": {"child_types": ["mdr"], "references": ["detection_model"]},
+        "bdr": {"child_types": ["mdr"], "references": ["detection_model"]},
     }
 
     model_type = get_type(model_id)
-
     if model_type not in mappings.keys():
         return []
 
-    child_type = mappings[model_type]["child_type"]
-    data = mappings[model_type].get("data", None)
-    reference = mappings[model_type]["reference"]
+    child_types = mappings[model_type]["child_types"]
+    child_types = [child_types] if type(child_types) is str else child_types
+    data_sections = mappings[model_type].get("data_sections", None)
+    references = mappings[model_type]["references"]
 
-    CHILDS_INDEX = MODELS_INDEX[child_type]
-    for child in CHILDS_INDEX:
-        if child_type == "mdr":
-            data = None
-        
-        if data:
-            if model_id in CHILDS_INDEX[child].get(data, {}).get(reference, []):
-                implementations.append(child)
-        else:
-            if model_id in CHILDS_INDEX[child].get(reference, []):
-                implementations.append(child)
 
+    for child_type in child_types:
+        CHILDS_INDEX = MODELS_INDEX[child_type]
+        for child in CHILDS_INDEX:            
+            if data_sections:
+                for section in data_sections:
+                    for reference in references:
+                        if model_id in CHILDS_INDEX[child].get(section, {}).get(reference, []):
+                            implementations.append(child)
+            else:
+                for reference in references:
+                    if model_id in CHILDS_INDEX[child].get(reference, []):
+                        implementations.append(child)
 
     return implementations
+
 @overload
 def get_type(model_uuid:str)->str:
     ...
@@ -420,6 +454,8 @@ def get_type(model_uuid:str, mute:bool=False):
     schema = model_body.get("metadata", {}).get("schema")
     if not schema:
         #TODO For backwards compatibility with MDR still on 1.0. To be deprecated.
+        if model_uuid in DataTide.Models.signal:
+            return "signal"
         if model_body.get("configurations"):
             return "mdr"
         if mute:
@@ -494,6 +530,18 @@ def techniques_resolver(model_id: str, recursive=True) -> list:
             else:
                 return techniques
 
+    if model_type == "dom":
+        if "att&ck" in model_body["objective"]:
+            techniques = model_body["objective"]["att&ck"]
+        else:
+            parent_ids = model_body["objective"].get("threats")
+            if recursive:
+                if parent_ids:
+                    for parent_id in parent_ids:
+                        techniques.extend(techniques_resolver(parent_id))
+            else:
+                return techniques
+
     if model_type == "cdm":
         if "att&ck" in model_body["detection"]:
             techniques = [model_body["detection"]["att&ck"]]
@@ -518,15 +566,20 @@ def techniques_resolver(model_id: str, recursive=True) -> list:
 def relations_downstream(id):
 
     tree = {}
-
-    if get_type(id) in ["cdm", "bdr"]:
+    
+    if get_type(id) in ["signal", "cdm", "bdr"]:
         tree = keep_active_mdr(childs(id))
+    elif get_type(id) == "dom":
+        for child in childs(id):
+            if get_type(child) == "signal":
+                tree[child] = relations_downstream(child)
+            elif get_type(child) == "mdr":
+                tree[child] = None
     else:
         for c in childs(id):
             tree[c] = relations_downstream(c)
 
     return tree
-
 
 def relations_upstream(id):
 

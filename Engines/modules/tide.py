@@ -3,7 +3,18 @@ import git
 import sys
 from pathlib import Path
 import json
-from typing import Literal, Dict, Mapping, Tuple, Never, overload, Any, Sequence, Mapping, Union
+from typing import (
+    Any,
+    Dict,
+    Literal,
+    Mapping,
+    Never,
+    Optional,
+    Sequence,
+    Tuple,
+    Union,
+    overload,
+)
 from functools import cache
 from abc import ABC
 from importlib import import_module
@@ -21,6 +32,8 @@ from Engines.modules.models import (DetectionSystems,
                                     TideConfigs,
                                     SystemConfig)
 from Engines.modules.patching import Tide2Patching
+from Engines.modules.datamodels.objects import Objects
+from Engines.modules.datamodels.configurations import Configurations
 
 ROOT = Path(str(git.Repo(".", search_parent_directories=True).working_dir))
 
@@ -28,7 +41,7 @@ ROOT = Path(str(git.Repo(".", search_parent_directories=True).working_dir))
 # Configuration Models. Used to facilitate type hinting
 class HelperTide:
     @staticmethod
-    def is_debug()->bool:
+    def is_debug() -> bool:
         """
         Provides an interface to discover whether the current execution
         context is considered to be in a debugging scenario.
@@ -75,7 +88,7 @@ class HelperTide:
             try:
                 import_module("Engines.modules.local_secrets")
             except:
-                print("[FAILURE]",
+                log("FAILURE",
                     "Could not find local python file at `Engines.modules.local_secrets` to set secret environment variables",
                     "Parts of this module may not work properly",
                     "Refer to the relevant TOML conguration file to find which variables may be necessary")
@@ -641,8 +654,7 @@ class SystemLoader:
                                     exclusions=exclusions)
 
 
-class TideLoader:
-
+class ConfigurationsLoader:
     @staticmethod
     def load_statuses(statuses_configuration:list[dict])->Sequence[TideConfigs.Deployment.Status]:
         """
@@ -660,6 +672,202 @@ class TideLoader:
             parsed_configuration.append(Status(**status_configuration))
 
         return parsed_configuration
+
+    @staticmethod
+    def load_visibility(config: dict) -> Optional[Configurations.Visibility]:
+        """Load visibility configuration from a dictionary into a strongly-typed dataclass.
+        
+        This method processes the visibility configuration which consists of three main components:
+        1. Assets - Business or technical assets that generate logs
+        2. Log Sources - Specific sources that can be queried for detection purposes
+        3. Detectors - External detection capabilities from third-party tools and platforms
+        
+        Args:
+            config: Dictionary containing the visibility configuration with 'assets', 'logsources', and 'detectors' sections
+            
+        Returns:
+            Configurations.Visibility: Populated dataclass if configuration exists
+            None: If no visibility configuration is found
+            
+        Raises:
+            ValueError: If the configuration is malformed, missing required fields,
+                      or contains references to non-existent assets
+        """
+        # Early return if no configuration exists
+        if not config:
+            return None
+            
+        try:
+            # Process assets section first to build reference set
+            assets = None
+            asset_names = set()
+            if asset_configuration:=config.get("assets"):
+                assets = []
+                for asset_config in asset_configuration:
+                    asset = Configurations.Visibility.Asset(**asset_config)
+                    assets.append(asset)
+                    asset_names.add(asset.name)
+                
+            # Process log sources section and validate asset references
+            logsources = []
+            for source_config in config.get("logsources", []):
+                # Validate asset references before creating LogSource
+                if source_assets := source_config.get("assets"):
+                    invalid_assets = [asset for asset in source_assets if asset not in asset_names]
+                    if invalid_assets:
+                        log("FAILURE", 
+                            f"Log source '{source_config.get('name')}' references non-existent assets",
+                            f"Invalid assets: {', '.join(invalid_assets)}",
+                            "These assets must be defined in the assets section",
+                            "Configuration will load but may be incomplete")
+                
+                logsources.append(Configurations.Visibility.LogSource(**source_config))
+                
+            # Process detectors section and validate asset references
+            detectors = []
+            for detector_config in config.get("detectors", []):
+                # Validate asset references before creating Detector
+                if detector_assets := detector_config.get("assets"):
+                    invalid_assets = [asset for asset in detector_assets if asset not in asset_names]
+                    if invalid_assets:
+                        log("FAILURE", 
+                            f"Detector '{detector_config.get('name')}' references non-existent assets",
+                            f"Invalid assets: {', '.join(invalid_assets)}",
+                            "These assets must be defined in the assets section",
+                            "Configuration will load but may be incomplete")
+                
+                detectors.append(Configurations.Visibility.Detector(**detector_config))
+                
+            # Create and return the complete configuration
+            return Configurations.Visibility(
+                logsources=logsources if logsources else None,
+                assets=assets if assets else None,
+                detectors=detectors if detectors else None
+            )
+            
+        except (KeyError, TypeError) as e:
+            log("FATAL",
+                "Failed to load visibility configuration",
+                f"Error details: {str(e)}",
+                "Ensure all required fields are present and properly formatted",
+                "Check the schema documentation for complete requirements")
+            raise ValueError(f"Failed to load visibility configuration: {str(e)}")
+
+
+class TideLoader:
+
+    @staticmethod
+    def load_signal(signal: dict) -> Objects.DetectionObjective.Objective.Signal:
+        try:
+            # Process data field - required
+            if "data" not in signal:
+                log("FATAL", "Missing required data field for signal", str(signal))
+                raise KeyError(f"Required 'data' field missing from signal")
+            
+            data = Objects.DetectionObjective.Objective.Signal.Data(**signal.pop("data"))
+            
+            # Process optional lists
+            detectors = [Objects.DetectionObjective.Objective.Signal.Detector(**ext) 
+                        for ext in signal.pop("detectors", [])]
+            examples = [Objects.DetectionObjective.Objective.Signal.Example(**comm) 
+                        for comm in signal.pop("examples", [])]
+            
+            # Create signal with remaining fields
+            return Objects.DetectionObjective.Objective.Signal(
+                data=data,
+                detectors=detectors if detectors else None,
+                examples=examples if examples else None,
+                **signal
+                )
+            
+        except (KeyError, TypeError) as e:
+            log("FATAL", "Failed to process signal", str(e))
+            raise ValueError("Invalid signal configuration")
+
+
+    @staticmethod
+    def load_dom(dom: dict) -> Objects.DetectionObjective:
+        """Transform a raw Detection Objective dictionary into a strongly-typed dataclass.
+        
+        Args:
+            dom: Raw dictionary loaded from a Detection Objective YAML file
+            
+        Returns:
+            Objects.DetectionObjective: Fully populated Detection Objective dataclass
+            
+        Raises:
+            KeyError: If required fields are missing
+            ValueError: If data validation fails
+        """
+        dom = deepcopy(dom)
+        
+        # Check for name first since we need it for meaningful error messages
+        if "name" not in dom:
+            log("FATAL", "Missing required field 'name' in Detection Objective")
+            raise KeyError("Missing required field 'name' in Detection Objective")
+            
+        log("ONGOING", "Loading Detection Objective", dom["name"])
+        
+        # Check remaining required top-level fields
+        if not all(key in dom for key in ["metadata", "objective"]):
+            missing = [k for k in ["name", "metadata", "objective"] if k not in dom]
+            log("FATAL", "Missing required top-level fields", ", ".join(missing))
+            raise KeyError("Required fields missing from Detection Objective")
+
+        try:
+            # Process metadata and references
+            metadata = TideDefinitionsModels.TideObjectMetadata(**dom.pop("metadata"))
+            references = None
+            if "references" in dom:
+                references = TideDefinitionsModels.TideObjectReferences(**dom.pop("references"))
+
+            # Process objective section
+            objective_data = dom.pop("objective")
+            if not objective_data:
+                log("FATAL", "Empty objective section")
+                raise ValueError("Objective section cannot be empty")
+            
+            attack = objective_data.pop("att&ck", None)
+
+            # Process signals with error handling
+            if "signals" not in objective_data:
+                log("FATAL", "Missing signals section in objective")
+                raise KeyError("Required 'signals' field missing from objective")
+                
+            signals = []
+            for signal in objective_data.pop("signals"):
+                signals.append(TideLoader.load_signal(signal))
+                
+            # Process composition - required
+            if "composition" not in objective_data:
+                log("FATAL", "Missing composition section in objective")
+                raise KeyError("Required 'composition' field missing from objective")
+            
+            composition = Objects.DetectionObjective.Objective.Composition(**objective_data.pop("composition"))
+            
+            # Create objective with remaining fields
+            objective = Objects.DetectionObjective.Objective(
+                signals=signals,
+                composition=composition,
+                attack=attack,
+                **objective_data
+            )
+            
+            result = Objects.DetectionObjective(
+                name=dom["name"],
+                metadata=metadata,
+                objective=objective,
+                composition=composition,
+                references=references
+            )
+            
+            log("ONGOING", "Detection Objective loaded successfully", dom["name"])
+            return result
+            
+        except Exception as e:
+            log("FATAL", f"Failed to load Detection Objective '{dom.get('name', 'unnamed')}':", str(e))
+            raise
+
 
     @staticmethod
     def load_mdr(mdr:dict)->TideModels.MDR:
@@ -919,6 +1127,16 @@ class DataTide:
         """Index containing model types"""
         tvm = dict(Index["tvm"])
         """Threat Vector Models Data Index"""
+        dom = dict(Index["dom"])
+        """Detection Objectives Raw Index"""
+        DOM = {uuid:TideLoader.load_dom(deepcopy(data)) for (uuid, data) in dict(Index.copy()["dom"]).items()} 
+        """Detection Objectives Pre-Loaded Index"""
+        signal = dict(Index["signal"])
+        """Detection Objectives Signals Raw Index"""
+        Signal = {uuid:TideLoader.load_signal(deepcopy(data)) for (uuid, data) in dict(Index.copy()["signal"]).items()} 
+        """Detection Objectives Signals Pre-Loaded Index"""
+        bdr = dict(Index["bdr"])
+        """Business Detection Rules Data Index"""
         cdm = dict(Index["cdm"])
         """Cyber Detection Models Data Index"""
         mdr = dict(Index["mdr"])
@@ -926,11 +1144,9 @@ class DataTide:
         # We need to do a deepcopy to ensure that loading steps aren't modifying the original data
         MDR = {uuid:TideLoader.load_mdr(deepcopy(data)) for (uuid, data) in dict(Index.copy()["mdr"]).items()} 
         """Model Mapped Managed Detection Rules Data Index"""
-        bdr = dict(Index["bdr"])
-        """Business Detection Rules Data Index"""
         chaining = IndexTide.compute_chains(tvm)
         """Index of all chaining relationships"""
-        FlatIndex =  tvm | cdm | mdr | bdr
+        FlatIndex =  tvm | dom | signal | cdm | mdr | bdr
         """Flat Key Value pair structure of all UUIDs in the index"""
         files = dict(IndexTide.load()["files"])
     
@@ -962,6 +1178,8 @@ class DataTide:
         Index = dict(IndexTide.load()["json_schemas"])
         tvm = dict(Index.get("tvm", {}))
         """Threat Vector Model JSON Schema"""
+        dom = dict(Index.get("dom", {}))
+        """Detection Objective Model JSON Schema"""
         cdm = dict(Index.get("cdm", {}))
         """Cyber Detection Model JSON Schema"""
         mdr = dict(Index.get("mdr", {}))
@@ -978,6 +1196,8 @@ class DataTide:
         Index = dict(IndexTide.load()["templates"])
         tvm = str(Index.get("tvm"))
         """Threat Vector Model Object Template"""
+        dom = str(Index.get("cdm"))
+        """Detection Objective Model Object Template"""
         cdm = str(Index.get("cdm"))
         """Cyber Detection Model Object Template"""
         mdr = str(Index.get("mdr"))
@@ -987,7 +1207,7 @@ class DataTide:
 
     @dataclass(frozen=True)
     class TideSchemas:
-        """TIDE Schema Interface.
+        """OpenTide Meta Schema Interface.
 
         Exposes the different schemas used across the instance
         """
@@ -998,6 +1218,8 @@ class DataTide:
         templates = dict(IndexTide.load()["templates"])
         tvm = dict(Index["tvm"])
         """Threat Vector Model Tide Schema"""
+        dom = dict(Index["dom"])
+        """Detection Objective Model Tide Schema"""
         cdm = dict(Index["cdm"])
         """Cyber Detection Model Tide Schema"""
         mdr = dict(Index["mdr"])
@@ -1087,6 +1309,7 @@ class DataTide:
                     the other attributes which are precomputed"""
                     
                     tvm = Index["tvm"]
+                    dom = Index["dom"]
                     cdm = Index["cdm"]
                     mdr = Index["mdr"]
                     bdr = Index["bdr"]
@@ -1195,13 +1418,21 @@ class DataTide:
             """Generic deployment parameters."""
 
             Index = dict(IndexTide.load()["configurations"]["deployment"])
-            print(Index)
-            statuses = TideLoader.load_statuses(Index["statuses"])
+            statuses = ConfigurationsLoader.load_statuses(Index["statuses"])
             promotion = dict(Index["promotion"])
             default_responders = str(Index["default_responders"])
             proxy = dict(Index["proxy"])
             metadata_lookup = dict(Index["metadata_lookup"])
             debug = dict(Index["debug"])
+
+        @dataclass(frozen=True)
+        class Visibility:
+            """OpenTide instance visibility configuration including logsources, assets, and detectors"""
+            Index = dict(IndexTide.load()["configurations"]["visibility"])
+            visibility = ConfigurationsLoader.load_visibility(Index)
+            assets = visibility.assets if visibility else None
+            detectors = visibility.detectors if visibility else None
+            logsources = visibility.logsources if visibility else None
 
         @dataclass(frozen=True)
         class Lookups:

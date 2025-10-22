@@ -77,7 +77,7 @@ def gen_schema_md(metaschema, template, model_type=None):
         if model_type == "mdr":
             template_name = "MDR Detection Name.yaml"
         else:
-            template_name = f"{model_type.upper()}0001 - Object Name.yaml"
+            template_name = f"Object Name.yaml"
 
     table = gen_schema_md_table(metaschema)
     template = template.rstrip()

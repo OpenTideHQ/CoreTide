@@ -10,6 +10,8 @@ sys.path.append(str(git.Repo(".", search_parent_directories=True).working_dir))
 
 from Engines.modules.tide import DataTide, IndexTide
 from Engines.modules.deployment import CIEnvironment
+from Engines.modules.framework import techniques_resolver
+from Engines.modules.documentation import rich_attack_links
 
 CONFIG = DataTide.Configurations
 INDEX = DataTide.Index
@@ -78,6 +80,46 @@ def actors_doc(actors:list[dict])->str:
 
     return pd.DataFrame(data).to_markdown(index=False)
 
+def attack_techniques(uuid:str) -> str:
+    """
+    Generate a formatted string of ATT&CK techniques for a given UUID.
+    Manages inheritance and technique overwriting.
+    Args:
+        uuid (str): The unique identifier for which to retrieve ATT&CK techniques.
+    Returns:
+        str: A formatted string containing ATT&CK techniques with icons and links,
+             or an empty string if no techniques are found.
+    """
+    
+    techniques = techniques_resolver(uuid)
+    if techniques:
+        techniques = rich_attack_links(techniques, output="string")
+        return f"{get_icon('att&ck')} **ATT&CK Techniques** :  {techniques}"
+    else:
+        return ""
+
+
+
+def frontmatter_doc(object_name:str, object_uuid:str)->str:
+    """
+    Generate YAML frontmatter for wiki pages.
+    
+    Args:
+        wiki_target: Target CI environment platform
+        object_name: Page title
+        object_uuid: UUID of the object
+    
+    Returns:
+        YAML frontmatter string or empty string if not applicable
+    """
+    
+    if CIEnvironment()._check_ci_environment() is not CIEnvironment.CIPlatforms.GitlabCI:
+        return ""    
+    if DataTide.Configurations.Documentation.gitlab.get("uuid_permalinks", False):
+        return f"---\ntitle:{get_icon(get_type(object_uuid))} {object_name}\n---"
+    else:
+        return ""
+
 def criticality_doc(criticality_data: str) -> str:
     criticality_icon = get_icon("criticality")
     criticality_data_icon = get_icon(criticality_data, vocab="criticality")
@@ -97,6 +139,8 @@ def metadata_doc(metadata: dict, model_type: str) -> str:
     schema = dict()
 
     for key, value in metadata.items():
+        if key == "tlp":
+            continue
         meta_title = get_field_title(key, metaschema)
         if meta_title:
             # Push schema at the end of the line
@@ -125,6 +169,10 @@ def reference_doc(references: dict) -> str:
     reference_doc_markdown = str()
     reference_labels = list()
     for scope in references:
+        
+        if not references[scope]:
+            continue
+        
         scope_title = get_field_title(
             scope, DEFINITIONS_INDEX["references"]["properties"]
         )
@@ -149,10 +197,14 @@ def relations_table(
     tree = None
     model_type = get_type(id)
 
+    current_page = "dom" if model_type == "dom" else None
+
     if direction == "downstream":
         tree = relations_downstream(id)
+        print(tree)
     elif direction == "upstream":
         tree = relations_upstream(id)
+        print(tree)
 
     if not tree:
         return ""
@@ -167,10 +219,10 @@ def relations_table(
                         branch_data[branch_type] = (
                             branch_data[branch_type]
                             + "<br>"
-                            + (backlink_resolver(branch))
+                            + (backlink_resolver(branch, current_page=current_page))
                         )
                     else:
-                        branch_data[branch_type] = backlink_resolver(branch)
+                        branch_data[branch_type] = backlink_resolver(branch, current_page=current_page)
 
                     if trunk[branch]:
                         unfold = unfold_trunk(trunk[branch]) or {}
@@ -182,7 +234,7 @@ def relations_table(
             if trunk:
                 branch_data = {}
                 branch_data[get_type(trunk[0])] = "<br>".join(
-                    [backlink_resolver(b) for b in trunk if b != "Unknown"] #type: ignore
+                    [backlink_resolver(b, current_page=current_page) for b in trunk if b != "Unknown"] #type: ignore
                 ) #type: ignore
                 return branch_data
 
@@ -200,20 +252,41 @@ def relations_table(
                 trunk_data["cdm"] = (
                     None if "cdm" not in trunk_data else trunk_data["cdm"]
                 )
-            if model_type in ["tvm", "cdm", "bdr"]:
+                trunk_data["dom"] = (
+                    None if "dom" not in trunk_data else trunk_data["dom"]
+                )
+
+            if model_type in ["tvm", "dom", "cdm", "bdr"]:
                 trunk_data["mdr"] = (
                     None if "mdr" not in trunk_data else trunk_data["mdr"]
                 )
 
+            if model_type == "dom":
+                    trunk_data["signal"] = (
+                    None if "signal" not in trunk_data else trunk_data["signal"]
+                )
+
+
         elif direction == "upstream":
             if "bdr" not in trunk_data:
-                if model_type in ["mdr", "cdm"]:
+                if model_type in ["mdr", "dom", "cdm"]:
                     trunk_data["tvm"] = (
                         None if "tvm" not in trunk_data else trunk_data["tvm"]
                     )
+                if model_type == "signal":
+                    trunk_data["dom"] = (
+                    None if "dom" not in trunk_data else trunk_data["dom"]
+                    )
+
                 if model_type in ["mdr"]:
                     trunk_data["cdm"] = (
                         None if "cdm" not in trunk_data else trunk_data["cdm"]
+                    )
+                    trunk_data["dom"] = (
+                        None if "dom" not in trunk_data else trunk_data["dom"]
+                    )
+                    trunk_data["signal"] = (
+                        None if "signal" not in trunk_data else trunk_data["signal"]
                     )
 
         data.append(trunk_data)

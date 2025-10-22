@@ -116,6 +116,11 @@ class TableExporter:
                 attack = object_data["threat"]["att&ck"]
                 attack = ", ".join(attack)
 
+            case "dom":
+                description = object_data["objective"].get("description")
+                if techniques:=object_data["objective"].get("att&ck"):
+                    attack = ", ".join(techniques)
+
             case "cdm":
                 description = object_data["detection"].get("guidelines")
                 if techniques:=object_data["detection"].get("att&ck"):
@@ -144,7 +149,15 @@ class TableExporter:
         
         dataset = list()
         for object_type in self.OBJECT_SCOPE:
-            for object in DataTide.Models.Index[object_type]:
+
+            object_index = DataTide.Models.Index.get(object_type)
+            if not object_index:
+                log("FAILURE",
+                    "Could not find a current indexable set of OpenTide object for the type",
+                    object_type)
+                continue
+
+            for object in object_index:
                 dataset.append(self._create_entry(object, object_type))
 
         return dataset

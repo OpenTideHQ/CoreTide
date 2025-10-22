@@ -17,7 +17,7 @@ from Engines.modules.logs import log
 from Engines.modules.patching import Tide2Patching
 
 def indexer(write_index=False) -> dict:
-    SKIPS = ["logsources", "ram", "mdrv2", "lookup_metadata"]
+    SKIPS = ["ram", "mdrv2", "lookup_metadata"]
     RESOLVED_CONFIGURATIONS = resolve_configurations()
 
     TIDE_CONFIG = RESOLVED_CONFIGURATIONS["global"]
@@ -221,13 +221,22 @@ def indexer(write_index=False) -> dict:
 
     objects_index = dict()
     files_index = dict()
+    objects_index["signal"] = dict() #Preassigning 
 
     #TODO Backward compatibility measure. To remove.
     patch = Tide2Patching()
-
     for meta_name in METASCHEMAS:
         if meta_name not in SKIPS:
             model_cat_index = dict()
+            
+            if not os.path.exists(PATHS[meta_name]):
+                log("FAILURE",
+                    "Could not find the folder at the expected location",
+                    str(PATHS[meta_name]),
+                    "Ensure that your repository and configuration files are aligned")
+                objects_index[meta_name] = {}
+                continue
+
             for model in os.listdir(PATHS[meta_name]):
                 
                 #Skips for empty InitTide repositories
@@ -250,6 +259,14 @@ def indexer(write_index=False) -> dict:
                         else:
                             model_cat_index[identifier] = model_body
                             files_index[identifier] = model
+
+                            # Creating a sub-index for signals so we can more easily search in them through DataTide
+                            if meta_name == "dom":
+                                signals = model_body.get("objective",{})["signals"]
+                                for signal in signals:
+                                    signal.update({"parent":identifier})
+                                    objects_index["signal"][signal["uuid"]] = signal
+
             objects_index[meta_name] = model_cat_index
 
     index["objects"] = objects_index

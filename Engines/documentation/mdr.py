@@ -311,7 +311,7 @@ def documentation(mdr):
     tlp = tlp_doc(mdr_metadata["tlp"])
 
     metadata = {k: v for k, v in mdr_metadata.items() if k != "tlp"}
-    metadata = metadata_doc(metadata, model_type="tvm")
+    metadata = metadata_doc(metadata, model_type="mdr")
 
     doc = TEMPLATEv3.format(
         frontmatter=frontmatter,

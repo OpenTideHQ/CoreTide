@@ -35,6 +35,11 @@ def run():
                 "Now checking for id duplication in",
                 f"{get_icon(meta_name)} {meta_name.upper()}...",
             )
+            if not os.path.exists(PATHS[meta_name]):
+                log("FAILURE",
+                    "Could not find the folder at the expected location",
+                    str(PATHS[meta_name]),
+                    "Ensure that your repository and configuration files are aligned")
 
             for model in os.listdir(PATHS[meta_name]):
                 #Skips for empty InitTide repositories

@@ -345,6 +345,11 @@ def get_key_in_model_body(model_body, key):
 
 def model_value(id, key):
     model_type = get_type(id)
+    if not MODELS_INDEX.get(model_type):
+        log("FAILURE", 
+            "Could not find object index",
+            model_type)
+        return None
     data = MODELS_INDEX[model_type][id]
     value = get_key_in_model_body(data, key)
     return value
@@ -367,6 +372,8 @@ def parents(id: str) -> list:
     }
 
     if model_type not in parent_mappings:
+        return []
+    if not MODELS_INDEX.get(model_type):
         return []
 
     model_data = MODELS_INDEX[model_type][id]
@@ -414,7 +421,7 @@ def childs(model_id: str) -> list:
 
 
     for child_type in child_types:
-        CHILDS_INDEX = MODELS_INDEX[child_type]
+        CHILDS_INDEX = MODELS_INDEX.get(child_type, [])
         for child in CHILDS_INDEX:            
             if data_sections:
                 for section in data_sections:
@@ -511,7 +518,12 @@ def techniques_resolver(model_id: str, recursive=True) -> list:
 
     # Find the model_type
     model_type = get_type(model_id)
-        
+    if not MODELS_INDEX.get(model_type):
+        log("FAILURE",
+            "Could not find object index",
+            model_type)
+        return []
+    
     # Load Model Data
     model_body = MODELS_INDEX[model_type][model_id]
 

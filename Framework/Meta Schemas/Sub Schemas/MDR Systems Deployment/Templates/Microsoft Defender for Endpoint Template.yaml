@@ -1,4 +1,4 @@
-  schema: defender_for_endpoint::2.0
+  schema: defender_for_endpoint::2.1
   status: 
   #contributors:
     #-
@@ -61,5 +61,7 @@
     #- tenant: 
       #reason: |
         #...
+      #let:
+        #variable: 
       #query: |
         #...

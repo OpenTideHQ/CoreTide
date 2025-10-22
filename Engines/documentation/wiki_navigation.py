@@ -120,7 +120,10 @@ MODELS = NAV_INDEX_FIELDS.keys()
 def build_search(model_type, mdr_status:Optional[Literal["ACTIVE", "DEPRECATED"]]=None):
 
     index = list()
-    index_data = MODELS_INDEX[model_type]
+    index_data = MODELS_INDEX.get(model_type)
+    if not index_data:
+        return "❌ No objects were indexed"
+    
     system_column = "🔧 Detection Systems"
     mdr_statuses = "♻️ Status"
     implementation_column = "🪛 Implementations"

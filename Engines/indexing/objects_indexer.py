@@ -37,6 +37,10 @@ def run():
         }
         entries = {}
         registry = DataTide.Models.Index.get(object_type)
+        object_index[object_type] = {}
+        object_index[object_type]["metadata"] = metadata
+        object_index[object_type]["entries"] = entries
+
         if not registry:
             log("FAILURE",
                 "Could not find a current indexable set of OpenTide object for the type",
@@ -107,13 +111,22 @@ def run():
                     entries[signal_uuid] = entry
 
 
-        object_index[object_type] = {}
-        object_index[object_type]["metadata"] = metadata
-        object_index[object_type]["entries"] = entries
 
+
+    # Set defaults to accomodate soft transition to DOM.
+    if not object_index.get("dom"):
+        object_index["dom"] = {}
+        object_index["dom"]["entries"] = {}
+    if not object_index.get("cdm"):
+        object_index["cdm"] = {}
+        object_index["cdm"]["entries"] = {}
+    if not object_index.get("bdr"):
+        object_index["bdr"] = {}
+        object_index["bdr"]["entries"] = {}
 
     # This allows us to merge existing CDM and BDR indexes with the new DOM to allow
     # MDRs to refer to both during the transitional period
+
     object_index["dom"]["entries"].update(object_index.get("cdm", {}).get("entries", {}))
     object_index["dom"]["entries"].update(object_index.get("bdr", {}).get("entries", {}))
 

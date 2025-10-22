@@ -417,16 +417,15 @@ def gen_lib_schema(
     enum = []
     enum_description = []
     enum_helper = []
-    # Search Hints only set to False if explicitely done from vocabulary
-    search_hints = VOCAB_INDEX[vocab]["metadata"].get("vocab.search_hints", True)
     # Loops through all vocabulary files
     if vocab not in VOCAB_INDEX:
         log("WARNING", "Could not retrieve vocabulary", vocab)
-
     else:
         # Edge case for possible model references, there is no description
         # in that case, only the id which is what the user needs to input
         # and the name used as a description.
+        # Search Hints only set to False if explicitely done from vocabulary
+        search_hints = VOCAB_INDEX[vocab]["metadata"].get("vocab.search_hints", True)
         if (VOCAB_INDEX[vocab]["metadata"].get("model")) or (vocab in TIDE_MODELS):
             for key in VOCAB_INDEX[vocab]["entries"]:
                 value = key

@@ -237,7 +237,7 @@ class FetchEnums:
                 parameter_key = config_path[config_path.index(key) + 1] 
                 for tenant in config_index["tenants"]:
                     tenant_name = tenant.get("name").strip()                
-                    if parameter_key in tenant.get("parameters"):
+                    if parameter_key in tenant.get("parameters", {}):
                         parameter_list.extend([tenant_name + "::" + item.strip() for item in tenant["parameters"][parameter_key]])
                 return parameter_list
             

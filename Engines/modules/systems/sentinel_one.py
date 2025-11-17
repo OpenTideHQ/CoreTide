@@ -1,13 +1,12 @@
 import sys
-import os
 import requests 
 import json
 
 import git
 
 from dataclasses import dataclass, asdict
-from typing import Literal, Never, ClassVar, Sequence, overload, Any, Optional
-from enum import Enum, auto
+from typing import Literal, Optional
+from enum import Enum
 from datetime import datetime, timedelta
 
 sys.path.append(str(git.Repo(".", search_parent_directories=True).working_dir))
@@ -184,7 +183,7 @@ class SentinelOneService:
         if rule_id:
             log("ONGOING", "Executing API call to update STAR Custom Rule with id", str(rule_id))
             endpoint += f"/{rule_id}"
-            error = TideErrors.DetectionRuleCreationFailed
+            error = TideErrors.DetectionRuleUpdateFailed
             request = self.session.put(url=endpoint,
                                         verify=self.tenant_config.setup.ssl,
                                         data=rule_body)

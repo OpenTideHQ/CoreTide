@@ -1,0 +1,35 @@
+  schema: gravityzone::2.0
+  status: 
+  #contributors:
+    #-
+  #tenants:
+    #-
+  #flags:
+    #-
+  target: 
+  #severity: 
+  #tags:
+    #-
+  
+  #actions:
+    #collect_investigation_package: 
+    #quarantine: 
+    #kill_process: 
+    #isolate: 
+    #antimalware_scan: 
+    #risk_scan: 
+    #add_to_sandbox: 
+  criteria:
+    - field: 
+      relation: 
+      value: 
+  #exclusions:
+    #- name: 
+      #enabled: 
+      #tenants:
+        #-
+      #target: 
+      #criteria:
+        #- field: 
+          #relation: 
+          #value: 

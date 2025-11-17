@@ -387,6 +387,83 @@ class SystemLoader:
         return mdr_config, rule_id_bundle
 
     @staticmethod
+    def gravityzone(mdr_config: dict[str, Any]) -> TideModels.MDR.Configurations.GravityZone:
+        """Build a GravityZone system configuration object from raw MDR config.
+
+        Transforms the provided mapping into a ``TideModels.MDR.Configurations.GravityZone``
+        instance by extracting the base configuration values, resolving any
+        external rule id bundle, and converting nested criteria, actions, and
+        exclusion structures.
+
+        Args:
+            mdr_config: A mapping containing gravityzone configuration fields.
+
+        Returns:
+            A ``TideModels.MDR.Configurations.GravityZone`` instance.
+        """
+
+        GravityZone = TideModels.MDR.Configurations.GravityZone
+
+        mdr_config, base_config = SystemLoader._base_configuration(mdr_config)
+        mdr_config, rule_id_bundle = SystemLoader._external_rule_id(mdr_config)
+
+        # Required fields
+        target = mdr_config.pop("target")
+        criteria_list = mdr_config.pop("criteria")
+        criteria = [GravityZone.Criteria(**criterion) for criterion in criteria_list]
+
+        # Optional fields
+        severity = mdr_config.pop("severity", None)
+        tags = mdr_config.pop("tags", None)
+
+        # Actions (optional nested structure)
+        actions = None
+        if mdr_config.get("actions"):
+            actions = GravityZone.Actions(**mdr_config.pop("actions"))
+
+        # Exclusions (optional array of nested structures)
+        exclusions = None
+        if mdr_config.get("exclusions"):
+            exclusions_list = mdr_config.pop("exclusions")
+            exclusions = []
+            for exclusion in exclusions_list:
+                # Parse nested criteria within each exclusion
+                exclusion_criteria = [GravityZone.Criteria(**criterion) 
+                                     for criterion in exclusion.pop("criteria")]
+                
+                # Extract exclusion-specific rule_id_bundle
+                exclusion_rule_id_bundle = {}
+                for key in list(exclusion.keys()):
+                    if key.startswith("rule_id::"):
+                        tenant = key.split("rule_id::")[1]
+                        exclusion_rule_id_bundle[tenant] = exclusion.pop(key)
+                
+                # Use the bundle if present, otherwise None
+                if not exclusion_rule_id_bundle:
+                    exclusion_rule_id_bundle = exclusion.pop("rule_id_bundle", None)
+                
+                exclusions.append(GravityZone.Exclusion(
+                    **exclusion,
+                    criteria=exclusion_criteria,
+                    rule_id_bundle=exclusion_rule_id_bundle  # type: ignore
+                ))
+
+        return GravityZone(
+            schema=base_config.schema,
+            status=base_config.status,
+            contributors=base_config.contributors,
+            tenants=base_config.tenants,
+            flags=base_config.flags,
+            rule_id_bundle=rule_id_bundle,  # type: ignore
+            target=target,
+            criteria=criteria,
+            severity=severity,
+            tags=tags,
+            actions=actions,
+            exclusions=exclusions
+        )
+
+    @staticmethod
     def sentinel(mdr_config: dict[str, Any]) -> TideModels.MDR.Configurations.Sentinel:
         """Build a Sentinel system configuration object from raw MDR config.
 
@@ -927,13 +1004,17 @@ class TideLoader:
             configurations.sentinel_one = SystemLoader.sentinel_one(system_configurations.pop("sentinel_one"))
         if system_configurations.get("crowdstrike"):
             configurations.crowdstrike = SystemLoader.crowdstrike(system_configurations.pop("crowdstrike"))
+        if system_configurations.get("gravityzone"):
+            configurations.gravityzone = SystemLoader.gravityzone(system_configurations.pop("gravityzone"))
 
         return TideModels.MDR(**mdr,
                                 metadata=metadata,
                                 response=response,
                                 references=references,
                                 configurations=configurations)
-
+    @overload
+    @staticmethod
+    def load_platform_config(platform_config:dict, system:Literal[DetectionSystems.GRAVITYZONE])->TideConfigs.Systems.GravityZone.Platform: ...
     @overload
     @staticmethod
     def load_platform_config(platform_config:dict, system:Literal[DetectionSystems.SENTINEL])->TideConfigs.Systems.Sentinel.Platform: ...
@@ -987,6 +1068,9 @@ class TideLoader:
 
             case DetectionSystems.SENTINEL_ONE:
                 return TideConfigs.Systems.SentinelOne.Platform(**platform_config)
+
+            case DetectionSystems.GRAVITYZONE:
+                return TideConfigs.Systems.GravityZone.Platform(**platform_config)
 
             case _:
                 return SystemConfig.Platform(**platform_config)
@@ -1085,11 +1169,14 @@ class TideLoader:
                         parameters = TideConfigs.Systems.DefenderForEndpoint.Tenant.Parameters(**parameters)
                     setup = TideConfigs.Systems.DefenderForEndpoint.Tenant.Setup(**setup_with_secrets)
 
+                case DetectionSystems.CROWDSTRIKE:
+                    setup = TideConfigs.Systems.Crowdstrike.Tenant.Setup(**setup_with_secrets)
+
                 case DetectionSystems.SENTINEL_ONE:
                     setup = TideConfigs.Systems.SentinelOne.Tenant.Setup(**setup_with_secrets)
 
-                case DetectionSystems.CROWDSTRIKE:
-                    setup = TideConfigs.Systems.Crowdstrike.Tenant.Setup(**setup_with_secrets)
+                case DetectionSystems.GRAVITYZONE:
+                    setup = TideConfigs.Systems.GravityZone.Tenant.Setup(**setup_with_secrets)
 
                 case _:
                     raise NotImplementedError(f"Platform {platform.name} is not recognized")
@@ -1380,6 +1467,16 @@ class DataTide:
                 platform = TideLoader.load_platform_config(dict(raw["platform"]), DetectionSystems.CROWDSTRIKE)
                 modifiers = TideLoader.load_modifiers_config(raw["modifiers"]) if raw.get("modifiers") else None
                 tenants = TideLoader.load_tenants_config(raw["tenants"], DetectionSystems.CROWDSTRIKE) if raw.get("tenants") else None
+
+            @dataclass
+            class GravityZone(TideConfigs.Systems.GravityZone):
+                raw = dict(
+                    IndexTide.load()["configurations"]["systems"]["gravityzone"]
+                )
+                platform = TideLoader.load_platform_config(dict(raw["platform"]), DetectionSystems.GRAVITYZONE)
+                modifiers = TideLoader.load_modifiers_config(raw["modifiers"]) if raw.get("modifiers") else None
+                tenants = TideLoader.load_tenants_config(raw["tenants"], DetectionSystems.GRAVITYZONE) if raw.get("tenants") else None
+
 
         @dataclass(frozen=True)
         class Documentation:

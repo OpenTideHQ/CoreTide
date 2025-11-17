@@ -38,6 +38,7 @@ class StatusStrategy(Enum):
     UNIVERSAL = "Deployment from both Pull/Merge Requests, and default branch pipelines."
 
 class DetectionSystems(Enum):
+    GRAVITYZONE = auto()
     DEFENDER_FOR_ENDPOINT = auto()
     CARBON_BLACK_CLOUD = auto()
     SPLUNK = auto()
@@ -155,6 +156,21 @@ class TideConfigs:
 
     @dataclass
     class Systems:
+
+
+        @dataclass
+        class GravityZone(SystemConfig):
+
+            @dataclass
+            class Tenant(SystemConfig.Tenant):
+
+                @dataclass
+                class Setup(SystemConfig.Tenant.Setup):
+                    api_token:str
+                    location:Literal["EU", "Non-EU"]
+                    company_id:Optional[str] = None
+
+                setup:Setup
 
         @dataclass
         class Sentinel(SystemConfig):
@@ -296,6 +312,69 @@ class TideModels:
         @dataclass
         class Configurations:
             
+            @dataclass
+            class GravityZone(TideDefinitionsModels.SystemConfigurationModel):
+                """Bitdefender GravityZone EDR detection rule configuration."""
+                
+                @dataclass
+                class Actions:
+                    """Automatic incident response actions for EDR detections."""
+                    collect_investigation_package: Optional[bool] = None
+                    """Collect relevant data and logs from the system"""
+                    quarantine: Optional[Literal["Standard", "Include Parent Process File", "Include Files of Child Processes", "Full"]] = None
+                    """Quarantine the file or process that triggered detection"""
+                    kill_process: Optional[Literal["Standard", "Include Parent Process", "Include Child Processes", "Full"]] = None
+                    """Terminate the process that triggered detection"""
+                    isolate: Optional[bool] = None
+                    """Disconnect the endpoint from the network"""
+                    antimalware_scan: Optional[Literal["Quick", "Full"]] = None
+                    """Run antimalware scan on the endpoint"""
+                    risk_scan: Optional[bool] = None
+                    """Run risk assessment scan on the endpoint"""
+                    add_to_sandbox: Optional[bool] = None
+                    """Submit suspicious file to sandbox for analysis"""
+
+                @dataclass
+                class Criteria:
+                    """Detection or exclusion criteria condition."""
+                    field: str
+                    """The field to match against (filtered by target type)"""
+                    relation: Literal["Is", "Contains", "Is One Of"]
+                    """Relationship operator"""
+                    value: Union[str, Sequence[str]]
+                    """Value(s) to match - string for Is/Contains, array for Is One Of"""
+
+                @dataclass
+                class Exclusion:
+                    """Exclusion rule to prevent specific conditions from triggering alerts."""
+                    name: str
+                    """Descriptive name for this exclusion rule"""
+                    enabled: bool
+                    """Status of the exclusion rule"""
+                    target: Literal["Process", "File", "Connection", "Registry", "User Connection", "Email", "Application", "Key Vault", "Role", "Policy", "Sharing Link", "Flow", "URL", "SSH Key", "Launch Template", "Service Principal", "User Group", "Automation Account", "Automation Account Hook", "API", "Certificate Authority", "Bucket"]
+                    """Type of entity to exclude"""
+                    criteria: Sequence['TideModels.MDR.Configurations.GravityZone.Criteria']
+                    """Conditions that define what should be excluded"""
+                    tenants: Optional[Sequence[str]] = None
+                    """Override default organizations and deploy to selected tenants only"""
+                    rule_id_bundle: Optional[Mapping[str, int]] = None
+                    """Mapping of tenant names to external exclusion rule IDs"""
+
+                target: Literal["Process", "File", "Registry", "Connection"]
+                """Type of entity to target"""
+                criteria: Sequence[Criteria]
+                """Conditions upon which the rule is triggered"""
+                severity: Optional[Literal["Low", "Medium", "High"]] = None
+                """Severity of incident created"""
+                tags: Optional[Sequence[str]] = None
+                """List of tags associated to the rule"""
+                actions: Optional[Actions] = None
+                """Automatic response actions for EDR incidents"""
+                exclusions: Optional[Sequence[Exclusion]] = None
+                """Rules that prevent specific conditions from triggering alerts"""
+                rule_id_bundle: Optional[Mapping[str, str]] = None
+                """Mapping of tenant names to external rule IDs"""
+
             @dataclass
             class SentinelOne(TideDefinitionsModels.SystemConfigurationModel):
                 @dataclass
@@ -531,6 +610,7 @@ class TideModels:
             defender_for_endpoint: Optional[DefenderForEndpoint] = None
             sentinel_one: Optional[SentinelOne] = None
             crowdstrike: Optional[Crowdstrike] = None
+            gravityzone: Optional[GravityZone] = None
             carbon_black_cloud: Optional[Mapping] = None
             splunk: Optional[Mapping] = None
 
@@ -577,3 +657,7 @@ class TenantDeployment:
     @dataclass
     class Crowdstrike(TenantDeploymentModel):
         tenant: TideConfigs.Systems.Crowdstrike.Tenant
+
+    @dataclass
+    class GravityZone(TenantDeploymentModel):
+        tenant: TideConfigs.Systems.GravityZone.Tenant

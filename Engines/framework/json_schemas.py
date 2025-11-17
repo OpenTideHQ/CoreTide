@@ -260,7 +260,7 @@ class FetchEnums:
         if not system_config:
             log("FATAL",
                 f"Could not retrieve an available configuration for system {system}",
-                f"Indexed Configurations : {str(system_config_index.keys())}")
+                f"Indexed Configurations : {str(system_config_index.get("systems", {}).keys())}")
             raise ValueError(f"Missing configuration for system {system}")
         
         tenants:list[dict] = system_config.get("tenants")

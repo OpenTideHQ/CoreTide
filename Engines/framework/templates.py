@@ -113,7 +113,9 @@ def definition_handler(entry_point):
 def gen_template(metaschema, required):
     body = {}
     for key in metaschema:
-        
+        if type(metaschema[key]) is not dict:
+            continue
+         
         if not metaschema[key].get("tide.template.hide"):
 
             if metadef := metaschema[key.replace("#", "")].get("tide.meta.definition"):

@@ -1,0 +1,1494 @@
+required: 
+  - schema
+  - status
+  - target
+  - criteria
+
+patternProperties:
+  "rule_id::.+$":
+    title: Internal Defender for Endpoint Rule ID
+    type: string
+    description: |
+      IMPORTANT: This is used by the automation to correctly
+      Target the rule on MDE, which uses its own ID system. 
+      This key will appear as many tenant as this rule is deployed to.
+      Do not alter this field manually, or create new fields.
+
+properties:
+  schema:
+    title: Schema identifier and version
+    type: string
+    description: Identifier of the schema at its current version 
+    const: gravityzone::2.0
+
+  status: 
+    title: Status of the use-case
+    type: string
+    description: Define the status according to use case development life cycle process
+    tide.config.statuses: True
+
+  contributors:
+    title: Development Contributors
+    type: array
+    description: Individuals who supported creating, enriching or tuning the detection. 
+    items:
+      type: string
+      format: email
+
+  tenants: 
+    title: Target Tenants
+    icon: 🏢
+    description: |
+      Override the default organizations and deploy to selected tenants only.
+    type: array
+    tide.config.system.tenants: gravityzone
+
+  flags:
+    title: Flags
+    icon: 🚩
+    description: Flags allow to customize the rule behaviour using the modifiers framework
+    type: array
+    tide.config.parameter-list: systems.gravityzone.platform.flags
+
+  target:
+    title: Rule Target
+    description: Indicates the type of entity you want to target.
+    type: string 
+    enum:
+      - Process
+      - File
+      - Registry
+      - Connection
+
+  severity:
+    title: Incident Severity
+    description: |
+      (Optional) Indicates the severity of the incident that will be created.
+      When not assigned, maps from top-level `alert_severity`
+    type: string
+    enum:
+      - Low
+      - Medium
+      - High
+  
+  tags:
+    title: Rule Tags
+    description: (Optional) List of tags associated to the rule
+    type: array
+    items:
+      type: string
+  
+  actions:
+    title: Automatic Incident Actions
+    description: |
+      Indicates if and which automatic response actions are enabled
+      for EDR incidents created as a result of this rule.
+    type: object
+    properties:
+      collect_investigation_package:
+        title: Collect Investigation Package
+        description: Collect relevant data and logs from the system. No further action is taken
+        type: boolean
+      
+      quarantine:
+        title: Quarantine
+        description: Quarantine the file or process that triggered the detection
+        type: string
+        enum:
+          - Standard
+          - Include Parent Process File
+          - Include Files of Child Processes
+          - Full
+        markdownEnumDescriptions:
+          - Quarantine only the targeted file or process
+          - Quarantine the targeted file and the parent process file
+          - Quarantine the targeted file and files of child processes
+          - Quarantine the targeted file, parent, and all child process files
+      
+      kill_process:
+        title: Kill Process
+        description: Terminate the process that triggered the detection
+        type: string
+        enum:
+          - Standard
+          - Include Parent Process
+          - Include Child Processes
+          - Full
+        markdownEnumDescriptions:
+          - Terminate only the targeted process
+          - Terminate the targeted process and its parent
+          - Terminate the targeted process and its children
+          - Terminate the targeted process, parent, and all children
+      
+      isolate:
+        title: Isolate
+        description: Disconnect the endpoint where detection occurred from the network
+        type: boolean
+      
+      antimalware_scan:
+        title: Antimalware Scan
+        description: Run an antimalware scan on the endpoint
+        type: string
+        enum:
+          - Quick
+          - Full
+        markdownEnumDescriptions:
+          - Run a quick antimalware scan
+          - Run a full antimalware scan
+      
+      risk_scan:
+        title: Risk Scan
+        description: Run a risk assessment scan on the endpoint
+        type: boolean
+      
+      add_to_sandbox:
+        title: Add to Sandbox
+        description: Submit the suspicious file to the sandbox environment for analysis
+        type: boolean
+
+  criteria:
+    title: Rule Criteria
+    description: | 
+      Conditions upon which the rule is triggered. Fields available depend
+      on the target type (Process/File/Connection/Registry) selected at
+      the rule level.
+    type: array
+    items:
+      type: object
+      required:
+        - field
+        - relation
+        - value
+      
+      properties:
+        field:
+          title: Condition Field
+          description: |
+            The field to match against. Available fields are filtered based
+            on the target type selected at the rule level.
+          type: string
+        
+        relation:
+          title: Condition Relation
+          description: |
+            The relationship operator. "Is One Of" requires an array of
+            values. "Is" and "Contains" require a single string value.
+          type: string
+          enum:
+            - Is
+            - Contains
+            - Is One Of
+        
+        value:
+          title: Condition Value
+          description: |
+            The value(s) to match. Type depends on the relation operator.
+      
+      # Strict conditional: value type MUST match relation
+      allOf:
+        # When relation is "Is One Of", value MUST be an array
+        - if:
+            properties:
+              relation:
+                const: Is One Of
+          then:
+            properties:
+              value:
+                type: array
+                items:
+                  type: string
+                minItems: 1
+        
+        # When relation is "Is", value MUST be a string
+        - if:
+            properties:
+              relation:
+                const: Is
+          then:
+            properties:
+              value:
+                type: string
+        
+        # When relation is "Contains", value MUST be a string
+        - if:
+            properties:
+              relation:
+                const: Contains
+          then:
+            properties:
+              value:
+                type: string
+
+  exclusions:
+    title: Exclusion Rules
+    description: |
+      Optional exclusion rules that prevent specific conditions from triggering
+      alerts. Each exclusion can target different entity types and has its own
+      set of criteria. Exclusions support a broader set of fields than detection
+      criteria.
+    type: array
+    items:
+      type: object
+      required:
+        - name
+        - enabled
+        - target
+        - criteria
+      
+      properties:
+        name:
+          title: Exclusion Name
+          description: Descriptive name for this exclusion rule
+          type: string
+        
+        enabled:
+          title: Exclusion Status
+          description: Status of the exclusion rule
+          type: boolean
+        
+        tenants:
+          title: Target Tenants
+          description: |
+            Override the default organizations and deploy to selected tenants only.
+          type: array
+          tide.config.system.tenants: gravityzone
+        
+        target:
+          title: Exclusion Target
+          description: The type of entity to exclude
+          type: string
+          enum:
+            - Process
+            - File
+            - Connection
+            - Registry
+            - User Connection
+            - Email
+            - Application
+            - Key Vault
+            - Role
+            - Policy
+            - Sharing Link
+            - Flow
+            - URL
+            - SSH Key
+            - Launch Template
+            - Service Principal
+            - User Group
+            - Automation Account
+            - Automation Account Hook
+            - API
+            - Certificate Authority
+            - Bucket
+        
+        criteria:
+          title: Exclusion Criteria
+          description: |
+            Conditions that define what should be excluded. Fields available
+            depend on the target type selected.
+          type: array
+          items:
+            type: object
+            required:
+              - field
+              - relation
+              - value
+            
+            properties:
+              field:
+                title: Exclusion Field
+                description: The field to match for exclusion
+                type: string
+              
+              relation:
+                title: Exclusion Relation
+                description: |
+                  The relationship operator. "Is One Of" requires an array of
+                  values. "Is" and "Contains" require a single string value.
+                type: string
+                enum:
+                  - Is
+                  - Contains
+                  - Is One Of
+              
+              value:
+                title: Exclusion Value
+                description: The value(s) to match for exclusion
+            
+            # Strict conditional: value type MUST match relation
+            allOf:
+              # When relation is "Is One Of", value MUST be an array
+              - if:
+                  properties:
+                    relation:
+                      const: Is One Of
+                then:
+                  properties:
+                    value:
+                      type: array
+                      items:
+                        type: string
+                      minItems: 1
+              
+              # When relation is "Is", value MUST be a string
+              - if:
+                  properties:
+                    relation:
+                      const: Is
+                then:
+                  properties:
+                    value:
+                      type: string
+              
+              # When relation is "Contains", value MUST be a string
+              - if:
+                  properties:
+                    relation:
+                      const: Contains
+                then:
+                  properties:
+                    value:
+                      type: string
+
+# Conditional field constraints based on target
+allOf:
+  - if:
+      properties:
+        target:
+          const: Process
+    then:
+      properties:
+        criteria:
+          items:
+            properties:
+              field:
+                enum:
+                  - Name
+                  - Path
+                  - FullPathName
+                  - CommandLine
+                  - Parent.Name
+                  - Parent.Path
+                  - Parent.FullPathName
+                  - Parent.CommandLine
+                markdownEnumDescriptions:
+                  - Name
+                  - Path
+                  - Full Path Name
+                  - Command Line
+                  - Parent Name
+                  - Parent Path
+                  - Paret Full Path Name
+                  - Parent Command Line
+  
+  - if:
+      properties:
+        target:
+          const: File
+    then:
+      properties:
+        criteria:
+          items:
+            properties:
+              field:
+                enum:
+                  - Name
+                  - Path
+                  - FullPathName
+                  - CreatedBy.Name
+                  - CreatedBy.Path
+                  - CreatedBy.FullPathName
+                  - CreatedBy.CommandLine
+                markdownEnumDescriptions:
+                  - Name
+                  - Path
+                  - Full Path Name
+                  - Creation Process Name
+                  - Creation Process Path
+                  - Creation Process Full Path Name
+                  - Creation Process Command Line
+  
+  - if:
+      properties:
+        target:
+          const: Connection
+    then:
+      properties:
+        criteria:
+          items:
+            properties:
+              field:
+                enum:
+                  - SourceIP
+                  - DestinationIP
+                  - SourcePort
+                  - DestinationPort
+                  - Process.Name
+                  - Process.Path
+                  - Process.FullPathName
+                  - Process.CommandLine
+                markdownEnumDescriptions:
+                  - Source IP
+                  - Destination IP
+                  - Source Port
+                  - Destination Port
+                  - Creation Process Name
+                  - Creation Process Path
+                  - Creation Process Full Path Name
+                  - Creation Process Command Line
+  
+  - if:
+      properties:
+        target:
+          const: Registry
+    then:
+      properties:
+        criteria:
+          items:
+            properties:
+              field:
+                enum:
+                  - Key
+                  - Value
+                  - CreatedBy.Path
+                  - CreatedBy.FullPathName
+                  - CreatedBy.CommandLine
+                  - Operation
+                markdownEnumDescriptions:
+                  - Key
+                  - Value
+                  - Creation Process Path
+                  - Creation Process Full Path Name
+                  - Creation Process Command Line
+                  - Operation
+            
+            # Additional constraint: Registry Operation field has specific allowed values
+            allOf:
+              - if:
+                  properties:
+                    field:
+                      const: Operation
+                then:
+                  properties:
+                    value:
+                      oneOf:
+                        # When relation is "Is", value must be one of the operations
+                        - type: string
+                          enum:
+                            - Key Created
+                            - Key Deleted
+                            - Key Renamed
+                            - Value Created
+                            - Value Deleted
+                            - Value Written
+                        # When relation is "Is One Of", value must be array of operations
+                        - type: array
+                          items:
+                            type: string
+                            enum:
+                              - Key Created
+                              - Key Deleted
+                              - Key Renamed
+                              - Value Created
+                              - Value Deleted
+                              - Value Written
+  
+  # Conditional field constraints for exclusions based on target
+  - if:
+      properties:
+        exclusions:
+          contains:
+            properties:
+              target:
+                const: Process
+    then:
+      properties:
+        exclusions:
+          items:
+            if:
+              properties:
+                target:
+                  const: Process
+            then:
+              properties:
+                criteria:
+                  items:
+                    properties:
+                      field:
+                        enum:
+                          - Name
+                          - Path
+                          - FullPathName
+                          - CommandLine
+                          - Parent.Name
+                          - Parent.Path
+                          - Parent.FullPathName
+                          - Parent.CommandLine
+                          - User
+                          - MD5
+                          - SHA256
+                        markdownEnumDescriptions:
+                          - Name
+                          - Path
+                          - Full Path Name
+                          - Command Line
+                          - Parent Name
+                          - Parent Path
+                          - Paret Full Path Name
+                          - Parent Command Line
+                          - File.Name
+                          - File.Path
+                          - SHA256
+  
+  - if:
+      properties:
+        exclusions:
+          contains:
+            properties:
+              target:
+                const: File
+    then:
+      properties:
+        exclusions:
+          items:
+            if:
+              properties:
+                target:
+                  const: File
+            then:
+              properties:
+                criteria:
+                  items:
+                    properties:
+                      field:
+                        enum:
+                          - Name
+                          - Path
+                          - FullPathName
+                          - CreatedBy.Name
+                          - CreatedBy.Path
+                          - CreatedBy.FullPathName
+                          - CreatedBy.CommandLine
+                          - Operation
+                          - MD5
+                          - SHA256
+                          - Url
+                          - CreatedBy.User
+                        markdownEnumDescriptions:
+                          - Name
+                          - Path
+                          - Full Path Name
+                          - Creation Process Name
+                          - Creation Process Path
+                          - Creation Process Full Path Name
+                          - Creation Process Command Line
+                          - Operation
+                          - MD5
+                          - SHA256
+                          - Url
+                          - Creation process user
+                    
+                    # File Operation field constraint for exclusions
+                    allOf:
+                      - if:
+                          properties:
+                            field:
+                              const: Operation
+                        then:
+                          properties:
+                            value:
+                              oneOf:
+                                - type: string
+                                  enum:
+                                    - Create
+                                    - Read
+                                    - Write
+                                    - Move
+                                    - Rename
+                                    - Copy
+                                - type: array
+                                  items:
+                                    type: string
+                                    enum:
+                                      - Create
+                                      - Read
+                                      - Write
+                                      - Move
+                                      - Rename
+                                      - Copy
+  
+  - if:
+      properties:
+        exclusions:
+          contains:
+            properties:
+              target:
+                const: Connection
+    then:
+      properties:
+        exclusions:
+          items:
+            if:
+              properties:
+                target:
+                  const: Connection
+            then:
+              properties:
+                criteria:
+                  items:
+                    properties:
+                      field:
+                        enum:
+                          - SourceIP
+                          - DestinationIP
+                          - SourcePort
+                          - DestinationPort
+                          - Process.Name
+                          - Process.Path
+                          - Process.FullPathName
+                          - Process.CommandLine
+                          - Process.User
+                          - URL
+                          - HTTPUser
+                          - HTTPDownloadedFile
+                          - HTTPUploadedFile
+                          - FTPUser
+                          - SMBDomain
+                          - SMBSharePath
+                          - SMBUser
+                          - SSHUser
+                          - WMIExecQuery
+                          - TelnetUser
+                          - FileRemoteOperation
+                          - FileRemotePath
+                          - File.Name
+                          - Email.Subject
+                          - Application.Name
+                          - KeyVault.Name
+                          - Role.Name
+                          - Policy.Name
+                          - SharingLink.Name
+                          - Flow.Name
+                          - Url.Name
+                          - SshKey.Name
+                          - LaunchTemplate.Name
+                          - ServicePrincipal.Name
+                          - UserGroup.Name
+                          - AutomationAccount.Name
+                          - AutomationAccountHook.Name
+                          - Api.Name
+                          - CertificateAuthority.Name
+                          - Bucket.Name
+                          - SourceUser
+                          - DestinationUser
+                        markdownEnumDescriptions:
+                          - Source IP
+                          - Destination IP
+                          - Source Port
+                          - Destination Port
+                          - Creation Process Name
+                          - Creation Process Path
+                          - Creation Process Full Path Name
+                          - Creation Process Command Line
+                          - Creation process user
+                          - Url
+                          - HTTP user
+                          - HTTP downloaded file
+                          - HTTP uploaded file
+                          - FTP user
+                          - SMB domain
+                          - SMB share path
+                          - SMB user
+                          - SSH user
+                          - WMI exec query
+                          - Telnet user
+                          - File remote operation
+                          - File remote path
+                          - File name
+                          - Email subject
+                          - Application name
+                          - Key vault name
+                          - Role name
+                          - Policy name
+                          - Sharing link name
+                          - Flow name
+                          - URL name
+                          - SSH key name
+                          - Launch template name
+                          - Service principal name
+                          - User group name
+                          - Automation account name
+                          - Automation account hook name
+                          - Api name
+                          - Certificate authority name
+                          - Bucket name
+                          - Source user
+                          - Destination user
+                    
+                    # Connection FileRemoteOperation field constraint for exclusions
+                    allOf:
+                      - if:
+                          properties:
+                            field:
+                              const: FileRemoteOperation
+                        then:
+                          properties:
+                            value:
+                              oneOf:
+                                - type: string
+                                  enum:
+                                    - Create
+                                    - Rem Delete
+                                    - Read
+                                    - Write
+                                    - Move
+                                - type: array
+                                  items:
+                                    type: string
+                                    enum:
+                                      - Create
+                                      - Rem Delete
+                                      - Read
+                                      - Write
+                                      - Move
+  
+  - if:
+      properties:
+        exclusions:
+          contains:
+            properties:
+              target:
+                const: Registry
+    then:
+      properties:
+        exclusions:
+          items:
+            if:
+              properties:
+                target:
+                  const: Registry
+            then:
+              properties:
+                criteria:
+                  items:
+                    properties:
+                      field:
+                        enum:
+                          - Key
+                          - Value
+                          - CreatedBy.Name
+                          - CreatedBy.Path
+                          - CreatedBy.FullPathName
+                          - CreatedBy.CommandLine
+                          - Operation
+                        markdownEnumDescriptions:
+                          - Key
+                          - Value
+                          - Creation Process Name
+                          - Creation Process Path
+                          - Creation Process Full Path Name
+                          - Creation Process Command Line
+                          - Operation
+                    
+                    # Registry Operation field constraint for exclusions
+                    allOf:
+                      - if:
+                          properties:
+                            field:
+                              const: Operation
+                        then:
+                          properties:
+                            value:
+                              oneOf:
+                                - type: string
+                                  enum:
+                                    - Key Created
+                                    - Key Deleted
+                                    - Key Renamed
+                                    - Value Created
+                                    - Value Deleted
+                                    - Value Written
+                                - type: array
+                                  items:
+                                    type: string
+                                    enum:
+                                      - Key Created
+                                      - Key Deleted
+                                      - Key Renamed
+                                      - Value Created
+                                      - Value Deleted
+                                      - Value Written
+  
+  - if:
+      properties:
+        exclusions:
+          contains:
+            properties:
+              target:
+                const: User Connection
+    then:
+      properties:
+        exclusions:
+          items:
+            if:
+              properties:
+                target:
+                  const: User Connection
+            then:
+              properties:
+                criteria:
+                  items:
+                    properties:
+                      field:
+                        enum:
+                          - Name
+                          - SourceUser
+                          - DestinationUser
+                          - Domain
+                          - File.Name
+                          - Email.Subject
+                          - Application.Name
+                          - KeyVault.Name
+                          - Role.Name
+                          - Policy.Name
+                          - SharingLink.Name
+                          - Flow.Name
+                          - Url.Name
+                          - SshKey.Name
+                          - LaunchTemplate.Name
+                          - ServicePrincipal.Name
+                          - UserGroup.Name
+                          - AutomationAccount.Name
+                          - AutomationAccountHook.Name
+                          - Api.Name
+                          - CertificateAuthority.Name
+                          - Bucket.Name
+                          - SourceIP
+                          - DestinationIP
+                        markdownEnumDescriptions:
+                          - Name
+                          - Source user
+                          - Destination user
+                          - Domain
+                          - File name
+                          - Email subject
+                          - Application name
+                          - Key vault name
+                          - Role name
+                          - Policy name
+                          - Sharing link name
+                          - Flow name
+                          - URL name
+                          - SSH key name
+                          - Launch template name
+                          - Service principal name
+                          - User group name
+                          - Automation account name
+                          - Automation account hook name
+                          - Api name
+                          - Certificate authority name
+                          - Bucket name
+                          - Source IP
+                          - Destination IP
+  
+  - if:
+      properties:
+        exclusions:
+          contains:
+            properties:
+              target:
+                const: Email
+    then:
+      properties:
+        exclusions:
+          items:
+            if:
+              properties:
+                target:
+                  const: Email
+            then:
+              properties:
+                criteria:
+                  items:
+                    properties:
+                      field:
+                        enum:
+                          - Subject
+                          - Sender
+                          - Receivers
+                          - Attachments
+                          - Url
+                        markdownEnumDescriptions:
+                          - Subject
+                          - Sender
+                          - Receiver
+                          - Attachment
+                          - Url
+  
+  - if:
+      properties:
+        exclusions:
+          contains:
+            properties:
+              target:
+                const: Application
+    then:
+      properties:
+        exclusions:
+          items:
+            if:
+              properties:
+                target:
+                  const: Application
+            then:
+              properties:
+                criteria:
+                  items:
+                    properties:
+                      field:
+                        enum:
+                          - Name
+                          - Id
+                          - Address
+                          - SourceUser
+                          - DestinationUser
+                          - SourceIP
+                          - DestinationIP
+                        markdownEnumDescriptions:
+                          - Name
+                          - Id
+                          - Application address
+                          - Source user
+                          - Destination user
+                          - Source IP
+                          - Destination IP
+  
+  - if:
+      properties:
+        exclusions:
+          contains:
+            properties:
+              target:
+                const: Key Vault
+    then:
+      properties:
+        exclusions:
+          items:
+            if:
+              properties:
+                target:
+                  const: Key Vault
+            then:
+              properties:
+                criteria:
+                  items:
+                    properties:
+                      field:
+                        enum:
+                          - Name
+                          - SourceUser
+                          - DestinationUser
+                          - SourceIP
+                          - DestinationIP
+                        markdownEnumDescriptions:
+                          - Name
+                          - Source user
+                          - Destination user
+                          - Source IP
+                          - Destination IP
+  
+  - if:
+      properties:
+        exclusions:
+          contains:
+            properties:
+              target:
+                const: Role
+    then:
+      properties:
+        exclusions:
+          items:
+            if:
+              properties:
+                target:
+                  const: Role
+            then:
+              properties:
+                criteria:
+                  items:
+                    properties:
+                      field:
+                        enum:
+                          - Name
+                          - Id
+                          - SourceUser
+                          - DestinationUser
+                          - SourceIP
+                          - DestinationIP
+                        markdownEnumDescriptions:
+                          - Name
+                          - Id
+                          - Source user
+                          - Destination user
+                          - Source IP
+                          - Destination IP
+  
+  - if:
+      properties:
+        exclusions:
+          contains:
+            properties:
+              target:
+                const: Policy
+    then:
+      properties:
+        exclusions:
+          items:
+            if:
+              properties:
+                target:
+                  const: Policy
+            then:
+              properties:
+                criteria:
+                  items:
+                    properties:
+                      field:
+                        enum:
+                          - Name
+                          - Id
+                          - ResourcePolicyType
+                          - SourceUser
+                          - DestinationUser
+                          - SourceIP
+                          - DestinationIP
+                        markdownEnumDescriptions:
+                          - Name
+                          - Id
+                          - Resource policy type
+                          - Source user
+                          - Destination user
+                          - Source IP
+                          - Destination IP
+  
+  - if:
+      properties:
+        exclusions:
+          contains:
+            properties:
+              target:
+                const: Sharing Link
+    then:
+      properties:
+        exclusions:
+          items:
+            if:
+              properties:
+                target:
+                  const: Sharing Link
+            then:
+              properties:
+                criteria:
+                  items:
+                    properties:
+                      field:
+                        enum:
+                          - Name
+                          - Url
+                          - SourceUser
+                          - DestinationUser
+                          - SourceIP
+                          - DestinationIP
+                        markdownEnumDescriptions:
+                          - Name
+                          - Url
+                          - Source user
+                          - Destination user
+                          - Source IP
+                          - Destination IP
+  
+  - if:
+      properties:
+        exclusions:
+          contains:
+            properties:
+              target:
+                const: Flow
+    then:
+      properties:
+        exclusions:
+          items:
+            if:
+              properties:
+                target:
+                  const: Flow
+            then:
+              properties:
+                criteria:
+                  items:
+                    properties:
+                      field:
+                        enum:
+                          - Name
+                          - Id
+                          - Url
+                          - SourceUser
+                          - DestinationUser
+                          - SourceIP
+                          - DestinationIP
+                        markdownEnumDescriptions:
+                          - Name
+                          - Id
+                          - Url
+                          - Source user
+                          - Destination user
+                          - Source IP
+                          - Destination IP
+  
+  - if:
+      properties:
+        exclusions:
+          contains:
+            properties:
+              target:
+                const: URL
+    then:
+      properties:
+        exclusions:
+          items:
+            if:
+              properties:
+                target:
+                  const: URL
+            then:
+              properties:
+                criteria:
+                  items:
+                    properties:
+                      field:
+                        enum:
+                          - Name
+                          - Url
+                          - SourceUser
+                          - DestinationUser
+                          - SourceIP
+                          - DestinationIP
+                        markdownEnumDescriptions:
+                          - Name
+                          - Url
+                          - Source user
+                          - Destination user
+                          - Source IP
+                          - Destination IP
+  
+  - if:
+      properties:
+        exclusions:
+          contains:
+            properties:
+              target:
+                const: SSH Key
+    then:
+      properties:
+        exclusions:
+          items:
+            if:
+              properties:
+                target:
+                  const: SSH Key
+            then:
+              properties:
+                criteria:
+                  items:
+                    properties:
+                      field:
+                        enum:
+                          - Name
+                          - PublicKey
+                          - SourceUser
+                          - DestinationUser
+                          - SourceIP
+                          - DestinationIP
+                        markdownEnumDescriptions:
+                          - Name
+                          - SSH public key
+                          - Source user
+                          - Destination user
+                          - Source IP
+                          - Destination IP
+  
+  - if:
+      properties:
+        exclusions:
+          contains:
+            properties:
+              target:
+                const: Launch Template
+    then:
+      properties:
+        exclusions:
+          items:
+            if:
+              properties:
+                target:
+                  const: Launch Template
+            then:
+              properties:
+                criteria:
+                  items:
+                    properties:
+                      field:
+                        enum:
+                          - Name
+                          - Id
+                          - SourceUser
+                          - DestinationUser
+                          - SourceIP
+                          - DestinationIP
+                        markdownEnumDescriptions:
+                          - Name
+                          - Id
+                          - Source user
+                          - Destination user
+                          - Source IP
+                          - Destination IP
+  
+  - if:
+      properties:
+        exclusions:
+          contains:
+            properties:
+              target:
+                const: Service Principal
+    then:
+      properties:
+        exclusions:
+          items:
+            if:
+              properties:
+                target:
+                  const: Service Principal
+            then:
+              properties:
+                criteria:
+                  items:
+                    properties:
+                      field:
+                        enum:
+                          - Name
+                          - Id
+                          - SourceUser
+                          - DestinationUser
+                          - SourceIP
+                          - DestinationIP
+                        markdownEnumDescriptions:
+                          - Name
+                          - Id
+                          - Source user
+                          - Destination user
+                          - Source IP
+                          - Destination IP
+  
+  - if:
+      properties:
+        exclusions:
+          contains:
+            properties:
+              target:
+                const: User Group
+    then:
+      properties:
+        exclusions:
+          items:
+            if:
+              properties:
+                target:
+                  const: User Group
+            then:
+              properties:
+                criteria:
+                  items:
+                    properties:
+                      field:
+                        enum:
+                          - Name
+                          - Id
+                          - SourceUser
+                          - DestinationUser
+                          - SourceIP
+                          - DestinationIP
+                        markdownEnumDescriptions:
+                          - Name
+                          - Id
+                          - Source user
+                          - Destination user
+                          - Source IP
+                          - Destination IP
+  
+  - if:
+      properties:
+        exclusions:
+          contains:
+            properties:
+              target:
+                const: Automation Account
+    then:
+      properties:
+        exclusions:
+          items:
+            if:
+              properties:
+                target:
+                  const: Automation Account
+            then:
+              properties:
+                criteria:
+                  items:
+                    properties:
+                      field:
+                        enum:
+                          - Name
+                          - Id
+                          - SourceUser
+                          - DestinationUser
+                          - SourceIP
+                          - DestinationIP
+                        markdownEnumDescriptions:
+                          - Name
+                          - Id
+                          - Source user
+                          - Destination user
+                          - Source IP
+                          - Destination IP
+  
+  - if:
+      properties:
+        exclusions:
+          contains:
+            properties:
+              target:
+                const: Automation Account Hook
+    then:
+      properties:
+        exclusions:
+          items:
+            if:
+              properties:
+                target:
+                  const: Automation Account Hook
+            then:
+              properties:
+                criteria:
+                  items:
+                    properties:
+                      field:
+                        enum:
+                          - Name
+                          - Id
+                          - SourceUser
+                          - DestinationUser
+                          - SourceIP
+                          - DestinationIP
+                        markdownEnumDescriptions:
+                          - Name
+                          - Id
+                          - Source user
+                          - Destination user
+                          - Source IP
+                          - Destination IP
+  
+  - if:
+      properties:
+        exclusions:
+          contains:
+            properties:
+              target:
+                const: API
+    then:
+      properties:
+        exclusions:
+          items:
+            if:
+              properties:
+                target:
+                  const: API
+            then:
+              properties:
+                criteria:
+                  items:
+                    properties:
+                      field:
+                        enum:
+                          - Name
+                          - Id
+                          - DestinationUser
+                          - SourceIP
+                          - DestinationIP
+                        markdownEnumDescriptions:
+                          - Name
+                          - Id
+                          - Destination user
+                          - Source IP
+                          - Destination IP
+  
+  - if:
+      properties:
+        exclusions:
+          contains:
+            properties:
+              target:
+                const: Certificate Authority
+    then:
+      properties:
+        exclusions:
+          items:
+            if:
+              properties:
+                target:
+                  const: Certificate Authority
+            then:
+              properties:
+                criteria:
+                  items:
+                    properties:
+                      field:
+                        enum:
+                          - Name
+                          - SourceUser
+                          - DestinationUser
+                          - SourceIP
+                          - DestinationIP
+                        markdownEnumDescriptions:
+                          - Name
+                          - Source user
+                          - Destination user
+                          - Source IP
+                          - Destination IP
+  
+  - if:
+      properties:
+        exclusions:
+          contains:
+            properties:
+              target:
+                const: Bucket
+    then:
+      properties:
+        exclusions:
+          items:
+            if:
+              properties:
+                target:
+                  const: Bucket
+            then:
+              properties:
+                criteria:
+                  items:
+                    properties:
+                      field:
+                        enum:
+                          - Name
+                          - SourceUser
+                        markdownEnumDescriptions:
+                          - Name
+                          - Source user

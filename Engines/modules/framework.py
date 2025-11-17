@@ -125,6 +125,8 @@ def get_value_metaschema(
 
     else:
         for key in metaschema.keys():
+            if type(metaschema[key]) is not dict: 
+                continue
             if metadef := metaschema[key].get("tide.meta.definition"):
                 if metadef is True:
                     definition = DEFINITIONS_INDEX[key]

@@ -647,6 +647,10 @@ class TideDeployment:
                 self.rule_deployment: Sequence[TenantDeployment.Crowdstrike] = (
                     self.deployment_resolver(deployment, system, strategy) # type:ignore
                 )
+            case DetectionSystems.GRAVITYZONE:
+                self.rule_deployment: Sequence[TenantDeployment.GravityZone] = (
+                    self.deployment_resolver(deployment, system, strategy) # type:ignore
+                )
             case _:
                 raise NotImplementedError(
                     f"System {system} is not implemented by TideDeployment"
@@ -666,6 +670,8 @@ class TideDeployment:
                 return DataTide.Configurations.Systems.SentinelOne
             case DetectionSystems.CROWDSTRIKE:
                 return DataTide.Configurations.Systems.Crowdstrike
+            case DetectionSystems.GRAVITYZONE:
+                return DataTide.Configurations.Systems.GravityZone
             # case _:
             #    raise NotImplemented
 
@@ -681,6 +687,8 @@ class TideDeployment:
                 mdr_config = data.configurations.sentinel_one
             case DetectionSystems.CROWDSTRIKE:
                 mdr_config = data.configurations.crowdstrike
+            case DetectionSystems.GRAVITYZONE:
+                mdr_config = data.configurations.gravityzone
             case _:
                 log(
                     "FATAL",

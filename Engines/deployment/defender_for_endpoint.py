@@ -154,6 +154,7 @@ class DefenderForEndpointDeploy(DeployMDR):
         print(query)
 
         rule = DetectionRule(displayName=data.name,
+                            description=data.description,
                             isEnabled=is_enabled,
                             queryCondition=DetectionRule.QueryCondition(queryText=query),
                             schedule=DetectionRule.Schedule(period=scheduling), # type: ignore

@@ -52,8 +52,9 @@ runs:
         git commit -m "CoreTide MDR Promotion [skip ci]"
 
         echo "Syncing remote trunk and rebasing"
-        git fetch origin ${{ github.ref_name }}
-        git rebase origin/${{ github.ref_name }}
+        BRANCH_NAME=${{ github.head.ref || github.ref_name }}
+        git fetch origin $BRANCH_NAME
+        git rebase origin/$BRANCH_NAME
 
         echo "Pushing changes"
-        git push origin HEAD:${{ github.ref_name }}
+        git push origin HEAD:$BRANCH_NAME

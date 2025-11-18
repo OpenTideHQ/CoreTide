@@ -129,7 +129,7 @@ class DefenderForEndpointDeploy(DeployMDR):
         category = mdr_config.alert.category.replace(" ", "")
 
         alert_template = DetectionRule.DetectionAction.AlertTemplate(title = mdr_config.alert.title or data.name,
-                                                                    description=mdr_config.alert.description or data.description,
+                                                                    description=data.description,
                                                                     severity=severity, 
                                                                     category=category,
                                                                     mitreTechniques=[],
@@ -154,7 +154,6 @@ class DefenderForEndpointDeploy(DeployMDR):
         print(query)
 
         rule = DetectionRule(displayName=data.name,
-                            description=data.description,
                             isEnabled=is_enabled,
                             queryCondition=DetectionRule.QueryCondition(queryText=query),
                             schedule=DetectionRule.Schedule(period=scheduling), # type: ignore

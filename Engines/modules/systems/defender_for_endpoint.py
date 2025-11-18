@@ -88,7 +88,6 @@ class DetectionRule:
     schedule: Schedule
     detectionAction: DetectionAction
     isEnabled: bool = False
-    description: Optional[str] = None
 
 class DefenderForEndpointService:
     """

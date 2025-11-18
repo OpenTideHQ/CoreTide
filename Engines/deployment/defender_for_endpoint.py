@@ -129,7 +129,7 @@ class DefenderForEndpointDeploy(DeployMDR):
         category = mdr_config.alert.category.replace(" ", "")
 
         alert_template = DetectionRule.DetectionAction.AlertTemplate(title = mdr_config.alert.title or data.name,
-                                                                    description=data.description,
+                                                                    description=mdr_config.alert.description or data.description,
                                                                     severity=severity, 
                                                                     category=category,
                                                                     mitreTechniques=[],

@@ -343,6 +343,7 @@ class TideModels:
                 class Alert:
                     category: str
                     title: Optional[str] = None
+                    description: Optional[str] = None
                     severity: Optional[str] = None
                     recommendation: Optional[str] = None
                     techniques: Optional[Sequence[str]] = None

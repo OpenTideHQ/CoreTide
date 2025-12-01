@@ -262,10 +262,10 @@ def indexer(write_index=False) -> dict:
 
                             # Creating a sub-index for signals so we can more easily search in them through DataTide
                             if meta_name == "dom":
-                                signals = model_body.get("objective",{})["signals"]
+                                signals = model_body.copy().get("objective",{})["signals"]
                                 for signal in signals:
                                     signal.update({"parent":identifier})
-                                    objects_index["signal"][signal["uuid"]] = signal
+                                    objects_index["signal"][signal["uuid"]] = signal.update({"parent":identifier})
 
             objects_index[meta_name] = model_cat_index
 

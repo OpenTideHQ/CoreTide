@@ -26,6 +26,7 @@ def run():
     overall = 0
 
     for schema in JSONSCHEMAS_INDEX:
+        log("INFO", f"Validating objects of type: {schema}")
         count = 0
 
         if schema in MODELS_INDEX:

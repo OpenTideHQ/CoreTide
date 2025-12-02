@@ -51,11 +51,7 @@ class TableExporter:
     def _rename_columns(self, dataset:pd.DataFrame)->pd.DataFrame:
         new_columns = {}
         for column in dataset.columns:
-            if column == "actors":
-                new_columns[column] = "Threat Actors"
-            elif column == "attack":
-                new_columns[column] = "ATT&CK"
-            elif column == "uuid":
+            if column == "uuid":
                 new_columns[column] = "UUID"
             else:
                 new_columns[column] = column.capitalize()

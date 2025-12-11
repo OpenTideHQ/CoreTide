@@ -452,3 +452,20 @@ keys:
     icon: 🧩
     description: The Windows API, informally WinAPI, is Microsoft's core set of application programming interfaces (APIs) available in the Microsoft Windows operating systems. The name Windows API collectively refers to several different platform implementations that are often referred to by their own names (for example, Win32 API). Almost all Windows programs interact with the Windows API.
     link: https://learn.microsoft.com/en-us/windows/win32/apiindex/windows-api-list
+  # OT/ICS Additional Targets
+  - id: TGT0110
+    name: OT Network Segment
+    icon: 🏭
+    description: Dedicated network segment containing operational technology assets including PLCs, RTUs, HMIs, and SCADA servers, typically isolated from corporate IT networks.
+  - id: TGT0111
+    name: Serial Communication Link
+    icon: 🔌
+    description: RS-232/RS-485 serial connections used for point-to-point communication between OT devices, often using Modbus RTU or DNP3 protocols.
+  - id: TGT0112
+    name: OT Historian
+    icon: 📊
+    description: Specialized time-series database for collecting and storing process data from industrial control systems, used for trending, analysis, and regulatory compliance.
+  - id: TGT0113
+    name: SCADA Master Station
+    icon: 🖥️
+    description: Central system in SCADA architecture that collects data from and sends commands to RTUs and PLCs across geographically distributed sites.

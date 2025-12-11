@@ -256,5 +256,46 @@ keys:
     link: https://learn.microsoft.com/en-us/purview/purview
   - id: PFM0070
     name: Sysdiagnose
-    description: You can use sysdiagnose to research general iOS and iPadOS issues before you troubleshoot or report them to AppleCare. Sysdiagnose extracts information from iPhone and iPad devices and captures it in a log file. You or AppleCare can then read the file to understand software or network issues. 
-    link: https://it-training.apple.com/tutorials/support/sup075/    
+    description: You can use sysdiagnose to research general iOS and iPadOS issues before you troubleshoot or research them to AppleCare. Sysdiagnose extracts information from iPhone and iPad devices and captures it in a log file. You or AppleCare can then read the file to understand software or network issues. 
+    link: https://it-training.apple.com/tutorials/support/sup075/
+  # OT/ICS Platforms
+  - id: PFM0071
+    name: Modbus TCP/RTU
+    description: Modbus is a serial communication protocol used for connecting electronic devices in industrial environments. Modbus TCP operates over TCP/IP networks while Modbus RTU uses serial RS-232/RS-485 connections.
+    link: https://modbus.org
+  - id: PFM0072
+    name: IEC 60870-5-104
+    description: IEC 60870-5-104 (IEC 104) is a telecontrol protocol for power system monitoring and control, commonly used in electric utility SCADA systems. It operates over TCP/IP networks.
+    link: https://webstore.iec.ch/publication/25035
+  - id: PFM0073
+    name: DNP3
+    description: Distributed Network Protocol 3 (DNP3) is a communication protocol used in SCADA systems, primarily for electric and water utilities. Supports both serial and TCP/IP transport.
+    link: https://www.dnp.org/
+  - id: PFM0074
+    name: Siemens S7comm
+    description: S7comm is the proprietary protocol used by Siemens S7-300/400 PLCs for communication between engineering software, HMIs, and controllers.
+    link: https://wiki.wireshark.org/S7comm
+  - id: PFM0075
+    name: EtherNet/IP CIP
+    description: EtherNet/IP is an industrial network protocol using Common Industrial Protocol (CIP) over standard Ethernet. Used primarily with Allen-Bradley/Rockwell Automation controllers.
+    link: https://www.odva.org/technology-standards/key-technologies/ethernet-ip/
+  - id: PFM0076
+    name: OPC UA
+    description: OPC Unified Architecture (OPC UA) is a machine-to-machine communication protocol for industrial automation. Provides secure, reliable data exchange across platforms.
+    link: https://opcfoundation.org/about/opc-technologies/opc-ua/
+  - id: PFM0077
+    name: OPC DA
+    description: OPC Data Access (OPC DA) is a legacy OPC specification for real-time data access from PLCs, DCS, and other control devices to HMIs and SCADA systems.
+    link: https://opcfoundation.org/about/opc-technologies/opc-classic/
+  - id: PFM0078
+    name: BACnet
+    description: Building Automation and Control Networks (BACnet) is a communication protocol for building automation and control networks, used in HVAC, lighting, and access control systems.
+    link: https://www.bacnetinternational.org/
+  - id: PFM0079
+    name: PROFINET
+    description: PROFINET is an industry standard for industrial Ethernet, primarily used with Siemens and other European automation equipment.
+    link: https://www.profibus.com/technology/profinet
+  - id: PFM0080
+    name: IEC 61850
+    description: IEC 61850 is a standard for communication networks and systems in substations, enabling interoperability between intelligent electronic devices (IEDs) in power systems.
+    link: https://webstore.iec.ch/publication/6028

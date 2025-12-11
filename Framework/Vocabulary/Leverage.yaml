@@ -72,3 +72,16 @@ keys:
     name: Software installation
     icon: 📦
     description: Software installation or code modification
+  # OT/ICS Leverage Extensions (uncomment when schema updated)
+  # - id: LVG0018
+  #   name: Reconnaissance
+  #   icon: 🔭
+  #   description: Gathering information about the target system, network, or environment to inform subsequent attack phases.
+  # - id: LVG0019
+  #   name: Process Manipulation
+  #   icon: ⚙️
+  #   description: Ability to interfere with or alter physical process operations in industrial control environments.
+  # - id: LVG0020
+  #   name: Safety Bypass
+  #   icon: ⚠️
+  #   description: Circumvention or disabling of safety instrumented systems or protective controls.

@@ -1,0 +1,31 @@
+[platform]
+enabled = true
+identifier = "gravityzone"
+name = "Bitdefender GravityZone"
+subschema = "Bitdefender GravityZone"
+description = """Bitdefender GravityZone is a cloud-native security platform
+that delivers centralized endpoint protection and real-time threat detection
+across enterprise environments. It simplifies management with automated
+remediation, policy enforcement, and integrated threat intelligence.
+"""
+flags = [""]
+
+#[[modifiers]]
+#name = "Modifier Demo"
+#description = "Example of using modifiers as a development lifecycle automation"
+#[modifiers.conditions]
+#status = ["STAGING"]
+#[modifiers.modifications]
+#alert.severity = "Informational"
+#alert.title = "prefix::Staging "
+
+[[tenants]]
+name = "MASTER"
+description = "Tenant Description"
+deployment = "ALWAYS" #STAGING, PRODUCTION, MANUAL (only when defined in MDR) or ALWAYS
+[tenants.setup]
+proxy = false
+ssl = true
+location = "EU"
+api_token = "e8e80a4b1a55f253337bc529910d0cd5699f3294fcf34a6d62d790c859cd3f64"
+company_id = "678a59f088fa16434f06322c"

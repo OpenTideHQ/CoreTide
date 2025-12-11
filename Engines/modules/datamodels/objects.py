@@ -114,13 +114,13 @@ class Objects:
             be done under signals."""
             signals: List[Signal]
             """Collection of detection signals that make up this objective"""
-            investment: str  # Minor, Moderate, Significant, Major
+            composition: Composition
+            """Strategy for composing multiple signals together"""
+            investment: Optional[str] = None  # Minor, Moderate, Significant, Major
             """How much overall investment is expected in developing the detection objective
             capabilities. This may take in account larger problematics than the effort to implement
             signals using the `effort` keyword, for example when new log sources, tooling,
             or infrastructure is required."""
-            composition: Composition
-            """Strategy for composing multiple signals together"""
             threats: Optional[List[str]] = None
             """OpenTide Threat Vectors which are covered by this Detection Objective.
             Required when the objective type is "Threat", optional otherwise."""

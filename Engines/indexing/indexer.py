@@ -261,8 +261,9 @@ def indexer(write_index=False) -> dict:
                             files_index[identifier] = model
 
                             # Creating a sub-index for signals so we can more easily search in them through DataTide
+                            # We copy each signal to avoid polluting the DOM data with the 'parent' field
                             if meta_name == "dom":
-                                signals = model_body.copy().get("objective",{}).get("signals", [])
+                                signals = model_body.get("objective",{}).get("signals", [])
                                 for idx, signal in enumerate(signals or []):
                                     if not signal:
                                         log("FATAL", 
@@ -279,8 +280,9 @@ def indexer(write_index=False) -> dict:
                                             f"Detection Objective UUID: {identifier}",
                                             "Every signal must have a unique 'uuid' field")
                                         raise ValueError(f"Signal '{signal_name}' missing UUID in Detection Objective '{model}'")
-                                    signal.update({"parent":identifier})
-                                    objects_index["signal"][signal["uuid"]] = signal
+                                    signal_copy = signal.copy()
+                                    signal_copy["parent"] = identifier
+                                    objects_index["signal"][signal["uuid"]] = signal_copy
 
             objects_index[meta_name] = model_cat_index
 

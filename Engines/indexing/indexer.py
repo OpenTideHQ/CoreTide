@@ -262,10 +262,25 @@ def indexer(write_index=False) -> dict:
 
                             # Creating a sub-index for signals so we can more easily search in them through DataTide
                             if meta_name == "dom":
-                                signals = model_body.copy().get("objective",{})["signals"]
-                                for signal in signals:
+                                signals = model_body.copy().get("objective",{}).get("signals", [])
+                                for idx, signal in enumerate(signals or []):
+                                    if not signal:
+                                        log("FATAL", 
+                                            f"Signal at index {idx} is empty/null in Detection Objective",
+                                            f"File: {model}",
+                                            f"Detection Objective UUID: {identifier}",
+                                            "Ensure all signals in the 'signals' list are properly defined")
+                                        raise ValueError(f"Empty signal at index {idx} in Detection Objective '{model}'")
+                                    if not signal.get("uuid"):
+                                        signal_name = signal.get("name", "unnamed")
+                                        log("FATAL", 
+                                            f"Signal '{signal_name}' is missing a UUID",
+                                            f"File: {model}",
+                                            f"Detection Objective UUID: {identifier}",
+                                            "Every signal must have a unique 'uuid' field")
+                                        raise ValueError(f"Signal '{signal_name}' missing UUID in Detection Objective '{model}'")
                                     signal.update({"parent":identifier})
-                                    objects_index["signal"][signal["uuid"]] = signal.update({"parent":identifier})
+                                    objects_index["signal"][signal["uuid"]] = signal
 
             objects_index[meta_name] = model_cat_index
 

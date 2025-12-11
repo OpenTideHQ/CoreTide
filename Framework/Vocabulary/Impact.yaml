@@ -64,20 +64,19 @@ keys:
     name: Competitive disadvantage
     icon: 📉
     description: Loss of competitive advantage
-  # OT/ICS Impact Extensions (uncomment when schema updated)
-  # - id: IMP0016
-  #   name: Loss of Safety
-  #   icon: ☠️
-  #   description: Compromise of safety systems or controls leading to potential physical harm to personnel, equipment damage, or environmental release.
-  # - id: IMP0017
-  #   name: Loss of Control
-  #   icon: 🎛️
-  #   description: Inability to monitor or command physical processes, leading to uncontrolled operations.
-  # - id: IMP0018
-  #   name: Loss of View
-  #   icon: 👁️‍🗨️
-  #   description: Loss of visibility into process state, preventing operators from understanding current conditions.
-  # - id: IMP0019
-  #   name: Physical Damage
-  #   icon: 💥
-  #   description: Damage to physical equipment, machinery, or infrastructure as a result of cyber attack.
+  - id: IMP0016
+    name: Loss of Safety
+    icon: ☠️
+    description: Compromise of safety systems or controls leading to potential physical harm to personnel, equipment damage, or environmental release.
+  - id: IMP0017
+    name: Loss of Control
+    icon: 🎛️
+    description: Inability to monitor or command physical processes, leading to uncontrolled operations.
+  - id: IMP0018
+    name: Loss of View
+    icon: 👁️‍🗨️
+    description: Loss of visibility into process state, preventing operators from understanding current conditions.
+  - id: IMP0019
+    name: Physical Damage
+    icon: 💥
+    description: Damage to physical equipment, machinery, or infrastructure as a result of cyber attack.

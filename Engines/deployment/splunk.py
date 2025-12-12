@@ -302,9 +302,8 @@ class SplunkDeploy(SplunkEngineInit, DeployMDR):
         deploy_config.update(actions_config)
         deploy_config["search"] = query
 
-        if self.DEBUG:
-            log("INFO", "The following configuration was compiled")
-            print(json.dumps(deploy_config, indent=1, sort_keys=True))
+        log("INFO", "The following configuration was compiled")
+        print(json.dumps(deploy_config, indent=1, sort_keys=True))
 
         # In Splunk, some configurations are coupled with others. The update()
         # method of saved_searches objects does not resolve this, and depending on the

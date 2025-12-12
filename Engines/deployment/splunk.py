@@ -303,7 +303,7 @@ class SplunkDeploy(SplunkEngineInit, DeployMDR):
         deploy_config["search"] = query
 
         if self.DEBUG:
-            log("DEBUG", "The following configuration was compiled")
+            log("INFO", "The following configuration was compiled")
             print(json.dumps(deploy_config, indent=1, sort_keys=True))
 
         # In Splunk, some configurations are coupled with others. The update()
@@ -324,8 +324,6 @@ class SplunkDeploy(SplunkEngineInit, DeployMDR):
         for attribute in second_stage_attributes:
             if attribute in deploy_config:
                 second_stage[attribute] = deploy_config.pop(attribute)
-
-        pprint(deploy_config)
 
         # Check if saved search already exists or create a new one
         try:

@@ -11,6 +11,7 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from Engines.modules.logs import log
 from Engines.modules.files import resolve_configurations, resolve_paths
+import re
 
 ROOT = Path(str(git.Repo(".", search_parent_directories=True).working_dir))
 
@@ -132,9 +133,10 @@ class PromoteMDR:
                     crossed = True
 
                 if crossed:
-                    for word in status_to_promote:
-                        if word in line:
-                            line = line.replace(word, PROMOTION_TARGET)
+                    if re.search(r'status\s*:\s*', line):
+                        for word in status_to_promote:
+                            if word in line:
+                                line = line.replace(word, PROMOTION_TARGET)
                 buffer.append(line)
 
         with open(mdr_path, "w", encoding="utf-8") as file:

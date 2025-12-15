@@ -46,7 +46,7 @@ class DetectionObjectivesWiki:
         WIKI_PATH = Path(DataTide.Configurations.Global.Paths.Core.models_docs_folder)
         self.DOCUMENTATION_PATH = WIKI_PATH / DataTide.Configurations.Documentation.object_names["dom"]
         if DOCUMENTATION_TARGET in TARGET_WITH_DASH_PATHS:
-            self.MDR_WIKI_PATH = Path(str(self.MDR_WIKI_PATH).replace(" ", "-"))
+            self.DOCUMENTATION_PATH = Path(str(self.DOCUMENTATION_PATH).replace(" ", "-"))
             log("INFO",
                 "Going to create file paths with dashes instead of space for the given environment",
                 str(DOCUMENTATION_TARGET))

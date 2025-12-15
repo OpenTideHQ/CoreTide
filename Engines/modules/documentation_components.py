@@ -116,7 +116,7 @@ def frontmatter_doc(object_name:str, object_uuid:str)->str:
     if CIEnvironment()._check_ci_environment() is not CIEnvironment.CIPlatforms.GitlabCI:
         return ""    
     if DataTide.Configurations.Documentation.gitlab.get("uuid_permalinks", False):
-        return f"---\ntitle:{get_icon(get_type(object_uuid))} {object_name}\n---"
+        return f"---\ntitle: {get_icon(get_type(object_uuid))} {object_name}\n---"
     else:
         return ""
 

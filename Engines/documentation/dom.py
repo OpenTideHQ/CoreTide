@@ -53,6 +53,8 @@ class DetectionObjectivesWiki:
 
 
     def create_wiki(self):
+        if not DataTide.Models.DOM:
+            return
         self._recreate_folder()
         for objective in DataTide.Models.DOM:
             objective_content = DataTide.Models.DOM[objective]
@@ -287,7 +289,9 @@ class DetectionObjectivesWiki:
             output.write(content)
 
 
-if __name__ == "__main__":
+def run():
     objectives_wiki = DetectionObjectivesWiki()
     objectives_wiki.create_wiki()
 
+if __name__ == "__main__":
+    run()

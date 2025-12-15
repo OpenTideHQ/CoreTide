@@ -340,9 +340,6 @@ def run():
         shutil.rmtree(MDR_WIKI_PATH)
     MDR_WIKI_PATH.mkdir(parents=True)
 
-    # Initialize a counter of created documents
-    mdr_doc_count = 0
-
     for mdr_uuid in MODELS_INDEX["mdr"]:
         
         # Make a file name based on MDR data
@@ -374,7 +371,6 @@ def run():
 
         with open(doc_path, "w+", encoding="utf-8") as output:
             output.write(document)
-            mdr_doc_count += 1
 
 
 if __name__ == "__main__":

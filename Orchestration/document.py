@@ -11,6 +11,7 @@ from Engines.modules.logs import coretide_intro, ANSI
 # This trick caches a special version of the index which will seek
 # and reconcile the staging index for MDRs which are in a Merge Request
 from Engines.documentation import (
+    dom,
     mdr,
     metaschemas,
     models,
@@ -28,5 +29,6 @@ CoreTide Documentation
 vocabularies.run()
 metaschemas.run()
 models.run()
+dom.run()
 mdr.run()
 wiki_navigation.run()

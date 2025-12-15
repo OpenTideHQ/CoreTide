@@ -1,0 +1,60 @@
+  #schema: harfanglab::1.0
+  #status: DEVELOPMENT
+  #contributors:
+    #-
+  #tenants:
+    #-
+  #flags:
+    #-
+  
+  # Common HarfangLab settings
+  #maturity: Experimental
+  #confidence: Moderate
+  #action: Alert
+  
+  # Choose either sigma OR yara configuration (not both)
+  
+  # --- Sigma Rule Configuration ---
+  sigma:
+    logsource:
+      category: process_creation
+      product: windows
+    
+    selections:
+      - name: selection
+        field: Image
+        modifiers:
+          - endswith
+        value:
+          - '\malware.exe'
+          - '\suspicious.exe'
+      
+      #- name: filter
+        #field: ParentImage
+        #modifiers:
+          #- endswith
+        #value:
+          #- '\legitimate.exe'
+    
+    condition: selection
+    #condition: selection and not filter
+    
+    #tags:
+      #- attack.execution
+      #- attack.t1059
+    
+    #false_positives:
+      #- Legitimate software installation
+  
+  # --- YARA Rule Configuration (alternative to sigma) ---
+  #yara:
+    #meta:
+      #context: process
+      #os: Windows
+    
+    #strings: |
+      #$str1 = "malicious_string" ascii
+      #$str2 = { 4D 5A 90 00 }
+    
+    #condition: |
+      #uint16(0) == 0x5A4D and all of ($str*)

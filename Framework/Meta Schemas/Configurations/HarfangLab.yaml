@@ -1,0 +1,299 @@
+title: HarfangLab Configuration
+description: Validates and Documents the HarfangLab Configuration file
+
+$schema: https://json-schema.org/draft-07/schema
+additionalProperties: false
+
+required:
+  - platform
+
+allOf:
+  - if:
+      properties:
+        platform:
+          properties:
+            enabled:
+              const: true
+    then:
+      required:
+        - tenants
+
+properties:
+
+  platform:
+    title: Platform Config Section
+    type: object
+    required:
+      - enabled
+      - identifier
+      - name
+      - subschema
+      - description
+      - flags
+    properties:
+
+      enabled:
+        title: System enabled
+        description: |
+          Controls whether the OpenTIDE instance considers the system
+          as enabled, and updates its internal schemas and logic accordingly
+        type: boolean
+        default: false
+
+      identifier:
+        title: System Identifier
+        description: |
+          Unique string to identify the system at several part of the framework,
+          especially within the MDR configuration section. Cannot be overwritten,
+          need to be changed at a schema level first 
+        type: string
+        const: harfanglab
+
+      name:
+        title: System Name
+        description: |
+          The usual commercial or commonly known term for the system. Mostly
+          used for documentation or enrichment purposes
+        type: string
+        const: HarfangLab
+      
+      subschema:
+        title: System Sub Schema 
+        description: |
+          Name of the file containing the schema definition for the system, without
+          path or extension. Should not be usually modified. 
+        type: string
+        const: HarfangLab
+
+      description:
+        title: System Description
+        description: |
+          Explanation of the system, for documentation purposes
+        type: string
+
+      flags:
+        title: System Flags
+        description: |
+          Flags can be referenced within the MDR. They may be useful as simple
+          internal tagging system for documentation and management, but they may also
+          be used as part of the deployment modifiers framework.
+        type: array
+        items:
+          type: string
+
+  modifiers:
+    title: Deployment Modifiers
+    description: |
+      Deployment-Time Modification is an advanced feature of OpenTide : it allows
+      defining a list of rules at instance level which are evaluated against conditions,
+      and if there is a match, allows to mutate ANY aspect of the MDR Configuration section.
+      
+      This is accomplished through a deep merge of the modifiers.modifications section with the related
+      system configuration data.
+
+      Deployment modifiers allows to effectively re-target deployment, and override any aspect of the MDR
+      depending on the desired business logic.
+    type: array
+    items:
+      type: object
+      additionalProperties: false
+      required:
+        - name
+        - description
+        - conditions
+        - modifications
+      
+      properties:
+        name: 
+          title: Modifier Section Name
+          description: |
+            A human readable name that is mostly used for logging and documentation purposes
+          type: string
+        
+        description:
+          title: Modifier Section Description
+          description: |
+            A human readable description that is mostly used for logging and documentation purposes
+          type: string
+
+        conditions:
+          title: Condition Expression
+          description: |
+            Conditions are simple to express : within a condition field, such as flags, 
+            a list of values is required. All values within that list are ORed. Between fields,
+            values are ANDed.
+
+            ```yaml
+            flags: ["Flag 1", "Flag 2"]
+            tenant: ["Tenant A"]
+            ```
+
+            This expression would be evaluated as IF (mdr.flags == "Flag 1" OR mdr.flags == "Flag 2")
+            AND (tenant == "Tenant A") 
+          type: object
+          additionalProperties: false
+          anyOf:
+            - required: [status]
+            - required: [flags]
+            - required: [tenants]
+
+          properties:
+            status:
+              title: MDR Status Condition
+              description: |
+                Matches the current MDR status against a list of MDR Status names. This list is not
+                validated, so ensure that you reference valid MDR Status names.
+              type: array
+              items:
+                type: string
+
+            tenants:
+              title: Current Tenant Deployment Condition
+              description: |
+                In the deployment loop, the current targeted tenant will be
+                evaluated against this rule. Tenants are targeted in the following order
+                
+                1. By the list of tenants defined under the tenants section in this configuration
+                2. If it is overwritten by the tenants keyword within the MDR, takes precedence
+              type: array
+              items:
+                type: string
+
+            flags:
+              title: MDR Flags Conditions
+              description: |
+                Matches the flags of the MDR, if it contains any. 
+              type: array
+              items:
+                type: string
+
+        modifications: 
+          title: Data Modifiers
+          description: |
+            If the condition section matches, this section gets merged into the MDR configuration section.
+            There are some important details to keep in mind.
+
+            You CAN NOT overwrite tenants again. Modifiers are only evaluated AFTER the tenant list gets reconciliated
+            according to the deployment strategy defined in the respective tenant section. 
+
+            You are expected to provide full paths to the value you wish to change. Note that in TOML, this is
+            accomplished with dot separated paths. Thus, to target the title keyword within the alert object,
+            this would be expressed as `alert.title = "NEW VALUE"` and result in merging into the MDR body
+            `{"alert": {title: "NEW VALUE"}}`. Incorrectly targeting the keyword will result in breaking the datamodel, 
+            and thus fail the pipeline after the modifier gets applied.
+
+            The algorithm perform a deep merging, which ensures that data is not overwritten. If you wish to
+            remove entirely a field, you can set the new value to `"NULL"`. This will be processed internally
+            as a None. 
+
+            By using `prefix::NEW_VALUE` and `suffix::NEW_VALUE` you may also respectivaly prepend of append your
+            new value to the one used by the MDR. If there is no existing value, this will simply become the new value.
+            This is particularly useful to automate business logic, for example by changing the alert title 
+            based on the status and/or flags. 
+          type: object
+          additionalProperties:
+                type: object
+
+  tenants:
+    title: Tenant Configuration
+    description: |
+      Each list item should be a particular tenant, with accompanying values. 
+      Note that when a string value is expected, you may use environment variables using the following
+      expression $ENVIRONMENT_VARIABLE. This is particularly useful for secrets, which you may keep 
+      as a CI variable.
+    type: array
+    items:
+      type: object
+      required:
+        - name
+        - description
+        - deployment
+        - setup
+      properties:
+
+        name: 
+          title: Tenant Name
+          description: |
+            Identifier for the tenant, which will be reused at several parts of the framework.
+            As this will be used as an identifier, use something explicit but concise. For
+            example, `DEV` or `PROD`
+            
+            Tenants may also be different clients, and if you need further subdivision you may
+            use a special syntax : CLIENT::ENVIRONMENT. No other special characters allowed. 
+          type: string
+          pattern: "^[a-zA-Z0-9]*(:{2})?[a-zA-Z0-9_]*$"
+        
+        description: 
+          title: Tenant Description
+          description: |
+            Explanation of what the tenant is, and if there's any specificities to be documented.
+          type: string
+        
+        deployment: 
+          title: Deployment Strategy
+          description: |
+            The deployment strategy allows to automate and safeguard how a tenant should be considered
+            by the deployment algorithms. 
+
+            - ALWAYS     : As part of every deployment, the tenant is considered as a target
+            - MANUAL     : The tenant is NEVER considered as a target, except if it has been defined in the MDR content under tenants.
+            - STAGING    : The tenant is ONLY targeted within a Staging context (e.g., during a merge request)
+            - PRODUCTION : The tenant is ONLY targeted within a Staging context (e.g., post-merge, after any commit to the default (main/master) branch)
+          type: string
+          enum:
+            - ALWAYS
+            - MANUAL
+            - STAGING
+            - PRODUCTION
+            
+        setup:
+          title: Tenant Setup
+          description: |
+            Technical data related to this specific tenant configuration.
+          type: object
+          required: 
+            - proxy
+            - ssl
+            - url
+            - api_token
+          
+          properties: 
+            proxy: 
+              title: Enable Proxy
+              description: |
+                If set to true, will retrieve proxy settings and use them ahead of making any
+                API calls. This is useful if you are in an enterprise context, and need to pass
+                through the corporate proxy to access external resources. The proxy settings are retrieved
+                from deployment.toml, under the proxy section. If you do not see this configuration in your instance,
+                refer to CoreTIDE repositories to reproduce and override. 
+              type: boolean
+              default: false
+            
+            ssl:
+              title: Enable SSL
+              description: |
+                If set to true, performs the calls over HTTPS. You may need to configure this to false
+                if you notice SSL or certificate errors during deployments, as some networking setup
+                will not work well for API calls over HTTPS, especially proxies, or the target platform.
+                
+                Another root cause for certificate errors may be the trust store of the CI runner not
+                recognizing the CA root of the system, in which case you could look into manually importing a
+                root CA. Self-signed certificates will create similar issues, and you could look into importing
+                the CA chain of the system directly. Refer to your CI system documentation to understand how this is possible, for example in 
+                Gitlab this is documented here: https://docs.gitlab.com/runner/configuration/tls-self-signed.html
+              type: boolean
+              default: true
+
+            url:
+              title: HarfangLab API URL
+              type: string
+              description: |
+                The root URL of the HarfangLab instance, the same as the one you see on your browser when visiting
+                the console. For example: https://harfanglab.example.com
+            
+            api_token:
+              title: API Token
+              type: string
+              description: |
+                The API token for authentication with the HarfangLab API.
+                You can generate this token from the HarfangLab console under Settings > API.

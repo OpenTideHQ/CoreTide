@@ -1,0 +1,440 @@
+# HarfangLab MDR Configuration Sub-Schema
+# Supports both Sigma rules (behavioral detection) and YARA rules (memory/file scanning)
+# A rule must be either Sigma OR YARA, not both
+
+required:
+  - status
+  - schema
+
+# Ensure that either sigma or yara is present, but not both
+oneOf:
+  - required: [sigma]
+    not:
+      required: [yara]
+  - required: [yara]
+    not:
+      required: [sigma]
+
+patternProperties:
+  "rule_id::.+$":
+    title: Internal HarfangLab Rule ID
+    type: string
+    description: |
+      IMPORTANT: This is used by the automation to correctly
+      target the rule on HarfangLab, which uses its own ID system. 
+      This key will appear as many tenant as this rule is deployed to.
+      Do not alter this field manually, or create new fields.
+
+properties:
+  schema:
+    title: Schema identifier and version
+    type: string
+    description: Identifier of the schema at its current version 
+    default: harfanglab::1.0
+    pattern: ^harfanglab::[1-9].[0-9]$
+
+  status: 
+    title: Status of the use-case
+    type: string
+    description: Define the status according to use case development life cycle process
+    tide.config.statuses: True
+
+  contributors:
+    title: Development Contributors
+    type: array
+    description: Individuals who supported creating, enriching or tuning the detection. 
+    items:
+      type: string
+      format: email
+
+  tenants: 
+    title: Target Tenants
+    icon: 🏢
+    description: |
+      Override the default organizations and deploy to selected tenants only.
+    type: array
+    tide.config.system.tenants: harfanglab
+
+  flags:
+    title: Flags
+    icon: 🚩
+    description: Flags allow to customize the rule behaviour using the modifiers framework
+    type: array
+    tide.config.parameter-list: systems.harfanglab.platform.flags
+
+  # Common HarfangLab rule metadata
+  maturity:
+    title: Rule Maturity
+    description: |
+      Indicates the maturity level of the rule. Maps to HarfangLab's hl_status field.
+    type: string
+    enum:
+      - Stable
+      - Testing
+      - Experimental
+    enumMarkdown:
+      - Rule has been validated and is production-ready
+      - Rule is being tested and may produce false positives
+      - Rule is experimental and should be used with caution
+
+  confidence:
+    title: Rule Confidence
+    description: |
+      Confidence level of the detection. Maps to HarfangLab's rule_confidence_override field.
+    type: string
+    enum:
+      - Weak
+      - Moderate
+      - Strong
+    enumMarkdown:
+      - Low confidence - may produce many false positives
+      - Medium confidence - some false positives expected
+      - High confidence - minimal false positives expected
+
+  action:
+    title: Rule Action
+    description: |
+      The action to take when the rule triggers. Maps to HarfangLab's global_state field.
+    type: string
+    enum:
+      - Alert
+      - Alert & Block
+      - Alert, Block & Quarantine
+    enumMarkdown:
+      - Generate an alert only
+      - Generate an alert and block the threat
+      - Generate an alert, block, and quarantine the affected system
+
+  # Sigma rule section
+  sigma:
+    title: Sigma Rule Configuration
+    description: |
+      Configuration for Sigma behavioral detection rules. HarfangLab's Sigma engine
+      provides detection based on log sources and event patterns.
+    type: object
+    required:
+      - logsource
+      - selections
+      - condition
+    
+    properties:
+      action:
+        title: Sigma-specific Action Override
+        description: Override the top-level action for this Sigma rule specifically
+        type: string
+        enum:
+          - Alert
+          - Alert & Block
+          - Alert, Block & Quarantine
+
+      confidence:
+        title: Sigma-specific Confidence Override
+        description: Override the top-level confidence for this Sigma rule specifically
+        type: string
+        enum:
+          - Weak
+          - Moderate
+          - Strong
+
+      tags:
+        title: Sigma Tags
+        description: |
+          Tags associated with the rule, including MITRE ATT&CK tactics (e.g., attack.credential_access)
+          and techniques (e.g., attack.t1557)
+        type: array
+        items:
+          type: string
+          pattern: ^(attack\.[a-z_]+|attack\.t[0-9]{4}(\.[0-9]{3})?|cve\.[0-9]{4}\.[0-9]+|[a-z_\.]+)$
+
+      logsource:
+        title: Log Source
+        description: |
+          Defines the product and category of logs this rule applies to.
+          See HarfangLab documentation for supported logsource combinations.
+        type: object
+        required:
+          - category
+          - product
+        properties:
+          category:
+            title: Log Category
+            description: The category of events to match
+            type: string
+            enum:
+              # Windows categories
+              - process_creation
+              - network_connection
+              - network_dpi
+              - network_close
+              - driver_load
+              - library_event
+              - remote_thread
+              - injected_thread
+              - raw_device_access
+              - process_access
+              - pipe_created
+              - pipe_connected
+              - file_event
+              - registry_event
+              - process_termination
+              - process_tampering
+              - wmi_event
+              - dns_query
+              - eventlog
+              - application
+              - security
+              - system
+              - powershell
+              - powershell-classic
+              - defender
+              - terminalservices-remoteconnectionmanager
+              - terminalservices-localsessionmanager
+              - win32k_getasynckeystate
+              - win32k_registerrawinputdevices
+              - win32k_setwindowshookex
+              # Linux categories
+              - process_ptrace
+              - bpf_event
+              - filesystem_event
+              - network_listen
+              - network_rawsocket
+              - login_event
+              - logout_event
+              - url_request
+              # macOS categories (many overlap with Linux)
+            enumMarkdown:
+              - "**Process Creation** - Event triggered when a process is created"
+              - "**Network Connection** - Event triggered when a network connection is created"
+              - "**Network DPI** - Event triggered when network connection protocols are identified"
+              - "**Network Close** - Event triggered when a network connection is closed"
+              - "**Driver Load** - Event triggered when a driver is loaded by the system"
+              - "**Library Event** - Event triggered when a native or managed library is loaded"
+              - "**Remote Thread** - Event triggered when a remote thread is created"
+              - "**Injected Thread** - Event triggered when an injected thread is created"
+              - "**Raw Device Access** - Event triggered when a process makes raw device access"
+              - "**Process Access** - Event triggered when a process is accessed"
+              - "**Pipe Created** - Event triggered when a pipe is created"
+              - "**Pipe Connected** - Event triggered when a pipe is connected"
+              - "**File Event** - Event triggered on file operations"
+              - "**Registry Event** - Event triggered on registry operations"
+              - "**Process Termination** - Event triggered when a process terminates"
+              - "**Process Tampering** - Event triggered on process tampering"
+              - "**WMI Event** - Event triggered on WMI operations"
+              - "**DNS Query** - Event triggered on DNS queries"
+              - "**Event Log (Generic)** - Generic Windows event log"
+              - "**Application Log** - Windows Application event log"
+              - "**Security Log** - Windows Security event log"
+              - "**System Log** - Windows System event log"
+              - "**PowerShell Operational** - Microsoft-Windows-PowerShell/Operational"
+              - "**PowerShell Classic** - Windows PowerShell classic log"
+              - "**Windows Defender** - Microsoft-Windows-Windows Defender/Operational"
+              - "**Terminal Services RCM** - Terminal Services Remote Connection Manager"
+              - "**Terminal Services LSM** - Terminal Services Local Session Manager"
+              - "**Win32k GetAsyncKeyState** - Win32k API monitoring"
+              - "**Win32k RegisterRawInputDevices** - Win32k API monitoring"
+              - "**Win32k SetWindowsHookEx** - Win32k API monitoring"
+              - "**Process Ptrace** - Linux ptrace events"
+              - "**BPF Event** - Linux BPF program events"
+              - "**Filesystem Event** - Linux filesystem events"
+              - "**Network Listen** - Linux network listen events"
+              - "**Network Raw Socket** - Linux raw socket events"
+              - "**Login Event** - Login authentication events"
+              - "**Logout Event** - Logout events"
+              - "**URL Request** - URL request events"
+
+          product:
+            title: Product
+            description: The product generating the logs
+            type: string
+            enum:
+              - windows
+              - linux
+              - macos
+            enumMarkdown:
+              - "**Windows** - Microsoft Windows operating system"
+              - "**Linux** - Linux operating system"
+              - "**macOS** - Apple macOS operating system"
+
+      selections:
+        title: Detection Selections
+        description: |
+          List of field selections for the detection rule. Each selection defines
+          a set of field conditions that can be combined using the condition expression.
+        type: array
+        minItems: 1
+        items:
+          type: object
+          required:
+            - name
+            - field
+            - value
+          properties:
+            name:
+              title: Selection Name
+              description: |
+                A unique name for this selection, used in the condition expression.
+                Use descriptive names like 'FileDetection', 'Exclusions', 'ProcessMatch'.
+              type: string
+              pattern: ^[A-Za-z][A-Za-z0-9_]*$
+
+            field:
+              title: Field Name
+              description: |
+                The field to match against. Available fields depend on the logsource category.
+                Refer to HarfangLab documentation for field names per category.
+              type: string
+
+            modifiers:
+              title: Value Modifiers
+              description: |
+                Modifiers to apply to the field matching. Multiple modifiers can be chained.
+              type: array
+              items:
+                type: string
+                enum:
+                  - all
+                  - base64
+                  - base64offset
+                  - cased
+                  - cidr
+                  - contains
+                  - endswith
+                  - exists
+                  - expand
+                  - fieldref
+                  - gt
+                  - gte
+                  - lt
+                  - lte
+                  - re
+                  - startswith
+                  - utf16
+                  - utf16le
+                  - utf16be
+                  - wide
+                  - windash
+                enumMarkdown:
+                  - "**all** - All values must match (AND instead of OR)"
+                  - "**base64** - Base64 encode the value"
+                  - "**base64offset** - Base64 encode with offset variants"
+                  - "**cased** - Case-sensitive matching"
+                  - "**cidr** - CIDR notation IP matching"
+                  - "**contains** - Value contains substring"
+                  - "**endswith** - Value ends with string"
+                  - "**exists** - Field exists (true/false)"
+                  - "**expand** - Expand placeholders"
+                  - "**fieldref** - Reference another field"
+                  - "**gt** - Greater than (numeric)"
+                  - "**gte** - Greater than or equal (numeric)"
+                  - "**lt** - Less than (numeric)"
+                  - "**lte** - Less than or equal (numeric)"
+                  - "**re** - Regular expression match"
+                  - "**startswith** - Value starts with string"
+                  - "**utf16** - UTF-16 encoding"
+                  - "**utf16le** - UTF-16 Little Endian encoding"
+                  - "**utf16be** - UTF-16 Big Endian encoding"
+                  - "**wide** - Wide string encoding (alias for utf16le)"
+                  - "**windash** - Windows dash variants"
+
+            value:
+              title: Match Values
+              description: |
+                Values to match against the field. Can be a single value or list of values.
+                Multiple values are OR'd together unless the 'all' modifier is used.
+              oneOf:
+                - type: string
+                - type: array
+                  items:
+                    type: string
+                - type: boolean
+                - type: integer
+                - type: number
+
+      condition:
+        title: Detection Condition
+        description: |
+          Boolean expression combining selections. Supports AND, OR, NOT operators
+          and parentheses for grouping. Use selection names defined in the selections array.
+          
+          Examples:
+          - `FileDetection and not Exclusions`
+          - `(ProcessMatch or CommandLineMatch) and not Filter`
+          - `selection1 or selection2`
+        type: string
+        pattern: ^[A-Za-z0-9_\s\(\)]+((and|or|not|AND|OR|NOT)[A-Za-z0-9_\s\(\)]+)*$
+
+      false_positives:
+        title: Known False Positives
+        description: List of known situations that may trigger false positives
+        type: array
+        items:
+          type: string
+
+  # YARA rule section
+  yara:
+    title: YARA Rule Configuration
+    description: |
+      Configuration for YARA rules for memory and file scanning.
+      YARA rules provide pattern-based detection for malware and threat hunting.
+    type: object
+    required:
+      - strings
+      - condition
+    properties:
+      meta:
+        title: YARA Meta Information
+        description: Metadata for the YARA rule
+        type: object
+        properties:
+          context:
+            title: Scan Context
+            description: The context in which the YARA rule should be applied
+            type: string
+            enum:
+              - process
+              - thread
+              - memory
+            enumMarkdown:
+              - "**Process** - Scan process memory and files"
+              - "**Thread** - Scan thread context"
+              - "**Memory** - Scan memory regions"
+
+          os:
+            title: Target Operating System
+            description: The operating system this YARA rule targets
+            type: string
+            enum:
+              - Windows
+              - MacOS
+              - Linux
+            enumMarkdown:
+              - "**Windows** - Microsoft Windows"
+              - "**MacOS** - Apple macOS"
+              - "**Linux** - Linux operating systems"
+
+      strings:
+        title: YARA Strings
+        description: |
+          Raw YARA strings definition block. Define the strings, hex patterns,
+          or regular expressions to match.
+          
+          Example:
+          ```
+          $str1 = "malware" ascii
+          $str2 = { 4D 5A 90 00 }
+          $str3 = /[a-z]{5,}/i
+          ```
+        type: string
+        tide.template.multiline: True
+
+      condition:
+        title: YARA Condition
+        description: |
+          Raw YARA condition expression. Defines how the strings should match.
+          
+          Example:
+          ```
+          uint16(0) == 0x5A4D and all of ($str*)
+          ```
+        type: string
+        tide.template.multiline: True

@@ -219,9 +219,9 @@ class HarfangLabDeploy(DeployMDR):
         # Load MDR objects if UUIDs were provided
         loaded_mdr = []
         for mdr in mdr_deployment:
-            if type(mdr) is str:
+            if isinstance(mdr, str):
                 loaded_mdr.append(DataTide.Models.MDR[mdr])
-            elif type(mdr) is TideModels.MDR:
+            elif isinstance(mdr, TideModels.MDR):
                 loaded_mdr.append(mdr)
         mdr_deployment = loaded_mdr
 

@@ -304,10 +304,11 @@ class HarfangLabService:
         if response.status_code in [200, 201]:
             log("SUCCESS", f"Created Sigma rule: {rule.name}")
             try:
-                rule_id = response.json().get("id") or response.json().get("source_id")
+                response_data = response.json()
+                rule_id = response_data.get("id") or response_data.get("source_id")
                 return str(rule_id)
-            except Exception:
-                log("WARNING", "Could not extract rule ID from response", str(response.json()))
+            except (KeyError, ValueError, json.JSONDecodeError) as e:
+                log("WARNING", "Could not extract rule ID from response", str(e))
                 return rule.source_id
         else:
             self._http_errors(response, TideErrors.DetectionRuleCreationFailed)

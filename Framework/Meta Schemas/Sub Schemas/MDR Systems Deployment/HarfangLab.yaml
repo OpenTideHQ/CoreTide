@@ -361,7 +361,7 @@ properties:
           - `(ProcessMatch or CommandLineMatch) and not Filter`
           - `selection1 or selection2`
         type: string
-        pattern: ^[A-Za-z0-9_\s\(\)]+((and|or|not|AND|OR|NOT)[A-Za-z0-9_\s\(\)]+)*$
+        pattern: ^[A-Za-z0-9_\s\(\)]*(\s*(and|or|not|AND|OR|NOT)\s*[A-Za-z0-9_\s\(\)]*)*$
 
       false_positives:
         title: Known False Positives

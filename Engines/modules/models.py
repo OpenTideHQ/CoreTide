@@ -248,6 +248,7 @@ class TideConfigs:
                 class Setup(SystemConfig.Tenant.Setup):
                     url: str
                     api_token: str
+                    source_id: str
 
                 setup: Setup
 

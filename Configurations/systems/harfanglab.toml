@@ -27,3 +27,4 @@ flags = [""]
 #ssl = true
 #url = "" #HarfangLab API URL (e.g., https://harfanglab.example.com)
 #api_token = "$HARFANGLAB_API_TOKEN"
+#source_id = "" #Source identifier for rules from this tenant

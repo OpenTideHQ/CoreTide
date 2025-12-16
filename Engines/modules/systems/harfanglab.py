@@ -234,6 +234,7 @@ class HarfangLabService:
         
         base_url = self.tenant_config.setup.url.rstrip("/")
         self.SIGMA_RULES_ENDPOINT = f"{base_url}/api/data/threat_intelligence/SigmaRule/"
+        self.YARA_RULES_ENDPOINT = f"{base_url}/api/data/threat_intelligence/YaraRule/"
         
         self.session = requests.Session()
         self.session.headers.update({
@@ -462,3 +463,103 @@ class HarfangLabService:
             "Critical": "critical"
         }
         return level_mapping.get(level, "medium")
+
+    def create_or_update_sigma_rule(self, rule: SigmaRule, rule_id: str) -> None:
+        """
+        Create or update a Sigma rule in HarfangLab using the MDR UUID as the rule ID.
+        Uses PUT with overwrite=True to handle both create and update cases.
+        
+        Args:
+            rule: SigmaRule dataclass with rule details
+            rule_id: The MDR UUID to use as the rule identifier
+        """
+        rule_body = remove_none_values(asdict(rule))
+        rule_body["overwrite"] = True
+        rule_body = json.dumps(rule_body)
+        
+        log("ONGOING", "Creating/updating Sigma rule in HarfangLab", rule.name, str(rule_id))
+        
+        # First try to update (PUT) if the rule exists
+        endpoint = f"{self.SIGMA_RULES_ENDPOINT}{rule_id}/"
+        response = self.session.put(
+            url=endpoint,
+            data=rule_body,
+            verify=self.tenant_config.setup.ssl
+        )
+
+        if response.status_code == 200:
+            log("SUCCESS", f"Updated Sigma rule: {rule.name}", str(rule_id))
+            return
+        
+        # If 404, the rule doesn't exist yet, so create it
+        if response.status_code == 404:
+            response = self.session.post(
+                url=self.SIGMA_RULES_ENDPOINT,
+                data=rule_body,
+                verify=self.tenant_config.setup.ssl
+            )
+            if response.status_code in [200, 201]:
+                log("SUCCESS", f"Created Sigma rule: {rule.name}", str(rule_id))
+                return
+        
+        self._http_errors(response, TideErrors.DetectionRuleCreationFailed)
+
+    def create_or_update_yara_rule(self, rule: YaraRule, rule_id: str) -> None:
+        """
+        Create or update a YARA rule in HarfangLab using the MDR UUID as the rule ID.
+        
+        Args:
+            rule: YaraRule dataclass with rule details
+            rule_id: The MDR UUID to use as the rule identifier
+        """
+        rule_body = remove_none_values(asdict(rule))
+        rule_body["overwrite"] = True
+        rule_body = json.dumps(rule_body)
+        
+        log("ONGOING", "Creating/updating YARA rule in HarfangLab", rule.name, str(rule_id))
+        
+        # First try to update (PUT) if the rule exists
+        endpoint = f"{self.YARA_RULES_ENDPOINT}{rule_id}/"
+        response = self.session.put(
+            url=endpoint,
+            data=rule_body,
+            verify=self.tenant_config.setup.ssl
+        )
+
+        if response.status_code == 200:
+            log("SUCCESS", f"Updated YARA rule: {rule.name}", str(rule_id))
+            return
+        
+        # If 404, the rule doesn't exist yet, so create it
+        if response.status_code == 404:
+            response = self.session.post(
+                url=self.YARA_RULES_ENDPOINT,
+                data=rule_body,
+                verify=self.tenant_config.setup.ssl
+            )
+            if response.status_code in [200, 201]:
+                log("SUCCESS", f"Created YARA rule: {rule.name}", str(rule_id))
+                return
+        
+        self._http_errors(response, TideErrors.DetectionRuleCreationFailed)
+
+    def delete_yara_rule(self, rule_id: str) -> None:
+        """
+        Delete a YARA rule from HarfangLab.
+        
+        Args:
+            rule_id: The HarfangLab rule ID to delete
+        """
+        endpoint = f"{self.YARA_RULES_ENDPOINT}{rule_id}/"
+        
+        log("ONGOING", "Deleting YARA rule from HarfangLab", str(rule_id))
+        
+        response = self.session.delete(
+            url=endpoint,
+            verify=self.tenant_config.setup.ssl
+        )
+
+        if response.status_code in [200, 204]:
+            log("SUCCESS", f"Deleted YARA rule with ID {rule_id}")
+        else:
+            self._http_errors(response, TideErrors.DetectionRuleDeletionFailed)

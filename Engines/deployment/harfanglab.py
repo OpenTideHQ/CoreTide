@@ -11,13 +11,14 @@ from Engines.modules.tide import DataTide, DetectionSystems
 from Engines.modules.plugins import DeployMDR
 from Engines.modules.models import (TideModels,
                                     DeploymentStrategy) 
-from Engines.modules.deployment import TideDeployment, ExternalIdHelper, check_status
+from Engines.modules.deployment import TideDeployment, check_status
 from Engines.modules.logs import log
 from Engines.modules.models import TideConfigs, StatusStrategy
 
 from Engines.modules.systems.harfanglab import (
     HarfangLabService,
     SigmaRule,
+    YaraRule,
     SigmaRuleBuilder
 )
 
@@ -113,10 +114,13 @@ class HarfangLabDeploy(DeployMDR):
         if global_state == "quarantine":
             quarantine_on_agent = True
         
+        # source_id comes from the tenant configuration
+        source_id = tenant_config.setup.source_id
+        
         return SigmaRule(
             name=rule_name,
             content=sigma_yaml,
-            source_id=data.metadata.uuid,
+            source_id=source_id,
             enabled=enabled,
             global_state=global_state,
             hl_status=hl_status,
@@ -124,6 +128,77 @@ class HarfangLabDeploy(DeployMDR):
             quarantine_on_agent=quarantine_on_agent,
             rule_confidence_override=rule_confidence,
             rule_level_override=rule_level
+        )
+
+    def compile_yara_deployment(
+        self,
+        data: TideModels.MDR,
+        tenant_config: TideConfigs.Systems.HarfangLab.Tenant
+    ) -> YaraRule:
+        """
+        Builds the YARA Rule for deployment to HarfangLab API.
+        Converts OpenTide's YARA format to HarfangLab's YARA format.
+        """
+        mdr_config = data.configurations.harfanglab
+
+        if not mdr_config:
+            log("FATAL", "Missing HarfangLab configuration in MDR", data.metadata.uuid)
+            raise Exception("Missing HarfangLab configuration")
+        
+        if not mdr_config.yara:
+            log("FATAL", "YARA configuration expected but not found", data.metadata.uuid)
+            raise Exception("Missing YARA configuration")
+
+        yara_config = mdr_config.yara
+        
+        # Build rule name
+        rule_name = data.name
+        
+        # Build YARA rule content
+        # We need to construct a valid YARA rule from the components
+        # Escape double quotes in description and author to prevent YARA syntax errors
+        def escape_yara_string(s: str) -> str:
+            return s.replace('\\', '\\\\').replace('"', '\\"') if s else ""
+        
+        yara_lines = []
+        yara_lines.append(f"rule {data.metadata.uuid.replace('-', '_')} {{")
+        
+        # Add meta section if present
+        if yara_config.meta:
+            yara_lines.append("    meta:")
+            yara_lines.append(f'        description = "{escape_yara_string(data.description)}"')
+            yara_lines.append(f'        author = "{escape_yara_string(data.metadata.author)}"')
+            if yara_config.meta.context:
+                yara_lines.append(f'        context = "{yara_config.meta.context}"')
+            if yara_config.meta.os:
+                yara_lines.append(f'        os = "{yara_config.meta.os}"')
+        
+        # Add strings section
+        yara_lines.append("    strings:")
+        for line in yara_config.strings.strip().split('\n'):
+            yara_lines.append(f"        {line}")
+        
+        # Add condition section
+        yara_lines.append("    condition:")
+        for line in yara_config.condition.strip().split('\n'):
+            yara_lines.append(f"        {line}")
+        
+        yara_lines.append("}")
+        yara_content = '\n'.join(yara_lines)
+        
+        # Determine enabled/disabled state
+        enabled = True
+        if check_status(mdr_config.status) is StatusStrategy.DISABLEMENT:
+            enabled = False
+        
+        # source_id comes from the tenant configuration
+        source_id = tenant_config.setup.source_id
+        
+        return YaraRule(
+            name=rule_name,
+            content=yara_content,
+            source_id=source_id,
+            enabled=enabled
         )
 
     def deploy_mdr(
@@ -134,77 +209,48 @@ class HarfangLabDeploy(DeployMDR):
     ):
         """
         Deploys the detection rule: creation, update, deletion, and disabling.
-        Currently supports Sigma rules. YARA support can be added similarly.
+        Supports both Sigma rules and YARA rules.
+        Uses the MDR UUID as the rule identifier - no external ID tracking needed.
         """
         mdr_config = data.configurations.harfanglab
         if not mdr_config:
             log("FATAL", "Missing HarfangLab configuration", data.metadata.uuid)
             raise Exception("Missing HarfangLab configuration")
         
-        # Determine rule type and build appropriate rule
-        if mdr_config.sigma:
-            rule = self.compile_sigma_deployment(data=data, tenant_config=tenant_config)
-        elif mdr_config.yara:
-            log("WARNING", 
-                "YARA rule deployment not yet fully implemented",
-                data.metadata.uuid,
-                "Sigma rules are fully supported")
-            return
-        else:
+        # The rule_id is the MDR UUID - no external ID helper needed
+        rule_id = data.metadata.uuid
+        
+        # Determine rule type (Sigma or YARA)
+        is_sigma = mdr_config.sigma is not None
+        is_yara = mdr_config.yara is not None
+        
+        if not is_sigma and not is_yara:
             log("FATAL",
                 "MDR must contain either sigma or yara configuration",
                 data.metadata.uuid)
             raise Exception("Invalid HarfangLab configuration")
 
-        # Check for existing rule ID
-        rule_id = None
-        if mdr_config.rule_id_bundle:
-            rule_id = mdr_config.rule_id_bundle.get(tenant_config.name.strip())
-            if rule_id:
-                log("INFO",
-                    f"Retrieved ID for tenant {tenant_config.name} in MDR",
-                    str(rule_id),
-                    "Will perform an update")
-            else:
-                log("INFO",
-                    f"Could not retrieve ID for tenant {tenant_config.name} in MDR existing rule IDs",
-                    str(mdr_config.rule_id_bundle),
-                    "Will create a new rule, and write back the ID to the file")
-        else:
-            log("INFO",
-                f"Could not retrieve ID for tenant {tenant_config.name} in MDR",
-                "Will create a new rule, and write back the ID to the file")
-
         # Handle deletion status
         if check_status(mdr_config.status) is StatusStrategy.DELETION:
-            if not rule_id:
-                log("FATAL",
-                    "Cannot remove the rule as a rule_id could not be found in the file",
-                    "You will need to manually check the target system to remove the rule")
-            else:
-                log("ONGOING",
-                    f"Proceeding with deletion of rule against tenant {tenant_config.name}",
-                    str(rule_id))
-                
+            log("ONGOING",
+                f"Proceeding with deletion of rule against tenant {tenant_config.name}",
+                str(rule_id))
+            
+            if is_sigma:
                 service.delete_sigma_rule(rule_id=rule_id)
-                ExternalIdHelper.remove_id(
-                    rule_id=rule_id,
-                    tenant_name=tenant_config.name,
-                    mdr_uuid=data.metadata.uuid
-                )
-        else:
-            # Create or update rule
-            if rule_id:
-                log("INFO", f"Found Rule ID", str(rule_id), "Going to update the rule")
-                service.update_sigma_rule(rule=rule, rule_id=rule_id)
-            else:
-                rule_id = service.create_sigma_rule(rule)
-                ExternalIdHelper.insert_id(
-                    rule_id=rule_id,
-                    tenant_name=tenant_config.name,
-                    mdr_uuid=data.metadata.uuid,
-                    system_name=DataTide.Configurations.Systems.HarfangLab.platform.identifier
-                )
+            elif is_yara:
+                service.delete_yara_rule(rule_id=rule_id)
+            return
+
+        # Build and deploy the rule
+        if is_sigma:
+            rule = self.compile_sigma_deployment(data=data, tenant_config=tenant_config)
+            log("ONGOING", "Deploying Sigma rule", rule.name, str(rule_id))
+            service.create_or_update_sigma_rule(rule=rule, rule_id=rule_id)
+        elif is_yara:
+            rule = self.compile_yara_deployment(data=data, tenant_config=tenant_config)
+            log("ONGOING", "Deploying YARA rule", rule.name, str(rule_id))
+            service.create_or_update_yara_rule(rule=rule, rule_id=rule_id)
 
     def deploy(
         self,

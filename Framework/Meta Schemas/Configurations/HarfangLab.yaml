@@ -256,6 +256,7 @@ properties:
             - ssl
             - url
             - api_token
+            - source_id
           
           properties: 
             proxy: 
@@ -297,3 +298,11 @@ properties:
               description: |
                 The API token for authentication with the HarfangLab API.
                 You can generate this token from the HarfangLab console under Settings > API.
+
+            source_id:
+              title: Source ID
+              type: string
+              description: |
+                The source identifier used by HarfangLab to track rules from this tenant.
+                This is required for deploying Sigma and YARA rules to HarfangLab.
+                Each tenant should have a unique source_id.

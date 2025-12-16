@@ -1329,6 +1329,812 @@ properties:
                       - "**TargetUsername** - Name of the user being logged into"
                       - "**SourceAddress** - IP address of the machine from which the logon attempt was performed"
 
+      #########################################################################
+      # MACOS LOGOUT_EVENT FIELDS
+      #########################################################################
+      - if:
+          properties:
+            logsource:
+              properties:
+                product:
+                  const: macos
+                category:
+                  const: logout_event
+        then:
+          properties:
+            selections:
+              items:
+                properties:
+                  field:
+                    enum:
+                      - TargetUsername
+                      - LogoutMethod
+                      - SourceAddress
+                    enumMarkdown:
+                      - "**TargetUsername** - Name of the user logging out"
+                      - "**LogoutMethod** - Method of logout (session_logout, session_lock, openssh_logout, login_logout, screensharing_detach)"
+                      - "**SourceAddress** - IP address of the machine from which the logout was performed"
+
+      #########################################################################
+      # MACOS LIBRARY_EVENT FIELDS
+      #########################################################################
+      - if:
+          properties:
+            logsource:
+              properties:
+                product:
+                  const: macos
+                category:
+                  const: library_event
+        then:
+          properties:
+            selections:
+              items:
+                properties:
+                  field:
+                    enum:
+                      - Image
+                      - ImageLoaded
+                    enumMarkdown:
+                      - "**Image** - Path of the process that loaded the library"
+                      - "**ImageLoaded** - Path of the Dylib library loaded"
+
+      #########################################################################
+      # MACOS FILESYSTEM_EVENT FIELDS
+      #########################################################################
+      - if:
+          properties:
+            logsource:
+              properties:
+                product:
+                  const: macos
+                category:
+                  const: filesystem_event
+        then:
+          properties:
+            selections:
+              items:
+                properties:
+                  field:
+                    enum:
+                      - Kind
+                      - Path
+                      - TargetPath
+                      - Mode
+                      - PrettyMode
+                      - OldMode
+                      - PrettyOldMode
+                      - Uid
+                      - Gid
+                      - FileMd5
+                      - FileSha1
+                      - FileSha256
+                      - FileSize
+                    enumMarkdown:
+                      - "**Kind** - Kind of operation (create, read, write, remove, rename, chmod, chown, symlink, hardlink, written_executable)"
+                      - "**Path** - Path to the file being operated on"
+                      - "**TargetPath** - Target path for rename/link operations"
+                      - "**Mode** - New file mode in octal form (e.g. 0601)"
+                      - "**PrettyMode** - New file mode in rwx form (e.g. rw------x)"
+                      - "**OldMode** - Old file mode in octal form"
+                      - "**PrettyOldMode** - Old file mode in rwx form"
+                      - "**Uid** - ID of user owning file after operation"
+                      - "**Gid** - ID of group owning file after operation"
+                      - "**FileMd5** - MD5 hash of executable file written to disk"
+                      - "**FileSha1** - SHA1 hash of executable file written to disk"
+                      - "**FileSha256** - SHA256 hash of executable file written to disk"
+                      - "**FileSize** - Size in bytes of executable file written to disk"
+
+      #########################################################################
+      # LINUX PROCESS_PTRACE FIELDS
+      #########################################################################
+      - if:
+          properties:
+            logsource:
+              properties:
+                product:
+                  const: linux
+                category:
+                  const: process_ptrace
+        then:
+          properties:
+            selections:
+              items:
+                properties:
+                  field:
+                    enum:
+                      - SourceImage
+                      - SourceProcessId
+                      - TargetImage
+                      - TargetProcessId
+                      - PtraceRequest
+                      - PtraceRequestStr
+                      - PtraceOptions
+                      - PtraceOptionsStr
+                      - TargetIsChild
+                    enumMarkdown:
+                      - "**SourceImage** - Path of the process calling ptrace"
+                      - "**SourceProcessId** - PID of the process calling ptrace"
+                      - "**TargetImage** - Path of the process that is the target of the ptrace operation"
+                      - "**TargetProcessId** - PID of the target process"
+                      - "**PtraceRequest** - Operation to be performed on the target process"
+                      - "**PtraceRequestStr** - Operation as string (e.g. PTRACE_POKETEXT)"
+                      - "**PtraceOptions** - Optional flags for SEIZE and SETOPTIONS operations"
+                      - "**PtraceOptionsStr** - Optional flags as string (e.g. PTRACE_O_EXITKILL|PTRACE_O_TRACEFORK)"
+                      - "**TargetIsChild** - true if target process is direct child of source process"
+
+      #########################################################################
+      # LINUX BPF_EVENT FIELDS
+      #########################################################################
+      - if:
+          properties:
+            logsource:
+              properties:
+                product:
+                  const: linux
+                category:
+                  const: bpf_event
+        then:
+          properties:
+            selections:
+              items:
+                properties:
+                  field:
+                    enum:
+                      - Image
+                      - Kind
+                      - InstructionCount
+                      - BpfDump
+                      - ProgramLoaded
+                      - ProgramType
+                      - ProgramTypeStr
+                      - ProgramFlags
+                      - ProgramFlagsStr
+                      - ExpectedAttachType
+                      - ExpectedAttachTypeStr
+                      - FunctionHooked
+                    enumMarkdown:
+                      - "**Image** - Path of the process that loaded/attached the BPF program"
+                      - "**Kind** - Kind of operation (cbpf_load, ebpf_load, ebpf_attach)"
+                      - "**InstructionCount** - Number of BPF instructions loaded"
+                      - "**BpfDump** - First 128 bytes of the BPF program in hexadecimal"
+                      - "**ProgramLoaded** - Name of the eBPF program (16 character string)"
+                      - "**ProgramType** - Type of the eBPF program loaded"
+                      - "**ProgramTypeStr** - Program type as string (e.g. BPF_PROG_TYPE_KPROBE)"
+                      - "**ProgramFlags** - Flags for the program"
+                      - "**ProgramFlagsStr** - Program flags as string (e.g. BPF_F_STRICT_ALIGNMENT)"
+                      - "**ExpectedAttachType** - Expected attach type for the program"
+                      - "**ExpectedAttachTypeStr** - Expected attach type as string (e.g. BPF_LSM_CGROUP)"
+                      - "**FunctionHooked** - Function hooked by eBPF (e.g. do_unlinkat or syscalls:sys_enter_openat)"
+
+      #########################################################################
+      # LINUX LIBRARY_EVENT FIELDS
+      #########################################################################
+      - if:
+          properties:
+            logsource:
+              properties:
+                product:
+                  const: linux
+                category:
+                  const: library_event
+        then:
+          properties:
+            selections:
+              items:
+                properties:
+                  field:
+                    enum:
+                      - Image
+                      - ImageLoaded
+                      - ImageSize
+                      - Hashes
+                    enumMarkdown:
+                      - "**Image** - Path of the process that loaded the library"
+                      - "**ImageLoaded** - Path of the shared library (.so) loaded"
+                      - "**ImageSize** - Size of memory allocated to map the library"
+                      - "**Hashes** - Hashes of the library file"
+
+      #########################################################################
+      # LINUX NETWORK_LISTEN FIELDS
+      #########################################################################
+      - if:
+          properties:
+            logsource:
+              properties:
+                product:
+                  const: linux
+                category:
+                  const: network_listen
+        then:
+          properties:
+            selections:
+              items:
+                properties:
+                  field:
+                    enum:
+                      - Address
+                      - Port
+                    enumMarkdown:
+                      - "**Address** - IP address the network server is bound to"
+                      - "**Port** - Port of the network server"
+
+      #########################################################################
+      # LINUX NETWORK_RAWSOCKET FIELDS
+      #########################################################################
+      - if:
+          properties:
+            logsource:
+              properties:
+                product:
+                  const: linux
+                category:
+                  const: network_rawsocket
+        then:
+          properties:
+            selections:
+              items:
+                properties:
+                  field:
+                    enum:
+                      - SocketFamily
+                      - SocketType
+                      - SocketProtocol
+                    enumMarkdown:
+                      - "**SocketFamily** - Integer value of the socket family (AF_INET, AF_PACKET, etc.)"
+                      - "**SocketType** - Integer value for the type of socket (SOCK_RAW, SOCK_DGRAM, etc.)"
+                      - "**SocketProtocol** - Integer value of the protocol of the socket"
+
+      #########################################################################
+      # LINUX LOGOUT_EVENT FIELDS
+      #########################################################################
+      - if:
+          properties:
+            logsource:
+              properties:
+                product:
+                  const: linux
+                category:
+                  const: logout_event
+        then:
+          properties:
+            selections:
+              items:
+                properties:
+                  field:
+                    enum:
+                      - TargetUid
+                      - TargetUsername
+                      - TargetGid
+                      - TargetGroup
+                      - SourceUsername
+                      - SourceHost
+                      - Tty
+                    enumMarkdown:
+                      - "**TargetUid** - UID of the user logging out"
+                      - "**TargetUsername** - Name of the user logging out"
+                      - "**TargetGid** - Group ID of the user logging out"
+                      - "**TargetGroup** - Group name of the user logging out"
+                      - "**SourceUsername** - Username of the process that caused the authentication"
+                      - "**SourceHost** - IP of the user logging out (for remote logins)"
+                      - "**Tty** - Path to the terminal device (e.g. /dev/tty1)"
+
+      #########################################################################
+      # LINUX URL_REQUEST FIELDS
+      #########################################################################
+      - if:
+          properties:
+            logsource:
+              properties:
+                product:
+                  const: linux
+                category:
+                  const: url_request
+        then:
+          properties:
+            selections:
+              items:
+                properties:
+                  field:
+                    enum:
+                      - RequestUrl
+                      - RequestUrlScheme
+                      - RequestUrlHost
+                      - RequestUrlPort
+                      - RequestUrlPath
+                      - RequestUrlQueryParams
+                      - RequestUrlUsername
+                      - RequestUrlPassword
+                    enumMarkdown:
+                      - "**RequestUrl** - URL to the resource requested"
+                      - "**RequestUrlScheme** - Scheme of the URL (http, https, etc.)"
+                      - "**RequestUrlHost** - Host where the resource is located"
+                      - "**RequestUrlPort** - Port used to access the resource"
+                      - "**RequestUrlPath** - Path of the resource on the targeted host"
+                      - "**RequestUrlQueryParams** - Query parameters used to access the resource"
+                      - "**RequestUrlUsername** - Username used to access the resource"
+                      - "**RequestUrlPassword** - Password used to access the resource"
+
+      #########################################################################
+      # WINDOWS NETWORK_DPI FIELDS
+      #########################################################################
+      - if:
+          properties:
+            logsource:
+              properties:
+                product:
+                  const: windows
+                category:
+                  const: network_dpi
+        then:
+          properties:
+            selections:
+              items:
+                properties:
+                  field:
+                    enum:
+                      - DestinationPort
+                      - DestinationIp
+                      - DestinationNames
+                      - DestinationHostname
+                      - DestinationIsIpv6
+                      - Image
+                      - Initiated
+                      - Protocol
+                      - ProtocolNumber
+                      - SourcePort
+                      - SourceIp
+                      - SourceIsIpv6
+                      - User
+                      - ConnectionGuid
+                      - IncomingApplicationProtocol
+                      - OutgoingApplicationProtocol
+                      - OutgoingTlsVersion
+                      - OutgoingTlsSni
+                      - OutgoingTlsAlpn
+                      - OutgoingTlsJa3
+                      - OutgoingTlsJa3n
+                      - OutgoingTlsJa4
+                      - IncomingTlsVersion
+                      - IncomingTlsAlpn
+                      - IncomingTlsJa3s
+                      - IncomingTlsCertificateThumbprintSha1
+                      - IncomingTlsCertificateThumbprintSha256
+                      - IncomingTlsCertificateDisplayName
+                      - IncomingTlsCertificateIssuerName
+                      - OutgoingHttpRequestVersion
+                      - OutgoingHttpRequestContentType
+                      - OutgoingHttpRequestContentLength
+                      - OutgoingHttpRequestMethod
+                      - OutgoingHttpRequestPath
+                      - OutgoingHttpRequestUserAgent
+                      - OutgoingHttpRequestHost
+                      - OutgoingHttpRequestReferer
+                      - OutgoingHttpRequestCookies
+                      - IncomingHttpResponseVersion
+                      - IncomingHttpResponseContentType
+                      - IncomingHttpResponseContentLength
+                      - IncomingHttpResponseCode
+                      - IncomingHttpResponseLastModified
+                      - IncomingHttpResponseServer
+                      - OutgoingSshProtoVersion
+                      - OutgoingSshSoftwareVersion
+                      - OutgoingSshBannerComments
+                      - IncomingSshProtoVersion
+                      - IncomingSshSoftwareVersion
+                      - IncomingSshBannerComments
+                      - IncomingSshServerPubkeyAndCertAlgo
+                      - IncomingSshServerFingerprint
+                    enumMarkdown:
+                      - "**DestinationPort** - Destination port number"
+                      - "**DestinationIp** - Destination IP address"
+                      - "**DestinationNames** - DNS names used to resolve the destination IP"
+                      - "**DestinationHostname** - Alias of DestinationNames"
+                      - "**DestinationIsIpv6** - true if destination is IPv6 (matched as string)"
+                      - "**Image** - Path of the process that initiated the connection"
+                      - "**Initiated** - Indicates if the process initiated the connection"
+                      - "**Protocol** - Protocol used (tcp/udp or empty)"
+                      - "**ProtocolNumber** - IANA protocol number"
+                      - "**SourcePort** - Source port number"
+                      - "**SourceIp** - Source IP address"
+                      - "**SourceIsIpv6** - true if source is IPv6 (matched as string)"
+                      - "**User** - User associated with the process"
+                      - "**ConnectionGuid** - Unique identifier for the connection"
+                      - "**IncomingApplicationProtocol** - Incoming application protocol (HTTP/TLS/SSH)"
+                      - "**OutgoingApplicationProtocol** - Outgoing application protocol (HTTP/TLS/SSH)"
+                      - "**OutgoingTlsVersion** - Outgoing TLS protocol version"
+                      - "**OutgoingTlsSni** - Outgoing TLS Server Name Indication"
+                      - "**OutgoingTlsAlpn** - Outgoing TLS Application-Layer Protocol Negotiation"
+                      - "**OutgoingTlsJa3** - Outgoing TLS JA3 hash"
+                      - "**OutgoingTlsJa3n** - Outgoing TLS JA3n hash"
+                      - "**OutgoingTlsJa4** - Outgoing TLS JA4 hash"
+                      - "**IncomingTlsVersion** - Incoming TLS protocol version"
+                      - "**IncomingTlsAlpn** - Incoming TLS ALPN"
+                      - "**IncomingTlsJa3s** - Incoming TLS JA3s hash"
+                      - "**IncomingTlsCertificateThumbprintSha1** - SHA1 thumbprint of server certificate"
+                      - "**IncomingTlsCertificateThumbprintSha256** - SHA256 thumbprint of server certificate"
+                      - "**IncomingTlsCertificateDisplayName** - Signer name of server certificate"
+                      - "**IncomingTlsCertificateIssuerName** - Issuer name of server certificate"
+                      - "**OutgoingHttpRequestVersion** - HTTP protocol version for outgoing request"
+                      - "**OutgoingHttpRequestContentType** - Content-Type header for outgoing HTTP request"
+                      - "**OutgoingHttpRequestContentLength** - Size of request payload in bytes"
+                      - "**OutgoingHttpRequestMethod** - HTTP method (GET, POST, PUT, etc.)"
+                      - "**OutgoingHttpRequestPath** - Request-URI path of outgoing HTTP request"
+                      - "**OutgoingHttpRequestUserAgent** - User-Agent header value"
+                      - "**OutgoingHttpRequestHost** - Host header value"
+                      - "**OutgoingHttpRequestReferer** - Referer header value"
+                      - "**OutgoingHttpRequestCookies** - Cookies in the outgoing HTTP request"
+                      - "**IncomingHttpResponseVersion** - HTTP version in incoming response"
+                      - "**IncomingHttpResponseContentType** - Content-Type in incoming HTTP response"
+                      - "**IncomingHttpResponseContentLength** - Size of response payload in bytes"
+                      - "**IncomingHttpResponseCode** - HTTP status code (e.g. 200, 404)"
+                      - "**IncomingHttpResponseLastModified** - Last-Modified header value"
+                      - "**IncomingHttpResponseServer** - Server header value"
+                      - "**OutgoingSshProtoVersion** - SSH protocol version from client"
+                      - "**OutgoingSshSoftwareVersion** - SSH software version from client"
+                      - "**OutgoingSshBannerComments** - SSH banner comments from client"
+                      - "**IncomingSshProtoVersion** - SSH protocol version from server"
+                      - "**IncomingSshSoftwareVersion** - SSH software version from server"
+                      - "**IncomingSshBannerComments** - SSH banner comments from server"
+                      - "**IncomingSshServerPubkeyAndCertAlgo** - Public key algorithm used by SSH server"
+                      - "**IncomingSshServerFingerprint** - Fingerprint of SSH server host key"
+
+      #########################################################################
+      # WINDOWS NETWORK_CLOSE FIELDS
+      #########################################################################
+      - if:
+          properties:
+            logsource:
+              properties:
+                product:
+                  const: windows
+                category:
+                  const: network_close
+        then:
+          properties:
+            selections:
+              items:
+                properties:
+                  field:
+                    enum:
+                      - DestinationPort
+                      - DestinationIp
+                      - DestinationNames
+                      - DestinationHostname
+                      - DestinationIsIpv6
+                      - Image
+                      - Initiated
+                      - Protocol
+                      - ProtocolNumber
+                      - SourcePort
+                      - SourceIp
+                      - SourceIsIpv6
+                      - User
+                      - ConnectionGuid
+                      - ConnectionSuccessful
+                      - IncomingBytesCount
+                      - OutgoingBytesCount
+                      - IncomingApplicationProtocol
+                      - OutgoingApplicationProtocol
+                    enumMarkdown:
+                      - "**DestinationPort** - Destination port number"
+                      - "**DestinationIp** - Destination IP address"
+                      - "**DestinationNames** - DNS names used to resolve the destination IP"
+                      - "**DestinationHostname** - Alias of DestinationNames"
+                      - "**DestinationIsIpv6** - true if destination is IPv6 (matched as string)"
+                      - "**Image** - Path of the process that initiated the connection"
+                      - "**Initiated** - Indicates if the process initiated the connection"
+                      - "**Protocol** - Protocol used (tcp/udp or empty)"
+                      - "**ProtocolNumber** - IANA protocol number"
+                      - "**SourcePort** - Source port number"
+                      - "**SourceIp** - Source IP address"
+                      - "**SourceIsIpv6** - true if source is IPv6 (matched as string)"
+                      - "**User** - User associated with the process"
+                      - "**ConnectionGuid** - Unique identifier for the connection"
+                      - "**ConnectionSuccessful** - true if connection was successful (matched as string)"
+                      - "**IncomingBytesCount** - Amount of incoming data in bytes"
+                      - "**OutgoingBytesCount** - Amount of outgoing data in bytes"
+                      - "**IncomingApplicationProtocol** - Incoming application protocol (HTTP/TLS/SSH)"
+                      - "**OutgoingApplicationProtocol** - Outgoing application protocol (HTTP/TLS/SSH)"
+
+      #########################################################################
+      # WINDOWS PIPE_CREATED (NAMED_PIPE_CREATION) FIELDS
+      #########################################################################
+      - if:
+          properties:
+            logsource:
+              properties:
+                product:
+                  const: windows
+                category:
+                  const: pipe_created
+        then:
+          properties:
+            selections:
+              items:
+                properties:
+                  field:
+                    enum:
+                      - PipeName
+                      - NamedPipeType
+                      - InboundQuota
+                      - OutboundQuota
+                      - MaximumInstances
+                      - DesiredAccess
+                      - Kind
+                      - StackTrace
+                      - MinimalStackTrace
+                    enumMarkdown:
+                      - "**PipeName** - Name of the created Named Pipe (format: \\\\PIPENAME)"
+                      - "**NamedPipeType** - Type of the created Named Pipe (integer)"
+                      - "**InboundQuota** - Inbound quota of the pipe (hex string, e.g. 0x4000)"
+                      - "**OutboundQuota** - Outbound quota of the pipe (hex string)"
+                      - "**MaximumInstances** - Maximum number of instances for the pipe"
+                      - "**DesiredAccess** - Desired access permissions (hex string)"
+                      - "**Kind** - Named pipe operation, value: creation"
+                      - "**StackTrace** - Full stacktrace leading to the event"
+                      - "**MinimalStackTrace** - Simplified stacktrace"
+
+      #########################################################################
+      # WINDOWS PIPE_CONNECTED (NAMED_PIPE_CONNECTION) FIELDS
+      #########################################################################
+      - if:
+          properties:
+            logsource:
+              properties:
+                product:
+                  const: windows
+                category:
+                  const: pipe_connected
+        then:
+          properties:
+            selections:
+              items:
+                properties:
+                  field:
+                    enum:
+                      - PipeName
+                      - Kind
+                      - StackTrace
+                      - MinimalStackTrace
+                    enumMarkdown:
+                      - "**PipeName** - Name of the Named Pipe (format: \\\\PIPENAME)"
+                      - "**Kind** - Named pipe operation, value: connection"
+                      - "**StackTrace** - Full stacktrace leading to the event"
+                      - "**MinimalStackTrace** - Simplified stacktrace"
+
+      #########################################################################
+      # WINDOWS PROCESS_TERMINATION FIELDS
+      #########################################################################
+      - if:
+          properties:
+            logsource:
+              properties:
+                product:
+                  const: windows
+                category:
+                  const: process_termination
+        then:
+          properties:
+            selections:
+              items:
+                properties:
+                  field:
+                    enum:
+                      - Image
+                      - ProcessId
+                      - User
+                    enumMarkdown:
+                      - "**Image** - Path of the terminated process"
+                      - "**ProcessId** - ID of the terminated process"
+                      - "**User** - User associated with the terminated process"
+
+      #########################################################################
+      # WINDOWS PROCESS_TAMPERING FIELDS
+      #########################################################################
+      - if:
+          properties:
+            logsource:
+              properties:
+                product:
+                  const: windows
+                category:
+                  const: process_tampering
+        then:
+          properties:
+            selections:
+              items:
+                properties:
+                  field:
+                    enum:
+                      - Image
+                      - Type
+                    enumMarkdown:
+                      - "**Image** - Image of the tampered process (e.g. C:\\\\toto.exe)"
+                      - "**Type** - Type of tampering (Image is replaced, Image is locked for access, Image is deleted)"
+
+      #########################################################################
+      # WINDOWS WMI_EVENT FIELDS
+      #########################################################################
+      - if:
+          properties:
+            logsource:
+              properties:
+                product:
+                  const: windows
+                category:
+                  const: wmi_event
+        then:
+          properties:
+            selections:
+              items:
+                properties:
+                  field:
+                    enum:
+                      - EventType
+                      - Operation
+                      - Destination
+                      - Name
+                      - Query
+                      - Consumer
+                      - Filter
+                    enumMarkdown:
+                      - "**EventType** - Type of WMI event"
+                      - "**Operation** - WMI operation performed"
+                      - "**Destination** - Destination of the WMI operation"
+                      - "**Name** - Name of WMI subscription"
+                      - "**Query** - WMI query being executed"
+                      - "**Consumer** - WMI event consumer"
+                      - "**Filter** - WMI event filter"
+
+      #########################################################################
+      # WINDOWS EVENTLOG FIELDS
+      #########################################################################
+      - if:
+          properties:
+            logsource:
+              properties:
+                product:
+                  const: windows
+                category:
+                  const: eventlog
+        then:
+          properties:
+            selections:
+              items:
+                properties:
+                  field:
+                    enum:
+                      - LogName
+                      - EventID
+                      - Provider
+                      - Message
+                      - Computer
+                      - Level
+                      - Task
+                      - Opcode
+                      - Keywords
+                    enumMarkdown:
+                      - "**LogName** - Channel name of the Windows Event Log"
+                      - "**EventID** - Event identifier"
+                      - "**Provider** - Event log provider name"
+                      - "**Message** - Event message"
+                      - "**Computer** - Computer name where event occurred"
+                      - "**Level** - Event level"
+                      - "**Task** - Event task category"
+                      - "**Opcode** - Event operation code"
+                      - "**Keywords** - Event keywords"
+
+      #########################################################################
+      # WINDOWS WIN32K_GETASYNCKEYSTATE FIELDS
+      #########################################################################
+      - if:
+          properties:
+            logsource:
+              properties:
+                product:
+                  const: windows
+                category:
+                  const: win32k_getasynckeystate
+        then:
+          properties:
+            selections:
+              items:
+                properties:
+                  field:
+                    enum:
+                      - ProcessId
+                      - Image
+                      - MsSinceLastKeyEvent
+                      - BackgroundCallCount
+                    enumMarkdown:
+                      - "**ProcessId** - ID of the process that called GetAsyncKeyState"
+                      - "**Image** - Path of the process that called the API"
+                      - "**MsSinceLastKeyEvent** - Milliseconds since last GetAsyncKeyState event"
+                      - "**BackgroundCallCount** - Number of all API calls between successful calls"
+
+      #########################################################################
+      # WINDOWS WIN32K_REGISTERRAWINPUTDEVICES FIELDS
+      #########################################################################
+      - if:
+          properties:
+            logsource:
+              properties:
+                product:
+                  const: windows
+                category:
+                  const: win32k_registerrawinputdevices
+        then:
+          properties:
+            selections:
+              items:
+                properties:
+                  field:
+                    enum:
+                      - ProcessId
+                      - Image
+                      - UsagePage
+                      - UsagePageStr
+                      - ReturnValue
+                      - UsageId
+                      - UsageIdStr
+                      - WindowsCount
+                      - VisibleWindowsCount
+                      - StartModuleName
+                      - Flags
+                      - FlagsStr
+                      - ThreadInfoFlags
+                      - StartAddressProtection
+                    enumMarkdown:
+                      - "**ProcessId** - ID of the process that called RegisterRawInputDevices"
+                      - "**Image** - Path of the process that called the API"
+                      - "**UsagePage** - Top-level collection (Usage Page) of the device"
+                      - "**UsagePageStr** - String representation of UsagePage"
+                      - "**ReturnValue** - Return value of RegisterRawInputDevices"
+                      - "**UsageId** - Specific device (Usage) within the Usage Page"
+                      - "**UsageIdStr** - String representation of UsageId"
+                      - "**WindowsCount** - Number of windows owned by caller thread"
+                      - "**VisibleWindowsCount** - Number of visible windows owned by caller thread"
+                      - "**StartModuleName** - Module name of thread start address"
+                      - "**Flags** - Mode flag for UsagePage and UsageId interpretation"
+                      - "**FlagsStr** - String representation of Flags"
+                      - "**ThreadInfoFlags** - Thread information flags"
+                      - "**StartAddressProtection** - Memory protection of caller thread start address"
+
+      #########################################################################
+      # WINDOWS WIN32K_SETWINDOWSHOOKEX FIELDS
+      #########################################################################
+      - if:
+          properties:
+            logsource:
+              properties:
+                product:
+                  const: windows
+                category:
+                  const: win32k_setwindowshookex
+        then:
+          properties:
+            selections:
+              items:
+                properties:
+                  field:
+                    enum:
+                      - ProcessId
+                      - Image
+                      - HookLibrary
+                      - HookFunction
+                      - ReturnValue
+                      - FilterType
+                      - FilterTypeStr
+                    enumMarkdown:
+                      - "**ProcessId** - ID of the process that called SetWindowsHookEx"
+                      - "**Image** - Path of the process that called the API"
+                      - "**HookLibrary** - DLL containing the hook procedure"
+                      - "**HookFunction** - Summary of the hook procedure"
+                      - "**ReturnValue** - Return value of SetWindowsHookEx"
+                      - "**FilterType** - Type of hook procedure as uint32"
+                      - "**FilterTypeStr** - Type of hook procedure as string"
+
   #############################################################################
   # YARA RULE SECTION
   #############################################################################

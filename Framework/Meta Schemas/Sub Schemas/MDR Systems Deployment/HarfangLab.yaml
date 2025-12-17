@@ -65,7 +65,7 @@ properties:
       - Stable
       - Testing
       - Experimental
-    enumMarkdown:
+    markdownEnumDescriptions:
       - Rule has been validated and is production-ready
       - Rule is being tested and may produce false positives
       - Rule is experimental and should be used with caution
@@ -79,7 +79,7 @@ properties:
       - Weak
       - Moderate
       - Strong
-    enumMarkdown:
+    markdownEnumDescriptions:
       - Low confidence - may produce many false positives
       - Medium confidence - some false positives expected
       - High confidence - minimal false positives expected
@@ -93,7 +93,7 @@ properties:
       - Alert
       - Alert & Block
       - Alert, Block & Quarantine
-    enumMarkdown:
+    markdownEnumDescriptions:
       - Generate an alert only
       - Generate an alert and block the threat
       - Generate an alert, block, and quarantine the affected system
@@ -306,7 +306,7 @@ properties:
                   - utf16be
                   - wide
                   - windash
-                enumMarkdown:
+                markdownEnumDescriptions:
                   - "**all** - All values must match (AND instead of OR)"
                   - "**base64** - Base64 encode the value before matching"
                   - "**base64offset** - Base64 encode with all 3 offset variants"
@@ -424,7 +424,7 @@ properties:
                       - IsFileObjectTransacted
                       - AuthentihashSha1
                       - AuthentihashSha256
-                    enumMarkdown:
+                    markdownEnumDescriptions:
                       - "**CommandLine** - Process command line"
                       - "**Company** - Company name from the process image"
                       - "**CurrentDirectory** - Directory under which the process image was executed"
@@ -496,7 +496,7 @@ properties:
                       - SourceIsIpv6
                       - User
                       - ConnectionGuid
-                    enumMarkdown:
+                    markdownEnumDescriptions:
                       - "**DestinationPort** - Destination port number"
                       - "**DestinationIp** - Destination IP address"
                       - "**DestinationNames** - DNS names used to resolve the destination IP address"
@@ -547,7 +547,7 @@ properties:
                       - ProductVersion
                       - AuthentihashSha1
                       - AuthentihashSha256
-                    enumMarkdown:
+                    markdownEnumDescriptions:
                       - "**ImageLoaded** - Path of the loaded driver"
                       - "**Signed** - true if the loaded driver is signed, false otherwise (matched as string)"
                       - "**Signature** - Signer name of the loaded driver"
@@ -617,7 +617,7 @@ properties:
                       - LibraryType
                       - AuthentihashSha1
                       - AuthentihashSha256
-                    enumMarkdown:
+                    markdownEnumDescriptions:
                       - "**Company** - Company name from the image loaded"
                       - "**Description** - File description from the image loaded"
                       - "**FileVersion** - File version from the image loaded"
@@ -679,7 +679,7 @@ properties:
                       - TargetProcessId
                       - StackTrace
                       - MinimalStackTrace
-                    enumMarkdown:
+                    markdownEnumDescriptions:
                       - "**NewThreadId** - ID of the new remote thread created in the target process"
                       - "**SourceProcessId** - ID of the source process that created the remote thread"
                       - "**SourceImage** - Path of the source process that created the remote thread"
@@ -732,7 +732,7 @@ properties:
                       - StackTrace
                       - MinimalStackTrace
                       - IsRemoteThread
-                    enumMarkdown:
+                    markdownEnumDescriptions:
                       - "**TargetProcessId** - ID of the target process"
                       - "**TargetImage** - Path of the target process"
                       - "**SourceProcessId** - ID of the source process that created the injected thread"
@@ -782,7 +782,7 @@ properties:
                       - DesiredAccessStr
                       - StackTrace
                       - MinimalStackTrace
-                    enumMarkdown:
+                    markdownEnumDescriptions:
                       - "**Image** - Path of the process that performed the raw device access"
                       - "**Device** - Device targeted by the raw device access"
                       - "**DesiredAccess** - Access Mask asked by the calling process (integer)"
@@ -854,7 +854,7 @@ properties:
                       - TargetProcessSize
                       - TargetProcessUser
                       - TargetProcessUserSID
-                    enumMarkdown:
+                    markdownEnumDescriptions:
                       - "**CallTrace** - Calltrace of the source thread"
                       - "**StackTrace** - Full stacktrace leading to the event"
                       - "**MinimalStackTrace** - Simplified stacktrace"
@@ -929,7 +929,7 @@ properties:
                       - QueryResults
                       - Image
                       - User
-                    enumMarkdown:
+                    markdownEnumDescriptions:
                       - "**QueryName** - Requested domain name"
                       - "**QueryType** - The DNS query type (A, AAAA, TXT, etc.)"
                       - "**QueryStatusCategory** - Status of query: success, connection_error, timeout, name_not_found, record_not_found, invalid_reply"
@@ -964,7 +964,7 @@ properties:
                       - FileDriveType
                       - StackTrace
                       - MinimalStackTrace
-                    enumMarkdown:
+                    markdownEnumDescriptions:
                       - "**Path** - Path of the file being created"
                       - "**TargetFilename** - Alias for Path"
                       - "**FileName** - Alias for Path"
@@ -996,7 +996,7 @@ properties:
                       - FileDriveType
                       - StackTrace
                       - MinimalStackTrace
-                    enumMarkdown:
+                    markdownEnumDescriptions:
                       - "**Path** - Path of the file being read"
                       - "**TargetFilename** - Alias for Path"
                       - "**FileName** - Alias for Path"
@@ -1029,7 +1029,7 @@ properties:
                       - FirstBytes
                       - StackTrace
                       - MinimalStackTrace
-                    enumMarkdown:
+                    markdownEnumDescriptions:
                       - "**Path** - Path of the file being written"
                       - "**TargetFilename** - Alias for Path"
                       - "**FileName** - Alias for Path"
@@ -1061,7 +1061,7 @@ properties:
                       - FileDriveType
                       - StackTrace
                       - MinimalStackTrace
-                    enumMarkdown:
+                    markdownEnumDescriptions:
                       - "**Path** - Path of the file being renamed"
                       - "**TargetPath** - New path of the file"
                       - "**FileDriveType** - Drive type of the file (unknown, removable, fixed, remote, disk_image, ramdisk)"
@@ -1092,7 +1092,7 @@ properties:
                       - FileDriveType
                       - StackTrace
                       - MinimalStackTrace
-                    enumMarkdown:
+                    markdownEnumDescriptions:
                       - "**Path** - Path of the file being removed"
                       - "**TargetFilename** - Alias for Path"
                       - "**FileName** - Alias for Path"
@@ -1128,7 +1128,7 @@ properties:
                       - CreateDispositionStr
                       - StackTrace
                       - MinimalStackTrace
-                    enumMarkdown:
+                    markdownEnumDescriptions:
                       - "**Path** - Path of the file"
                       - "**TargetFilename** - Alias for Path"
                       - "**FileName** - Alias for Path"
@@ -1181,7 +1181,7 @@ properties:
                       - LastWriterPackageFamilyName
                       - StackTrace
                       - MinimalStackTrace
-                    enumMarkdown:
+                    markdownEnumDescriptions:
                       - "**Path** - Path of the file being downloaded"
                       - "**TargetFilename** - Alias for Path"
                       - "**FileName** - Alias for Path"
@@ -1237,7 +1237,7 @@ properties:
                       - HivePath
                       - StackTrace
                       - MinimalStackTrace
-                    enumMarkdown:
+                    markdownEnumDescriptions:
                       - "**EventType** - Type: CreateKey, DeleteKey, SetValue, RenameKey, SaveKey, ReadValue"
                       - "**Image** - Path of the process that generated the registry event"
                       - "**TargetObject** - Complete path of the registry key/value"
@@ -1289,7 +1289,7 @@ properties:
                       - GrandparentCommandLine
                       - Ancestors
                       - MemfdName
-                    enumMarkdown:
+                    markdownEnumDescriptions:
                       - "**Image** - Path of the process image"
                       - "**CommandLine** - Process command line"
                       - "**CurrentDirectory** - Directory under which the process image was executed"
@@ -1341,7 +1341,7 @@ properties:
                       - FileSha1
                       - FileSha256
                       - FileSize
-                    enumMarkdown:
+                    markdownEnumDescriptions:
                       - "**Kind** - Kind of operation (read, write, remove, rename, chmod, chown, symlink, hardlink, written_executable)"
                       - "**Path** - Path to the file being operated on"
                       - "**TargetPath** - Target path for rename/symlink operations"
@@ -1385,7 +1385,7 @@ properties:
                       - SourceIp
                       - SourceIsIpv6
                       - SourcePort
-                    enumMarkdown:
+                    markdownEnumDescriptions:
                       - "**DestinationIp** - Destination IP address"
                       - "**DestinationNames** - DNS names used to resolve the destination IP address"
                       - "**DestinationHostname** - Alias of DestinationNames"
@@ -1423,7 +1423,7 @@ properties:
                       - TextRecords
                       - Image
                       - User
-                    enumMarkdown:
+                    markdownEnumDescriptions:
                       - "**QueryName** - Requested domain name"
                       - "**QueryType** - The DNS query type (A, AAAA, TXT, etc.)"
                       - "**QueryStatusCategory** - Status of query: success, connection_error, timeout, name_not_found, record_not_found, invalid_reply"
@@ -1459,7 +1459,7 @@ properties:
                       - SourceUsername
                       - SourceHost
                       - Tty
-                    enumMarkdown:
+                    markdownEnumDescriptions:
                       - "**Success** - true if the authentication was successful, false otherwise"
                       - "**Kind** - How the authentication occurred (authenticate or session_open)"
                       - "**TargetUid** - UID of the user being logged into"
@@ -1511,7 +1511,7 @@ properties:
                       - CodesigningFlags
                       - CodesigningFlagsStr
                       - IsPlatformBinary
-                    enumMarkdown:
+                    markdownEnumDescriptions:
                       - "**Image** - Path of the process image"
                       - "**CommandLine** - Process command line"
                       - "**CurrentDirectory** - Directory under which the process image was executed"
@@ -1567,7 +1567,7 @@ properties:
                       - SourceIp
                       - SourceIsIpv6
                       - User
-                    enumMarkdown:
+                    markdownEnumDescriptions:
                       - "**DestinationPort** - Destination port number"
                       - "**DestinationIp** - Destination IP address"
                       - "**DestinationNames** - DNS names used to resolve the destination IP address"
@@ -1604,7 +1604,7 @@ properties:
                       - LoginMethod
                       - TargetUsername
                       - SourceAddress
-                    enumMarkdown:
+                    markdownEnumDescriptions:
                       - "**Success** - true if the authentication was successful, false otherwise"
                       - "**LoginMethod** - Authentication method (open_directory, touch_id, token, auto_unlock, session_login, session_unlock, screensharing_attach, openssh_login, login_login)"
                       - "**TargetUsername** - Name of the user being logged into"
@@ -1631,7 +1631,7 @@ properties:
                       - TargetUsername
                       - LogoutMethod
                       - SourceAddress
-                    enumMarkdown:
+                    markdownEnumDescriptions:
                       - "**TargetUsername** - Name of the user logging out"
                       - "**LogoutMethod** - Method of logout (session_logout, session_lock, openssh_logout, login_logout, screensharing_detach)"
                       - "**SourceAddress** - IP address of the machine from which the logout was performed"
@@ -1656,7 +1656,7 @@ properties:
                     enum:
                       - Image
                       - ImageLoaded
-                    enumMarkdown:
+                    markdownEnumDescriptions:
                       - "**Image** - Path of the process that loaded the library"
                       - "**ImageLoaded** - Path of the Dylib library loaded"
 
@@ -1691,7 +1691,7 @@ properties:
                       - FileSha1
                       - FileSha256
                       - FileSize
-                    enumMarkdown:
+                    markdownEnumDescriptions:
                       - "**Kind** - Kind of operation (create, read, write, remove, rename, chmod, chown, symlink, hardlink, written_executable)"
                       - "**Path** - Path to the file being operated on"
                       - "**TargetPath** - Target path for rename/link operations"
@@ -1733,7 +1733,7 @@ properties:
                       - PtraceOptions
                       - PtraceOptionsStr
                       - TargetIsChild
-                    enumMarkdown:
+                    markdownEnumDescriptions:
                       - "**SourceImage** - Path of the process calling ptrace"
                       - "**SourceProcessId** - PID of the process calling ptrace"
                       - "**TargetImage** - Path of the process that is the target of the ptrace operation"
@@ -1774,7 +1774,7 @@ properties:
                       - ExpectedAttachType
                       - ExpectedAttachTypeStr
                       - FunctionHooked
-                    enumMarkdown:
+                    markdownEnumDescriptions:
                       - "**Image** - Path of the process that loaded/attached the BPF program"
                       - "**Kind** - Kind of operation (cbpf_load, ebpf_load, ebpf_attach)"
                       - "**InstructionCount** - Number of BPF instructions loaded"
@@ -1810,7 +1810,7 @@ properties:
                       - ImageLoaded
                       - ImageSize
                       - Hashes
-                    enumMarkdown:
+                    markdownEnumDescriptions:
                       - "**Image** - Path of the process that loaded the library"
                       - "**ImageLoaded** - Path of the shared library (.so) loaded"
                       - "**ImageSize** - Size of memory allocated to map the library"
@@ -1836,7 +1836,7 @@ properties:
                     enum:
                       - Address
                       - Port
-                    enumMarkdown:
+                    markdownEnumDescriptions:
                       - "**Address** - IP address the network server is bound to"
                       - "**Port** - Port of the network server"
 
@@ -1861,7 +1861,7 @@ properties:
                       - SocketFamily
                       - SocketType
                       - SocketProtocol
-                    enumMarkdown:
+                    markdownEnumDescriptions:
                       - "**SocketFamily** - Integer value of the socket family (AF_INET, AF_PACKET, etc.)"
                       - "**SocketType** - Integer value for the type of socket (SOCK_RAW, SOCK_DGRAM, etc.)"
                       - "**SocketProtocol** - Integer value of the protocol of the socket"
@@ -1891,7 +1891,7 @@ properties:
                       - SourceUsername
                       - SourceHost
                       - Tty
-                    enumMarkdown:
+                    markdownEnumDescriptions:
                       - "**TargetUid** - UID of the user logging out"
                       - "**TargetUsername** - Name of the user logging out"
                       - "**TargetGid** - Group ID of the user logging out"
@@ -1926,7 +1926,7 @@ properties:
                       - RequestUrlQueryParams
                       - RequestUrlUsername
                       - RequestUrlPassword
-                    enumMarkdown:
+                    markdownEnumDescriptions:
                       - "**RequestUrl** - URL to the resource requested"
                       - "**RequestUrlScheme** - Scheme of the URL (http, https, etc.)"
                       - "**RequestUrlHost** - Host where the resource is located"
@@ -2006,7 +2006,7 @@ properties:
                       - IncomingSshBannerComments
                       - IncomingSshServerPubkeyAndCertAlgo
                       - IncomingSshServerFingerprint
-                    enumMarkdown:
+                    markdownEnumDescriptions:
                       - "**DestinationPort** - Destination port number"
                       - "**DestinationIp** - Destination IP address"
                       - "**DestinationNames** - DNS names used to resolve the destination IP"
@@ -2097,7 +2097,7 @@ properties:
                       - OutgoingBytesCount
                       - IncomingApplicationProtocol
                       - OutgoingApplicationProtocol
-                    enumMarkdown:
+                    markdownEnumDescriptions:
                       - "**DestinationPort** - Destination port number"
                       - "**DestinationIp** - Destination IP address"
                       - "**DestinationNames** - DNS names used to resolve the destination IP"
@@ -2145,7 +2145,7 @@ properties:
                       - Kind
                       - StackTrace
                       - MinimalStackTrace
-                    enumMarkdown:
+                    markdownEnumDescriptions:
                       - "**PipeName** - Name of the created Named Pipe (format: \\PIPENAME)"
                       - "**NamedPipeType** - Type of the created Named Pipe (integer)"
                       - "**InboundQuota** - Inbound quota of the pipe (hex string, e.g. 0x4000)"
@@ -2217,7 +2217,7 @@ properties:
                       - TargetProcessSize
                       - TargetProcessUser
                       - TargetProcessUserSID
-                    enumMarkdown:
+                    markdownEnumDescriptions:
                       - "**PipeName** - Name of the Named Pipe (format: \\PIPENAME)"
                       - "**Kind** - Named pipe operation, value: connection"
                       - "**StackTrace** - Full stacktrace leading to the event"
@@ -2282,7 +2282,7 @@ properties:
                     enum:
                       - Image
                       - Type
-                    enumMarkdown:
+                    markdownEnumDescriptions:
                       - "**Image** - Image of the tampered process"
                       - "**Type** - Type of tampering (Image is replaced, Image is locked for access, Image is deleted)"
 
@@ -2318,7 +2318,7 @@ properties:
                       - StackTrace
                       - MinimalStackTrace
                       - CallerIsDestination
-                    enumMarkdown:
+                    markdownEnumDescriptions:
                       - "**CallerImage** - Path of the process calling DuplicateHandle"
                       - "**CallerProcessId** - ID of the process calling DuplicateHandle"
                       - "**SourceImage** - Path of the process with the handle to be duplicated"
@@ -2364,7 +2364,7 @@ properties:
                       - ProtectionMask
                       - ProtectionMaskStr
                       - IsRemote
-                    enumMarkdown:
+                    markdownEnumDescriptions:
                       - "**ProcessId** - ID of the process that called the API"
                       - "**ThreadId** - ID of the thread that called the API"
                       - "**Image** - Path of the process that called the API"
@@ -2408,7 +2408,7 @@ properties:
                       - Sha256
                       - ScriptSize
                       - ScriptNumberOfLines
-                    enumMarkdown:
+                    markdownEnumDescriptions:
                       - "**PowershellCommand** - PowerShell command executed"
                       - "**ScriptBlockText** - PowerShell command executed"
                       - "**PowershellScriptPath** - Path of the PowerShell script"
@@ -2450,7 +2450,7 @@ properties:
                       - RequestUrlUsername
                       - RequestUrlPassword
                       - UserAgent
-                    enumMarkdown:
+                    markdownEnumDescriptions:
                       - "**RequestUrl** - URL to the resource requested"
                       - "**RequestUrlVerb** - Verb used (GET, POST, etc.)"
                       - "**RequestUrlScheme** - Scheme of the URL"
@@ -2493,7 +2493,7 @@ properties:
                       - IpPort
                       - Status
                       - SubStatus
-                    enumMarkdown:
+                    markdownEnumDescriptions:
                       - "**Success** - true if authentication was successful"
                       - "**TargetUsername** - Name of the user being logged into"
                       - "**TargetDomainName** - Domain name of the user"
@@ -2529,7 +2529,7 @@ properties:
                       - TargetUsername
                       - TargetDomainName
                       - TargetSid
-                    enumMarkdown:
+                    markdownEnumDescriptions:
                       - "**TargetUsername** - Name of the user"
                       - "**TargetDomainName** - Domain name"
                       - "**TargetSid** - SID of the user"
@@ -2576,7 +2576,7 @@ properties:
                       - SIDHistory
                       - NewUserName
                       - OperationType
-                    enumMarkdown:
+                    markdownEnumDescriptions:
                       - "**TargetUserName** - Username of the target user"
                       - "**TargetDomainName** - Domain name of the target"
                       - "**TargetUserID** - ID of the target user"
@@ -2635,7 +2635,7 @@ properties:
                       - TargetMemberName
                       - TargetMemberID
                       - OperationType
-                    enumMarkdown:
+                    markdownEnumDescriptions:
                       - "**GroupName** - Name of the group"
                       - "**DomainName** - Domain name"
                       - "**GroupID** - ID of the target group"
@@ -2673,7 +2673,7 @@ properties:
                       - AppName
                       - ContentName
                       - TextPayload
-                    enumMarkdown:
+                    markdownEnumDescriptions:
                       - "**AppName** - Application name/version/GUID string"
                       - "**ContentName** - Filename, URL, unique script ID"
                       - "**TextPayload** - Textual content of the payload"
@@ -2711,7 +2711,7 @@ properties:
                       - SourceUserName
                       - SourceDomainName
                       - OperationType
-                    enumMarkdown:
+                    markdownEnumDescriptions:
                       - "**ServiceName** - Name of the service"
                       - "**IsRemote** - Whether operation was triggered remotely"
                       - "**Image** - Path of the process"
@@ -2772,7 +2772,7 @@ properties:
                       - TaskHidden
                       - ExecutionTimeLimit
                       - TaskPriority
-                    enumMarkdown:
+                    markdownEnumDescriptions:
                       - "**TaskName** - Name of the scheduled task"
                       - "**TaskPath** - Path to the task on disk"
                       - "**Image** - Path of the process"
@@ -2827,7 +2827,7 @@ properties:
                       - Task
                       - Opcode
                       - Keywords
-                    enumMarkdown:
+                    markdownEnumDescriptions:
                       - "**LogName** - Channel name of the Windows Event Log"
                       - "**EventID** - Event identifier"
                       - "**Provider** - Event log provider name"
@@ -2860,7 +2860,7 @@ properties:
                       - Image
                       - MsSinceLastKeyEvent
                       - BackgroundCallCount
-                    enumMarkdown:
+                    markdownEnumDescriptions:
                       - "**ProcessId** - ID of the process that called GetAsyncKeyState"
                       - "**Image** - Path of the process that called the API"
                       - "**MsSinceLastKeyEvent** - Milliseconds since last GetAsyncKeyState event"
@@ -2898,7 +2898,7 @@ properties:
                       - FlagsStr
                       - ThreadInfoFlags
                       - StartAddressProtection
-                    enumMarkdown:
+                    markdownEnumDescriptions:
                       - "**ProcessId** - ID of the process that called RegisterRawInputDevices"
                       - "**Image** - Path of the process that called the API"
                       - "**UsagePage** - Top-level collection (Usage Page) of the device"
@@ -2939,7 +2939,7 @@ properties:
                       - ReturnValue
                       - FilterType
                       - FilterTypeStr
-                    enumMarkdown:
+                    markdownEnumDescriptions:
                       - "**ProcessId** - ID of the process that called SetWindowsHookEx"
                       - "**Image** - Path of the process that called the API"
                       - "**HookLibrary** - DLL containing the hook procedure"
@@ -2974,7 +2974,7 @@ properties:
               - process
               - thread
               - memory
-            enumMarkdown:
+            markdownEnumDescriptions:
               - "**process** - Scan process memory and associated files"
               - "**thread** - Scan thread context and associated memory"
               - "**memory** - Scan raw memory regions"
@@ -2987,7 +2987,7 @@ properties:
               - Windows
               - MacOS
               - Linux
-            enumMarkdown:
+            markdownEnumDescriptions:
               - "**Windows** - Microsoft Windows systems"
               - "**MacOS** - Apple macOS systems"
               - "**Linux** - Linux systems"

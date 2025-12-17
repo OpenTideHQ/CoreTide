@@ -184,14 +184,29 @@ properties:
                     - injected_thread
                     - raw_device_access
                     - process_access
-                    - pipe_created
-                    - pipe_connected
-                    - file_event
+                    - process_duplicate_handle
+                    - process_tampered
+                    - etwti_ntallocatevirtualmemory
                     - registry_event
-                    - process_termination
-                    - process_tampering
-                    - wmi_event
+                    - named_pipe_creation
+                    - named_pipe_connection
+                    - file_create
+                    - file_read
+                    - file_write
+                    - file_rename
+                    - file_remove
+                    - file_shadowcopy
+                    - file_download
+                    - powershell_event
+                    - url_request
+                    - login_event
+                    - logout_event
                     - dns_query
+                    - user
+                    - group
+                    - amsi_scan
+                    - service
+                    - scheduled_task
                     - eventlog
                     - win32k_getasynckeystate
                     - win32k_registerrawinputdevices
@@ -828,19 +843,30 @@ properties:
                       - TargetProcessSignature
                       - TargetProcessSignatureStatus
                       - TargetProcessSigned
+                      - TargetProcessSignatureRootDisplayName
+                      - TargetProcessSignatureRootIssuerName
+                      - TargetProcessSignatureRootSerialNumber
+                      - TargetProcessSignatureRootThumbprint
+                      - TargetProcessSignatureSignerDisplayName
+                      - TargetProcessSignatureSignerIssuerName
+                      - TargetProcessSignatureSignerSerialNumber
+                      - TargetProcessSignatureSignerThumbprint
+                      - TargetProcessSize
+                      - TargetProcessUser
+                      - TargetProcessUserSID
                     enumMarkdown:
                       - "**CallTrace** - Calltrace of the source thread"
                       - "**StackTrace** - Full stacktrace leading to the event"
-                      - "**MinimalStackTrace** - Simplified stacktrace (ntdll.dll|kernel32.dll|UNKNOWN|...)"
+                      - "**MinimalStackTrace** - Simplified stacktrace"
                       - "**GrantedAccess** - Access flags requested for the target process"
-                      - "**GrantedAccessStr** - Access flags as string (e.g. PROCESS_DUP_HANDLE|PROCESS_VM_READ|PROCESS_TERMINATE)"
+                      - "**GrantedAccessStr** - Access flags as string"
                       - "**SourceImage** - Path of the source process that opened the target process"
                       - "**TargetImage** - Path of the target process"
                       - "**TargetProcessCommandLine** - Target process command line"
                       - "**TargetProcessCompany** - Target process company name"
                       - "**TargetProcessCurrentDirectory** - Target process current directory"
                       - "**TargetProcessDescription** - Target process description"
-                      - "**TargetProcessFileVersion** - Target process file version from the image loaded"
+                      - "**TargetProcessFileVersion** - Target process file version"
                       - "**TargetProcessGrandparentCommandLine** - Target process grandparent command line"
                       - "**TargetProcessGrandparentImage** - Target process grandparent image"
                       - "**TargetProcessGrandparentIntegrityLevel** - Target process grandparent integrity level"
@@ -848,22 +874,33 @@ properties:
                       - "**TargetProcessImphash** - Target process import hash"
                       - "**TargetProcessIntegrityLevel** - Target process integrity level"
                       - "**TargetProcessInternalName** - Target process internal name"
-                      - "**TargetProcessLegalCopyright** - Target process legal copyright as indicated in the image"
+                      - "**TargetProcessLegalCopyright** - Target process legal copyright"
                       - "**TargetProcessLogonId** - Logon ID of the user who created the target process"
                       - "**TargetProcessMd5** - Target process MD5 hash"
                       - "**TargetProcessName** - Target process name"
                       - "**TargetProcessOriginalFileName** - Target process original file name"
                       - "**TargetProcessParentCommandLine** - Parent command line of the target process"
                       - "**TargetProcessParentImage** - Parent image of the target process"
-                      - "**TargetProcessParentIntegrityLevel** - Parent process integrity level of the target process"
+                      - "**TargetProcessParentIntegrityLevel** - Parent process integrity level"
                       - "**TargetProcessPETimestamp** - PE timestamp of the target process image"
                       - "**TargetProcessProduct** - Product name of the target process image"
                       - "**TargetProcessProductVersion** - Product version of the target process image"
                       - "**TargetProcessSha1** - Target process SHA1 hash"
                       - "**TargetProcessSha256** - Target process SHA256 hash"
                       - "**TargetProcessSignature** - Signature of the target process image"
-                      - "**TargetProcessSignatureStatus** - Signature status of target process (Valid or empty string if not signed)"
+                      - "**TargetProcessSignatureStatus** - Signature status (Valid or empty string if not signed)"
                       - "**TargetProcessSigned** - Boolean indicating whether the target process is signed"
+                      - "**TargetProcessSignatureRootDisplayName** - Root CA name"
+                      - "**TargetProcessSignatureRootIssuerName** - Root issuer name"
+                      - "**TargetProcessSignatureRootSerialNumber** - Root CA serial number"
+                      - "**TargetProcessSignatureRootThumbprint** - Root thumbprint"
+                      - "**TargetProcessSignatureSignerDisplayName** - Signer name"
+                      - "**TargetProcessSignatureSignerIssuerName** - Signer issuer name"
+                      - "**TargetProcessSignatureSignerSerialNumber** - Signer serial number"
+                      - "**TargetProcessSignatureSignerThumbprint** - Signer thumbprint"
+                      - "**TargetProcessSize** - Image size of the target process (in bytes)"
+                      - "**TargetProcessUser** - User who initiated the target process"
+                      - "**TargetProcessUserSID** - SID of the user who initiated the target process"
 
       #########################################################################
       # WINDOWS DNS_QUERY FIELDS
@@ -883,22 +920,28 @@ properties:
                 properties:
                   field:
                     enum:
-                      - Image
                       - QueryName
                       - QueryType
-                      - QueryResult
-                      - StackTrace
-                      - MinimalStackTrace
+                      - QueryStatusCategory
+                      - IpAddresses
+                      - TextRecords
+                      - QueryStatus
+                      - QueryResults
+                      - Image
+                      - User
                     enumMarkdown:
-                      - "**Image** - Path of the process making the DNS query"
-                      - "**QueryName** - The DNS name being queried"
-                      - "**QueryType** - The type of DNS query (A, AAAA, TXT, etc.)"
-                      - "**QueryResult** - The result of the DNS query"
-                      - "**StackTrace** - Full stacktrace leading to the event"
-                      - "**MinimalStackTrace** - Simplified stacktrace (ntdll.dll|kernel32.dll|UNKNOWN|...)"
+                      - "**QueryName** - Requested domain name"
+                      - "**QueryType** - The DNS query type (A, AAAA, TXT, etc.)"
+                      - "**QueryStatusCategory** - Status of query: success, connection_error, timeout, name_not_found, record_not_found, invalid_reply"
+                      - "**IpAddresses** - The addresses returned by the resolution"
+                      - "**TextRecords** - The text records returned by a TXT query"
+                      - "**QueryStatus** - The raw return code of the resolution"
+                      - "**QueryResults** - The raw resolution results"
+                      - "**Image** - Path of the process that initiated the DNS resolution"
+                      - "**User** - The user associated to the process that initiated the DNS resolution"
 
       #########################################################################
-      # WINDOWS FILE_EVENT FIELDS
+      # WINDOWS FILE_CREATE FIELDS
       #########################################################################
       - if:
           properties:
@@ -907,7 +950,7 @@ properties:
                 product:
                   const: windows
                 category:
-                  const: file_event
+                  const: file_create
         then:
           properties:
             selections:
@@ -915,25 +958,253 @@ properties:
                 properties:
                   field:
                     enum:
-                      - Kind
                       - Path
-                      - TargetPath
+                      - TargetFilename
                       - FileName
-                      - Hashes
-                      - User
-                      - Image
+                      - FileDriveType
                       - StackTrace
                       - MinimalStackTrace
                     enumMarkdown:
-                      - "**Kind** - Type of file operation (create, modify, delete, rename)"
-                      - "**Path** - Path of the file being operated on"
-                      - "**TargetPath** - Target path for rename operations"
-                      - "**FileName** - Name of the file"
-                      - "**Hashes** - Hash values of the file"
-                      - "**User** - User performing the file operation"
-                      - "**Image** - Path of the process performing the operation"
+                      - "**Path** - Path of the file being created"
+                      - "**TargetFilename** - Alias for Path"
+                      - "**FileName** - Alias for Path"
+                      - "**FileDriveType** - Drive type of the file (unknown, removable, fixed, remote, disk_image, ramdisk)"
                       - "**StackTrace** - Full stacktrace leading to the event"
-                      - "**MinimalStackTrace** - Simplified stacktrace (ntdll.dll|kernel32.dll|UNKNOWN|...)"
+                      - "**MinimalStackTrace** - Simplified stacktrace"
+
+      #########################################################################
+      # WINDOWS FILE_READ FIELDS
+      #########################################################################
+      - if:
+          properties:
+            logsource:
+              properties:
+                product:
+                  const: windows
+                category:
+                  const: file_read
+        then:
+          properties:
+            selections:
+              items:
+                properties:
+                  field:
+                    enum:
+                      - Path
+                      - TargetFilename
+                      - FileName
+                      - FileDriveType
+                      - StackTrace
+                      - MinimalStackTrace
+                    enumMarkdown:
+                      - "**Path** - Path of the file being read"
+                      - "**TargetFilename** - Alias for Path"
+                      - "**FileName** - Alias for Path"
+                      - "**FileDriveType** - Drive type of the file (unknown, removable, fixed, remote, disk_image, ramdisk)"
+                      - "**StackTrace** - Full stacktrace leading to the event"
+                      - "**MinimalStackTrace** - Simplified stacktrace"
+
+      #########################################################################
+      # WINDOWS FILE_WRITE FIELDS
+      #########################################################################
+      - if:
+          properties:
+            logsource:
+              properties:
+                product:
+                  const: windows
+                category:
+                  const: file_write
+        then:
+          properties:
+            selections:
+              items:
+                properties:
+                  field:
+                    enum:
+                      - Path
+                      - TargetFilename
+                      - FileName
+                      - FileDriveType
+                      - FirstBytes
+                      - StackTrace
+                      - MinimalStackTrace
+                    enumMarkdown:
+                      - "**Path** - Path of the file being written"
+                      - "**TargetFilename** - Alias for Path"
+                      - "**FileName** - Alias for Path"
+                      - "**FileDriveType** - Drive type of the file (unknown, removable, fixed, remote, disk_image, ramdisk)"
+                      - "**FirstBytes** - First 16 bytes written to the file (hex)"
+                      - "**StackTrace** - Full stacktrace leading to the event"
+                      - "**MinimalStackTrace** - Simplified stacktrace"
+
+      #########################################################################
+      # WINDOWS FILE_RENAME FIELDS
+      #########################################################################
+      - if:
+          properties:
+            logsource:
+              properties:
+                product:
+                  const: windows
+                category:
+                  const: file_rename
+        then:
+          properties:
+            selections:
+              items:
+                properties:
+                  field:
+                    enum:
+                      - Path
+                      - TargetPath
+                      - FileDriveType
+                      - StackTrace
+                      - MinimalStackTrace
+                    enumMarkdown:
+                      - "**Path** - Path of the file being renamed"
+                      - "**TargetPath** - New path of the file"
+                      - "**FileDriveType** - Drive type of the file (unknown, removable, fixed, remote, disk_image, ramdisk)"
+                      - "**StackTrace** - Full stacktrace leading to the event"
+                      - "**MinimalStackTrace** - Simplified stacktrace"
+
+      #########################################################################
+      # WINDOWS FILE_REMOVE FIELDS
+      #########################################################################
+      - if:
+          properties:
+            logsource:
+              properties:
+                product:
+                  const: windows
+                category:
+                  const: file_remove
+        then:
+          properties:
+            selections:
+              items:
+                properties:
+                  field:
+                    enum:
+                      - Path
+                      - TargetFilename
+                      - FileName
+                      - FileDriveType
+                      - StackTrace
+                      - MinimalStackTrace
+                    enumMarkdown:
+                      - "**Path** - Path of the file being removed"
+                      - "**TargetFilename** - Alias for Path"
+                      - "**FileName** - Alias for Path"
+                      - "**FileDriveType** - Drive type of the file (unknown, removable, fixed, remote, disk_image, ramdisk)"
+                      - "**StackTrace** - Full stacktrace leading to the event"
+                      - "**MinimalStackTrace** - Simplified stacktrace"
+
+      #########################################################################
+      # WINDOWS FILE_SHADOWCOPY FIELDS
+      #########################################################################
+      - if:
+          properties:
+            logsource:
+              properties:
+                product:
+                  const: windows
+                category:
+                  const: file_shadowcopy
+        then:
+          properties:
+            selections:
+              items:
+                properties:
+                  field:
+                    enum:
+                      - Path
+                      - TargetFilename
+                      - FileName
+                      - FileDriveType
+                      - CreateOptions
+                      - CreateOptionsStr
+                      - CreateDisposition
+                      - CreateDispositionStr
+                      - StackTrace
+                      - MinimalStackTrace
+                    enumMarkdown:
+                      - "**Path** - Path of the file"
+                      - "**TargetFilename** - Alias for Path"
+                      - "**FileName** - Alias for Path"
+                      - "**FileDriveType** - Drive type of the file"
+                      - "**CreateOptions** - File creation options (integer)"
+                      - "**CreateOptionsStr** - Translated file creation options"
+                      - "**CreateDisposition** - File disposition value"
+                      - "**CreateDispositionStr** - Translated file disposition value"
+                      - "**StackTrace** - Full stacktrace leading to the event"
+                      - "**MinimalStackTrace** - Simplified stacktrace"
+
+      #########################################################################
+      # WINDOWS FILE_DOWNLOAD FIELDS
+      #########################################################################
+      - if:
+          properties:
+            logsource:
+              properties:
+                product:
+                  const: windows
+                category:
+                  const: file_download
+        then:
+          properties:
+            selections:
+              items:
+                properties:
+                  field:
+                    enum:
+                      - Path
+                      - TargetFilename
+                      - FileName
+                      - FileDriveType
+                      - Kind
+                      - SourceUrl
+                      - SourceUrlScheme
+                      - SourceUrlHost
+                      - SourceUrlPort
+                      - SourceUrlPath
+                      - SourceUrlQueryParams
+                      - SourceUrlUsername
+                      - SourceUrlPassword
+                      - UrlZone
+                      - ZoneId
+                      - HostUrl
+                      - ReferrerUrl
+                      - HostIpAddress
+                      - SourceIpAddress
+                      - AppZoneId
+                      - LastWriterPackageFamilyName
+                      - StackTrace
+                      - MinimalStackTrace
+                    enumMarkdown:
+                      - "**Path** - Path of the file being downloaded"
+                      - "**TargetFilename** - Alias for Path"
+                      - "**FileName** - Alias for Path"
+                      - "**FileDriveType** - Drive type of the file"
+                      - "**Kind** - download"
+                      - "**SourceUrl** - URL from which the file was downloaded"
+                      - "**SourceUrlScheme** - Scheme of the URL"
+                      - "**SourceUrlHost** - Host where the file is located"
+                      - "**SourceUrlPort** - Port used to access the file"
+                      - "**SourceUrlPath** - Path of the file in the URL"
+                      - "**SourceUrlQueryParams** - Query parameters"
+                      - "**SourceUrlUsername** - Username used"
+                      - "**SourceUrlPassword** - Password used"
+                      - "**UrlZone** - URL Security Zone"
+                      - "**ZoneId** - ID of the URL Zone"
+                      - "**HostUrl** - URL from which file was downloaded"
+                      - "**ReferrerUrl** - Referrer URL"
+                      - "**HostIpAddress** - IP address from which file was downloaded"
+                      - "**SourceIpAddress** - IP address from which file was downloaded"
+                      - "**AppZoneId** - URL Zone ID of downloaded Windows App"
+                      - "**LastWriterPackageFamilyName** - Package family name of last app to edit"
+                      - "**StackTrace** - Full stacktrace leading to the event"
+                      - "**MinimalStackTrace** - Simplified stacktrace"
 
       #########################################################################
       # WINDOWS REGISTRY_EVENT FIELDS
@@ -953,23 +1224,33 @@ properties:
                 properties:
                   field:
                     enum:
-                      - Kind
+                      - EventType
+                      - Image
                       - TargetObject
                       - Details
+                      - PreviousDetails
+                      - DetailsAdded
+                      - DetailsRemoved
+                      - IsPreviousDetailsSet
+                      - ValueType
                       - NewName
-                      - Image
-                      - User
+                      - HivePath
                       - StackTrace
                       - MinimalStackTrace
                     enumMarkdown:
-                      - "**Kind** - Type of registry operation (SetValue, CreateKey, DeleteKey, DeleteValue, RenameKey)"
-                      - "**TargetObject** - Full path of the registry key or value being operated on"
+                      - "**EventType** - Type: CreateKey, DeleteKey, SetValue, RenameKey, SaveKey, ReadValue"
+                      - "**Image** - Path of the process that generated the registry event"
+                      - "**TargetObject** - Complete path of the registry key/value"
                       - "**Details** - Value data or details of the registry operation"
+                      - "**PreviousDetails** - Previous value before the operation"
+                      - "**DetailsAdded** - List of strings added (REG_MULTI_SZ only)"
+                      - "**DetailsRemoved** - List of strings removed (REG_MULTI_SZ only)"
+                      - "**IsPreviousDetailsSet** - Whether a previous value existed"
+                      - "**ValueType** - Type of the registry value (REG_SZ, REG_DWORD, etc.)"
                       - "**NewName** - New name for rename operations"
-                      - "**Image** - Path of the process performing the registry operation"
-                      - "**User** - User performing the registry operation"
+                      - "**HivePath** - Path where hive will be saved (SaveKey only)"
                       - "**StackTrace** - Full stacktrace leading to the event"
-                      - "**MinimalStackTrace** - Simplified stacktrace (ntdll.dll|kernel32.dll|UNKNOWN|...)"
+                      - "**MinimalStackTrace** - Simplified stacktrace"
 
       #########################################################################
       # LINUX PROCESS_CREATION FIELDS
@@ -1838,7 +2119,7 @@ properties:
                       - "**OutgoingApplicationProtocol** - Outgoing application protocol (HTTP/TLS/SSH)"
 
       #########################################################################
-      # WINDOWS PIPE_CREATED (NAMED_PIPE_CREATION) FIELDS
+      # WINDOWS NAMED_PIPE_CREATION FIELDS
       #########################################################################
       - if:
           properties:
@@ -1847,7 +2128,7 @@ properties:
                 product:
                   const: windows
                 category:
-                  const: pipe_created
+                  const: named_pipe_creation
         then:
           properties:
             selections:
@@ -1865,7 +2146,7 @@ properties:
                       - StackTrace
                       - MinimalStackTrace
                     enumMarkdown:
-                      - "**PipeName** - Name of the created Named Pipe (format: \\\\PIPENAME)"
+                      - "**PipeName** - Name of the created Named Pipe (format: \\PIPENAME)"
                       - "**NamedPipeType** - Type of the created Named Pipe (integer)"
                       - "**InboundQuota** - Inbound quota of the pipe (hex string, e.g. 0x4000)"
                       - "**OutboundQuota** - Outbound quota of the pipe (hex string)"
@@ -1876,7 +2157,7 @@ properties:
                       - "**MinimalStackTrace** - Simplified stacktrace"
 
       #########################################################################
-      # WINDOWS PIPE_CONNECTED (NAMED_PIPE_CONNECTION) FIELDS
+      # WINDOWS NAMED_PIPE_CONNECTION FIELDS
       #########################################################################
       - if:
           properties:
@@ -1885,7 +2166,7 @@ properties:
                 product:
                   const: windows
                 category:
-                  const: pipe_connected
+                  const: named_pipe_connection
         then:
           properties:
             selections:
@@ -1897,14 +2178,92 @@ properties:
                       - Kind
                       - StackTrace
                       - MinimalStackTrace
+                      - TargetProcessCommandLine
+                      - TargetProcessCompany
+                      - TargetProcessCurrentDirectory
+                      - TargetProcessDescription
+                      - TargetProcessFileVersion
+                      - TargetProcessGrandparentCommandLine
+                      - TargetProcessGrandparentImage
+                      - TargetProcessGrandparentIntegrityLevel
+                      - TargetProcessImage
+                      - TargetProcessImphash
+                      - TargetProcessIntegrityLevel
+                      - TargetProcessInternalName
+                      - TargetProcessLegalCopyright
+                      - TargetProcessLogonId
+                      - TargetProcessMd5
+                      - TargetProcessName
+                      - TargetProcessOriginalFileName
+                      - TargetProcessParentCommandLine
+                      - TargetProcessParentImage
+                      - TargetProcessParentIntegrityLevel
+                      - TargetProcessPETimestamp
+                      - TargetProcessProduct
+                      - TargetProcessProductVersion
+                      - TargetProcessSha1
+                      - TargetProcessSha256
+                      - TargetProcessSignature
+                      - TargetProcessSignatureStatus
+                      - TargetProcessSigned
+                      - TargetProcessSignatureRootDisplayName
+                      - TargetProcessSignatureRootIssuerName
+                      - TargetProcessSignatureRootSerialNumber
+                      - TargetProcessSignatureRootThumbprint
+                      - TargetProcessSignatureSignerDisplayName
+                      - TargetProcessSignatureSignerIssuerName
+                      - TargetProcessSignatureSignerSerialNumber
+                      - TargetProcessSignatureSignerThumbprint
+                      - TargetProcessSize
+                      - TargetProcessUser
+                      - TargetProcessUserSID
                     enumMarkdown:
-                      - "**PipeName** - Name of the Named Pipe (format: \\\\PIPENAME)"
+                      - "**PipeName** - Name of the Named Pipe (format: \\PIPENAME)"
                       - "**Kind** - Named pipe operation, value: connection"
                       - "**StackTrace** - Full stacktrace leading to the event"
                       - "**MinimalStackTrace** - Simplified stacktrace"
+                      - "**TargetProcessCommandLine** - Target process command line"
+                      - "**TargetProcessCompany** - Target process company"
+                      - "**TargetProcessCurrentDirectory** - Target process current directory"
+                      - "**TargetProcessDescription** - Target process description"
+                      - "**TargetProcessFileVersion** - Target process file version"
+                      - "**TargetProcessGrandparentCommandLine** - Target process grandparent command line"
+                      - "**TargetProcessGrandparentImage** - Target process grandparent image"
+                      - "**TargetProcessGrandparentIntegrityLevel** - Target process grandparent integrity level"
+                      - "**TargetProcessImage** - Target process image"
+                      - "**TargetProcessImphash** - Target process import hash"
+                      - "**TargetProcessIntegrityLevel** - Target process integrity level"
+                      - "**TargetProcessInternalName** - Target process internal name"
+                      - "**TargetProcessLegalCopyright** - Target process legal copyright"
+                      - "**TargetProcessLogonId** - Target process logon ID"
+                      - "**TargetProcessMd5** - Target process MD5"
+                      - "**TargetProcessName** - Target process name"
+                      - "**TargetProcessOriginalFileName** - Target process original file name"
+                      - "**TargetProcessParentCommandLine** - Target process parent command line"
+                      - "**TargetProcessParentImage** - Target process parent image"
+                      - "**TargetProcessParentIntegrityLevel** - Target process parent integrity level"
+                      - "**TargetProcessPETimestamp** - Target process PE timestamp"
+                      - "**TargetProcessProduct** - Target process product"
+                      - "**TargetProcessProductVersion** - Target process product version"
+                      - "**TargetProcessSha1** - Target process SHA1"
+                      - "**TargetProcessSha256** - Target process SHA256"
+                      - "**TargetProcessSignature** - Target process signature"
+                      - "**TargetProcessSignatureStatus** - Target process signature status"
+                      - "**TargetProcessSigned** - Target process signed"
+                      - "**TargetProcessSignatureRootDisplayName** - Target process root CA name"
+                      - "**TargetProcessSignatureRootIssuerName** - Target process root issuer name"
+                      - "**TargetProcessSignatureRootSerialNumber** - Target process root serial number"
+                      - "**TargetProcessSignatureRootThumbprint** - Target process root thumbprint"
+                      - "**TargetProcessSignatureSignerDisplayName** - Target process signer name"
+                      - "**TargetProcessSignatureSignerIssuerName** - Target process signer issuer name"
+                      - "**TargetProcessSignatureSignerSerialNumber** - Target process signer serial number"
+                      - "**TargetProcessSignatureSignerThumbprint** - Target process signer thumbprint"
+                      - "**TargetProcessSize** - Target process size"
+                      - "**TargetProcessUser** - Target process user"
+                      - "**TargetProcessUserSID** - Target process user SID"
 
       #########################################################################
-      # WINDOWS PROCESS_TERMINATION FIELDS
+      # WINDOWS PROCESS_TAMPERED FIELDS
       #########################################################################
       - if:
           properties:
@@ -1913,33 +2272,7 @@ properties:
                 product:
                   const: windows
                 category:
-                  const: process_termination
-        then:
-          properties:
-            selections:
-              items:
-                properties:
-                  field:
-                    enum:
-                      - Image
-                      - ProcessId
-                      - User
-                    enumMarkdown:
-                      - "**Image** - Path of the terminated process"
-                      - "**ProcessId** - ID of the terminated process"
-                      - "**User** - User associated with the terminated process"
-
-      #########################################################################
-      # WINDOWS PROCESS_TAMPERING FIELDS
-      #########################################################################
-      - if:
-          properties:
-            logsource:
-              properties:
-                product:
-                  const: windows
-                category:
-                  const: process_tampering
+                  const: process_tampered
         then:
           properties:
             selections:
@@ -1950,11 +2283,11 @@ properties:
                       - Image
                       - Type
                     enumMarkdown:
-                      - "**Image** - Image of the tampered process (e.g. C:\\\\toto.exe)"
+                      - "**Image** - Image of the tampered process"
                       - "**Type** - Type of tampering (Image is replaced, Image is locked for access, Image is deleted)"
 
       #########################################################################
-      # WINDOWS WMI_EVENT FIELDS
+      # WINDOWS PROCESS_DUPLICATE_HANDLE FIELDS
       #########################################################################
       - if:
           properties:
@@ -1963,7 +2296,7 @@ properties:
                 product:
                   const: windows
                 category:
-                  const: wmi_event
+                  const: process_duplicate_handle
         then:
           properties:
             selections:
@@ -1971,21 +2304,501 @@ properties:
                 properties:
                   field:
                     enum:
-                      - EventType
-                      - Operation
-                      - Destination
-                      - Name
-                      - Query
-                      - Consumer
-                      - Filter
+                      - CallerImage
+                      - CallerProcessId
+                      - SourceImage
+                      - SourceProcessId
+                      - DestinationImage
+                      - DestinationProcessId
+                      - TargetImage
+                      - TargetProcessId
+                      - GrantedAccess
+                      - GrantedAccessStr
+                      - CallTrace
+                      - StackTrace
+                      - MinimalStackTrace
+                      - CallerIsDestination
                     enumMarkdown:
-                      - "**EventType** - Type of WMI event"
-                      - "**Operation** - WMI operation performed"
-                      - "**Destination** - Destination of the WMI operation"
-                      - "**Name** - Name of WMI subscription"
-                      - "**Query** - WMI query being executed"
-                      - "**Consumer** - WMI event consumer"
-                      - "**Filter** - WMI event filter"
+                      - "**CallerImage** - Path of the process calling DuplicateHandle"
+                      - "**CallerProcessId** - ID of the process calling DuplicateHandle"
+                      - "**SourceImage** - Path of the process with the handle to be duplicated"
+                      - "**SourceProcessId** - ID of the process with the handle to be duplicated"
+                      - "**DestinationImage** - Path of the process to receive the duplicated handle"
+                      - "**DestinationProcessId** - ID of the process to receive the duplicated handle"
+                      - "**TargetImage** - Path of the process that is target of handle operation"
+                      - "**TargetProcessId** - ID of the process that is target of handle operation"
+                      - "**GrantedAccess** - Access flags requested for the target process"
+                      - "**GrantedAccessStr** - Access flags as string"
+                      - "**CallTrace** - Calltrace of the caller thread"
+                      - "**StackTrace** - Full stacktrace leading to the event"
+                      - "**MinimalStackTrace** - Simplified stacktrace"
+                      - "**CallerIsDestination** - true if caller process is the destination process"
+
+      #########################################################################
+      # WINDOWS ETWTI_NTALLOCATEVIRTUALMEMORY FIELDS
+      #########################################################################
+      - if:
+          properties:
+            logsource:
+              properties:
+                product:
+                  const: windows
+                category:
+                  const: etwti_ntallocatevirtualmemory
+        then:
+          properties:
+            selections:
+              items:
+                properties:
+                  field:
+                    enum:
+                      - ProcessId
+                      - ThreadId
+                      - Image
+                      - TargetProcessId
+                      - TargetImage
+                      - BaseAddress
+                      - RegionSize
+                      - AllocationType
+                      - AllocationTypeStr
+                      - ProtectionMask
+                      - ProtectionMaskStr
+                      - IsRemote
+                    enumMarkdown:
+                      - "**ProcessId** - ID of the process that called the API"
+                      - "**ThreadId** - ID of the thread that called the API"
+                      - "**Image** - Path of the process that called the API"
+                      - "**TargetProcessId** - ID of the target process"
+                      - "**TargetImage** - Path of the target process"
+                      - "**BaseAddress** - Base address of memory allocation (hex)"
+                      - "**RegionSize** - Size of the allocated region (hex)"
+                      - "**AllocationType** - Type of allocation (hex)"
+                      - "**AllocationTypeStr** - Type of allocation as string"
+                      - "**ProtectionMask** - Protection mask of allocated memory (hex)"
+                      - "**ProtectionMaskStr** - Protection mask as string"
+                      - "**IsRemote** - Whether allocation is in a remote process"
+
+      #########################################################################
+      # WINDOWS POWERSHELL_EVENT FIELDS
+      #########################################################################
+      - if:
+          properties:
+            logsource:
+              properties:
+                product:
+                  const: windows
+                category:
+                  const: powershell_event
+        then:
+          properties:
+            selections:
+              items:
+                properties:
+                  field:
+                    enum:
+                      - PowershellCommand
+                      - ScriptBlockText
+                      - PowershellScriptPath
+                      - Path
+                      - Signed
+                      - Signature
+                      - SignatureStatus
+                      - Md5
+                      - Sha1
+                      - Sha256
+                      - ScriptSize
+                      - ScriptNumberOfLines
+                    enumMarkdown:
+                      - "**PowershellCommand** - PowerShell command executed"
+                      - "**ScriptBlockText** - PowerShell command executed"
+                      - "**PowershellScriptPath** - Path of the PowerShell script"
+                      - "**Path** - Path of the PowerShell script"
+                      - "**Signed** - true if script is signed (matched as string)"
+                      - "**Signature** - Signer name of the script"
+                      - "**SignatureStatus** - Status of the signature"
+                      - "**Md5** - MD5 hash of the PowerShell script"
+                      - "**Sha1** - SHA1 hash of the PowerShell script"
+                      - "**Sha256** - SHA256 hash of the PowerShell script"
+                      - "**ScriptSize** - Size of the PowerShell script (bytes)"
+                      - "**ScriptNumberOfLines** - Number of lines"
+
+      #########################################################################
+      # WINDOWS URL_REQUEST FIELDS
+      #########################################################################
+      - if:
+          properties:
+            logsource:
+              properties:
+                product:
+                  const: windows
+                category:
+                  const: url_request
+        then:
+          properties:
+            selections:
+              items:
+                properties:
+                  field:
+                    enum:
+                      - RequestUrl
+                      - RequestUrlVerb
+                      - RequestUrlScheme
+                      - RequestUrlHost
+                      - RequestUrlPort
+                      - RequestUrlPath
+                      - RequestUrlQueryParams
+                      - RequestUrlUsername
+                      - RequestUrlPassword
+                      - UserAgent
+                    enumMarkdown:
+                      - "**RequestUrl** - URL to the resource requested"
+                      - "**RequestUrlVerb** - Verb used (GET, POST, etc.)"
+                      - "**RequestUrlScheme** - Scheme of the URL"
+                      - "**RequestUrlHost** - Host where the resource is located"
+                      - "**RequestUrlPort** - Port used"
+                      - "**RequestUrlPath** - Path of the resource"
+                      - "**RequestUrlQueryParams** - Query parameters"
+                      - "**RequestUrlUsername** - Username used"
+                      - "**RequestUrlPassword** - Password used"
+                      - "**UserAgent** - User agent used"
+
+      #########################################################################
+      # WINDOWS LOGIN_EVENT FIELDS
+      #########################################################################
+      - if:
+          properties:
+            logsource:
+              properties:
+                product:
+                  const: windows
+                category:
+                  const: login_event
+        then:
+          properties:
+            selections:
+              items:
+                properties:
+                  field:
+                    enum:
+                      - Success
+                      - TargetUsername
+                      - TargetDomainName
+                      - TargetSid
+                      - SourceUsername
+                      - SourceDomainName
+                      - SourceSid
+                      - AuthenticationPackageName
+                      - WorkstationName
+                      - IpAddress
+                      - IpPort
+                      - Status
+                      - SubStatus
+                    enumMarkdown:
+                      - "**Success** - true if authentication was successful"
+                      - "**TargetUsername** - Name of the user being logged into"
+                      - "**TargetDomainName** - Domain name of the user"
+                      - "**TargetSid** - SID of the user"
+                      - "**SourceUsername** - Username of the process causing the login"
+                      - "**SourceDomainName** - Domain name of the process"
+                      - "**SourceSid** - SID of the user causing the login"
+                      - "**AuthenticationPackageName** - Authentication package name"
+                      - "**WorkstationName** - Machine name from which logon attempt was performed"
+                      - "**IpAddress** - IP address of the machine"
+                      - "**IpPort** - Source port for the logon attempt"
+                      - "**Status** - Reason why logon failed"
+                      - "**SubStatus** - Additional information about logon failure"
+
+      #########################################################################
+      # WINDOWS LOGOUT_EVENT FIELDS
+      #########################################################################
+      - if:
+          properties:
+            logsource:
+              properties:
+                product:
+                  const: windows
+                category:
+                  const: logout_event
+        then:
+          properties:
+            selections:
+              items:
+                properties:
+                  field:
+                    enum:
+                      - TargetUsername
+                      - TargetDomainName
+                      - TargetSid
+                    enumMarkdown:
+                      - "**TargetUsername** - Name of the user"
+                      - "**TargetDomainName** - Domain name"
+                      - "**TargetSid** - SID of the user"
+
+      #########################################################################
+      # WINDOWS USER FIELDS
+      #########################################################################
+      - if:
+          properties:
+            logsource:
+              properties:
+                product:
+                  const: windows
+                category:
+                  const: user
+        then:
+          properties:
+            selections:
+              items:
+                properties:
+                  field:
+                    enum:
+                      - TargetUserName
+                      - TargetDomainName
+                      - TargetUserID
+                      - SourceUserID
+                      - SourceUserName
+                      - SourceDomainName
+                      - SourceLogonID
+                      - SourcePrivilegelist
+                      - TargetSAMName
+                      - TargetDisplayName
+                      - TargetPrincipalName
+                      - TargetHomeDirectory
+                      - TargetHomePath
+                      - TargetScriptPath
+                      - TargetProfilePath
+                      - TargetUserWorkstations
+                      - TargetPasswordLastSet
+                      - TargetAccountExpires
+                      - TargetPrimaryGroupId
+                      - TargetAllowedToDelegateTo
+                      - UserAccountControl
+                      - SIDHistory
+                      - NewUserName
+                      - OperationType
+                    enumMarkdown:
+                      - "**TargetUserName** - Username of the target user"
+                      - "**TargetDomainName** - Domain name of the target"
+                      - "**TargetUserID** - ID of the target user"
+                      - "**SourceUserID** - ID of the source user"
+                      - "**SourceUserName** - Username of the source user"
+                      - "**SourceDomainName** - Domain name of the source user"
+                      - "**SourceLogonID** - LogonID of the source user"
+                      - "**SourcePrivilegelist** - List of user privileges used"
+                      - "**TargetSAMName** - Logon name for previous Windows versions"
+                      - "**TargetDisplayName** - Name displayed in address book"
+                      - "**TargetPrincipalName** - Internet-style login name"
+                      - "**TargetHomeDirectory** - User's home directory"
+                      - "**TargetHomePath** - Drive letter for UNC path"
+                      - "**TargetScriptPath** - Path of account's logon script"
+                      - "**TargetProfilePath** - Path to account's profile"
+                      - "**TargetUserWorkstations** - List of allowed computers"
+                      - "**TargetPasswordLastSet** - Last password modification time"
+                      - "**TargetAccountExpires** - Account expiration date"
+                      - "**TargetPrimaryGroupId** - RID of user's primary group"
+                      - "**TargetAllowedToDelegateTo** - SPNs for delegation"
+                      - "**UserAccountControl** - User account properties"
+                      - "**SIDHistory** - Previous SIDs"
+                      - "**NewUserName** - New username for rename operation"
+                      - "**OperationType** - Operation type"
+
+      #########################################################################
+      # WINDOWS GROUP FIELDS
+      #########################################################################
+      - if:
+          properties:
+            logsource:
+              properties:
+                product:
+                  const: windows
+                category:
+                  const: group
+        then:
+          properties:
+            selections:
+              items:
+                properties:
+                  field:
+                    enum:
+                      - GroupName
+                      - DomainName
+                      - GroupID
+                      - SourceUserID
+                      - SourceUserName
+                      - SourceDomainName
+                      - SourceLogonID
+                      - SourcePrivilegelist
+                      - TargetSAMName
+                      - SIDHistory
+                      - OldGroupType
+                      - NewGroupType
+                      - TargetMemberName
+                      - TargetMemberID
+                      - OperationType
+                    enumMarkdown:
+                      - "**GroupName** - Name of the group"
+                      - "**DomainName** - Domain name"
+                      - "**GroupID** - ID of the target group"
+                      - "**SourceUserID** - ID of the source user"
+                      - "**SourceUserName** - Username of the source user"
+                      - "**SourceDomainName** - Domain name of the source user"
+                      - "**SourceLogonID** - LogonID of the source user"
+                      - "**SourcePrivilegelist** - List of user privileges used"
+                      - "**TargetSAMName** - Name for previous Windows versions"
+                      - "**SIDHistory** - Previous SIDs"
+                      - "**OldGroupType** - Old group type"
+                      - "**NewGroupType** - New group type"
+                      - "**TargetMemberName** - Name of user added/removed"
+                      - "**TargetMemberID** - ID of user added/removed"
+                      - "**OperationType** - Operation type"
+
+      #########################################################################
+      # WINDOWS AMSI_SCAN FIELDS
+      #########################################################################
+      - if:
+          properties:
+            logsource:
+              properties:
+                product:
+                  const: windows
+                category:
+                  const: amsi_scan
+        then:
+          properties:
+            selections:
+              items:
+                properties:
+                  field:
+                    enum:
+                      - AppName
+                      - ContentName
+                      - TextPayload
+                    enumMarkdown:
+                      - "**AppName** - Application name/version/GUID string"
+                      - "**ContentName** - Filename, URL, unique script ID"
+                      - "**TextPayload** - Textual content of the payload"
+
+      #########################################################################
+      # WINDOWS SERVICE FIELDS
+      #########################################################################
+      - if:
+          properties:
+            logsource:
+              properties:
+                product:
+                  const: windows
+                category:
+                  const: service
+        then:
+          properties:
+            selections:
+              items:
+                properties:
+                  field:
+                    enum:
+                      - ServiceName
+                      - IsRemote
+                      - Image
+                      - ServiceStartType
+                      - ServiceStartTypeStr
+                      - ServiceCommandLine
+                      - ServiceType
+                      - ServiceTypeStr
+                      - ServiceAccount
+                      - ControlCode
+                      - ControlCodeStr
+                      - SourceUserID
+                      - SourceUserName
+                      - SourceDomainName
+                      - OperationType
+                    enumMarkdown:
+                      - "**ServiceName** - Name of the service"
+                      - "**IsRemote** - Whether operation was triggered remotely"
+                      - "**Image** - Path of the process"
+                      - "**ServiceStartType** - Start type of the service"
+                      - "**ServiceStartTypeStr** - Start type as string"
+                      - "**ServiceCommandLine** - Service command line"
+                      - "**ServiceType** - Type of the service"
+                      - "**ServiceTypeStr** - Type as string"
+                      - "**ServiceAccount** - Account of the service"
+                      - "**ControlCode** - Control code received"
+                      - "**ControlCodeStr** - Control code as string"
+                      - "**SourceUserID** - ID of the source user"
+                      - "**SourceUserName** - Username of the source user"
+                      - "**SourceDomainName** - Domain name of the source user"
+                      - "**OperationType** - Operation type"
+
+      #########################################################################
+      # WINDOWS SCHEDULED_TASK FIELDS
+      #########################################################################
+      - if:
+          properties:
+            logsource:
+              properties:
+                product:
+                  const: windows
+                category:
+                  const: scheduled_task
+        then:
+          properties:
+            selections:
+              items:
+                properties:
+                  field:
+                    enum:
+                      - TaskName
+                      - TaskPath
+                      - Image
+                      - SourceUserName
+                      - SourceUserId
+                      - SourceDomainName
+                      - IsRemote
+                      - TaskContent
+                      - SourceLogonId
+                      - ClientProcessId
+                      - RpcCallLocality
+                      - SpawnedProcessPid
+                      - ProcessPriority
+                      - OperationType
+                      - FirstActionCommandLine
+                      - NumberOfTriggers
+                      - NumberOfActions
+                      - TaskCommands
+                      - PrincipalUserId
+                      - LogonType
+                      - RunLevel
+                      - PrincipalGroupId
+                      - TaskEnabled
+                      - TaskHidden
+                      - ExecutionTimeLimit
+                      - TaskPriority
+                    enumMarkdown:
+                      - "**TaskName** - Name of the scheduled task"
+                      - "**TaskPath** - Path to the task on disk"
+                      - "**Image** - Path of the process"
+                      - "**SourceUserName** - Username that triggered the operation"
+                      - "**SourceUserId** - User ID that triggered the operation"
+                      - "**SourceDomainName** - Domain name of the user"
+                      - "**IsRemote** - Whether operation was performed remotely"
+                      - "**TaskContent** - Raw XML content of task definition"
+                      - "**SourceLogonId** - Logon ID of the source user"
+                      - "**ClientProcessId** - Process ID of the client"
+                      - "**RpcCallLocality** - RPC call locality information"
+                      - "**SpawnedProcessPid** - Process ID of spawned process"
+                      - "**ProcessPriority** - Priority of spawned process"
+                      - "**OperationType** - Operation type"
+                      - "**FirstActionCommandLine** - Command-line of first executable action"
+                      - "**NumberOfTriggers** - Number of triggers configured"
+                      - "**NumberOfActions** - Number of actions configured"
+                      - "**TaskCommands** - All command-lines in task actions"
+                      - "**PrincipalUserId** - User ID under which task runs"
+                      - "**LogonType** - Logon type for task execution"
+                      - "**RunLevel** - Run level of the task"
+                      - "**PrincipalGroupId** - Group ID associated with task principal"
+                      - "**TaskEnabled** - Whether task is enabled"
+                      - "**TaskHidden** - Whether task is hidden"
+                      - "**ExecutionTimeLimit** - Maximum time task is allowed to run"
+                      - "**TaskPriority** - Priority level of task execution"
 
       #########################################################################
       # WINDOWS EVENTLOG FIELDS

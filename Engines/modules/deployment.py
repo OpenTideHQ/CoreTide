@@ -647,6 +647,10 @@ class TideDeployment:
                 self.rule_deployment: Sequence[TenantDeployment.Crowdstrike] = (
                     self.deployment_resolver(deployment, system, strategy) # type:ignore
                 )
+            case DetectionSystems.HARFANGLAB:
+                self.rule_deployment: Sequence[TenantDeployment.HarfangLab] = (
+                    self.deployment_resolver(deployment, system, strategy) # type:ignore
+                )
             case _:
                 raise NotImplementedError(
                     f"System {system} is not implemented by TideDeployment"
@@ -666,6 +670,8 @@ class TideDeployment:
                 return DataTide.Configurations.Systems.SentinelOne
             case DetectionSystems.CROWDSTRIKE:
                 return DataTide.Configurations.Systems.Crowdstrike
+            case DetectionSystems.HARFANGLAB:
+                return DataTide.Configurations.Systems.HarfangLab
             # case _:
             #    raise NotImplemented
 
@@ -681,6 +687,8 @@ class TideDeployment:
                 mdr_config = data.configurations.sentinel_one
             case DetectionSystems.CROWDSTRIKE:
                 mdr_config = data.configurations.crowdstrike
+            case DetectionSystems.HARFANGLAB:
+                mdr_config = data.configurations.harfanglab
             case _:
                 log(
                     "FATAL",

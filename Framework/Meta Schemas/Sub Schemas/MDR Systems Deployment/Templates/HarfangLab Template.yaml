@@ -1,79 +1,45 @@
-  #schema: harfanglab::1.0
-  #status: DEVELOPMENT
+  schema: harfanglab::1.0
+  status: 
   #contributors:
     #-
   #tenants:
     #-
   #flags:
     #-
+  maturity: 
+  confidence: 
+  action: 
+  #tags:
+    #-
   
-  # Common HarfangLab settings
-  #maturity: Experimental  # Stable, Testing, Experimental
-  #confidence: Moderate     # Weak, Moderate, Strong
-  #action: Alert            # Alert, Alert & Block, Alert, Block & Quarantine
+  #sigma:
   
-  # Choose either sigma OR yara configuration (not both)
-  
-  # --- Sigma Rule Configuration ---
-  sigma:
-    logsource:
-      # Product must be selected first - determines available categories
-      product: windows  # windows, linux, macos
-      
-      # Category options depend on product selected
-      # Windows: process_creation, network_connection, network_dpi, network_close,
-      #          driver_load, library_event, remote_thread, injected_thread,
-      #          raw_device_access, process_access, pipe_created, pipe_connected,
-      #          file_event, registry_event, process_termination, process_tampering,
-      #          wmi_event, dns_query, eventlog, win32k_*
-      # Linux: process_creation, process_ptrace, bpf_event, library_event,
-      #        filesystem_event, network_connection, network_listen, network_rawsocket,
-      #        login_event, logout_event, url_request, dns_query
-      # macOS: process_creation, library_event, filesystem_event, network_connection,
-      #        login_event, logout_event
-      category: process_creation
-    
-    # Selections - each defines field conditions
-    # Available fields depend on product/category combination
-    selections:
-      - name: selection
-        # Example Windows process_creation fields:
-        # CommandLine, Image, ParentImage, OriginalFileName, md5, sha256, User, etc.
-        field: Image
-        modifiers:
-          - endswith  # all, contains, endswith, startswith, re, cidr, gt, gte, lt, lte, etc.
-        value:
-          - '\malware.exe'
-          - '\suspicious.exe'
-      
-      #- name: filter
-        #field: ParentImage
+    #logsource:
+      #product: 
+      #category: 
+    #selections:
+      #- name: 
+        #field: 
         #modifiers:
-          #- endswith
-        #value:
-          #- '\legitimate.exe'
-    
-    # Boolean condition combining selections
-    condition: selection
-    #condition: selection and not filter
-    
-    #tags:
-      #- attack.execution
-      #- attack.t1059
-    
+          #-
+        #value: 
+    #condition: 
     #false_positives:
-      #- Legitimate software installation
+      #-
   
-  # --- YARA Rule Configuration (alternative to sigma) ---
   #yara:
+    #imports:
+      #-
+  
     #meta:
-      #context: process   # process, thread, memory
-      #os: Windows        # Windows, MacOS, Linux
-    
+      #context:
+        #-
+      #os: 
+      #arch:
+        #-
+      #score: 
+      #classification: 
     #strings: |
-      #$str1 = "malicious_string" ascii
-      #$str2 = { 4D 5A 90 00 }  # MZ header
-      #$re1 = /https?:\/\/[^\s]+/i
-    
+      #...
     #condition: |
-      #uint16(0) == 0x5A4D and all of ($str*)
+      #...

@@ -1,0 +1,31 @@
+[platform]
+enabled = false
+identifier = "harfanglab"
+name = "HarfangLab"
+subschema = "HarfangLab"
+description = """HarfangLab EDR provides advanced threat detection using Sigma rules
+for behavioral detection and YARA rules for memory/file scanning. This integration
+supports deploying detection rules to HarfangLab's threat intelligence API, including
+both Sigma-based behavioral rules and YARA-based scanning rules.
+"""
+flags = [""]
+
+#[[modifiers]]
+#name = "Modifier Demo"
+#description = "Example of using modifiers as a development lifecycle automation"
+#[modifiers.conditions]
+#status = ["STAGING"]
+#[modifiers.modifications]
+#global_state = "alert"
+
+#[[tenants]]
+#name = "Environment::Name"
+#description = "Description"
+#deployment = "ALWAYS" #STAGING, PRODUCTION, MANUAL (only when defined in MDR) or ALWAYS
+#[tenants.setup]
+#proxy = true
+#ssl = true
+#type = "YARA" or "Sigma"
+#url = "" #HarfangLab API URL (e.g., https://harfanglab.example.com)
+#api_token = "$HARFANGLAB_API_TOKEN"
+#source_id = "" #Source identifier for YARA/Sigma rules from this tenant

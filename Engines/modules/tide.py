@@ -653,6 +653,74 @@ class SystemLoader:
                                     scope=group_scoping,
                                     exclusions=exclusions)
 
+    @staticmethod
+    def harfanglab(mdr_config: dict[str, Any]) -> TideModels.MDR.Configurations.HarfangLab:
+        """Build a HarfangLab system configuration object from raw MDR config.
+
+        Parses sigma and yara rule configurations, along with common HarfangLab
+        metadata like maturity, confidence, and action settings.
+
+        Args:
+            mdr_config: A mapping containing harfanglab configuration fields.
+
+        Returns:
+            A ``TideModels.MDR.Configurations.HarfangLab`` instance.
+        """
+        HarfangLab = TideModels.MDR.Configurations.HarfangLab
+        
+        mdr_config, base_config = SystemLoader._base_configuration(mdr_config)
+        mdr_config, rule_id_bundle = SystemLoader._external_rule_id(mdr_config)
+        
+        # Extract HarfangLab-specific fields (REQUIRED, but provide defaults for backwards compatibility)
+        maturity = mdr_config.pop("maturity", "Experimental")
+        confidence = mdr_config.pop("confidence", "Moderate")
+        action = mdr_config.pop("action", "Alert")
+        # Tags are optional, at top level (used by both Sigma and YARA)
+        tags = mdr_config.pop("tags", None)
+        
+        # Parse Sigma configuration if present
+        sigma = None
+        sigma_config = mdr_config.pop("sigma", None)
+        if sigma_config:
+            logsource = HarfangLab.Sigma.LogSource(**sigma_config.pop("logsource"))
+            selections_data = sigma_config.pop("selections", [])
+            selections = [HarfangLab.Sigma.Selection(**sel) for sel in selections_data]
+            sigma = HarfangLab.Sigma(
+                logsource=logsource,
+                selections=selections,
+                condition=sigma_config.pop("condition"),
+                false_positives=sigma_config.pop("false_positives", None)
+            )
+        
+        # Parse YARA configuration if present
+        yara = None
+        yara_config = mdr_config.pop("yara", None)
+        if yara_config:
+            # meta is REQUIRED with context and os
+            meta_config = yara_config.pop("meta")
+            meta = HarfangLab.Yara.Meta(**meta_config)
+            yara = HarfangLab.Yara(
+                meta=meta,
+                strings=yara_config.pop("strings"),
+                condition=yara_config.pop("condition"),
+                imports=yara_config.pop("imports", None)
+            )
+        
+        return HarfangLab(
+            schema=base_config.schema,
+            status=base_config.status,
+            contributors=base_config.contributors,
+            tenants=base_config.tenants,
+            flags=base_config.flags,
+            maturity=maturity,
+            confidence=confidence,
+            action=action,
+            tags=tags,
+            sigma=sigma,
+            yara=yara,
+            rule_id_bundle=rule_id_bundle if rule_id_bundle else None  # type: ignore
+        )
+
 
 class ConfigurationsLoader:
     @staticmethod
@@ -927,6 +995,8 @@ class TideLoader:
             configurations.sentinel_one = SystemLoader.sentinel_one(system_configurations.pop("sentinel_one"))
         if system_configurations.get("crowdstrike"):
             configurations.crowdstrike = SystemLoader.crowdstrike(system_configurations.pop("crowdstrike"))
+        if system_configurations.get("harfanglab"):
+            configurations.harfanglab = SystemLoader.harfanglab(system_configurations.pop("harfanglab"))
 
         return TideModels.MDR(**mdr,
                                 metadata=metadata,
@@ -946,6 +1016,9 @@ class TideLoader:
     @overload
     @staticmethod
     def load_platform_config(platform_config:dict, system:Literal[DetectionSystems.DEFENDER_FOR_ENDPOINT])->TideConfigs.Systems.DefenderForEndpoint.Platform: ...
+    @overload
+    @staticmethod
+    def load_platform_config(platform_config:dict, system:Literal[DetectionSystems.HARFANGLAB])->TideConfigs.Systems.HarfangLab.Platform: ...
     @staticmethod
     def load_platform_config(platform_config:dict, system:DetectionSystems):
         """Load and type a platform configuration for a given detection system.
@@ -987,6 +1060,9 @@ class TideLoader:
 
             case DetectionSystems.SENTINEL_ONE:
                 return TideConfigs.Systems.SentinelOne.Platform(**platform_config)
+
+            case DetectionSystems.HARFANGLAB:
+                return TideConfigs.Systems.HarfangLab.Platform(**platform_config)
 
             case _:
                 return SystemConfig.Platform(**platform_config)
@@ -1090,6 +1166,9 @@ class TideLoader:
 
                 case DetectionSystems.CROWDSTRIKE:
                     setup = TideConfigs.Systems.Crowdstrike.Tenant.Setup(**setup_with_secrets)
+
+                case DetectionSystems.HARFANGLAB:
+                    setup = TideConfigs.Systems.HarfangLab.Tenant.Setup(**setup_with_secrets)
 
                 case _:
                     raise NotImplementedError(f"Platform {platform.name} is not recognized")
@@ -1380,6 +1459,15 @@ class DataTide:
                 platform = TideLoader.load_platform_config(dict(raw["platform"]), DetectionSystems.CROWDSTRIKE)
                 modifiers = TideLoader.load_modifiers_config(raw["modifiers"]) if raw.get("modifiers") else None
                 tenants = TideLoader.load_tenants_config(raw["tenants"], DetectionSystems.CROWDSTRIKE) if raw.get("tenants") else None
+
+            @dataclass
+            class HarfangLab(TideConfigs.Systems.HarfangLab):
+                raw = dict(
+                    IndexTide.load()["configurations"]["systems"]["harfanglab"]
+                )
+                platform = TideLoader.load_platform_config(dict(raw["platform"]), DetectionSystems.HARFANGLAB)
+                modifiers = TideLoader.load_modifiers_config(raw["modifiers"]) if raw.get("modifiers") else None
+                tenants = TideLoader.load_tenants_config(raw["tenants"], DetectionSystems.HARFANGLAB) if raw.get("tenants") else None
 
         @dataclass(frozen=True)
         class Documentation:

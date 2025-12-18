@@ -1,0 +1,3154 @@
+# HarfangLab MDR Configuration Sub-Schema
+# Supports both Sigma rules (behavioral detection) and YARA rules (memory/file scanning)
+# A rule must be either Sigma OR YARA, not both
+#
+# Key Design: Fields are CONDITIONAL based on the logsource hierarchy:
+# product (windows/linux/macos) → category (event type) → available fields
+# Each field is fully documented with its description from HarfangLab documentation.
+
+required:
+  - status
+  - schema
+  - maturity
+  - confidence
+  - action
+
+# Ensure that either sigma or yara is present, but not both
+oneOf:
+  - required: [sigma]
+    not:
+      required: [yara]
+  - required: [yara]
+    not:
+      required: [sigma]
+
+properties:
+  schema:
+    title: Schema identifier and version
+    type: string
+    description: Identifier of the schema at its current version 
+    default: harfanglab::1.0
+    pattern: ^harfanglab::[1-9].[0-9]$
+
+  status: 
+    title: Status of the use-case
+    type: string
+    description: Define the status according to use case development life cycle process
+    tide.config.statuses: True
+
+  contributors:
+    title: Development Contributors
+    type: array
+    description: Individuals who supported creating, enriching or tuning the detection. 
+    items:
+      type: string
+      format: email
+
+  tenants: 
+    title: Target Tenants
+    icon: 🏢
+    description: |
+      Override the default organizations and deploy to selected tenants only.
+    type: array
+    tide.config.system.tenants: harfanglab
+
+  flags:
+    title: Flags
+    icon: 🚩
+    description: Flags allow to customize the rule behaviour using the modifiers framework
+    type: array
+    tide.config.parameter-list: systems.harfanglab.platform.flags
+
+  maturity:
+    title: Rule Maturity
+    description: |
+      Indicates the maturity level of the rule. Maps to HarfangLab's hl_status field.
+    type: string
+    enum:
+      - Stable
+      - Testing
+      - Experimental
+    markdownEnumDescriptions:
+      - Rule has been validated and is production-ready
+      - Rule is being tested and may produce false positives
+      - Rule is experimental and should be used with caution
+
+  confidence:
+    title: Rule Confidence
+    description: |
+      Confidence level of the detection. Maps to HarfangLab's rule_confidence_override field.
+    type: string
+    enum:
+      - Weak
+      - Moderate
+      - Strong
+    markdownEnumDescriptions:
+      - Low confidence - may produce many false positives
+      - Medium confidence - some false positives expected
+      - High confidence - minimal false positives expected
+
+  action:
+    title: Rule Action
+    description: |
+      The action to take when the rule triggers. Maps to HarfangLab's global_state field.
+    type: string
+    enum:
+      - Alert
+      - Alert & Block
+      - Alert, Block & Quarantine
+    markdownEnumDescriptions:
+      - Generate an alert only
+      - Generate an alert and block the threat
+      - Generate an alert, block, and quarantine the affected system
+
+  tags:
+    title: Rule Tags
+    description: |
+      Tags associated with the rule, including MITRE ATT&CK tactics and techniques.
+      Used by both Sigma and YARA rules. For YARA, tags will be serialized to 
+      semicolon-separated format in the meta section.
+    type: array
+    items:
+      type: string
+      pattern: ^(attack\.[a-z_]+|attack\.t[0-9]{4}(\.[0-9]{3})?|cve\.[0-9]{4}\.[0-9]+|[a-z_\.]+)$
+
+  #############################################################################
+  # SIGMA RULE SECTION
+  #############################################################################
+  sigma:
+    title: Sigma Rule Configuration
+    description: |
+      Configuration for Sigma behavioral detection rules. HarfangLab's Sigma engine
+      provides detection based on log sources and event patterns.
+    type: object
+    required:
+      - logsource
+      - selections
+      - condition
+    
+    properties:
+      logsource:
+        title: Log Source
+        description: |
+          Defines the product and category of logs this rule applies to.
+          Product determines which categories are available, and category determines which fields are available.
+        type: object
+        required:
+          - product
+          - category
+        properties:
+          product:
+            title: Product
+            description: The operating system/product generating the logs
+            type: string
+            enum:
+              - windows
+              - linux
+              - macos
+
+          category:
+            title: Category
+            description: The event category (available options depend on selected product)
+            type: string
+
+        # Conditional categories based on product
+        allOf:
+          - if:
+              properties:
+                product:
+                  const: windows
+            then:
+              properties:
+                category:
+                  enum:
+                    - process_creation
+                    - network_connection
+                    - network_dpi
+                    - network_close
+                    - driver_load
+                    - library_event
+                    - remote_thread
+                    - injected_thread
+                    - raw_device_access
+                    - process_access
+                    - process_duplicate_handle
+                    - process_tampered
+                    - etwti_ntallocatevirtualmemory
+                    - registry_event
+                    - named_pipe_creation
+                    - named_pipe_connection
+                    - file_create
+                    - file_read
+                    - file_write
+                    - file_rename
+                    - file_remove
+                    - file_shadowcopy
+                    - file_download
+                    - powershell_event
+                    - url_request
+                    - login_event
+                    - logout_event
+                    - dns_query
+                    - user
+                    - group
+                    - amsi_scan
+                    - service
+                    - scheduled_task
+                    - eventlog
+                    - win32k_getasynckeystate
+                    - win32k_registerrawinputdevices
+                    - win32k_setwindowshookex
+
+          - if:
+              properties:
+                product:
+                  const: linux
+            then:
+              properties:
+                category:
+                  enum:
+                    - process_creation
+                    - process_ptrace
+                    - bpf_event
+                    - library_event
+                    - filesystem_event
+                    - network_connection
+                    - network_listen
+                    - network_rawsocket
+                    - login_event
+                    - logout_event
+                    - url_request
+                    - dns_query
+
+          - if:
+              properties:
+                product:
+                  const: macos
+            then:
+              properties:
+                category:
+                  enum:
+                    - process_creation
+                    - library_event
+                    - filesystem_event
+                    - network_connection
+                    - login_event
+                    - logout_event
+
+      selections:
+        title: Detection Selections
+        description: |
+          List of field selections for the detection rule. Each selection defines
+          a set of field conditions that can be combined using the condition expression.
+        type: array
+        minItems: 1
+        items:
+          type: object
+          required:
+            - name
+            - field
+            - value
+          properties:
+            name:
+              title: Selection Name
+              description: |
+                A unique name for this selection, used in the condition expression.
+              type: string
+              pattern: ^[A-Za-z][A-Za-z0-9_]*$
+
+            field:
+              title: Field Name
+              description: |
+                The field to match against. Available fields depend on selected product and category.
+              type: string
+
+            modifiers:
+              title: Value Modifiers
+              description: |
+                Modifiers to apply to the field matching. Multiple modifiers can be chained
+                to transform or change how values are matched. Modifiers alter the default
+                behavior of field matching (which is case-insensitive string matching).
+              type: array
+              items:
+                type: string
+                enum:
+                  - all
+                  - base64
+                  - base64offset
+                  - cased
+                  - cidr
+                  - contains
+                  - endswith
+                  - exists
+                  - expand
+                  - fieldref
+                  - gt
+                  - gte
+                  - lt
+                  - lte
+                  - re
+                  - startswith
+                  - utf16
+                  - utf16le
+                  - utf16be
+                  - wide
+                  - windash
+                markdownEnumDescriptions:
+                  - "**all** - All values must match (AND instead of OR)"
+                  - "**base64** - Base64 encode the value before matching"
+                  - "**base64offset** - Base64 encode with all 3 offset variants"
+                  - "**cased** - Case-sensitive matching (default is case-insensitive)"
+                  - "**cidr** - Match IP addresses using CIDR notation"
+                  - "**contains** - Value contains the specified substring"
+                  - "**endswith** - Value ends with the specified string"
+                  - "**exists** - Check if field exists (use true/false as value)"
+                  - "**expand** - Expand placeholder values from pipelines"
+                  - "**fieldref** - Reference another field's value"
+                  - "**gt** - Greater than (for numeric comparisons)"
+                  - "**gte** - Greater than or equal to"
+                  - "**lt** - Less than (for numeric comparisons)"
+                  - "**lte** - Less than or equal to"
+                  - "**re** - Regular expression match"
+                  - "**startswith** - Value starts with the specified string"
+                  - "**utf16** - UTF-16 encoding (use with base64 modifiers)"
+                  - "**utf16le** - UTF-16 Little Endian encoding"
+                  - "**utf16be** - UTF-16 Big Endian encoding"
+                  - "**wide** - Wide string encoding, alias for utf16le"
+                  - "**windash** - Windows dash variants (-, /, –, —, ―)"
+
+            value:
+              title: Match Values
+              description: |
+                Values to match against the field. Can be a single value or a list of values.
+                Multiple values are OR'd together by default. Use the 'all' modifier to change
+                this behavior to AND (all values must match).
+              oneOf:
+                - type: string
+                - type: array
+                  items:
+                    type: string
+                - type: boolean
+                - type: integer
+                - type: number
+
+      condition:
+        title: Detection Condition
+        description: |
+          Boolean expression combining selections. Supports AND, OR, NOT operators
+          and parentheses for grouping. Use selection names defined in the selections array.
+          
+          Examples:
+          - `FileDetection and not Exclusions`
+          - `(ProcessMatch or CommandLineMatch) and not Filter`
+          - `selection`
+          - `1 of selection*`
+        type: string
+        pattern: ^[A-Za-z0-9_\s\(\)\*\|]+(\s*(and|or|not|AND|OR|NOT|of)\s*[A-Za-z0-9_\s\(\)\*\|]*)*$
+
+      false_positives:
+        title: Known False Positives
+        description: List of known situations that may trigger false positives
+        type: array
+        items:
+          type: string
+
+    # CONDITIONAL FIELD VALIDATION based on product + category
+    # Each combination exposes specific fields with full descriptions
+    allOf:
+      #########################################################################
+      # WINDOWS PROCESS_CREATION FIELDS
+      #########################################################################
+      - if:
+          properties:
+            logsource:
+              properties:
+                product:
+                  const: windows
+                category:
+                  const: process_creation
+        then:
+          properties:
+            selections:
+              items:
+                properties:
+                  field:
+                    enum:
+                      - CommandLine
+                      - Company
+                      - CurrentDirectory
+                      - Description
+                      - GrandparentImage
+                      - GrandparentIntegrityLevel
+                      - GrandparentCommandLine
+                      - Image
+                      - ImageDriveType
+                      - Imphash
+                      - IntegrityLevel
+                      - InternalName
+                      - FileVersion
+                      - LegalCopyright
+                      - LogonId
+                      - md5
+                      - OriginalFileName
+                      - ParentImage
+                      - ParentCommandLine
+                      - ParentIntegrityLevel
+                      - Product
+                      - ProductVersion
+                      - sha1
+                      - sha256
+                      - User
+                      - UserSID
+                      - Signed
+                      - Signature
+                      - SignatureStatus
+                      - Ancestors
+                      - StackTrace
+                      - MinimalStackTrace
+                      - LnkLinked
+                      - LnkPath
+                      - LnkDriveType
+                      - IsFileObjectTransacted
+                      - AuthentihashSha1
+                      - AuthentihashSha256
+                    markdownEnumDescriptions:
+                      - "**CommandLine** - Process command line"
+                      - "**Company** - Company name from the process image"
+                      - "**CurrentDirectory** - Directory under which the process image was executed"
+                      - "**Description** - File description from the process image"
+                      - "**GrandparentImage** - Path of the grandparent process image"
+                      - "**GrandparentIntegrityLevel** - Grandparent process integrity level"
+                      - "**GrandparentCommandLine** - Grandparent process command line"
+                      - "**Image** - Path of the process image"
+                      - "**ImageDriveType** - Drive type of process image (unknown, removable, fixed, remote, disk_image, ramdisk)"
+                      - "**Imphash** - Imphash of the process image"
+                      - "**IntegrityLevel** - Process integrity level"
+                      - "**InternalName** - Internal file name from the process image"
+                      - "**FileVersion** - File version from the process image"
+                      - "**LegalCopyright** - Legal copyright from the process image"
+                      - "**LogonId** - Login ID of the user who created the new process"
+                      - "**md5** - MD5 hash of the process image"
+                      - "**OriginalFileName** - Original file name from the process image"
+                      - "**ParentImage** - Path of the parent process image"
+                      - "**ParentCommandLine** - Parent process command line"
+                      - "**ParentIntegrityLevel** - Parent process integrity level"
+                      - "**Product** - Product name from the process image"
+                      - "**ProductVersion** - Product version from the process image"
+                      - "**sha1** - SHA1 hash of the process image"
+                      - "**sha256** - SHA256 hash of the process image"
+                      - "**User** - The user that created this process"
+                      - "**UserSID** - The user security identifier (SID)"
+                      - "**Signed** - true if the process is signed, false otherwise (matched as string)"
+                      - "**Signature** - Signer name of the process"
+                      - "**SignatureStatus** - Status of the signature (Valid or empty string if not signed)"
+                      - "**Ancestors** - Process ancestors images joined by | (e.g. C:\\parent.exe|C:\\grandparent.exe)"
+                      - "**StackTrace** - Full stacktrace leading to the event (e.g. ntdll.dll!NtCreateFile+0x200|...)"
+                      - "**MinimalStackTrace** - Simplified stacktrace (ntdll.dll|kernel32.dll|UNKNOWN|...)"
+                      - "**LnkLinked** - true if process was loaded from a .lnk file (matched as string)"
+                      - "**LnkPath** - Path of the Windows LNK file that started the process"
+                      - "**LnkDriveType** - Drive type of the LNK file (unknown, removable, fixed, remote, disk_image, ramdisk)"
+                      - "**IsFileObjectTransacted** - Whether the file object is subject to NTFS transaction"
+                      - "**AuthentihashSha1** - SHA1 of the authenticode-signed data of the process image"
+                      - "**AuthentihashSha256** - SHA256 of the authenticode-signed data of the process image"
+
+      #########################################################################
+      # WINDOWS NETWORK_CONNECTION FIELDS
+      #########################################################################
+      - if:
+          properties:
+            logsource:
+              properties:
+                product:
+                  const: windows
+                category:
+                  const: network_connection
+        then:
+          properties:
+            selections:
+              items:
+                properties:
+                  field:
+                    enum:
+                      - DestinationPort
+                      - DestinationIp
+                      - DestinationNames
+                      - DestinationHostname
+                      - DestinationIsIpv6
+                      - Image
+                      - Initiated
+                      - Protocol
+                      - ProtocolNumber
+                      - SourcePort
+                      - SourceIp
+                      - SourceIsIpv6
+                      - User
+                      - ConnectionGuid
+                    markdownEnumDescriptions:
+                      - "**DestinationPort** - Destination port number"
+                      - "**DestinationIp** - Destination IP address"
+                      - "**DestinationNames** - DNS names used to resolve the destination IP address"
+                      - "**DestinationHostname** - Alias of DestinationNames"
+                      - "**DestinationIsIpv6** - true if the destination IP is IPv6, false otherwise (matched as string)"
+                      - "**Image** - Path of the process that initiated the network connection"
+                      - "**Initiated** - Indicates if the process initiated the network connection"
+                      - "**Protocol** - Protocol used for the connection (tcp/udp or empty string)"
+                      - "**ProtocolNumber** - IANA protocol number (tcp=6, udp=17)"
+                      - "**SourcePort** - Source port number"
+                      - "**SourceIp** - Source IP address"
+                      - "**SourceIsIpv6** - true if the source IP is IPv6, false otherwise (matched as string)"
+                      - "**User** - User associated with the process that initiated the connection"
+                      - "**ConnectionGuid** - Unique identifier for the network connection"
+
+      #########################################################################
+      # WINDOWS DRIVER_LOAD FIELDS
+      #########################################################################
+      - if:
+          properties:
+            logsource:
+              properties:
+                product:
+                  const: windows
+                category:
+                  const: driver_load
+        then:
+          properties:
+            selections:
+              items:
+                properties:
+                  field:
+                    enum:
+                      - ImageLoaded
+                      - Signed
+                      - Signature
+                      - SignatureStatus
+                      - DriverMd5
+                      - DriverSha1
+                      - DriverSha256
+                      - Company
+                      - Description
+                      - FileVersion
+                      - InternalName
+                      - LegalCopyright
+                      - OriginalFileName
+                      - Product
+                      - ProductVersion
+                      - AuthentihashSha1
+                      - AuthentihashSha256
+                    markdownEnumDescriptions:
+                      - "**ImageLoaded** - Path of the loaded driver"
+                      - "**Signed** - true if the loaded driver is signed, false otherwise (matched as string)"
+                      - "**Signature** - Signer name of the loaded driver"
+                      - "**SignatureStatus** - Status of the signature (Valid or empty string if not signed)"
+                      - "**DriverMd5** - MD5 hash of the loaded driver"
+                      - "**DriverSha1** - SHA1 hash of the loaded driver"
+                      - "**DriverSha256** - SHA256 hash of the loaded driver"
+                      - "**Company** - Company name from the loaded driver"
+                      - "**Description** - File description from the loaded driver"
+                      - "**FileVersion** - File version from the loaded driver"
+                      - "**InternalName** - Internal file name from the loaded driver"
+                      - "**LegalCopyright** - Legal copyright from the loaded driver"
+                      - "**OriginalFileName** - Original file name from the loaded driver"
+                      - "**Product** - Product name from the loaded driver"
+                      - "**ProductVersion** - Product version from the loaded driver"
+                      - "**AuthentihashSha1** - SHA1 of the authenticode-signed data of the loaded driver"
+                      - "**AuthentihashSha256** - SHA256 of the authenticode-signed data of the loaded driver"
+
+      #########################################################################
+      # WINDOWS LIBRARY_EVENT FIELDS
+      #########################################################################
+      - if:
+          properties:
+            logsource:
+              properties:
+                product:
+                  const: windows
+                category:
+                  const: library_event
+        then:
+          properties:
+            selections:
+              items:
+                properties:
+                  field:
+                    enum:
+                      - Company
+                      - Description
+                      - FileVersion
+                      - InternalName
+                      - Image
+                      - ImageLoaded
+                      - ImageLoadedDriveType
+                      - LegalCopyright
+                      - OriginalFileName
+                      - Product
+                      - ProductVersion
+                      - Signed
+                      - Signature
+                      - SignatureStatus
+                      - StackTrace
+                      - MinimalStackTrace
+                      - AppDomainID
+                      - AssemblyFlags
+                      - AssemblyFlagsStr
+                      - FullyQualifiedAssemblyName
+                      - AssemblyName
+                      - AssemblyVersion
+                      - AssemblyCulture
+                      - AssemblyToken
+                      - ModuleFlags
+                      - ModuleFlagsStr
+                      - ModuleILPath
+                      - ModuleNativePath
+                      - ManagedPdbBuildPath
+                      - NativePdbBuildPath
+                      - LibraryType
+                      - AuthentihashSha1
+                      - AuthentihashSha256
+                    markdownEnumDescriptions:
+                      - "**Company** - Company name from the image loaded"
+                      - "**Description** - File description from the image loaded"
+                      - "**FileVersion** - File version from the image loaded"
+                      - "**InternalName** - Internal file name from the image loaded"
+                      - "**Image** - Path of the process that loaded the image"
+                      - "**ImageLoaded** - Path of the image loaded"
+                      - "**ImageLoadedDriveType** - Drive type of the image loaded (unknown, removable, fixed, remote, disk_image, ramdisk)"
+                      - "**LegalCopyright** - Legal copyright from the image loaded"
+                      - "**OriginalFileName** - Original file name from the image loaded"
+                      - "**Product** - Product name from the image loaded"
+                      - "**ProductVersion** - Product version from the image loaded"
+                      - "**Signed** - true if image is signed (matched as string)"
+                      - "**Signature** - Signer name of the image loaded"
+                      - "**SignatureStatus** - Status of the signature (Valid or empty string if not signed)"
+                      - "**StackTrace** - Full stacktrace leading to the event"
+                      - "**MinimalStackTrace** - Simplified stacktrace (ntdll.dll|kernel32.dll|UNKNOWN|...)"
+                      - "**AppDomainID** - Identifier for the .NET application domain where assembly is loaded"
+                      - "**AssemblyFlags** - Flags that describe characteristics of the assembly"
+                      - "**AssemblyFlagsStr** - Assembly flags as pipe-separated string values"
+                      - "**FullyQualifiedAssemblyName** - Complete name of assembly including version, culture, public key token"
+                      - "**AssemblyName** - Name of the assembly"
+                      - "**AssemblyVersion** - Version of the assembly"
+                      - "**AssemblyCulture** - Culture of the assembly"
+                      - "**AssemblyToken** - Public key token of the assembly"
+                      - "**ModuleFlags** - Flags providing additional information about the module"
+                      - "**ModuleFlagsStr** - Module flags as pipe-separated string values"
+                      - "**ModuleILPath** - Path to the Intermediate Language file for the module"
+                      - "**ModuleNativePath** - Path to the native image file for the module"
+                      - "**ManagedPdbBuildPath** - Build path for the PDB of the managed code"
+                      - "**NativePdbBuildPath** - Build path for the PDB of the native code"
+                      - "**LibraryType** - Type of the library (Native or Managed), Windows only"
+                      - "**AuthentihashSha1** - SHA1 of the authenticode-signed data of the loaded image"
+                      - "**AuthentihashSha256** - SHA256 of the authenticode-signed data of the loaded image"
+
+      #########################################################################
+      # WINDOWS REMOTE_THREAD FIELDS
+      #########################################################################
+      - if:
+          properties:
+            logsource:
+              properties:
+                product:
+                  const: windows
+                category:
+                  const: remote_thread
+        then:
+          properties:
+            selections:
+              items:
+                properties:
+                  field:
+                    enum:
+                      - NewThreadId
+                      - SourceProcessId
+                      - SourceImage
+                      - StartAddress
+                      - StartModule
+                      - StartFunction
+                      - TargetProcessId
+                      - StackTrace
+                      - MinimalStackTrace
+                    markdownEnumDescriptions:
+                      - "**NewThreadId** - ID of the new remote thread created in the target process"
+                      - "**SourceProcessId** - ID of the source process that created the remote thread"
+                      - "**SourceImage** - Path of the source process that created the remote thread"
+                      - "**StartAddress** - New thread start address (8-digit padded hex, e.g. 0x0010006D)"
+                      - "**StartModule** - Start module of the thread start address (empty string if unknown)"
+                      - "**StartFunction** - Start function from image export table (empty string if not found)"
+                      - "**TargetProcessId** - ID of the target process"
+                      - "**StackTrace** - Full stacktrace leading to the event"
+                      - "**MinimalStackTrace** - Simplified stacktrace (ntdll.dll|kernel32.dll|UNKNOWN|...)"
+
+      #########################################################################
+      # WINDOWS INJECTED_THREAD FIELDS
+      #########################################################################
+      - if:
+          properties:
+            logsource:
+              properties:
+                product:
+                  const: windows
+                category:
+                  const: injected_thread
+        then:
+          properties:
+            selections:
+              items:
+                properties:
+                  field:
+                    enum:
+                      - TargetProcessId
+                      - TargetImage
+                      - SourceProcessId
+                      - SourceImage
+                      - NewThreadId
+                      - StartAddress
+                      - RegionBaseAddress
+                      - RegionSize
+                      - RegionStateHex
+                      - RegionState
+                      - RegionProtectionHex
+                      - RegionProtection
+                      - RegionTypeHex
+                      - RegionType
+                      - RegionAllocationBase
+                      - RegionAllocationProtectionHex
+                      - RegionAllocationProtection
+                      - RegionAllocationSize
+                      - RegionMappedFile
+                      - RegionDump
+                      - ThreadDump
+                      - StackTrace
+                      - MinimalStackTrace
+                      - IsRemoteThread
+                    markdownEnumDescriptions:
+                      - "**TargetProcessId** - ID of the target process"
+                      - "**TargetImage** - Path of the target process"
+                      - "**SourceProcessId** - ID of the source process that created the injected thread"
+                      - "**SourceImage** - Path of the source process that created the injected thread"
+                      - "**NewThreadId** - ID of the new injected thread created in the target process"
+                      - "**StartAddress** - New thread start address (8-digit padded hex, e.g. 0x0010006D)"
+                      - "**RegionBaseAddress** - New thread's region base address (hex)"
+                      - "**RegionSize** - New thread's region size in bytes"
+                      - "**RegionStateHex** - State flags of the pages in the region in hexadecimal (e.g. 0x00003000)"
+                      - "**RegionState** - State flags as string (e.g. MEM_COMMIT | MEM_RESERVE)"
+                      - "**RegionProtectionHex** - Protection flags of the pages in hexadecimal (e.g. 0x00000040)"
+                      - "**RegionProtection** - Protection flags as string (e.g. PAGE_EXECUTE_READWRITE)"
+                      - "**RegionTypeHex** - Type flags of the pages in hexadecimal (e.g. 0x00020000)"
+                      - "**RegionType** - Type flags as string (e.g. MEM_PRIVATE)"
+                      - "**RegionAllocationBase** - Base address of range of pages allocated by VirtualAlloc (hex)"
+                      - "**RegionAllocationProtectionHex** - Protection flags when region was initially allocated (hex)"
+                      - "**RegionAllocationProtection** - Initial protection flags as string"
+                      - "**RegionAllocationSize** - Total size of the allocation in bytes"
+                      - "**RegionMappedFile** - DOS path of the file mapped at allocation's address (if any)"
+                      - "**RegionDump** - First 128 bytes of the thread's memory region in hexadecimal"
+                      - "**ThreadDump** - First 128 bytes after the thread's start address in hexadecimal"
+                      - "**StackTrace** - Full stacktrace leading to the event"
+                      - "**MinimalStackTrace** - Simplified stacktrace (ntdll.dll|kernel32.dll|UNKNOWN|...)"
+                      - "**IsRemoteThread** - Boolean value holding whether the thread is being injected in a remote process"
+
+      #########################################################################
+      # WINDOWS RAW_DEVICE_ACCESS FIELDS
+      #########################################################################
+      - if:
+          properties:
+            logsource:
+              properties:
+                product:
+                  const: windows
+                category:
+                  const: raw_device_access
+        then:
+          properties:
+            selections:
+              items:
+                properties:
+                  field:
+                    enum:
+                      - Image
+                      - Device
+                      - DesiredAccess
+                      - DesiredAccessStr
+                      - StackTrace
+                      - MinimalStackTrace
+                    markdownEnumDescriptions:
+                      - "**Image** - Path of the process that performed the raw device access"
+                      - "**Device** - Device targeted by the raw device access"
+                      - "**DesiredAccess** - Access Mask asked by the calling process (integer)"
+                      - "**DesiredAccessStr** - String translation of the Access Mask"
+                      - "**StackTrace** - Full stacktrace leading to the event"
+                      - "**MinimalStackTrace** - Simplified stacktrace (ntdll.dll|kernel32.dll|UNKNOWN|...)"
+
+      #########################################################################
+      # WINDOWS PROCESS_ACCESS FIELDS
+      #########################################################################
+      - if:
+          properties:
+            logsource:
+              properties:
+                product:
+                  const: windows
+                category:
+                  const: process_access
+        then:
+          properties:
+            selections:
+              items:
+                properties:
+                  field:
+                    enum:
+                      - CallTrace
+                      - StackTrace
+                      - MinimalStackTrace
+                      - GrantedAccess
+                      - GrantedAccessStr
+                      - SourceImage
+                      - TargetImage
+                      - TargetProcessCommandLine
+                      - TargetProcessCompany
+                      - TargetProcessCurrentDirectory
+                      - TargetProcessDescription
+                      - TargetProcessFileVersion
+                      - TargetProcessGrandparentCommandLine
+                      - TargetProcessGrandparentImage
+                      - TargetProcessGrandparentIntegrityLevel
+                      - TargetProcessImage
+                      - TargetProcessImphash
+                      - TargetProcessIntegrityLevel
+                      - TargetProcessInternalName
+                      - TargetProcessLegalCopyright
+                      - TargetProcessLogonId
+                      - TargetProcessMd5
+                      - TargetProcessName
+                      - TargetProcessOriginalFileName
+                      - TargetProcessParentCommandLine
+                      - TargetProcessParentImage
+                      - TargetProcessParentIntegrityLevel
+                      - TargetProcessPETimestamp
+                      - TargetProcessProduct
+                      - TargetProcessProductVersion
+                      - TargetProcessSha1
+                      - TargetProcessSha256
+                      - TargetProcessSignature
+                      - TargetProcessSignatureStatus
+                      - TargetProcessSigned
+                      - TargetProcessSignatureRootDisplayName
+                      - TargetProcessSignatureRootIssuerName
+                      - TargetProcessSignatureRootSerialNumber
+                      - TargetProcessSignatureRootThumbprint
+                      - TargetProcessSignatureSignerDisplayName
+                      - TargetProcessSignatureSignerIssuerName
+                      - TargetProcessSignatureSignerSerialNumber
+                      - TargetProcessSignatureSignerThumbprint
+                      - TargetProcessSize
+                      - TargetProcessUser
+                      - TargetProcessUserSID
+                    markdownEnumDescriptions:
+                      - "**CallTrace** - Calltrace of the source thread"
+                      - "**StackTrace** - Full stacktrace leading to the event"
+                      - "**MinimalStackTrace** - Simplified stacktrace"
+                      - "**GrantedAccess** - Access flags requested for the target process"
+                      - "**GrantedAccessStr** - Access flags as string"
+                      - "**SourceImage** - Path of the source process that opened the target process"
+                      - "**TargetImage** - Path of the target process"
+                      - "**TargetProcessCommandLine** - Target process command line"
+                      - "**TargetProcessCompany** - Target process company name"
+                      - "**TargetProcessCurrentDirectory** - Target process current directory"
+                      - "**TargetProcessDescription** - Target process description"
+                      - "**TargetProcessFileVersion** - Target process file version"
+                      - "**TargetProcessGrandparentCommandLine** - Target process grandparent command line"
+                      - "**TargetProcessGrandparentImage** - Target process grandparent image"
+                      - "**TargetProcessGrandparentIntegrityLevel** - Target process grandparent integrity level"
+                      - "**TargetProcessImage** - Target process image"
+                      - "**TargetProcessImphash** - Target process import hash"
+                      - "**TargetProcessIntegrityLevel** - Target process integrity level"
+                      - "**TargetProcessInternalName** - Target process internal name"
+                      - "**TargetProcessLegalCopyright** - Target process legal copyright"
+                      - "**TargetProcessLogonId** - Logon ID of the user who created the target process"
+                      - "**TargetProcessMd5** - Target process MD5 hash"
+                      - "**TargetProcessName** - Target process name"
+                      - "**TargetProcessOriginalFileName** - Target process original file name"
+                      - "**TargetProcessParentCommandLine** - Parent command line of the target process"
+                      - "**TargetProcessParentImage** - Parent image of the target process"
+                      - "**TargetProcessParentIntegrityLevel** - Parent process integrity level"
+                      - "**TargetProcessPETimestamp** - PE timestamp of the target process image"
+                      - "**TargetProcessProduct** - Product name of the target process image"
+                      - "**TargetProcessProductVersion** - Product version of the target process image"
+                      - "**TargetProcessSha1** - Target process SHA1 hash"
+                      - "**TargetProcessSha256** - Target process SHA256 hash"
+                      - "**TargetProcessSignature** - Signature of the target process image"
+                      - "**TargetProcessSignatureStatus** - Signature status (Valid or empty string if not signed)"
+                      - "**TargetProcessSigned** - Boolean indicating whether the target process is signed"
+                      - "**TargetProcessSignatureRootDisplayName** - Root CA name"
+                      - "**TargetProcessSignatureRootIssuerName** - Root issuer name"
+                      - "**TargetProcessSignatureRootSerialNumber** - Root CA serial number"
+                      - "**TargetProcessSignatureRootThumbprint** - Root thumbprint"
+                      - "**TargetProcessSignatureSignerDisplayName** - Signer name"
+                      - "**TargetProcessSignatureSignerIssuerName** - Signer issuer name"
+                      - "**TargetProcessSignatureSignerSerialNumber** - Signer serial number"
+                      - "**TargetProcessSignatureSignerThumbprint** - Signer thumbprint"
+                      - "**TargetProcessSize** - Image size of the target process (in bytes)"
+                      - "**TargetProcessUser** - User who initiated the target process"
+                      - "**TargetProcessUserSID** - SID of the user who initiated the target process"
+
+      #########################################################################
+      # WINDOWS DNS_QUERY FIELDS
+      #########################################################################
+      - if:
+          properties:
+            logsource:
+              properties:
+                product:
+                  const: windows
+                category:
+                  const: dns_query
+        then:
+          properties:
+            selections:
+              items:
+                properties:
+                  field:
+                    enum:
+                      - QueryName
+                      - QueryType
+                      - QueryStatusCategory
+                      - IpAddresses
+                      - TextRecords
+                      - QueryStatus
+                      - QueryResults
+                      - Image
+                      - User
+                    markdownEnumDescriptions:
+                      - "**QueryName** - Requested domain name"
+                      - "**QueryType** - The DNS query type (A, AAAA, TXT, etc.)"
+                      - "**QueryStatusCategory** - Status of query: success, connection_error, timeout, name_not_found, record_not_found, invalid_reply"
+                      - "**IpAddresses** - The addresses returned by the resolution"
+                      - "**TextRecords** - The text records returned by a TXT query"
+                      - "**QueryStatus** - The raw return code of the resolution"
+                      - "**QueryResults** - The raw resolution results"
+                      - "**Image** - Path of the process that initiated the DNS resolution"
+                      - "**User** - The user associated to the process that initiated the DNS resolution"
+
+      #########################################################################
+      # WINDOWS FILE_CREATE FIELDS
+      #########################################################################
+      - if:
+          properties:
+            logsource:
+              properties:
+                product:
+                  const: windows
+                category:
+                  const: file_create
+        then:
+          properties:
+            selections:
+              items:
+                properties:
+                  field:
+                    enum:
+                      - Path
+                      - TargetFilename
+                      - FileName
+                      - FileDriveType
+                      - StackTrace
+                      - MinimalStackTrace
+                    markdownEnumDescriptions:
+                      - "**Path** - Path of the file being created"
+                      - "**TargetFilename** - Alias for Path"
+                      - "**FileName** - Alias for Path"
+                      - "**FileDriveType** - Drive type of the file (unknown, removable, fixed, remote, disk_image, ramdisk)"
+                      - "**StackTrace** - Full stacktrace leading to the event"
+                      - "**MinimalStackTrace** - Simplified stacktrace"
+
+      #########################################################################
+      # WINDOWS FILE_READ FIELDS
+      #########################################################################
+      - if:
+          properties:
+            logsource:
+              properties:
+                product:
+                  const: windows
+                category:
+                  const: file_read
+        then:
+          properties:
+            selections:
+              items:
+                properties:
+                  field:
+                    enum:
+                      - Path
+                      - TargetFilename
+                      - FileName
+                      - FileDriveType
+                      - StackTrace
+                      - MinimalStackTrace
+                    markdownEnumDescriptions:
+                      - "**Path** - Path of the file being read"
+                      - "**TargetFilename** - Alias for Path"
+                      - "**FileName** - Alias for Path"
+                      - "**FileDriveType** - Drive type of the file (unknown, removable, fixed, remote, disk_image, ramdisk)"
+                      - "**StackTrace** - Full stacktrace leading to the event"
+                      - "**MinimalStackTrace** - Simplified stacktrace"
+
+      #########################################################################
+      # WINDOWS FILE_WRITE FIELDS
+      #########################################################################
+      - if:
+          properties:
+            logsource:
+              properties:
+                product:
+                  const: windows
+                category:
+                  const: file_write
+        then:
+          properties:
+            selections:
+              items:
+                properties:
+                  field:
+                    enum:
+                      - Path
+                      - TargetFilename
+                      - FileName
+                      - FileDriveType
+                      - FirstBytes
+                      - StackTrace
+                      - MinimalStackTrace
+                    markdownEnumDescriptions:
+                      - "**Path** - Path of the file being written"
+                      - "**TargetFilename** - Alias for Path"
+                      - "**FileName** - Alias for Path"
+                      - "**FileDriveType** - Drive type of the file (unknown, removable, fixed, remote, disk_image, ramdisk)"
+                      - "**FirstBytes** - First 16 bytes written to the file (hex)"
+                      - "**StackTrace** - Full stacktrace leading to the event"
+                      - "**MinimalStackTrace** - Simplified stacktrace"
+
+      #########################################################################
+      # WINDOWS FILE_RENAME FIELDS
+      #########################################################################
+      - if:
+          properties:
+            logsource:
+              properties:
+                product:
+                  const: windows
+                category:
+                  const: file_rename
+        then:
+          properties:
+            selections:
+              items:
+                properties:
+                  field:
+                    enum:
+                      - Path
+                      - TargetPath
+                      - FileDriveType
+                      - StackTrace
+                      - MinimalStackTrace
+                    markdownEnumDescriptions:
+                      - "**Path** - Path of the file being renamed"
+                      - "**TargetPath** - New path of the file"
+                      - "**FileDriveType** - Drive type of the file (unknown, removable, fixed, remote, disk_image, ramdisk)"
+                      - "**StackTrace** - Full stacktrace leading to the event"
+                      - "**MinimalStackTrace** - Simplified stacktrace"
+
+      #########################################################################
+      # WINDOWS FILE_REMOVE FIELDS
+      #########################################################################
+      - if:
+          properties:
+            logsource:
+              properties:
+                product:
+                  const: windows
+                category:
+                  const: file_remove
+        then:
+          properties:
+            selections:
+              items:
+                properties:
+                  field:
+                    enum:
+                      - Path
+                      - TargetFilename
+                      - FileName
+                      - FileDriveType
+                      - StackTrace
+                      - MinimalStackTrace
+                    markdownEnumDescriptions:
+                      - "**Path** - Path of the file being removed"
+                      - "**TargetFilename** - Alias for Path"
+                      - "**FileName** - Alias for Path"
+                      - "**FileDriveType** - Drive type of the file (unknown, removable, fixed, remote, disk_image, ramdisk)"
+                      - "**StackTrace** - Full stacktrace leading to the event"
+                      - "**MinimalStackTrace** - Simplified stacktrace"
+
+      #########################################################################
+      # WINDOWS FILE_SHADOWCOPY FIELDS
+      #########################################################################
+      - if:
+          properties:
+            logsource:
+              properties:
+                product:
+                  const: windows
+                category:
+                  const: file_shadowcopy
+        then:
+          properties:
+            selections:
+              items:
+                properties:
+                  field:
+                    enum:
+                      - Path
+                      - TargetFilename
+                      - FileName
+                      - FileDriveType
+                      - CreateOptions
+                      - CreateOptionsStr
+                      - CreateDisposition
+                      - CreateDispositionStr
+                      - StackTrace
+                      - MinimalStackTrace
+                    markdownEnumDescriptions:
+                      - "**Path** - Path of the file"
+                      - "**TargetFilename** - Alias for Path"
+                      - "**FileName** - Alias for Path"
+                      - "**FileDriveType** - Drive type of the file"
+                      - "**CreateOptions** - File creation options (integer)"
+                      - "**CreateOptionsStr** - Translated file creation options"
+                      - "**CreateDisposition** - File disposition value"
+                      - "**CreateDispositionStr** - Translated file disposition value"
+                      - "**StackTrace** - Full stacktrace leading to the event"
+                      - "**MinimalStackTrace** - Simplified stacktrace"
+
+      #########################################################################
+      # WINDOWS FILE_DOWNLOAD FIELDS
+      #########################################################################
+      - if:
+          properties:
+            logsource:
+              properties:
+                product:
+                  const: windows
+                category:
+                  const: file_download
+        then:
+          properties:
+            selections:
+              items:
+                properties:
+                  field:
+                    enum:
+                      - Path
+                      - TargetFilename
+                      - FileName
+                      - FileDriveType
+                      - Kind
+                      - SourceUrl
+                      - SourceUrlScheme
+                      - SourceUrlHost
+                      - SourceUrlPort
+                      - SourceUrlPath
+                      - SourceUrlQueryParams
+                      - SourceUrlUsername
+                      - SourceUrlPassword
+                      - UrlZone
+                      - ZoneId
+                      - HostUrl
+                      - ReferrerUrl
+                      - HostIpAddress
+                      - SourceIpAddress
+                      - AppZoneId
+                      - LastWriterPackageFamilyName
+                      - StackTrace
+                      - MinimalStackTrace
+                    markdownEnumDescriptions:
+                      - "**Path** - Path of the file being downloaded"
+                      - "**TargetFilename** - Alias for Path"
+                      - "**FileName** - Alias for Path"
+                      - "**FileDriveType** - Drive type of the file"
+                      - "**Kind** - download"
+                      - "**SourceUrl** - URL from which the file was downloaded"
+                      - "**SourceUrlScheme** - Scheme of the URL"
+                      - "**SourceUrlHost** - Host where the file is located"
+                      - "**SourceUrlPort** - Port used to access the file"
+                      - "**SourceUrlPath** - Path of the file in the URL"
+                      - "**SourceUrlQueryParams** - Query parameters"
+                      - "**SourceUrlUsername** - Username used"
+                      - "**SourceUrlPassword** - Password used"
+                      - "**UrlZone** - URL Security Zone"
+                      - "**ZoneId** - ID of the URL Zone"
+                      - "**HostUrl** - URL from which file was downloaded"
+                      - "**ReferrerUrl** - Referrer URL"
+                      - "**HostIpAddress** - IP address from which file was downloaded"
+                      - "**SourceIpAddress** - IP address from which file was downloaded"
+                      - "**AppZoneId** - URL Zone ID of downloaded Windows App"
+                      - "**LastWriterPackageFamilyName** - Package family name of last app to edit"
+                      - "**StackTrace** - Full stacktrace leading to the event"
+                      - "**MinimalStackTrace** - Simplified stacktrace"
+
+      #########################################################################
+      # WINDOWS REGISTRY_EVENT FIELDS
+      #########################################################################
+      - if:
+          properties:
+            logsource:
+              properties:
+                product:
+                  const: windows
+                category:
+                  const: registry_event
+        then:
+          properties:
+            selections:
+              items:
+                properties:
+                  field:
+                    enum:
+                      - EventType
+                      - Image
+                      - TargetObject
+                      - Details
+                      - PreviousDetails
+                      - DetailsAdded
+                      - DetailsRemoved
+                      - IsPreviousDetailsSet
+                      - ValueType
+                      - NewName
+                      - HivePath
+                      - StackTrace
+                      - MinimalStackTrace
+                    markdownEnumDescriptions:
+                      - "**EventType** - Type: CreateKey, DeleteKey, SetValue, RenameKey, SaveKey, ReadValue"
+                      - "**Image** - Path of the process that generated the registry event"
+                      - "**TargetObject** - Complete path of the registry key/value"
+                      - "**Details** - Value data or details of the registry operation"
+                      - "**PreviousDetails** - Previous value before the operation"
+                      - "**DetailsAdded** - List of strings added (REG_MULTI_SZ only)"
+                      - "**DetailsRemoved** - List of strings removed (REG_MULTI_SZ only)"
+                      - "**IsPreviousDetailsSet** - Whether a previous value existed"
+                      - "**ValueType** - Type of the registry value (REG_SZ, REG_DWORD, etc.)"
+                      - "**NewName** - New name for rename operations"
+                      - "**HivePath** - Path where hive will be saved (SaveKey only)"
+                      - "**StackTrace** - Full stacktrace leading to the event"
+                      - "**MinimalStackTrace** - Simplified stacktrace"
+
+      #########################################################################
+      # LINUX PROCESS_CREATION FIELDS
+      #########################################################################
+      - if:
+          properties:
+            logsource:
+              properties:
+                product:
+                  const: linux
+                category:
+                  const: process_creation
+        then:
+          properties:
+            selections:
+              items:
+                properties:
+                  field:
+                    enum:
+                      - Image
+                      - CommandLine
+                      - CurrentDirectory
+                      - md5
+                      - sha1
+                      - sha256
+                      - User
+                      - RealUsername
+                      - EffectiveUsername
+                      - SavedUsername
+                      - RealGroup
+                      - EffectiveGroup
+                      - SavedGroup
+                      - ParentImage
+                      - ParentCommandLine
+                      - GrandparentImage
+                      - GrandparentCommandLine
+                      - Ancestors
+                      - MemfdName
+                    markdownEnumDescriptions:
+                      - "**Image** - Path of the process image"
+                      - "**CommandLine** - Process command line"
+                      - "**CurrentDirectory** - Directory under which the process image was executed"
+                      - "**md5** - MD5 hash of the process image"
+                      - "**sha1** - SHA1 hash of the process image"
+                      - "**sha256** - SHA256 hash of the process image"
+                      - "**User** - Alias of RealUsername"
+                      - "**RealUsername** - Name of the real user (uid) of the newly created process"
+                      - "**EffectiveUsername** - Name of the effective user (euid) of the newly created process"
+                      - "**SavedUsername** - Name of the saved user (suid) of the newly created process"
+                      - "**RealGroup** - Name of the real group (gid) that created this process"
+                      - "**EffectiveGroup** - Name of the effective group (egid) that created the process"
+                      - "**SavedGroup** - Name of the saved group (sgid) that created the process"
+                      - "**ParentImage** - Path of the parent process image"
+                      - "**ParentCommandLine** - Parent process command line"
+                      - "**GrandparentImage** - Path of the grandparent process image"
+                      - "**GrandparentCommandLine** - Grandparent process command line"
+                      - "**Ancestors** - Process ancestors images joined by | (e.g. /usr/bin/parent|/usr/bin/grandparent|...)"
+                      - "**MemfdName** - Name of the memfd used to execute the process filelessly"
+
+      #########################################################################
+      # LINUX FILESYSTEM_EVENT FIELDS
+      #########################################################################
+      - if:
+          properties:
+            logsource:
+              properties:
+                product:
+                  const: linux
+                category:
+                  const: filesystem_event
+        then:
+          properties:
+            selections:
+              items:
+                properties:
+                  field:
+                    enum:
+                      - Kind
+                      - Path
+                      - TargetPath
+                      - Mode
+                      - PrettyMode
+                      - OldMode
+                      - PrettyOldMode
+                      - Uid
+                      - Gid
+                      - FileMd5
+                      - FileSha1
+                      - FileSha256
+                      - FileSize
+                    markdownEnumDescriptions:
+                      - "**Kind** - Kind of operation (read, write, remove, rename, chmod, chown, symlink, hardlink, written_executable)"
+                      - "**Path** - Path to the file being operated on"
+                      - "**TargetPath** - Target path for rename/symlink operations"
+                      - "**Mode** - New file mode in octal form (e.g. 0601)"
+                      - "**PrettyMode** - New file mode in rwx form (e.g. rw------x for mode 0601)"
+                      - "**OldMode** - Old file mode in octal form (e.g. 0601)"
+                      - "**PrettyOldMode** - Old file mode in rwx form"
+                      - "**Uid** - ID of the user owning the file after the operation"
+                      - "**Gid** - ID of the group owning the file after the operation"
+                      - "**FileMd5** - MD5 hash of the executable file written to disk"
+                      - "**FileSha1** - SHA1 hash of the executable file written to disk"
+                      - "**FileSha256** - SHA256 hash of the executable file written to disk"
+                      - "**FileSize** - Size in bytes of the executable file written to disk"
+
+      #########################################################################
+      # LINUX NETWORK_CONNECTION FIELDS
+      #########################################################################
+      - if:
+          properties:
+            logsource:
+              properties:
+                product:
+                  const: linux
+                category:
+                  const: network_connection
+        then:
+          properties:
+            selections:
+              items:
+                properties:
+                  field:
+                    enum:
+                      - DestinationIp
+                      - DestinationNames
+                      - DestinationHostname
+                      - DestinationIsIpv6
+                      - DestinationPort
+                      - Protocol
+                      - ProtocolNumber
+                      - Initiated
+                      - SourceIp
+                      - SourceIsIpv6
+                      - SourcePort
+                    markdownEnumDescriptions:
+                      - "**DestinationIp** - Destination IP address"
+                      - "**DestinationNames** - DNS names used to resolve the destination IP address"
+                      - "**DestinationHostname** - Alias of DestinationNames"
+                      - "**DestinationIsIpv6** - true if destination IP is IPv6 (matched as string)"
+                      - "**DestinationPort** - Destination port number"
+                      - "**Protocol** - Protocol used (tcp/udp or empty string if not known)"
+                      - "**ProtocolNumber** - IANA protocol number (tcp=6, udp=17)"
+                      - "**Initiated** - Indicates if the process initiated the network connection"
+                      - "**SourceIp** - Source IP address"
+                      - "**SourceIsIpv6** - true if source IP is IPv6 (matched as string)"
+                      - "**SourcePort** - Source port number"
+
+      #########################################################################
+      # LINUX DNS_QUERY FIELDS
+      #########################################################################
+      - if:
+          properties:
+            logsource:
+              properties:
+                product:
+                  const: linux
+                category:
+                  const: dns_query
+        then:
+          properties:
+            selections:
+              items:
+                properties:
+                  field:
+                    enum:
+                      - QueryName
+                      - QueryType
+                      - QueryStatusCategory
+                      - IpAddresses
+                      - TextRecords
+                      - Image
+                      - User
+                    markdownEnumDescriptions:
+                      - "**QueryName** - Requested domain name"
+                      - "**QueryType** - The DNS query type (A, AAAA, TXT, etc.)"
+                      - "**QueryStatusCategory** - Status of query: success, connection_error, timeout, name_not_found, record_not_found, invalid_reply"
+                      - "**IpAddresses** - The addresses returned by the resolution (may be empty for TXT requests)"
+                      - "**TextRecords** - Text records returned by TXT query (empty for other types)"
+                      - "**Image** - Path of the process that initiated the DNS resolution"
+                      - "**User** - User associated with the process that initiated the DNS resolution"
+
+      #########################################################################
+      # LINUX LOGIN_EVENT FIELDS
+      #########################################################################
+      - if:
+          properties:
+            logsource:
+              properties:
+                product:
+                  const: linux
+                category:
+                  const: login_event
+        then:
+          properties:
+            selections:
+              items:
+                properties:
+                  field:
+                    enum:
+                      - Success
+                      - Kind
+                      - TargetUid
+                      - TargetUsername
+                      - TargetGid
+                      - TargetGroup
+                      - SourceUsername
+                      - SourceHost
+                      - Tty
+                    markdownEnumDescriptions:
+                      - "**Success** - true if the authentication was successful, false otherwise"
+                      - "**Kind** - How the authentication occurred (authenticate or session_open)"
+                      - "**TargetUid** - UID of the user being logged into"
+                      - "**TargetUsername** - Name of the user being logged into"
+                      - "**TargetGid** - Group ID (gid) of the user being logged into"
+                      - "**TargetGroup** - Group name of the user being logged into"
+                      - "**SourceUsername** - Username of the process causing the login"
+                      - "**SourceHost** - IP of the user logging in, in case of remote logins (e.g. ssh)"
+                      - "**Tty** - Path to the terminal device that initiated the authentication (e.g. /dev/tty1)"
+
+      #########################################################################
+      # MACOS PROCESS_CREATION FIELDS
+      #########################################################################
+      - if:
+          properties:
+            logsource:
+              properties:
+                product:
+                  const: macos
+                category:
+                  const: process_creation
+        then:
+          properties:
+            selections:
+              items:
+                properties:
+                  field:
+                    enum:
+                      - Image
+                      - CommandLine
+                      - CurrentDirectory
+                      - User
+                      - ParentImage
+                      - ParentCommandLine
+                      - GrandparentImage
+                      - GrandparentCommandLine
+                      - md5
+                      - sha1
+                      - sha256
+                      - Ancestors
+                      - RealUsername
+                      - EffectiveUsername
+                      - RealGroup
+                      - EffectiveGroup
+                      - CdHash
+                      - Signed
+                      - SignatureTeamId
+                      - SignatureSigningId
+                      - CodesigningFlags
+                      - CodesigningFlagsStr
+                      - IsPlatformBinary
+                    markdownEnumDescriptions:
+                      - "**Image** - Path of the process image"
+                      - "**CommandLine** - Process command line"
+                      - "**CurrentDirectory** - Directory under which the process image was executed"
+                      - "**User** - Alias of RealUsername"
+                      - "**ParentImage** - Path of the parent process image"
+                      - "**ParentCommandLine** - Parent process command line"
+                      - "**GrandparentImage** - Path of the grandparent process image"
+                      - "**GrandparentCommandLine** - Grandparent process command line"
+                      - "**md5** - MD5 hash of the process image"
+                      - "**sha1** - SHA1 hash of the process image"
+                      - "**sha256** - SHA256 hash of the process image"
+                      - "**Ancestors** - Process ancestors images joined by |"
+                      - "**RealUsername** - Name of the real user (uid) of the newly created process"
+                      - "**EffectiveUsername** - Name of the effective user (euid) of the newly created process"
+                      - "**RealGroup** - Name of the real group (gid) that created this process"
+                      - "**EffectiveGroup** - Name of the effective group (egid) that created the process"
+                      - "**CdHash** - CDHash of the process"
+                      - "**Signed** - true if the process loaded is signed (matched as string)"
+                      - "**SignatureTeamId** - TeamID responsible for signing the binary"
+                      - "**SignatureSigningId** - Signing identifier of the binary (e.g. com.apple.MRT)"
+                      - "**CodesigningFlags** - Code signature flags as an integer"
+                      - "**CodesigningFlagsStr** - Code signature flags as a string (e.g. CS_VALID|CS_SIGNED)"
+                      - "**IsPlatformBinary** - true if the process is part of the operating system (matched as string)"
+
+      #########################################################################
+      # MACOS NETWORK_CONNECTION FIELDS
+      #########################################################################
+      - if:
+          properties:
+            logsource:
+              properties:
+                product:
+                  const: macos
+                category:
+                  const: network_connection
+        then:
+          properties:
+            selections:
+              items:
+                properties:
+                  field:
+                    enum:
+                      - DestinationPort
+                      - DestinationIp
+                      - DestinationNames
+                      - DestinationHostname
+                      - DestinationIsIpv6
+                      - Image
+                      - Initiated
+                      - Protocol
+                      - ProtocolNumber
+                      - SourcePort
+                      - SourceIp
+                      - SourceIsIpv6
+                      - User
+                    markdownEnumDescriptions:
+                      - "**DestinationPort** - Destination port number"
+                      - "**DestinationIp** - Destination IP address"
+                      - "**DestinationNames** - DNS names used to resolve the destination IP address"
+                      - "**DestinationHostname** - Alias of DestinationNames"
+                      - "**DestinationIsIpv6** - true if destination IP is IPv6 (matched as string)"
+                      - "**Image** - Path of the process that initiated the network connection"
+                      - "**Initiated** - Indicates if the process initiated the network connection"
+                      - "**Protocol** - Protocol used (tcp/udp or empty string if not known)"
+                      - "**ProtocolNumber** - IANA protocol number (tcp=6, udp=17)"
+                      - "**SourcePort** - Source port number"
+                      - "**SourceIp** - Source IP address"
+                      - "**SourceIsIpv6** - true if source IP is IPv6 (matched as string)"
+                      - "**User** - User associated with the process that initiated the network connection"
+
+      #########################################################################
+      # MACOS LOGIN_EVENT FIELDS
+      #########################################################################
+      - if:
+          properties:
+            logsource:
+              properties:
+                product:
+                  const: macos
+                category:
+                  const: login_event
+        then:
+          properties:
+            selections:
+              items:
+                properties:
+                  field:
+                    enum:
+                      - Success
+                      - LoginMethod
+                      - TargetUsername
+                      - SourceAddress
+                    markdownEnumDescriptions:
+                      - "**Success** - true if the authentication was successful, false otherwise"
+                      - "**LoginMethod** - Authentication method (open_directory, touch_id, token, auto_unlock, session_login, session_unlock, screensharing_attach, openssh_login, login_login)"
+                      - "**TargetUsername** - Name of the user being logged into"
+                      - "**SourceAddress** - IP address of the machine from which the logon attempt was performed"
+
+      #########################################################################
+      # MACOS LOGOUT_EVENT FIELDS
+      #########################################################################
+      - if:
+          properties:
+            logsource:
+              properties:
+                product:
+                  const: macos
+                category:
+                  const: logout_event
+        then:
+          properties:
+            selections:
+              items:
+                properties:
+                  field:
+                    enum:
+                      - TargetUsername
+                      - LogoutMethod
+                      - SourceAddress
+                    markdownEnumDescriptions:
+                      - "**TargetUsername** - Name of the user logging out"
+                      - "**LogoutMethod** - Method of logout (session_logout, session_lock, openssh_logout, login_logout, screensharing_detach)"
+                      - "**SourceAddress** - IP address of the machine from which the logout was performed"
+
+      #########################################################################
+      # MACOS LIBRARY_EVENT FIELDS
+      #########################################################################
+      - if:
+          properties:
+            logsource:
+              properties:
+                product:
+                  const: macos
+                category:
+                  const: library_event
+        then:
+          properties:
+            selections:
+              items:
+                properties:
+                  field:
+                    enum:
+                      - Image
+                      - ImageLoaded
+                    markdownEnumDescriptions:
+                      - "**Image** - Path of the process that loaded the library"
+                      - "**ImageLoaded** - Path of the Dylib library loaded"
+
+      #########################################################################
+      # MACOS FILESYSTEM_EVENT FIELDS
+      #########################################################################
+      - if:
+          properties:
+            logsource:
+              properties:
+                product:
+                  const: macos
+                category:
+                  const: filesystem_event
+        then:
+          properties:
+            selections:
+              items:
+                properties:
+                  field:
+                    enum:
+                      - Kind
+                      - Path
+                      - TargetPath
+                      - Mode
+                      - PrettyMode
+                      - OldMode
+                      - PrettyOldMode
+                      - Uid
+                      - Gid
+                      - FileMd5
+                      - FileSha1
+                      - FileSha256
+                      - FileSize
+                    markdownEnumDescriptions:
+                      - "**Kind** - Kind of operation (create, read, write, remove, rename, chmod, chown, symlink, hardlink, written_executable)"
+                      - "**Path** - Path to the file being operated on"
+                      - "**TargetPath** - Target path for rename/link operations"
+                      - "**Mode** - New file mode in octal form (e.g. 0601)"
+                      - "**PrettyMode** - New file mode in rwx form (e.g. rw------x)"
+                      - "**OldMode** - Old file mode in octal form"
+                      - "**PrettyOldMode** - Old file mode in rwx form"
+                      - "**Uid** - ID of user owning file after operation"
+                      - "**Gid** - ID of group owning file after operation"
+                      - "**FileMd5** - MD5 hash of executable file written to disk"
+                      - "**FileSha1** - SHA1 hash of executable file written to disk"
+                      - "**FileSha256** - SHA256 hash of executable file written to disk"
+                      - "**FileSize** - Size in bytes of executable file written to disk"
+
+      #########################################################################
+      # LINUX PROCESS_PTRACE FIELDS
+      #########################################################################
+      - if:
+          properties:
+            logsource:
+              properties:
+                product:
+                  const: linux
+                category:
+                  const: process_ptrace
+        then:
+          properties:
+            selections:
+              items:
+                properties:
+                  field:
+                    enum:
+                      - SourceImage
+                      - SourceProcessId
+                      - TargetImage
+                      - TargetProcessId
+                      - PtraceRequest
+                      - PtraceRequestStr
+                      - PtraceOptions
+                      - PtraceOptionsStr
+                      - TargetIsChild
+                    markdownEnumDescriptions:
+                      - "**SourceImage** - Path of the process calling ptrace"
+                      - "**SourceProcessId** - PID of the process calling ptrace"
+                      - "**TargetImage** - Path of the process that is the target of the ptrace operation"
+                      - "**TargetProcessId** - PID of the target process"
+                      - "**PtraceRequest** - Operation to be performed on the target process"
+                      - "**PtraceRequestStr** - Operation as string (e.g. PTRACE_POKETEXT)"
+                      - "**PtraceOptions** - Optional flags for SEIZE and SETOPTIONS operations"
+                      - "**PtraceOptionsStr** - Optional flags as string (e.g. PTRACE_O_EXITKILL|PTRACE_O_TRACEFORK)"
+                      - "**TargetIsChild** - true if target process is direct child of source process"
+
+      #########################################################################
+      # LINUX BPF_EVENT FIELDS
+      #########################################################################
+      - if:
+          properties:
+            logsource:
+              properties:
+                product:
+                  const: linux
+                category:
+                  const: bpf_event
+        then:
+          properties:
+            selections:
+              items:
+                properties:
+                  field:
+                    enum:
+                      - Image
+                      - Kind
+                      - InstructionCount
+                      - BpfDump
+                      - ProgramLoaded
+                      - ProgramType
+                      - ProgramTypeStr
+                      - ProgramFlags
+                      - ProgramFlagsStr
+                      - ExpectedAttachType
+                      - ExpectedAttachTypeStr
+                      - FunctionHooked
+                    markdownEnumDescriptions:
+                      - "**Image** - Path of the process that loaded/attached the BPF program"
+                      - "**Kind** - Kind of operation (cbpf_load, ebpf_load, ebpf_attach)"
+                      - "**InstructionCount** - Number of BPF instructions loaded"
+                      - "**BpfDump** - First 128 bytes of the BPF program in hexadecimal"
+                      - "**ProgramLoaded** - Name of the eBPF program (16 character string)"
+                      - "**ProgramType** - Type of the eBPF program loaded"
+                      - "**ProgramTypeStr** - Program type as string (e.g. BPF_PROG_TYPE_KPROBE)"
+                      - "**ProgramFlags** - Flags for the program"
+                      - "**ProgramFlagsStr** - Program flags as string (e.g. BPF_F_STRICT_ALIGNMENT)"
+                      - "**ExpectedAttachType** - Expected attach type for the program"
+                      - "**ExpectedAttachTypeStr** - Expected attach type as string (e.g. BPF_LSM_CGROUP)"
+                      - "**FunctionHooked** - Function hooked by eBPF (e.g. do_unlinkat or syscalls:sys_enter_openat)"
+
+      #########################################################################
+      # LINUX LIBRARY_EVENT FIELDS
+      #########################################################################
+      - if:
+          properties:
+            logsource:
+              properties:
+                product:
+                  const: linux
+                category:
+                  const: library_event
+        then:
+          properties:
+            selections:
+              items:
+                properties:
+                  field:
+                    enum:
+                      - Image
+                      - ImageLoaded
+                      - ImageSize
+                      - Hashes
+                    markdownEnumDescriptions:
+                      - "**Image** - Path of the process that loaded the library"
+                      - "**ImageLoaded** - Path of the shared library (.so) loaded"
+                      - "**ImageSize** - Size of memory allocated to map the library"
+                      - "**Hashes** - Hashes of the library file"
+
+      #########################################################################
+      # LINUX NETWORK_LISTEN FIELDS
+      #########################################################################
+      - if:
+          properties:
+            logsource:
+              properties:
+                product:
+                  const: linux
+                category:
+                  const: network_listen
+        then:
+          properties:
+            selections:
+              items:
+                properties:
+                  field:
+                    enum:
+                      - Address
+                      - Port
+                    markdownEnumDescriptions:
+                      - "**Address** - IP address the network server is bound to"
+                      - "**Port** - Port of the network server"
+
+      #########################################################################
+      # LINUX NETWORK_RAWSOCKET FIELDS
+      #########################################################################
+      - if:
+          properties:
+            logsource:
+              properties:
+                product:
+                  const: linux
+                category:
+                  const: network_rawsocket
+        then:
+          properties:
+            selections:
+              items:
+                properties:
+                  field:
+                    enum:
+                      - SocketFamily
+                      - SocketType
+                      - SocketProtocol
+                    markdownEnumDescriptions:
+                      - "**SocketFamily** - Integer value of the socket family (AF_INET, AF_PACKET, etc.)"
+                      - "**SocketType** - Integer value for the type of socket (SOCK_RAW, SOCK_DGRAM, etc.)"
+                      - "**SocketProtocol** - Integer value of the protocol of the socket"
+
+      #########################################################################
+      # LINUX LOGOUT_EVENT FIELDS
+      #########################################################################
+      - if:
+          properties:
+            logsource:
+              properties:
+                product:
+                  const: linux
+                category:
+                  const: logout_event
+        then:
+          properties:
+            selections:
+              items:
+                properties:
+                  field:
+                    enum:
+                      - TargetUid
+                      - TargetUsername
+                      - TargetGid
+                      - TargetGroup
+                      - SourceUsername
+                      - SourceHost
+                      - Tty
+                    markdownEnumDescriptions:
+                      - "**TargetUid** - UID of the user logging out"
+                      - "**TargetUsername** - Name of the user logging out"
+                      - "**TargetGid** - Group ID of the user logging out"
+                      - "**TargetGroup** - Group name of the user logging out"
+                      - "**SourceUsername** - Username of the process that caused the authentication"
+                      - "**SourceHost** - IP of the user logging out (for remote logins)"
+                      - "**Tty** - Path to the terminal device (e.g. /dev/tty1)"
+
+      #########################################################################
+      # LINUX URL_REQUEST FIELDS
+      #########################################################################
+      - if:
+          properties:
+            logsource:
+              properties:
+                product:
+                  const: linux
+                category:
+                  const: url_request
+        then:
+          properties:
+            selections:
+              items:
+                properties:
+                  field:
+                    enum:
+                      - RequestUrl
+                      - RequestUrlScheme
+                      - RequestUrlHost
+                      - RequestUrlPort
+                      - RequestUrlPath
+                      - RequestUrlQueryParams
+                      - RequestUrlUsername
+                      - RequestUrlPassword
+                    markdownEnumDescriptions:
+                      - "**RequestUrl** - URL to the resource requested"
+                      - "**RequestUrlScheme** - Scheme of the URL (http, https, etc.)"
+                      - "**RequestUrlHost** - Host where the resource is located"
+                      - "**RequestUrlPort** - Port used to access the resource"
+                      - "**RequestUrlPath** - Path of the resource on the targeted host"
+                      - "**RequestUrlQueryParams** - Query parameters used to access the resource"
+                      - "**RequestUrlUsername** - Username used to access the resource"
+                      - "**RequestUrlPassword** - Password used to access the resource"
+
+      #########################################################################
+      # WINDOWS NETWORK_DPI FIELDS
+      #########################################################################
+      - if:
+          properties:
+            logsource:
+              properties:
+                product:
+                  const: windows
+                category:
+                  const: network_dpi
+        then:
+          properties:
+            selections:
+              items:
+                properties:
+                  field:
+                    enum:
+                      - DestinationPort
+                      - DestinationIp
+                      - DestinationNames
+                      - DestinationHostname
+                      - DestinationIsIpv6
+                      - Image
+                      - Initiated
+                      - Protocol
+                      - ProtocolNumber
+                      - SourcePort
+                      - SourceIp
+                      - SourceIsIpv6
+                      - User
+                      - ConnectionGuid
+                      - IncomingApplicationProtocol
+                      - OutgoingApplicationProtocol
+                      - OutgoingTlsVersion
+                      - OutgoingTlsSni
+                      - OutgoingTlsAlpn
+                      - OutgoingTlsJa3
+                      - OutgoingTlsJa3n
+                      - OutgoingTlsJa4
+                      - IncomingTlsVersion
+                      - IncomingTlsAlpn
+                      - IncomingTlsJa3s
+                      - IncomingTlsCertificateThumbprintSha1
+                      - IncomingTlsCertificateThumbprintSha256
+                      - IncomingTlsCertificateDisplayName
+                      - IncomingTlsCertificateIssuerName
+                      - OutgoingHttpRequestVersion
+                      - OutgoingHttpRequestContentType
+                      - OutgoingHttpRequestContentLength
+                      - OutgoingHttpRequestMethod
+                      - OutgoingHttpRequestPath
+                      - OutgoingHttpRequestUserAgent
+                      - OutgoingHttpRequestHost
+                      - OutgoingHttpRequestReferer
+                      - OutgoingHttpRequestCookies
+                      - IncomingHttpResponseVersion
+                      - IncomingHttpResponseContentType
+                      - IncomingHttpResponseContentLength
+                      - IncomingHttpResponseCode
+                      - IncomingHttpResponseLastModified
+                      - IncomingHttpResponseServer
+                      - OutgoingSshProtoVersion
+                      - OutgoingSshSoftwareVersion
+                      - OutgoingSshBannerComments
+                      - IncomingSshProtoVersion
+                      - IncomingSshSoftwareVersion
+                      - IncomingSshBannerComments
+                      - IncomingSshServerPubkeyAndCertAlgo
+                      - IncomingSshServerFingerprint
+                    markdownEnumDescriptions:
+                      - "**DestinationPort** - Destination port number"
+                      - "**DestinationIp** - Destination IP address"
+                      - "**DestinationNames** - DNS names used to resolve the destination IP"
+                      - "**DestinationHostname** - Alias of DestinationNames"
+                      - "**DestinationIsIpv6** - true if destination is IPv6 (matched as string)"
+                      - "**Image** - Path of the process that initiated the connection"
+                      - "**Initiated** - Indicates if the process initiated the connection"
+                      - "**Protocol** - Protocol used (tcp/udp or empty)"
+                      - "**ProtocolNumber** - IANA protocol number"
+                      - "**SourcePort** - Source port number"
+                      - "**SourceIp** - Source IP address"
+                      - "**SourceIsIpv6** - true if source is IPv6 (matched as string)"
+                      - "**User** - User associated with the process"
+                      - "**ConnectionGuid** - Unique identifier for the connection"
+                      - "**IncomingApplicationProtocol** - Incoming application protocol (HTTP/TLS/SSH)"
+                      - "**OutgoingApplicationProtocol** - Outgoing application protocol (HTTP/TLS/SSH)"
+                      - "**OutgoingTlsVersion** - Outgoing TLS protocol version"
+                      - "**OutgoingTlsSni** - Outgoing TLS Server Name Indication"
+                      - "**OutgoingTlsAlpn** - Outgoing TLS Application-Layer Protocol Negotiation"
+                      - "**OutgoingTlsJa3** - Outgoing TLS JA3 hash"
+                      - "**OutgoingTlsJa3n** - Outgoing TLS JA3n hash"
+                      - "**OutgoingTlsJa4** - Outgoing TLS JA4 hash"
+                      - "**IncomingTlsVersion** - Incoming TLS protocol version"
+                      - "**IncomingTlsAlpn** - Incoming TLS ALPN"
+                      - "**IncomingTlsJa3s** - Incoming TLS JA3s hash"
+                      - "**IncomingTlsCertificateThumbprintSha1** - SHA1 thumbprint of server certificate"
+                      - "**IncomingTlsCertificateThumbprintSha256** - SHA256 thumbprint of server certificate"
+                      - "**IncomingTlsCertificateDisplayName** - Signer name of server certificate"
+                      - "**IncomingTlsCertificateIssuerName** - Issuer name of server certificate"
+                      - "**OutgoingHttpRequestVersion** - HTTP protocol version for outgoing request"
+                      - "**OutgoingHttpRequestContentType** - Content-Type header for outgoing HTTP request"
+                      - "**OutgoingHttpRequestContentLength** - Size of request payload in bytes"
+                      - "**OutgoingHttpRequestMethod** - HTTP method (GET, POST, PUT, etc.)"
+                      - "**OutgoingHttpRequestPath** - Request-URI path of outgoing HTTP request"
+                      - "**OutgoingHttpRequestUserAgent** - User-Agent header value"
+                      - "**OutgoingHttpRequestHost** - Host header value"
+                      - "**OutgoingHttpRequestReferer** - Referer header value"
+                      - "**OutgoingHttpRequestCookies** - Cookies in the outgoing HTTP request"
+                      - "**IncomingHttpResponseVersion** - HTTP version in incoming response"
+                      - "**IncomingHttpResponseContentType** - Content-Type in incoming HTTP response"
+                      - "**IncomingHttpResponseContentLength** - Size of response payload in bytes"
+                      - "**IncomingHttpResponseCode** - HTTP status code (e.g. 200, 404)"
+                      - "**IncomingHttpResponseLastModified** - Last-Modified header value"
+                      - "**IncomingHttpResponseServer** - Server header value"
+                      - "**OutgoingSshProtoVersion** - SSH protocol version from client"
+                      - "**OutgoingSshSoftwareVersion** - SSH software version from client"
+                      - "**OutgoingSshBannerComments** - SSH banner comments from client"
+                      - "**IncomingSshProtoVersion** - SSH protocol version from server"
+                      - "**IncomingSshSoftwareVersion** - SSH software version from server"
+                      - "**IncomingSshBannerComments** - SSH banner comments from server"
+                      - "**IncomingSshServerPubkeyAndCertAlgo** - Public key algorithm used by SSH server"
+                      - "**IncomingSshServerFingerprint** - Fingerprint of SSH server host key"
+
+      #########################################################################
+      # WINDOWS NETWORK_CLOSE FIELDS
+      #########################################################################
+      - if:
+          properties:
+            logsource:
+              properties:
+                product:
+                  const: windows
+                category:
+                  const: network_close
+        then:
+          properties:
+            selections:
+              items:
+                properties:
+                  field:
+                    enum:
+                      - DestinationPort
+                      - DestinationIp
+                      - DestinationNames
+                      - DestinationHostname
+                      - DestinationIsIpv6
+                      - Image
+                      - Initiated
+                      - Protocol
+                      - ProtocolNumber
+                      - SourcePort
+                      - SourceIp
+                      - SourceIsIpv6
+                      - User
+                      - ConnectionGuid
+                      - ConnectionSuccessful
+                      - IncomingBytesCount
+                      - OutgoingBytesCount
+                      - IncomingApplicationProtocol
+                      - OutgoingApplicationProtocol
+                    markdownEnumDescriptions:
+                      - "**DestinationPort** - Destination port number"
+                      - "**DestinationIp** - Destination IP address"
+                      - "**DestinationNames** - DNS names used to resolve the destination IP"
+                      - "**DestinationHostname** - Alias of DestinationNames"
+                      - "**DestinationIsIpv6** - true if destination is IPv6 (matched as string)"
+                      - "**Image** - Path of the process that initiated the connection"
+                      - "**Initiated** - Indicates if the process initiated the connection"
+                      - "**Protocol** - Protocol used (tcp/udp or empty)"
+                      - "**ProtocolNumber** - IANA protocol number"
+                      - "**SourcePort** - Source port number"
+                      - "**SourceIp** - Source IP address"
+                      - "**SourceIsIpv6** - true if source is IPv6 (matched as string)"
+                      - "**User** - User associated with the process"
+                      - "**ConnectionGuid** - Unique identifier for the connection"
+                      - "**ConnectionSuccessful** - true if connection was successful (matched as string)"
+                      - "**IncomingBytesCount** - Amount of incoming data in bytes"
+                      - "**OutgoingBytesCount** - Amount of outgoing data in bytes"
+                      - "**IncomingApplicationProtocol** - Incoming application protocol (HTTP/TLS/SSH)"
+                      - "**OutgoingApplicationProtocol** - Outgoing application protocol (HTTP/TLS/SSH)"
+
+      #########################################################################
+      # WINDOWS NAMED_PIPE_CREATION FIELDS
+      #########################################################################
+      - if:
+          properties:
+            logsource:
+              properties:
+                product:
+                  const: windows
+                category:
+                  const: named_pipe_creation
+        then:
+          properties:
+            selections:
+              items:
+                properties:
+                  field:
+                    enum:
+                      - PipeName
+                      - NamedPipeType
+                      - InboundQuota
+                      - OutboundQuota
+                      - MaximumInstances
+                      - DesiredAccess
+                      - Kind
+                      - StackTrace
+                      - MinimalStackTrace
+                    markdownEnumDescriptions:
+                      - "**PipeName** - Name of the created Named Pipe (format: \\PIPENAME)"
+                      - "**NamedPipeType** - Type of the created Named Pipe (integer)"
+                      - "**InboundQuota** - Inbound quota of the pipe (hex string, e.g. 0x4000)"
+                      - "**OutboundQuota** - Outbound quota of the pipe (hex string)"
+                      - "**MaximumInstances** - Maximum number of instances for the pipe"
+                      - "**DesiredAccess** - Desired access permissions (hex string)"
+                      - "**Kind** - Named pipe operation, value: creation"
+                      - "**StackTrace** - Full stacktrace leading to the event"
+                      - "**MinimalStackTrace** - Simplified stacktrace"
+
+      #########################################################################
+      # WINDOWS NAMED_PIPE_CONNECTION FIELDS
+      #########################################################################
+      - if:
+          properties:
+            logsource:
+              properties:
+                product:
+                  const: windows
+                category:
+                  const: named_pipe_connection
+        then:
+          properties:
+            selections:
+              items:
+                properties:
+                  field:
+                    enum:
+                      - PipeName
+                      - Kind
+                      - StackTrace
+                      - MinimalStackTrace
+                      - TargetProcessCommandLine
+                      - TargetProcessCompany
+                      - TargetProcessCurrentDirectory
+                      - TargetProcessDescription
+                      - TargetProcessFileVersion
+                      - TargetProcessGrandparentCommandLine
+                      - TargetProcessGrandparentImage
+                      - TargetProcessGrandparentIntegrityLevel
+                      - TargetProcessImage
+                      - TargetProcessImphash
+                      - TargetProcessIntegrityLevel
+                      - TargetProcessInternalName
+                      - TargetProcessLegalCopyright
+                      - TargetProcessLogonId
+                      - TargetProcessMd5
+                      - TargetProcessName
+                      - TargetProcessOriginalFileName
+                      - TargetProcessParentCommandLine
+                      - TargetProcessParentImage
+                      - TargetProcessParentIntegrityLevel
+                      - TargetProcessPETimestamp
+                      - TargetProcessProduct
+                      - TargetProcessProductVersion
+                      - TargetProcessSha1
+                      - TargetProcessSha256
+                      - TargetProcessSignature
+                      - TargetProcessSignatureStatus
+                      - TargetProcessSigned
+                      - TargetProcessSignatureRootDisplayName
+                      - TargetProcessSignatureRootIssuerName
+                      - TargetProcessSignatureRootSerialNumber
+                      - TargetProcessSignatureRootThumbprint
+                      - TargetProcessSignatureSignerDisplayName
+                      - TargetProcessSignatureSignerIssuerName
+                      - TargetProcessSignatureSignerSerialNumber
+                      - TargetProcessSignatureSignerThumbprint
+                      - TargetProcessSize
+                      - TargetProcessUser
+                      - TargetProcessUserSID
+                    markdownEnumDescriptions:
+                      - "**PipeName** - Name of the Named Pipe (format: \\PIPENAME)"
+                      - "**Kind** - Named pipe operation, value: connection"
+                      - "**StackTrace** - Full stacktrace leading to the event"
+                      - "**MinimalStackTrace** - Simplified stacktrace"
+                      - "**TargetProcessCommandLine** - Target process command line"
+                      - "**TargetProcessCompany** - Target process company"
+                      - "**TargetProcessCurrentDirectory** - Target process current directory"
+                      - "**TargetProcessDescription** - Target process description"
+                      - "**TargetProcessFileVersion** - Target process file version"
+                      - "**TargetProcessGrandparentCommandLine** - Target process grandparent command line"
+                      - "**TargetProcessGrandparentImage** - Target process grandparent image"
+                      - "**TargetProcessGrandparentIntegrityLevel** - Target process grandparent integrity level"
+                      - "**TargetProcessImage** - Target process image"
+                      - "**TargetProcessImphash** - Target process import hash"
+                      - "**TargetProcessIntegrityLevel** - Target process integrity level"
+                      - "**TargetProcessInternalName** - Target process internal name"
+                      - "**TargetProcessLegalCopyright** - Target process legal copyright"
+                      - "**TargetProcessLogonId** - Target process logon ID"
+                      - "**TargetProcessMd5** - Target process MD5"
+                      - "**TargetProcessName** - Target process name"
+                      - "**TargetProcessOriginalFileName** - Target process original file name"
+                      - "**TargetProcessParentCommandLine** - Target process parent command line"
+                      - "**TargetProcessParentImage** - Target process parent image"
+                      - "**TargetProcessParentIntegrityLevel** - Target process parent integrity level"
+                      - "**TargetProcessPETimestamp** - Target process PE timestamp"
+                      - "**TargetProcessProduct** - Target process product"
+                      - "**TargetProcessProductVersion** - Target process product version"
+                      - "**TargetProcessSha1** - Target process SHA1"
+                      - "**TargetProcessSha256** - Target process SHA256"
+                      - "**TargetProcessSignature** - Target process signature"
+                      - "**TargetProcessSignatureStatus** - Target process signature status"
+                      - "**TargetProcessSigned** - Target process signed"
+                      - "**TargetProcessSignatureRootDisplayName** - Target process root CA name"
+                      - "**TargetProcessSignatureRootIssuerName** - Target process root issuer name"
+                      - "**TargetProcessSignatureRootSerialNumber** - Target process root serial number"
+                      - "**TargetProcessSignatureRootThumbprint** - Target process root thumbprint"
+                      - "**TargetProcessSignatureSignerDisplayName** - Target process signer name"
+                      - "**TargetProcessSignatureSignerIssuerName** - Target process signer issuer name"
+                      - "**TargetProcessSignatureSignerSerialNumber** - Target process signer serial number"
+                      - "**TargetProcessSignatureSignerThumbprint** - Target process signer thumbprint"
+                      - "**TargetProcessSize** - Target process size"
+                      - "**TargetProcessUser** - Target process user"
+                      - "**TargetProcessUserSID** - Target process user SID"
+
+      #########################################################################
+      # WINDOWS PROCESS_TAMPERED FIELDS
+      #########################################################################
+      - if:
+          properties:
+            logsource:
+              properties:
+                product:
+                  const: windows
+                category:
+                  const: process_tampered
+        then:
+          properties:
+            selections:
+              items:
+                properties:
+                  field:
+                    enum:
+                      - Image
+                      - Type
+                    markdownEnumDescriptions:
+                      - "**Image** - Image of the tampered process"
+                      - "**Type** - Type of tampering (Image is replaced, Image is locked for access, Image is deleted)"
+
+      #########################################################################
+      # WINDOWS PROCESS_DUPLICATE_HANDLE FIELDS
+      #########################################################################
+      - if:
+          properties:
+            logsource:
+              properties:
+                product:
+                  const: windows
+                category:
+                  const: process_duplicate_handle
+        then:
+          properties:
+            selections:
+              items:
+                properties:
+                  field:
+                    enum:
+                      - CallerImage
+                      - CallerProcessId
+                      - SourceImage
+                      - SourceProcessId
+                      - DestinationImage
+                      - DestinationProcessId
+                      - TargetImage
+                      - TargetProcessId
+                      - GrantedAccess
+                      - GrantedAccessStr
+                      - CallTrace
+                      - StackTrace
+                      - MinimalStackTrace
+                      - CallerIsDestination
+                    markdownEnumDescriptions:
+                      - "**CallerImage** - Path of the process calling DuplicateHandle"
+                      - "**CallerProcessId** - ID of the process calling DuplicateHandle"
+                      - "**SourceImage** - Path of the process with the handle to be duplicated"
+                      - "**SourceProcessId** - ID of the process with the handle to be duplicated"
+                      - "**DestinationImage** - Path of the process to receive the duplicated handle"
+                      - "**DestinationProcessId** - ID of the process to receive the duplicated handle"
+                      - "**TargetImage** - Path of the process that is target of handle operation"
+                      - "**TargetProcessId** - ID of the process that is target of handle operation"
+                      - "**GrantedAccess** - Access flags requested for the target process"
+                      - "**GrantedAccessStr** - Access flags as string"
+                      - "**CallTrace** - Calltrace of the caller thread"
+                      - "**StackTrace** - Full stacktrace leading to the event"
+                      - "**MinimalStackTrace** - Simplified stacktrace"
+                      - "**CallerIsDestination** - true if caller process is the destination process"
+
+      #########################################################################
+      # WINDOWS ETWTI_NTALLOCATEVIRTUALMEMORY FIELDS
+      #########################################################################
+      - if:
+          properties:
+            logsource:
+              properties:
+                product:
+                  const: windows
+                category:
+                  const: etwti_ntallocatevirtualmemory
+        then:
+          properties:
+            selections:
+              items:
+                properties:
+                  field:
+                    enum:
+                      - ProcessId
+                      - ThreadId
+                      - Image
+                      - TargetProcessId
+                      - TargetImage
+                      - BaseAddress
+                      - RegionSize
+                      - AllocationType
+                      - AllocationTypeStr
+                      - ProtectionMask
+                      - ProtectionMaskStr
+                      - IsRemote
+                    markdownEnumDescriptions:
+                      - "**ProcessId** - ID of the process that called the API"
+                      - "**ThreadId** - ID of the thread that called the API"
+                      - "**Image** - Path of the process that called the API"
+                      - "**TargetProcessId** - ID of the target process"
+                      - "**TargetImage** - Path of the target process"
+                      - "**BaseAddress** - Base address of memory allocation (hex)"
+                      - "**RegionSize** - Size of the allocated region (hex)"
+                      - "**AllocationType** - Type of allocation (hex)"
+                      - "**AllocationTypeStr** - Type of allocation as string"
+                      - "**ProtectionMask** - Protection mask of allocated memory (hex)"
+                      - "**ProtectionMaskStr** - Protection mask as string"
+                      - "**IsRemote** - Whether allocation is in a remote process"
+
+      #########################################################################
+      # WINDOWS POWERSHELL_EVENT FIELDS
+      #########################################################################
+      - if:
+          properties:
+            logsource:
+              properties:
+                product:
+                  const: windows
+                category:
+                  const: powershell_event
+        then:
+          properties:
+            selections:
+              items:
+                properties:
+                  field:
+                    enum:
+                      - PowershellCommand
+                      - ScriptBlockText
+                      - PowershellScriptPath
+                      - Path
+                      - Signed
+                      - Signature
+                      - SignatureStatus
+                      - Md5
+                      - Sha1
+                      - Sha256
+                      - ScriptSize
+                      - ScriptNumberOfLines
+                    markdownEnumDescriptions:
+                      - "**PowershellCommand** - PowerShell command executed"
+                      - "**ScriptBlockText** - PowerShell command executed"
+                      - "**PowershellScriptPath** - Path of the PowerShell script"
+                      - "**Path** - Path of the PowerShell script"
+                      - "**Signed** - true if script is signed (matched as string)"
+                      - "**Signature** - Signer name of the script"
+                      - "**SignatureStatus** - Status of the signature"
+                      - "**Md5** - MD5 hash of the PowerShell script"
+                      - "**Sha1** - SHA1 hash of the PowerShell script"
+                      - "**Sha256** - SHA256 hash of the PowerShell script"
+                      - "**ScriptSize** - Size of the PowerShell script (bytes)"
+                      - "**ScriptNumberOfLines** - Number of lines"
+
+      #########################################################################
+      # WINDOWS URL_REQUEST FIELDS
+      #########################################################################
+      - if:
+          properties:
+            logsource:
+              properties:
+                product:
+                  const: windows
+                category:
+                  const: url_request
+        then:
+          properties:
+            selections:
+              items:
+                properties:
+                  field:
+                    enum:
+                      - RequestUrl
+                      - RequestUrlVerb
+                      - RequestUrlScheme
+                      - RequestUrlHost
+                      - RequestUrlPort
+                      - RequestUrlPath
+                      - RequestUrlQueryParams
+                      - RequestUrlUsername
+                      - RequestUrlPassword
+                      - UserAgent
+                    markdownEnumDescriptions:
+                      - "**RequestUrl** - URL to the resource requested"
+                      - "**RequestUrlVerb** - Verb used (GET, POST, etc.)"
+                      - "**RequestUrlScheme** - Scheme of the URL"
+                      - "**RequestUrlHost** - Host where the resource is located"
+                      - "**RequestUrlPort** - Port used"
+                      - "**RequestUrlPath** - Path of the resource"
+                      - "**RequestUrlQueryParams** - Query parameters"
+                      - "**RequestUrlUsername** - Username used"
+                      - "**RequestUrlPassword** - Password used"
+                      - "**UserAgent** - User agent used"
+
+      #########################################################################
+      # WINDOWS LOGIN_EVENT FIELDS
+      #########################################################################
+      - if:
+          properties:
+            logsource:
+              properties:
+                product:
+                  const: windows
+                category:
+                  const: login_event
+        then:
+          properties:
+            selections:
+              items:
+                properties:
+                  field:
+                    enum:
+                      - Success
+                      - TargetUsername
+                      - TargetDomainName
+                      - TargetSid
+                      - SourceUsername
+                      - SourceDomainName
+                      - SourceSid
+                      - AuthenticationPackageName
+                      - WorkstationName
+                      - IpAddress
+                      - IpPort
+                      - Status
+                      - SubStatus
+                    markdownEnumDescriptions:
+                      - "**Success** - true if authentication was successful"
+                      - "**TargetUsername** - Name of the user being logged into"
+                      - "**TargetDomainName** - Domain name of the user"
+                      - "**TargetSid** - SID of the user"
+                      - "**SourceUsername** - Username of the process causing the login"
+                      - "**SourceDomainName** - Domain name of the process"
+                      - "**SourceSid** - SID of the user causing the login"
+                      - "**AuthenticationPackageName** - Authentication package name"
+                      - "**WorkstationName** - Machine name from which logon attempt was performed"
+                      - "**IpAddress** - IP address of the machine"
+                      - "**IpPort** - Source port for the logon attempt"
+                      - "**Status** - Reason why logon failed"
+                      - "**SubStatus** - Additional information about logon failure"
+
+      #########################################################################
+      # WINDOWS LOGOUT_EVENT FIELDS
+      #########################################################################
+      - if:
+          properties:
+            logsource:
+              properties:
+                product:
+                  const: windows
+                category:
+                  const: logout_event
+        then:
+          properties:
+            selections:
+              items:
+                properties:
+                  field:
+                    enum:
+                      - TargetUsername
+                      - TargetDomainName
+                      - TargetSid
+                    markdownEnumDescriptions:
+                      - "**TargetUsername** - Name of the user"
+                      - "**TargetDomainName** - Domain name"
+                      - "**TargetSid** - SID of the user"
+
+      #########################################################################
+      # WINDOWS USER FIELDS
+      #########################################################################
+      - if:
+          properties:
+            logsource:
+              properties:
+                product:
+                  const: windows
+                category:
+                  const: user
+        then:
+          properties:
+            selections:
+              items:
+                properties:
+                  field:
+                    enum:
+                      - TargetUserName
+                      - TargetDomainName
+                      - TargetUserID
+                      - SourceUserID
+                      - SourceUserName
+                      - SourceDomainName
+                      - SourceLogonID
+                      - SourcePrivilegelist
+                      - TargetSAMName
+                      - TargetDisplayName
+                      - TargetPrincipalName
+                      - TargetHomeDirectory
+                      - TargetHomePath
+                      - TargetScriptPath
+                      - TargetProfilePath
+                      - TargetUserWorkstations
+                      - TargetPasswordLastSet
+                      - TargetAccountExpires
+                      - TargetPrimaryGroupId
+                      - TargetAllowedToDelegateTo
+                      - UserAccountControl
+                      - SIDHistory
+                      - NewUserName
+                      - OperationType
+                    markdownEnumDescriptions:
+                      - "**TargetUserName** - Username of the target user"
+                      - "**TargetDomainName** - Domain name of the target"
+                      - "**TargetUserID** - ID of the target user"
+                      - "**SourceUserID** - ID of the source user"
+                      - "**SourceUserName** - Username of the source user"
+                      - "**SourceDomainName** - Domain name of the source user"
+                      - "**SourceLogonID** - LogonID of the source user"
+                      - "**SourcePrivilegelist** - List of user privileges used"
+                      - "**TargetSAMName** - Logon name for previous Windows versions"
+                      - "**TargetDisplayName** - Name displayed in address book"
+                      - "**TargetPrincipalName** - Internet-style login name"
+                      - "**TargetHomeDirectory** - User's home directory"
+                      - "**TargetHomePath** - Drive letter for UNC path"
+                      - "**TargetScriptPath** - Path of account's logon script"
+                      - "**TargetProfilePath** - Path to account's profile"
+                      - "**TargetUserWorkstations** - List of allowed computers"
+                      - "**TargetPasswordLastSet** - Last password modification time"
+                      - "**TargetAccountExpires** - Account expiration date"
+                      - "**TargetPrimaryGroupId** - RID of user's primary group"
+                      - "**TargetAllowedToDelegateTo** - SPNs for delegation"
+                      - "**UserAccountControl** - User account properties"
+                      - "**SIDHistory** - Previous SIDs"
+                      - "**NewUserName** - New username for rename operation"
+                      - "**OperationType** - Operation type"
+
+      #########################################################################
+      # WINDOWS GROUP FIELDS
+      #########################################################################
+      - if:
+          properties:
+            logsource:
+              properties:
+                product:
+                  const: windows
+                category:
+                  const: group
+        then:
+          properties:
+            selections:
+              items:
+                properties:
+                  field:
+                    enum:
+                      - GroupName
+                      - DomainName
+                      - GroupID
+                      - SourceUserID
+                      - SourceUserName
+                      - SourceDomainName
+                      - SourceLogonID
+                      - SourcePrivilegelist
+                      - TargetSAMName
+                      - SIDHistory
+                      - OldGroupType
+                      - NewGroupType
+                      - TargetMemberName
+                      - TargetMemberID
+                      - OperationType
+                    markdownEnumDescriptions:
+                      - "**GroupName** - Name of the group"
+                      - "**DomainName** - Domain name"
+                      - "**GroupID** - ID of the target group"
+                      - "**SourceUserID** - ID of the source user"
+                      - "**SourceUserName** - Username of the source user"
+                      - "**SourceDomainName** - Domain name of the source user"
+                      - "**SourceLogonID** - LogonID of the source user"
+                      - "**SourcePrivilegelist** - List of user privileges used"
+                      - "**TargetSAMName** - Name for previous Windows versions"
+                      - "**SIDHistory** - Previous SIDs"
+                      - "**OldGroupType** - Old group type"
+                      - "**NewGroupType** - New group type"
+                      - "**TargetMemberName** - Name of user added/removed"
+                      - "**TargetMemberID** - ID of user added/removed"
+                      - "**OperationType** - Operation type"
+
+      #########################################################################
+      # WINDOWS AMSI_SCAN FIELDS
+      #########################################################################
+      - if:
+          properties:
+            logsource:
+              properties:
+                product:
+                  const: windows
+                category:
+                  const: amsi_scan
+        then:
+          properties:
+            selections:
+              items:
+                properties:
+                  field:
+                    enum:
+                      - AppName
+                      - ContentName
+                      - TextPayload
+                    markdownEnumDescriptions:
+                      - "**AppName** - Application name/version/GUID string"
+                      - "**ContentName** - Filename, URL, unique script ID"
+                      - "**TextPayload** - Textual content of the payload"
+
+      #########################################################################
+      # WINDOWS SERVICE FIELDS
+      #########################################################################
+      - if:
+          properties:
+            logsource:
+              properties:
+                product:
+                  const: windows
+                category:
+                  const: service
+        then:
+          properties:
+            selections:
+              items:
+                properties:
+                  field:
+                    enum:
+                      - ServiceName
+                      - IsRemote
+                      - Image
+                      - ServiceStartType
+                      - ServiceStartTypeStr
+                      - ServiceCommandLine
+                      - ServiceType
+                      - ServiceTypeStr
+                      - ServiceAccount
+                      - ControlCode
+                      - ControlCodeStr
+                      - SourceUserID
+                      - SourceUserName
+                      - SourceDomainName
+                      - OperationType
+                    markdownEnumDescriptions:
+                      - "**ServiceName** - Name of the service"
+                      - "**IsRemote** - Whether operation was triggered remotely"
+                      - "**Image** - Path of the process"
+                      - "**ServiceStartType** - Start type of the service"
+                      - "**ServiceStartTypeStr** - Start type as string"
+                      - "**ServiceCommandLine** - Service command line"
+                      - "**ServiceType** - Type of the service"
+                      - "**ServiceTypeStr** - Type as string"
+                      - "**ServiceAccount** - Account of the service"
+                      - "**ControlCode** - Control code received"
+                      - "**ControlCodeStr** - Control code as string"
+                      - "**SourceUserID** - ID of the source user"
+                      - "**SourceUserName** - Username of the source user"
+                      - "**SourceDomainName** - Domain name of the source user"
+                      - "**OperationType** - Operation type"
+
+      #########################################################################
+      # WINDOWS SCHEDULED_TASK FIELDS
+      #########################################################################
+      - if:
+          properties:
+            logsource:
+              properties:
+                product:
+                  const: windows
+                category:
+                  const: scheduled_task
+        then:
+          properties:
+            selections:
+              items:
+                properties:
+                  field:
+                    enum:
+                      - TaskName
+                      - TaskPath
+                      - Image
+                      - SourceUserName
+                      - SourceUserId
+                      - SourceDomainName
+                      - IsRemote
+                      - TaskContent
+                      - SourceLogonId
+                      - ClientProcessId
+                      - RpcCallLocality
+                      - SpawnedProcessPid
+                      - ProcessPriority
+                      - OperationType
+                      - FirstActionCommandLine
+                      - NumberOfTriggers
+                      - NumberOfActions
+                      - TaskCommands
+                      - PrincipalUserId
+                      - LogonType
+                      - RunLevel
+                      - PrincipalGroupId
+                      - TaskEnabled
+                      - TaskHidden
+                      - ExecutionTimeLimit
+                      - TaskPriority
+                    markdownEnumDescriptions:
+                      - "**TaskName** - Name of the scheduled task"
+                      - "**TaskPath** - Path to the task on disk"
+                      - "**Image** - Path of the process"
+                      - "**SourceUserName** - Username that triggered the operation"
+                      - "**SourceUserId** - User ID that triggered the operation"
+                      - "**SourceDomainName** - Domain name of the user"
+                      - "**IsRemote** - Whether operation was performed remotely"
+                      - "**TaskContent** - Raw XML content of task definition"
+                      - "**SourceLogonId** - Logon ID of the source user"
+                      - "**ClientProcessId** - Process ID of the client"
+                      - "**RpcCallLocality** - RPC call locality information"
+                      - "**SpawnedProcessPid** - Process ID of spawned process"
+                      - "**ProcessPriority** - Priority of spawned process"
+                      - "**OperationType** - Operation type"
+                      - "**FirstActionCommandLine** - Command-line of first executable action"
+                      - "**NumberOfTriggers** - Number of triggers configured"
+                      - "**NumberOfActions** - Number of actions configured"
+                      - "**TaskCommands** - All command-lines in task actions"
+                      - "**PrincipalUserId** - User ID under which task runs"
+                      - "**LogonType** - Logon type for task execution"
+                      - "**RunLevel** - Run level of the task"
+                      - "**PrincipalGroupId** - Group ID associated with task principal"
+                      - "**TaskEnabled** - Whether task is enabled"
+                      - "**TaskHidden** - Whether task is hidden"
+                      - "**ExecutionTimeLimit** - Maximum time task is allowed to run"
+                      - "**TaskPriority** - Priority level of task execution"
+
+      #########################################################################
+      # WINDOWS EVENTLOG FIELDS
+      #########################################################################
+      - if:
+          properties:
+            logsource:
+              properties:
+                product:
+                  const: windows
+                category:
+                  const: eventlog
+        then:
+          properties:
+            selections:
+              items:
+                properties:
+                  field:
+                    enum:
+                      - LogName
+                      - EventID
+                      - Provider
+                      - Message
+                      - Computer
+                      - Level
+                      - Task
+                      - Opcode
+                      - Keywords
+                    markdownEnumDescriptions:
+                      - "**LogName** - Channel name of the Windows Event Log"
+                      - "**EventID** - Event identifier"
+                      - "**Provider** - Event log provider name"
+                      - "**Message** - Event message"
+                      - "**Computer** - Computer name where event occurred"
+                      - "**Level** - Event level"
+                      - "**Task** - Event task category"
+                      - "**Opcode** - Event operation code"
+                      - "**Keywords** - Event keywords"
+
+      #########################################################################
+      # WINDOWS WIN32K_GETASYNCKEYSTATE FIELDS
+      #########################################################################
+      - if:
+          properties:
+            logsource:
+              properties:
+                product:
+                  const: windows
+                category:
+                  const: win32k_getasynckeystate
+        then:
+          properties:
+            selections:
+              items:
+                properties:
+                  field:
+                    enum:
+                      - ProcessId
+                      - Image
+                      - MsSinceLastKeyEvent
+                      - BackgroundCallCount
+                    markdownEnumDescriptions:
+                      - "**ProcessId** - ID of the process that called GetAsyncKeyState"
+                      - "**Image** - Path of the process that called the API"
+                      - "**MsSinceLastKeyEvent** - Milliseconds since last GetAsyncKeyState event"
+                      - "**BackgroundCallCount** - Number of all API calls between successful calls"
+
+      #########################################################################
+      # WINDOWS WIN32K_REGISTERRAWINPUTDEVICES FIELDS
+      #########################################################################
+      - if:
+          properties:
+            logsource:
+              properties:
+                product:
+                  const: windows
+                category:
+                  const: win32k_registerrawinputdevices
+        then:
+          properties:
+            selections:
+              items:
+                properties:
+                  field:
+                    enum:
+                      - ProcessId
+                      - Image
+                      - UsagePage
+                      - UsagePageStr
+                      - ReturnValue
+                      - UsageId
+                      - UsageIdStr
+                      - WindowsCount
+                      - VisibleWindowsCount
+                      - StartModuleName
+                      - Flags
+                      - FlagsStr
+                      - ThreadInfoFlags
+                      - StartAddressProtection
+                    markdownEnumDescriptions:
+                      - "**ProcessId** - ID of the process that called RegisterRawInputDevices"
+                      - "**Image** - Path of the process that called the API"
+                      - "**UsagePage** - Top-level collection (Usage Page) of the device"
+                      - "**UsagePageStr** - String representation of UsagePage"
+                      - "**ReturnValue** - Return value of RegisterRawInputDevices"
+                      - "**UsageId** - Specific device (Usage) within the Usage Page"
+                      - "**UsageIdStr** - String representation of UsageId"
+                      - "**WindowsCount** - Number of windows owned by caller thread"
+                      - "**VisibleWindowsCount** - Number of visible windows owned by caller thread"
+                      - "**StartModuleName** - Module name of thread start address"
+                      - "**Flags** - Mode flag for UsagePage and UsageId interpretation"
+                      - "**FlagsStr** - String representation of Flags"
+                      - "**ThreadInfoFlags** - Thread information flags"
+                      - "**StartAddressProtection** - Memory protection of caller thread start address"
+
+      #########################################################################
+      # WINDOWS WIN32K_SETWINDOWSHOOKEX FIELDS
+      #########################################################################
+      - if:
+          properties:
+            logsource:
+              properties:
+                product:
+                  const: windows
+                category:
+                  const: win32k_setwindowshookex
+        then:
+          properties:
+            selections:
+              items:
+                properties:
+                  field:
+                    enum:
+                      - ProcessId
+                      - Image
+                      - HookLibrary
+                      - HookFunction
+                      - ReturnValue
+                      - FilterType
+                      - FilterTypeStr
+                    markdownEnumDescriptions:
+                      - "**ProcessId** - ID of the process that called SetWindowsHookEx"
+                      - "**Image** - Path of the process that called the API"
+                      - "**HookLibrary** - DLL containing the hook procedure"
+                      - "**HookFunction** - Summary of the hook procedure"
+                      - "**ReturnValue** - Return value of SetWindowsHookEx"
+                      - "**FilterType** - Type of hook procedure as uint32"
+                      - "**FilterTypeStr** - Type of hook procedure as string"
+
+  #############################################################################
+  # YARA RULE SECTION
+  #############################################################################
+  yara:
+    title: YARA Rule Configuration
+    description: |
+      Configuration for YARA rules for memory and file scanning.
+      YARA rules provide pattern-based detection for malware and threat hunting.
+    type: object
+    required:
+      - meta
+      - strings
+      - condition
+    properties:
+      imports:
+        title: YARA Module Imports
+        description: |
+          YARA modules to import for advanced rule capabilities.
+          Selected modules will be compiled as `import "module"` statements at the top of the rule.
+        type: array
+        items:
+          type: string
+          enum:
+            - pe
+            - dotnet
+            - elf
+            - hash
+            - math
+            - time
+            - string
+            - macho
+          markdownEnumDescriptions:
+            - |
+              **pe** - PE (Portable Executable) module for Windows executables.
+              Access PE headers, sections, imports, exports, resources, version info, signatures.
+              *Example:* `pe.machine == pe.MACHINE_AMD64`, `pe.imports("kernel32.dll", "VirtualAlloc")`,
+              `pe.number_of_sections > 5`, `pe.entry_point`, `pe.rich_signature.key`
+            - |
+              **dotnet** - .NET assembly analysis module.
+              Access .NET metadata, streams, classes, methods, GUIDs.
+              *Example:* `dotnet.is_dotnet`, `dotnet.module_name == "malware"`,
+              `dotnet.number_of_streams`, `dotnet.typelib`
+            - |
+              **elf** - ELF (Executable and Linkable Format) module for Linux/Unix binaries.
+              Access ELF headers, sections, segments, symbols, dynamic entries.
+              *Example:* `elf.type == elf.ET_EXEC`, `elf.machine == elf.EM_X86_64`,
+              `elf.number_of_sections`, `elf.entry_point`
+              ⚠️ *Not recommended for performance reasons*
+            - |
+              **hash** - Cryptographic hash functions module.
+              Calculate MD5, SHA1, SHA256, CRC32 checksums.
+              *Example:* `hash.md5(0, filesize) == "abc123..."`,
+              `hash.sha256(pe.rich_signature.offset, pe.rich_signature.length)`
+            - |
+              **math** - Mathematical functions module.
+              Calculate entropy, mean, deviation, serial correlation, Monte Carlo Pi.
+              *Example:* `math.entropy(0, filesize) > 7.5`,
+              `math.mean(0, filesize) < 100`, `math.serial_correlation(0, filesize) < 0.3`
+            - |
+              **time** - Time-related functions module.
+              Compare file/rule times against timestamps.
+              *Example:* `time.now() > 1609459200`, used with PE timestamps
+            - |
+              **string** - String manipulation module (YARA 4.x).
+              String functions for pattern matching.
+              *Example:* `string.to_int("1234")`, `string.length("test")`
+            - |
+              **macho** - Mach-O module for macOS/iOS binaries.
+              Access Mach-O headers, load commands, segments, sections.
+              *Example:* `macho.file_type == macho.MH_EXECUTE`,
+              `macho.has_entitlement("com.apple.security.cs.allow-jit")`
+
+      meta:
+        title: YARA Meta Information
+        description: |
+          Metadata for the YARA rule. The following fields are **automatically populated** during deployment:
+          - `id` - MDR UUID (required for HarfangLab API rule identification)
+          - `title` - MDR name
+          - `description` - MDR description  
+          - `author` - MDR author/organisation
+          - `date` - MDR creation date
+          - `modified` - MDR modification date
+          - `references` - MDR public references
+          - `confidence` - From top-level confidence field
+          - `score` - Auto-derived from alert_severity (can be overridden)
+        type: object
+        required:
+          - context
+          - os
+        properties:
+          context:
+            title: Scan Context
+            description: |
+              Context(s) in which the YARA rule should be applied.
+              Select one or more scan contexts. The `file` option will automatically
+              route to the correct format based on OS (file.pe for Windows, file.macho for MacOS, file.elf for Linux).
+            type: array
+            items:
+              type: string
+              enum:
+                - process
+                - thread
+                - memory
+                - file
+            markdownEnumDescriptions:
+              - "**process** - Scan process memory and associated executable images"
+              - "**thread** - Scan thread context and associated memory regions"
+              - "**memory** - Scan raw memory regions and buffers"
+              - "**file** - Scan files on disk. Auto-routes based on OS: `file.pe` (Windows), `file.macho` (MacOS), `file.elf` (Linux)"
+
+          os:
+            title: Target Operating System
+            description: |
+              Operating system this YARA rule targets.
+              Used for file context routing and rule applicability.
+            type: string
+            enum:
+              - Windows
+              - MacOS
+              - Linux
+            markdownEnumDescriptions:
+              - "**Windows** - Microsoft Windows systems. File context routes to `file.pe`"
+              - "**MacOS** - Apple macOS systems. File context routes to `file.macho`"
+              - "**Linux** - Linux systems. File context routes to `file.elf`"
+
+          arch:
+            title: Target Architecture
+            description: |
+              CPU architecture(s) this YARA rule targets.
+              Select applicable architectures for the detection.
+            type: array
+            items:
+              type: string
+              enum:
+                - x86
+                - x64
+            markdownEnumDescriptions:
+              - "**x86** - 32-bit x86 architecture"
+              - "**x64** - 64-bit x86-64/AMD64 architecture"
+
+          score:
+            title: Severity Override
+            description: |
+              Override the auto-derived severity score. By default, score is computed from `alert_severity`:
+              
+              | Severity | Score |
+              |----------|-------|
+              | Informational | 10 |
+              | Low | 30 |
+              | Medium | 50 |
+              | High | 70 |
+              | Critical | 90 |
+              
+              HarfangLab displays criticality based on score ranges:
+              0-20=Informational, 21-40=Low, 41-60=Medium, 61-80=High, 81-100=Critical
+            type: string
+            enum:
+              - Informational
+              - Low
+              - Medium
+              - High
+              - Critical
+            markdownEnumDescriptions:
+              - "**Informational** - Score 10. Minimal severity, for logging purposes"
+              - "**Low** - Score 30. Low severity, investigate when time permits"
+              - "**Medium** - Score 50. Medium severity, should be investigated"
+              - "**High** - Score 70. High severity, requires prompt attention"
+              - "**Critical** - Score 90. Critical severity, requires immediate action"
+
+          classification:
+            title: Classification
+            description: |
+              Classification string for the detection, typically following the format:
+              `<OS>.<Type>.<Family>` (e.g., "Windows.Loader.3CXSupplyChainAttack")
+            type: string
+            examples:
+              - "Windows.Loader.3CXSupplyChainAttack"
+              - "Windows.Trojan.Emotet"
+              - "MacOS.Stealer.Amos"
+              - "Linux.Backdoor.Tsunami"
+
+      strings:
+        title: YARA Strings
+        description: |
+          Raw YARA strings definition block. Define text strings, hex patterns, or regex.
+          
+          **Text strings:**
+          $str1 = "malware" ascii
+          $str2 = "suspicious" wide nocase
+          
+          **Hex patterns:**
+          $hex1 = { 4D 5A 90 00 }
+          $hex2 = { E8 ?? ?? ?? ?? }
+          
+          **Regular expressions:**
+          $re1 = /[a-z]{5,10}/i
+          
+          **Modifiers:** ascii, wide, nocase, fullword, private, base64, xor
+        type: string
+        tide.template.multiline: True
+
+      condition:
+        title: YARA Condition
+        description: |
+          Raw YARA condition expression defining how strings should match.
+          
+          **Examples:**
+          all of them
+          any of ($str*)
+          $str1 and $str2
+          uint16(0) == 0x5A4D and $str1
+          #str1 > 5
+          filesize < 100KB and $hex1
+          
+          **Functions:** uint8, uint16, uint32, int8, int16, int32, filesize, entrypoint, at, in, for, of, them, any, all, none
+        type: string
+        tide.template.multiline: True

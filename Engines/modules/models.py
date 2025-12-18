@@ -44,6 +44,7 @@ class DetectionSystems(Enum):
     SENTINEL = auto()
     SENTINEL_ONE = auto()
     CROWDSTRIKE = auto()
+    HARFANGLAB = auto()
 
 class DeploymentStrategy(Enum):
     STAGING = "Deployment allowed during a Pull (or Merge) Request Pipeline"
@@ -230,6 +231,27 @@ class TideConfigs:
                     customer_id: str
 
                 setup:Setup
+
+            tenants: Optional[Sequence[Tenant]]
+
+        @dataclass
+        class HarfangLab(SystemConfig):
+            
+            @dataclass
+            class Platform(SystemConfig.Platform):
+                pass
+
+            @dataclass
+            class Tenant(SystemConfig.Tenant):
+
+                @dataclass
+                class Setup(SystemConfig.Tenant.Setup):
+                    type: str  # "Sigma" or "YARA"
+                    url: str
+                    api_token: str
+                    source_id: str
+
+                setup: Setup
 
             tenants: Optional[Sequence[Tenant]]
 
@@ -526,6 +548,59 @@ class TideModels:
             @dataclass
             class CarbonBlackCloud(TideDefinitionsModels.SystemConfigurationModel):
                 ...
+
+            @dataclass
+            class HarfangLab(TideDefinitionsModels.SystemConfigurationModel):
+                """HarfangLab MDR Configuration supporting Sigma and YARA rules"""
+                
+                @dataclass
+                class Sigma:
+                    """Sigma rule configuration for behavioral detection"""
+                    
+                    @dataclass
+                    class LogSource:
+                        category: str
+                        product: str
+                    
+                    @dataclass
+                    class Selection:
+                        name: str
+                        field: str
+                        value: Union[str, List[str], bool, int, float]
+                        modifiers: Optional[List[str]] = None
+                    
+                    logsource: LogSource
+                    selections: Sequence[Selection]
+                    condition: str
+                    false_positives: Optional[List[str]] = None
+                
+                @dataclass
+                class Yara:
+                    """YARA rule configuration for memory/file scanning"""
+                    
+                    @dataclass
+                    class Meta:
+                        """YARA meta section with HarfangLab-specific fields"""
+                        context: List[str]  # process, thread, memory, file (REQUIRED)
+                        os: str  # Windows, Linux, MacOS (REQUIRED)
+                        arch: Optional[List[str]] = None  # x86, x64
+                        score: Optional[str] = None  # Severity level override: Informational, Low, Medium, High, Critical
+                        classification: Optional[str] = None  # e.g., Windows.Loader.3CXSupplyChainAttack
+                    
+                    meta: Meta  # REQUIRED
+                    strings: str
+                    condition: str
+                    imports: Optional[List[str]] = None  # YARA modules: pe, dotnet, elf, hash, math, time, string, macho
+
+                # HarfangLab-specific fields (REQUIRED)
+                maturity: str  # Stable, Testing, Experimental
+                confidence: str  # Weak, Moderate, Strong
+                action: str  # Alert, Alert & Block, Alert, Block & Quarantine
+                # Optional fields
+                tags: Optional[List[str]] = None  # MITRE ATT&CK tags (used by both Sigma and YARA)
+                sigma: Optional[Sigma] = None
+                yara: Optional[Yara] = None
+                rule_id_bundle: Optional[Mapping[str, str]] = None
                         
             sentinel: Optional[Sentinel] = None
             defender_for_endpoint: Optional[DefenderForEndpoint] = None
@@ -533,6 +608,7 @@ class TideModels:
             crowdstrike: Optional[Crowdstrike] = None
             carbon_black_cloud: Optional[Mapping] = None
             splunk: Optional[Mapping] = None
+            harfanglab: Optional[HarfangLab] = None
 
         name: str
         metadata: TideDefinitionsModels.TideObjectMetadata
@@ -577,3 +653,7 @@ class TenantDeployment:
     @dataclass
     class Crowdstrike(TenantDeploymentModel):
         tenant: TideConfigs.Systems.Crowdstrike.Tenant
+
+    @dataclass
+    class HarfangLab(TenantDeploymentModel):
+        tenant: TideConfigs.Systems.HarfangLab.Tenant

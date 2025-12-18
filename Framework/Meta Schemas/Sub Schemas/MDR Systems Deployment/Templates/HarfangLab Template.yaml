@@ -1,0 +1,45 @@
+  schema: harfanglab::1.0
+  status: 
+  #contributors:
+    #-
+  #tenants:
+    #-
+  #flags:
+    #-
+  maturity: 
+  confidence: 
+  action: 
+  #tags:
+    #-
+  
+  #sigma:
+  
+    #logsource:
+      #product: 
+      #category: 
+    #selections:
+      #- name: 
+        #field: 
+        #modifiers:
+          #-
+        #value: 
+    #condition: 
+    #false_positives:
+      #-
+  
+  #yara:
+    #imports:
+      #-
+  
+    #meta:
+      #context:
+        #-
+      #os: 
+      #arch:
+        #-
+      #score: 
+      #classification: 
+    #strings: |
+      #...
+    #condition: |
+      #...

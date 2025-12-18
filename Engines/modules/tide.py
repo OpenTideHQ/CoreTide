@@ -671,10 +671,12 @@ class SystemLoader:
         mdr_config, base_config = SystemLoader._base_configuration(mdr_config)
         mdr_config, rule_id_bundle = SystemLoader._external_rule_id(mdr_config)
         
-        # Extract HarfangLab-specific fields
-        maturity = mdr_config.pop("maturity", None)
-        confidence = mdr_config.pop("confidence", None)
-        action = mdr_config.pop("action", None)
+        # Extract HarfangLab-specific fields (REQUIRED, but provide defaults for backwards compatibility)
+        maturity = mdr_config.pop("maturity", "Experimental")
+        confidence = mdr_config.pop("confidence", "Moderate")
+        action = mdr_config.pop("action", "Alert")
+        # Tags are optional, at top level (used by both Sigma and YARA)
+        tags = mdr_config.pop("tags", None)
         
         # Parse Sigma configuration if present
         sigma = None
@@ -687,9 +689,6 @@ class SystemLoader:
                 logsource=logsource,
                 selections=selections,
                 condition=sigma_config.pop("condition"),
-                action=sigma_config.pop("action", None),
-                confidence=sigma_config.pop("confidence", None),
-                tags=sigma_config.pop("tags", None),
                 false_positives=sigma_config.pop("false_positives", None)
             )
         
@@ -697,14 +696,14 @@ class SystemLoader:
         yara = None
         yara_config = mdr_config.pop("yara", None)
         if yara_config:
-            meta = None
-            meta_config = yara_config.pop("meta", None)
-            if meta_config:
-                meta = HarfangLab.Yara.Meta(**meta_config)
+            # meta is REQUIRED with context and os
+            meta_config = yara_config.pop("meta")
+            meta = HarfangLab.Yara.Meta(**meta_config)
             yara = HarfangLab.Yara(
+                meta=meta,
                 strings=yara_config.pop("strings"),
                 condition=yara_config.pop("condition"),
-                meta=meta
+                imports=yara_config.pop("imports", None)
             )
         
         return HarfangLab(
@@ -716,6 +715,7 @@ class SystemLoader:
             maturity=maturity,
             confidence=confidence,
             action=action,
+            tags=tags,
             sigma=sigma,
             yara=yara,
             rule_id_bundle=rule_id_bundle if rule_id_bundle else None  # type: ignore

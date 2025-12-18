@@ -246,6 +246,7 @@ class TideConfigs:
 
                 @dataclass
                 class Setup(SystemConfig.Tenant.Setup):
+                    type: str  # "Sigma" or "YARA"
                     url: str
                     api_token: str
                     source_id: str
@@ -571,9 +572,6 @@ class TideModels:
                     logsource: LogSource
                     selections: Sequence[Selection]
                     condition: str
-                    action: Optional[str] = None
-                    confidence: Optional[str] = None
-                    tags: Optional[List[str]] = None
                     false_positives: Optional[List[str]] = None
                 
                 @dataclass
@@ -582,17 +580,24 @@ class TideModels:
                     
                     @dataclass
                     class Meta:
-                        context: Optional[str] = None
-                        os: Optional[str] = None
+                        """YARA meta section with HarfangLab-specific fields"""
+                        context: List[str]  # process, thread, memory, file (REQUIRED)
+                        os: str  # Windows, Linux, MacOS (REQUIRED)
+                        arch: Optional[List[str]] = None  # x86, x64
+                        score: Optional[str] = None  # Severity level override: Informational, Low, Medium, High, Critical
+                        classification: Optional[str] = None  # e.g., Windows.Loader.3CXSupplyChainAttack
                     
+                    meta: Meta  # REQUIRED
                     strings: str
                     condition: str
-                    meta: Optional[Meta] = None
+                    imports: Optional[List[str]] = None  # YARA modules: pe, dotnet, elf, hash, math, time, string, macho
 
-                # HarfangLab-specific fields
-                maturity: Optional[str] = None
-                confidence: Optional[str] = None
-                action: Optional[str] = None
+                # HarfangLab-specific fields (REQUIRED)
+                maturity: str  # Stable, Testing, Experimental
+                confidence: str  # Weak, Moderate, Strong
+                action: str  # Alert, Alert & Block, Alert, Block & Quarantine
+                # Optional fields
+                tags: Optional[List[str]] = None  # MITRE ATT&CK tags (used by both Sigma and YARA)
                 sigma: Optional[Sigma] = None
                 yara: Optional[Yara] = None
                 rule_id_bundle: Optional[Mapping[str, str]] = None

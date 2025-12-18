@@ -9,6 +9,9 @@
 required:
   - status
   - schema
+  - maturity
+  - confidence
+  - action
 
 # Ensure that either sigma or yara is present, but not both
 oneOf:
@@ -98,6 +101,17 @@ properties:
       - Generate an alert and block the threat
       - Generate an alert, block, and quarantine the affected system
 
+  tags:
+    title: Rule Tags
+    description: |
+      Tags associated with the rule, including MITRE ATT&CK tactics and techniques.
+      Used by both Sigma and YARA rules. For YARA, tags will be serialized to 
+      semicolon-separated format in the meta section.
+    type: array
+    items:
+      type: string
+      pattern: ^(attack\.[a-z_]+|attack\.t[0-9]{4}(\.[0-9]{3})?|cve\.[0-9]{4}\.[0-9]+|[a-z_\.]+)$
+
   #############################################################################
   # SIGMA RULE SECTION
   #############################################################################
@@ -113,33 +127,6 @@ properties:
       - condition
     
     properties:
-      action:
-        title: Sigma-specific Action Override
-        description: Override the top-level action for this Sigma rule specifically
-        type: string
-        enum:
-          - Alert
-          - Alert & Block
-          - Alert, Block & Quarantine
-
-      confidence:
-        title: Sigma-specific Confidence Override
-        description: Override the top-level confidence for this Sigma rule specifically
-        type: string
-        enum:
-          - Weak
-          - Moderate
-          - Strong
-
-      tags:
-        title: Sigma Tags
-        description: |
-          Tags associated with the rule, including MITRE ATT&CK tactics and techniques
-        type: array
-        items:
-          type: string
-          pattern: ^(attack\.[a-z_]+|attack\.t[0-9]{4}(\.[0-9]{3})?|cve\.[0-9]{4}\.[0-9]+|[a-z_\.]+)$
-
       logsource:
         title: Log Source
         description: |
@@ -2958,39 +2945,176 @@ properties:
       YARA rules provide pattern-based detection for malware and threat hunting.
     type: object
     required:
+      - meta
       - strings
       - condition
     properties:
+      imports:
+        title: YARA Module Imports
+        description: |
+          YARA modules to import for advanced rule capabilities.
+          Selected modules will be compiled as `import "module"` statements at the top of the rule.
+        type: array
+        items:
+          type: string
+          enum:
+            - pe
+            - dotnet
+            - elf
+            - hash
+            - math
+            - time
+            - string
+            - macho
+          markdownEnumDescriptions:
+            - |
+              **pe** - PE (Portable Executable) module for Windows executables.
+              Access PE headers, sections, imports, exports, resources, version info, signatures.
+              *Example:* `pe.machine == pe.MACHINE_AMD64`, `pe.imports("kernel32.dll", "VirtualAlloc")`,
+              `pe.number_of_sections > 5`, `pe.entry_point`, `pe.rich_signature.key`
+            - |
+              **dotnet** - .NET assembly analysis module.
+              Access .NET metadata, streams, classes, methods, GUIDs.
+              *Example:* `dotnet.is_dotnet`, `dotnet.module_name == "malware"`,
+              `dotnet.number_of_streams`, `dotnet.typelib`
+            - |
+              **elf** - ELF (Executable and Linkable Format) module for Linux/Unix binaries.
+              Access ELF headers, sections, segments, symbols, dynamic entries.
+              *Example:* `elf.type == elf.ET_EXEC`, `elf.machine == elf.EM_X86_64`,
+              `elf.number_of_sections`, `elf.entry_point`
+              ⚠️ *Not recommended for performance reasons*
+            - |
+              **hash** - Cryptographic hash functions module.
+              Calculate MD5, SHA1, SHA256, CRC32 checksums.
+              *Example:* `hash.md5(0, filesize) == "abc123..."`,
+              `hash.sha256(pe.rich_signature.offset, pe.rich_signature.length)`
+            - |
+              **math** - Mathematical functions module.
+              Calculate entropy, mean, deviation, serial correlation, Monte Carlo Pi.
+              *Example:* `math.entropy(0, filesize) > 7.5`,
+              `math.mean(0, filesize) < 100`, `math.serial_correlation(0, filesize) < 0.3`
+            - |
+              **time** - Time-related functions module.
+              Compare file/rule times against timestamps.
+              *Example:* `time.now() > 1609459200`, used with PE timestamps
+            - |
+              **string** - String manipulation module (YARA 4.x).
+              String functions for pattern matching.
+              *Example:* `string.to_int("1234")`, `string.length("test")`
+            - |
+              **macho** - Mach-O module for macOS/iOS binaries.
+              Access Mach-O headers, load commands, segments, sections.
+              *Example:* `macho.file_type == macho.MH_EXECUTE`,
+              `macho.has_entitlement("com.apple.security.cs.allow-jit")`
+
       meta:
         title: YARA Meta Information
-        description: Metadata for the YARA rule
+        description: |
+          Metadata for the YARA rule. The following fields are **automatically populated** during deployment:
+          - `id` - MDR UUID (required for HarfangLab API rule identification)
+          - `title` - MDR name
+          - `description` - MDR description  
+          - `author` - MDR author/organisation
+          - `date` - MDR creation date
+          - `modified` - MDR modification date
+          - `references` - MDR public references
+          - `confidence` - From top-level confidence field
+          - `score` - Auto-derived from alert_severity (can be overridden)
         type: object
+        required:
+          - context
+          - os
         properties:
           context:
             title: Scan Context
-            description: Context in which the YARA rule should be applied
-            type: string
-            enum:
-              - process
-              - thread
-              - memory
+            description: |
+              Context(s) in which the YARA rule should be applied.
+              Select one or more scan contexts. The `file` option will automatically
+              route to the correct format based on OS (file.pe for Windows, file.macho for MacOS, file.elf for Linux).
+            type: array
+            items:
+              type: string
+              enum:
+                - process
+                - thread
+                - memory
+                - file
             markdownEnumDescriptions:
-              - "**process** - Scan process memory and associated files"
-              - "**thread** - Scan thread context and associated memory"
-              - "**memory** - Scan raw memory regions"
+              - "**process** - Scan process memory and associated executable images"
+              - "**thread** - Scan thread context and associated memory regions"
+              - "**memory** - Scan raw memory regions and buffers"
+              - "**file** - Scan files on disk. Auto-routes based on OS: `file.pe` (Windows), `file.macho` (MacOS), `file.elf` (Linux)"
 
           os:
             title: Target Operating System
-            description: Operating system this YARA rule targets
+            description: |
+              Operating system this YARA rule targets.
+              Used for file context routing and rule applicability.
             type: string
             enum:
               - Windows
               - MacOS
               - Linux
             markdownEnumDescriptions:
-              - "**Windows** - Microsoft Windows systems"
-              - "**MacOS** - Apple macOS systems"
-              - "**Linux** - Linux systems"
+              - "**Windows** - Microsoft Windows systems. File context routes to `file.pe`"
+              - "**MacOS** - Apple macOS systems. File context routes to `file.macho`"
+              - "**Linux** - Linux systems. File context routes to `file.elf`"
+
+          arch:
+            title: Target Architecture
+            description: |
+              CPU architecture(s) this YARA rule targets.
+              Select applicable architectures for the detection.
+            type: array
+            items:
+              type: string
+              enum:
+                - x86
+                - x64
+            markdownEnumDescriptions:
+              - "**x86** - 32-bit x86 architecture"
+              - "**x64** - 64-bit x86-64/AMD64 architecture"
+
+          score:
+            title: Severity Override
+            description: |
+              Override the auto-derived severity score. By default, score is computed from `alert_severity`:
+              
+              | Severity | Score |
+              |----------|-------|
+              | Informational | 10 |
+              | Low | 30 |
+              | Medium | 50 |
+              | High | 70 |
+              | Critical | 90 |
+              
+              HarfangLab displays criticality based on score ranges:
+              0-20=Informational, 21-40=Low, 41-60=Medium, 61-80=High, 81-100=Critical
+            type: string
+            enum:
+              - Informational
+              - Low
+              - Medium
+              - High
+              - Critical
+            markdownEnumDescriptions:
+              - "**Informational** - Score 10. Minimal severity, for logging purposes"
+              - "**Low** - Score 30. Low severity, investigate when time permits"
+              - "**Medium** - Score 50. Medium severity, should be investigated"
+              - "**High** - Score 70. High severity, requires prompt attention"
+              - "**Critical** - Score 90. Critical severity, requires immediate action"
+
+          classification:
+            title: Classification
+            description: |
+              Classification string for the detection, typically following the format:
+              `<OS>.<Type>.<Family>` (e.g., "Windows.Loader.3CXSupplyChainAttack")
+            type: string
+            examples:
+              - "Windows.Loader.3CXSupplyChainAttack"
+              - "Windows.Trojan.Emotet"
+              - "MacOS.Stealer.Amos"
+              - "Linux.Backdoor.Tsunami"
 
       strings:
         title: YARA Strings

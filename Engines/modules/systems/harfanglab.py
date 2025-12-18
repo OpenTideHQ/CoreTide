@@ -84,12 +84,15 @@ class SigmaRule:
 class YaraRule:
     """
     Dataclass representing a HarfangLab YARA rule for the API.
-    Note: This is a placeholder as YARA rules may use a different endpoint.
+    Simplified to match the working API payload structure.
     """
     name: str
     content: str  # Full YARA rule content
-    source_id: str
-    enabled: bool = True
+    source_id: str  # Unique identifier (usually MDR UUID)
+    global_state: str = "alert"  # alert, backend_alert, block, disabled, quarantine
+    hl_status: str = "experimental"  # experimental, stable, testing
+    rule_confidence_override: Optional[str] = None  # weak, moderate, strong
+    rule_level_override: Optional[str] = None  # informational, low, medium, high, critical
 
 
 class SigmaRuleBuilder:
@@ -234,7 +237,7 @@ class HarfangLabService:
         
         base_url = self.tenant_config.setup.url.rstrip("/")
         self.SIGMA_RULES_ENDPOINT = f"{base_url}/api/data/threat_intelligence/SigmaRule/"
-        self.YARA_RULES_ENDPOINT = f"{base_url}/api/data/threat_intelligence/YaraRule/"
+        self.YARA_RULES_ENDPOINT = f"{base_url}/api/data/threat_intelligence/YaraFile/"
         
         self.session = requests.Session()
         self.session.headers.update({
@@ -512,34 +515,31 @@ class HarfangLabService:
             rule: YaraRule dataclass with rule details
             rule_id: The MDR UUID to use as the rule identifier
         """
-        rule_body = remove_none_values(asdict(rule))
+        rule_body = asdict(rule)
         rule_body["overwrite"] = True
-        rule_body = json.dumps(rule_body)
+        
+        log("DEBUG", "YARA API request body (excluding content):", 
+            json.dumps({k: v for k, v in rule_body.items() if k != "content"}, indent=2))
+        log("DEBUG", "YARA rule content preview:", rule_body.get("content", "")[:500])
+        
+        rule_body_json = json.dumps(rule_body)
         
         log("ONGOING", "Creating/updating YARA rule in HarfangLab", rule.name, str(rule_id))
         
-        # First try to update (PUT) if the rule exists
-        endpoint = f"{self.YARA_RULES_ENDPOINT}{rule_id}/"
-        response = self.session.put(
-            url=endpoint,
-            data=rule_body,
+        # YARA API uses POST with overwrite=True for both create and update
+        log("DEBUG", "POST to:", self.YARA_RULES_ENDPOINT)
+        
+        response = self.session.post(
+            url=self.YARA_RULES_ENDPOINT,
+            data=rule_body_json,
             verify=self.tenant_config.setup.ssl
         )
-
-        if response.status_code == 200:
-            log("SUCCESS", f"Updated YARA rule: {rule.name}", str(rule_id))
-            return
         
-        # If 404, the rule doesn't exist yet, so create it
-        if response.status_code == 404:
-            response = self.session.post(
-                url=self.YARA_RULES_ENDPOINT,
-                data=rule_body,
-                verify=self.tenant_config.setup.ssl
-            )
-            if response.status_code in [200, 201]:
-                log("SUCCESS", f"Created YARA rule: {rule.name}", str(rule_id))
-                return
+        log("DEBUG", f"POST response [{response.status_code}]:", response.text[:1000] if response.text else "empty")
+
+        if response.status_code in [200, 201]:
+            log("SUCCESS", f"Created/Updated YARA rule: {rule.name}", str(rule_id))
+            return
         
         self._http_errors(response, TideErrors.DetectionRuleCreationFailed)
 

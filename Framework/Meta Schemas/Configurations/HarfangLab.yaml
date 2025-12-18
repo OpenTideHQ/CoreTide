@@ -252,13 +252,26 @@ properties:
             Technical data related to this specific tenant configuration.
           type: object
           required: 
+            - type
             - proxy
             - ssl
             - url
             - api_token
             - source_id
           
-          properties: 
+          properties:
+            type:
+              title: Tenant Type
+              description: |
+                Specifies whether this tenant handles Sigma rules (behavioral detection) or YARA rules (memory/file scanning).
+                Rules will only be deployed to tenants matching their type:
+                - Sigma rules → tenants with type: Sigma
+                - YARA rules → tenants with type: YARA
+              type: string
+              enum:
+                - Sigma
+                - YARA
+            
             proxy: 
               title: Enable Proxy
               description: |

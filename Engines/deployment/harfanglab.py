@@ -23,6 +23,34 @@ from Engines.modules.systems.harfanglab import (
 )
 
 
+# YARA score mapping from alert severity levels
+# Based on HarfangLab criticality levels:
+# 0-20: Informational, 21-40: Low, 41-60: Medium, 61-80: High, 81-100: Critical
+SEVERITY_TO_SCORE = {
+    "Informational": 10,
+    "Low": 30,
+    "Medium": 50,
+    "High": 70,
+    "Critical": 90
+}
+
+# Score mapping for explicit severity override in YARA meta
+SCORE_OVERRIDE_MAP = {
+    "Informational": 10,
+    "Low": 30,
+    "Medium": 50,
+    "High": 70,
+    "Critical": 90
+}
+
+# OS to file context mapping for YARA rules
+OS_TO_FILE_CONTEXT = {
+    "Windows": "file.pe",
+    "MacOS": "file.macho",
+    "Linux": "file.elf"
+}
+
+
 class HarfangLabDeploy(DeployMDR):
     """
     Deployer for HarfangLab EDR.
@@ -54,16 +82,11 @@ class HarfangLabDeploy(DeployMDR):
         rule_name = data.name
         rule_description = data.description
         
-        # Map maturity to hl_status
-        hl_status = "experimental"  # default
-        if mdr_config.maturity:
-            hl_status = HarfangLabService.map_maturity_to_hl_status(mdr_config.maturity)
+        # Map maturity to hl_status (REQUIRED field)
+        hl_status = HarfangLabService.map_maturity_to_hl_status(mdr_config.maturity)
         
-        # Map action to global_state
-        global_state = "alert"  # default
-        action = sigma_config.action or mdr_config.action
-        if action:
-            global_state = HarfangLabService.map_action_to_global_state(action)
+        # Map action to global_state (REQUIRED field)
+        global_state = HarfangLabService.map_action_to_global_state(mdr_config.action)
         
         # Determine enabled/disabled state
         enabled = True
@@ -71,11 +94,8 @@ class HarfangLabDeploy(DeployMDR):
             enabled = False
             global_state = "disabled"
         
-        # Map confidence
-        rule_confidence = None
-        confidence = sigma_config.confidence or mdr_config.confidence
-        if confidence:
-            rule_confidence = HarfangLabService.map_confidence(confidence)
+        # Map confidence (REQUIRED field)
+        rule_confidence = HarfangLabService.map_confidence(mdr_config.confidence)
         
         # Map severity to level
         rule_level = HarfangLabService.map_level(data.response.alert_severity)
@@ -91,6 +111,7 @@ class HarfangLabDeploy(DeployMDR):
             })
         
         # Build the Sigma YAML content
+        # Tags are now at top-level mdr_config, not inside sigma section
         sigma_yaml = SigmaRuleBuilder.build_sigma_yaml(
             title=rule_name,
             description=rule_description,
@@ -101,18 +122,17 @@ class HarfangLabDeploy(DeployMDR):
             condition=sigma_config.condition,
             level=rule_level,
             status=hl_status,
-            tags=sigma_config.tags,
+            tags=mdr_config.tags,
             false_positives=sigma_config.false_positives,
             author=data.metadata.author
         )
         
+        # Debug output: display compiled Sigma rule
+        log("DEBUG", "Compiled Sigma rule content:", f"\n{sigma_yaml}")
+        
         # Determine block/quarantine settings from action
-        block_on_agent = False
-        quarantine_on_agent = False
-        if global_state in ["block", "quarantine"]:
-            block_on_agent = True
-        if global_state == "quarantine":
-            quarantine_on_agent = True
+        block_on_agent = global_state in ["block", "quarantine"]
+        quarantine_on_agent = global_state == "quarantine"
         
         # source_id comes from the tenant configuration
         source_id = tenant_config.setup.source_id
@@ -138,6 +158,13 @@ class HarfangLabDeploy(DeployMDR):
         """
         Builds the YARA Rule for deployment to HarfangLab API.
         Converts OpenTide's YARA format to HarfangLab's YARA format.
+        
+        Features:
+        - Automatic id field for rule identification
+        - Score derived from alert_severity (can be overridden)
+        - Context auto-routing based on OS (file -> file.pe/file.macho/file.elf)
+        - Import statements for YARA modules
+        - Rule name from MDR name (lowercased, underscored)
         """
         mdr_config = data.configurations.harfanglab
 
@@ -151,27 +178,107 @@ class HarfangLabDeploy(DeployMDR):
 
         yara_config = mdr_config.yara
         
-        # Build rule name
+        # Build rule name from MDR name (lowercased, spaces to underscores)
         rule_name = data.name
+        yara_rule_name = data.name.lower().replace(' ', '_').replace('-', '_')
+        # Remove any non-alphanumeric characters except underscores
+        yara_rule_name = ''.join(c if c.isalnum() or c == '_' else '_' for c in yara_rule_name)
+        # Ensure it doesn't start with a number
+        if yara_rule_name and yara_rule_name[0].isdigit():
+            yara_rule_name = f"rule_{yara_rule_name}"
         
-        # Build YARA rule content
-        # We need to construct a valid YARA rule from the components
-        # Escape double quotes in description and author to prevent YARA syntax errors
+        # Escape special characters in YARA meta string values
         def escape_yara_string(s: str) -> str:
-            return s.replace('\\', '\\\\').replace('"', '\\"') if s else ""
+            if not s:
+                return ""
+            s = s.replace('\\', '\\\\')
+            s = s.replace('"', '\\"')
+            s = s.replace('\n', '\\n')
+            s = s.replace('\r', '')
+            return s
         
         yara_lines = []
-        yara_lines.append(f"rule {data.metadata.uuid.replace('-', '_')} {{")
         
-        # Add meta section if present
-        if yara_config.meta:
-            yara_lines.append("    meta:")
-            yara_lines.append(f'        description = "{escape_yara_string(data.description)}"')
-            yara_lines.append(f'        author = "{escape_yara_string(data.metadata.author)}"')
-            if yara_config.meta.context:
-                yara_lines.append(f'        context = "{yara_config.meta.context}"')
-            if yara_config.meta.os:
-                yara_lines.append(f'        os = "{yara_config.meta.os}"')
+        # Add import statements if specified
+        if yara_config.imports:
+            for module in yara_config.imports:
+                yara_lines.append(f'import "{module}"')
+            yara_lines.append("")  # Blank line after imports
+        
+        yara_lines.append(f"rule {yara_rule_name} {{")
+        
+        # Determine author
+        if author := data.metadata.author:
+            author = author
+        elif organisation := data.metadata.organisation:
+            author = organisation.name
+        else:
+            author = ""
+
+        # Meta section is ALWAYS generated because id is required for HarfangLab API rule identification
+        yara_lines.append("    meta:")
+        # CRITICAL: id field is required for HarfangLab to properly identify and update rules
+        yara_lines.append(f'        id = "{data.metadata.uuid}"')
+        yara_lines.append(f'        title = "{escape_yara_string(data.name)}"')
+        yara_lines.append(f'        description = "{escape_yara_string(data.description)}"')
+        yara_lines.append(f'        author = "{escape_yara_string(author)}"')
+        
+        # Add date metadata from MDR
+        if data.metadata.created:
+            yara_lines.append(f'        date = "{data.metadata.created}"')
+        if data.metadata.modified:
+            yara_lines.append(f'        modified = "{data.metadata.modified}"')
+        
+        # Add references if present
+        if data.references and data.references.public:
+            refs = "\\n".join([str(ref) for ref in data.references.public.values()])
+            yara_lines.append(f'        references = "{refs}"')
+        
+        # Add tags if present (semicolon-separated format for HarfangLab)
+        # Tags are now at the top-level mdr_config, not inside yara section
+        if mdr_config.tags:
+            tags_str = ";".join(mdr_config.tags)
+            yara_lines.append(f'        tags = "{tags_str}"')
+        
+        # Build context with OS-based file routing
+        # meta is now required, so yara_config.meta is always present
+        os_value = yara_config.meta.os
+        contexts = yara_config.meta.context
+        
+        # Auto-route 'file' context to OS-specific format
+        compiled_contexts = []
+        for ctx in contexts:
+            if ctx == "file" and os_value in OS_TO_FILE_CONTEXT:
+                compiled_contexts.append(OS_TO_FILE_CONTEXT[os_value])
+            else:
+                compiled_contexts.append(ctx)
+        
+        if compiled_contexts:
+            yara_lines.append(f'        context = "{','.join(compiled_contexts)}"')
+        
+        yara_lines.append(f'        os = "{os_value}"')
+        
+        if yara_config.meta.arch:
+            arch_str = ','.join(yara_config.meta.arch) if isinstance(yara_config.meta.arch, list) else yara_config.meta.arch
+            yara_lines.append(f'        arch = "{arch_str}"')
+        if yara_config.meta.classification:
+            yara_lines.append(f'        classification = "{escape_yara_string(yara_config.meta.classification)}"')
+        
+        # Compute score: explicit override > default from alert_severity
+        score = None
+        if yara_config.meta.score:
+            # User specified explicit severity level, map to numeric score
+            score = SCORE_OVERRIDE_MAP.get(yara_config.meta.score)
+        
+        if score is None:
+            # Derive from alert_severity
+            score = SEVERITY_TO_SCORE.get(data.response.alert_severity, 50)
+        
+        yara_lines.append(f'        score = {score}')
+        
+        # Map confidence from MDR config (top-level, now REQUIRED)
+        confidence_value = HarfangLabService.map_confidence(mdr_config.confidence)
+        yara_lines.append(f'        confidence = "{confidence_value}"')
         
         # Add strings section
         yara_lines.append("    strings:")
@@ -186,6 +293,9 @@ class HarfangLabDeploy(DeployMDR):
         yara_lines.append("}")
         yara_content = '\n'.join(yara_lines)
         
+        # Debug output: display compiled YARA rule
+        log("DEBUG", "Compiled YARA rule content:", f"\n{yara_content}")
+        
         # Determine enabled/disabled state
         enabled = True
         if check_status(mdr_config.status) is StatusStrategy.DISABLEMENT:
@@ -194,11 +304,30 @@ class HarfangLabDeploy(DeployMDR):
         # source_id comes from the tenant configuration
         source_id = tenant_config.setup.source_id
         
+        # Map maturity to hl_status (REQUIRED field)
+        hl_status = HarfangLabService.map_maturity_to_hl_status(mdr_config.maturity)
+        log("DEBUG", f"Maturity mapping: '{mdr_config.maturity}' -> hl_status='{hl_status}'")
+        
+        # Map confidence
+        rule_confidence = HarfangLabService.map_confidence(mdr_config.confidence)
+        log("DEBUG", f"Confidence mapping: '{mdr_config.confidence}' -> rule_confidence_override='{rule_confidence}'")
+        
+        # Map action to global_state
+        global_state = HarfangLabService.map_action_to_global_state(mdr_config.action)
+        log("DEBUG", f"Action mapping: '{mdr_config.action}' -> global_state='{global_state}'")
+        
+        # Map severity to level
+        rule_level = HarfangLabService.map_level(data.response.alert_severity)
+        log("DEBUG", f"Severity mapping: '{data.response.alert_severity}' -> rule_level_override='{rule_level}'")
+        
         return YaraRule(
             name=rule_name,
             content=yara_content,
             source_id=source_id,
-            enabled=enabled
+            global_state=global_state,
+            hl_status=hl_status,
+            rule_confidence_override=rule_confidence,
+            rule_level_override=rule_level
         )
 
     def deploy_mdr(
@@ -280,8 +409,25 @@ class HarfangLabDeploy(DeployMDR):
         for tenant_deployment in deployment.rule_deployment:
             log("ONGOING", "Currently targeting tenant", tenant_deployment.tenant.name)
             service = HarfangLabService(tenant_deployment.tenant)  # type: ignore
+            tenant_type = tenant_deployment.tenant.setup.type  # type: ignore
 
             for mdr in tenant_deployment.rules:
+                # Determine rule type
+                mdr_config = mdr.configurations.harfanglab
+                if not mdr_config:
+                    log("WARNING", "Skipping MDR - no HarfangLab config", mdr.name)
+                    continue
+                
+                is_sigma = mdr_config.sigma is not None
+                is_yara = mdr_config.yara is not None
+                rule_type = "Sigma" if is_sigma else "YARA" if is_yara else None
+                
+                # Skip if tenant type doesn't match rule type
+                if rule_type != tenant_type:
+                    log("INFO", f"Skipping {rule_type} rule on {tenant_type} tenant", 
+                        mdr.name, tenant_deployment.tenant.name)
+                    continue
+                
                 log("ONGOING", "Processing rule", mdr.name, mdr.metadata.uuid)
                 self.deploy_mdr(
                     data=mdr,

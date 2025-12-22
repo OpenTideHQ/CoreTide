@@ -54,7 +54,13 @@ on:
         default: "false"
     secrets:
       wiki_token:
-        description: "Personal Access Token to push to the Wiki repository"
+        description: "Personal Access Token to push to the Wiki repository (use this OR github_app_id/github_app_private_key)"
+        required: false
+      github_app_id:
+        description: "GitHub App ID for generating installation token (alternative to wiki_token)"
+        required: false
+      github_app_private_key:
+        description: "GitHub App Private Key for generating installation token (alternative to wiki_token)"
         required: false
 
 jobs:
@@ -64,6 +70,8 @@ jobs:
     concurrency:
       group: wiki
       cancel-in-progress: false
+    env:
+      HAS_GITHUB_APP: ${{ secrets.github_app_id && secrets.github_app_private_key && 'true' || 'false' }}
     if: ${{ inputs.wiki_enabled == true && github.event_name == 'pull_request' && inputs.mdr_changes == 'true' }}
     steps:
       - name: Checkout Tide Instance
@@ -79,12 +87,22 @@ jobs:
           path: ${{ inputs.coretide_path }}
           ref: refs/heads/${{ inputs.coretide_ref }}
 
+      - name: Generate GitHub App Token
+        id: generate_token
+        if: ${{ env.HAS_GITHUB_APP == 'true' }}
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ secrets.github_app_id }}
+          private-key: ${{ secrets.github_app_private_key }}
+          owner: ${{ inputs.wiki_repo_owner }}
+          repositories: ${{ inputs.wiki_repo_name }}
+
       - name: Checkout Wiki
         uses: actions/checkout@v4
         with:
           repository: ${{ inputs.wiki_repo_owner }}/${{ inputs.wiki_repo_name }}
           ref: refs/heads/${{ inputs.wiki_repo_branch }}
-          token: ${{ secrets.wiki_token }}
+          token: ${{ steps.generate_token.outputs.token || secrets.wiki_token }}
           path: ${{ inputs.wiki_repo_name }}
 
       - uses: ./coretide/Pipelines/GitHub/tide-setup
@@ -109,6 +127,8 @@ jobs:
     concurrency:
       group: wiki
       cancel-in-progress: false
+    env:
+      HAS_GITHUB_APP: ${{ secrets.github_app_id && secrets.github_app_private_key && 'true' || 'false' }}
     if: ${{ inputs.wiki_enabled == true && github.ref_name == github.event.repository.default_branch }}
     steps:
       - name: Checkout Tide Instance
@@ -124,13 +144,23 @@ jobs:
           path: ${{ inputs.coretide_path }}
           ref: refs/heads/${{ inputs.coretide_ref }}
 
+      - name: Generate GitHub App Token
+        id: generate_token
+        if: ${{ env.HAS_GITHUB_APP == 'true' }}
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ secrets.github_app_id }}
+          private-key: ${{ secrets.github_app_private_key }}
+          owner: ${{ inputs.wiki_repo_owner }}
+          repositories: ${{ inputs.wiki_repo_name }}
+
       - name: Checkout Wiki
         uses: actions/checkout@v4
         with:
           repository: ${{ inputs.wiki_repo_owner }}/${{ inputs.wiki_repo_name }}
           ref: refs/heads/${{ inputs.wiki_repo_branch }}
           path: ${{ inputs.wiki_repo_name }}
-          token: ${{ secrets.wiki_token }}
+          token: ${{ steps.generate_token.outputs.token || secrets.wiki_token }}
 
       - name: Tide Setup
         uses: ./coretide/Pipelines/GitHub/tide-setup

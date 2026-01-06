@@ -234,7 +234,7 @@ def connect_splunk(
             token=token,
             autologin=True,
             app=app,
-            sharing="app"
+            sharing="app",
             scheme="https" if ssl_enabled else "http"
         )
 

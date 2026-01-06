@@ -226,8 +226,14 @@ def connect_splunk(
 ) -> client.Service:
     port = int(port)
     
-    
+
+    if ssl_enabled:
+        log("INFO", "SSL verification is enabled for Splunk connection")
+    else:
+        log("WARNING", "SSL verification is disabled for Splunk connection")
+
     if not proxy_enabled:
+        log("INFO", "No proxy will be used for Splunk connection")
         service = client.connect(
             host=host,
             port=port,
@@ -238,9 +244,10 @@ def connect_splunk(
             scheme="https" if ssl_enabled else "http"
         )
 
-        log("SUCCESS", "Successfully connected to Splunk with SSL enabled!")
+        log("SUCCESS", "Successfully connected to Splunk")
 
     else:
+        log("INFO", "Proxy will be used for Splunk connection")
         if allow_http_errors:
             os.environ["TIDE_SPLUNK_PLUGIN_ALLOW_HTTP_ERRORS"] = "True"
             log("INFO", "HTTP Errors will be returned with error code 19", "Ensure to handle them appropriately")
@@ -261,6 +268,7 @@ def connect_splunk(
             sharing="app",
             scheme="https" if ssl_enabled else "http"
         )
+        log("SUCCESS", "Successfully connected to Splunk")
 
 
     return service

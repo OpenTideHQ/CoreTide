@@ -235,6 +235,7 @@ def connect_splunk(
             autologin=True,
             app=app,
             sharing="app"
+            scheme="https" if ssl_enabled else "http"
         )
 
         log("SUCCESS", "Successfully connected to Splunk with SSL enabled!")
@@ -258,6 +259,7 @@ def connect_splunk(
             autologin=True,
             app=app,
             sharing="app",
+            scheme="https" if ssl_enabled else "http"
         )
 
 

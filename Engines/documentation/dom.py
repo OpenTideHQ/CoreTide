@@ -223,7 +223,7 @@ class DetectionObjectivesWiki:
                 for detector in detectors:
                     detector_data = {}
                     detector_data["Name"] = detector.name
-                    detector_data["Description"] = detector.description
+                    detector_data["Description"] = detector.description.replace("\n", "<br>")
                     detector_data["Technology"] = _technology(detector)
                     detector_data["Monitored Assets"] = _monitored_assets(detector)
                     detector_data["Link"] = f'[Link]({detector.link} "{detector.link}")' if detector.link else "_❌ No link referenced_"

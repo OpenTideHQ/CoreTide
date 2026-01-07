@@ -48,10 +48,8 @@ class SplunkEngineInit(ABC):
 
         if SPLUNK_SETUP["proxy"]:
             Proxy.set_proxy()
-            self.PROXY_ENABLED = True
         else:
             Proxy.unset_proxy()
-            self.PROXY_ENABLED = False
 
         self.CORRELATION_SEARCHES = SPLUNK_SETUP["correlation_searches"]
         self.SPLUNK_ACTIONS = SPLUNK_SETUP["actions_enabled"]
@@ -186,7 +184,7 @@ def cron_to_timeframe(
     return cron
 
 
-def custom_proxy_request_handler(url, message):
+def custom_request_handler(url, message):
     method = message["method"].lower()
     data = message.get("body", "") if method == "post" else None
     headers = dict(message.get("headers", []))
@@ -221,55 +219,29 @@ def connect_splunk(
     token: str,
     app: str,
     allow_http_errors:bool=False,
-    ssl_enabled:bool=True,
-    proxy_enabled:bool=False,
+    ssl_enabled:bool=True
 ) -> client.Service:
     port = int(port)
     
 
-    if ssl_enabled:
-        log("INFO", "SSL verification is enabled for Splunk connection")
-    else:
-        log("WARNING", "SSL verification is disabled for Splunk connection")
-
-    if not proxy_enabled:
-        log("INFO", "No proxy will be used for Splunk connection")
-        service = client.connect(
-            host=host,
-            port=port,
-            token=token,
-            autologin=True,
-            app=app,
-            sharing="app",
-            scheme="https" if ssl_enabled else "http"
-        )
-
-        log("SUCCESS", "Successfully connected to Splunk")
-
-    else:
-        log("INFO", "Proxy will be used for Splunk connection")
-        if allow_http_errors:
-            os.environ["TIDE_SPLUNK_PLUGIN_ALLOW_HTTP_ERRORS"] = "True"
-            log("INFO", "HTTP Errors will be returned with error code 19", "Ensure to handle them appropriately")
+    if allow_http_errors:
+        os.environ["TIDE_SPLUNK_PLUGIN_ALLOW_HTTP_ERRORS"] = "True"
+        log("INFO", "HTTP Errors will be returned with error code 19", "Ensure to handle them appropriately")
         
-        # Setting this signal over environment variables to workaround how the handler function is passed 
-        if ssl_enabled:
-            os.environ["TIDE_SPLUNK_SSL_ENABLED"] = "True"
-        else:
-            os.environ["TIDE_SPLUNK_SSL_ENABLED"] = "False"
-            
-        service = client.connect(
-            handler=custom_proxy_request_handler,
-            host=host,
-            port=port,
-            token=token,
-            autologin=True,
-            app=app,
-            sharing="app",
-            scheme="https" if ssl_enabled else "http"
-        )
-        log("SUCCESS", "Successfully connected to Splunk")
+    # Setting this signal over environment variables to workaround how the handler function is passed 
+    os.environ["TIDE_SPLUNK_SSL_ENABLED"] = "True"
+    
+    service = client.connect(
+        handler=custom_request_handler,
+        host=host,
+        port=port,
+        token=token,
+        autologin=True,
+        app=app,
+        sharing="app",
+    )
 
+    log("SUCCESS", "Successfully connected to Splunk !")
 
     return service
 

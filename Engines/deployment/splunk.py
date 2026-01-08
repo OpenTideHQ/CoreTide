@@ -380,8 +380,7 @@ class SplunkDeploy(SplunkEngineInit, DeployMDR):
             port=self.SPLUNK_PORT,
             token=self.SPLUNK_TOKEN,
             app=self.SPLUNK_APP,
-            ssl_enabled=self.SSL_ENABLED,
-            proxy_enabled=self.PROXY_ENABLED
+            ssl_enabled=self.SSL_ENABLED
         )
 
         # Start deployment routine

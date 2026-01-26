@@ -22,8 +22,6 @@ from Engines.modules.systems.defender_for_endpoint import (DetectionRule,
     
 
 
-
-
 class DefenderForEndpointDeploy(DeployMDR):
     
     def deploy_mdr(self, data:TideModels.MDR, service:DefenderForEndpointService, tenant:str):
@@ -127,17 +125,23 @@ class DefenderForEndpointDeploy(DeployMDR):
 
         # Remove spaces in category
         category = mdr_config.alert.category.replace(" ", "")
+        
+        # Handle Alert description
+        alert_description = mdr_config.alert.description or data.description
 
+        # Compile Alert Template
         alert_template = DetectionRule.DetectionAction.AlertTemplate(title = mdr_config.alert.title or data.name,
-                                                                    description=data.description,
+                                                                    description=alert_description,
                                                                     severity=severity, 
                                                                     category=category,
                                                                     mitreTechniques=[],
                                                                     impactedAssets=impacted_assets,
                                                                     recommendedActions=mdr_config.alert.recommendation or None)
 
+        # Handle Scheduling
         scheduling = mdr_config.scheduling if mdr_config.scheduling != "NRT" else "0"
         
+        # Check if the rule is enabled or disabled
         is_enabled = False if check_status(mdr_config.status) is StatusStrategy.DISABLEMENT else True
         
         # Handle Query and Exclusions
@@ -153,6 +157,7 @@ class DefenderForEndpointDeploy(DeployMDR):
         log("INFO", "Final compiled query")
         print(query)
 
+        # Compile Detection Rule
         rule = DetectionRule(displayName=data.name,
                             isEnabled=is_enabled,
                             queryCondition=DetectionRule.QueryCondition(queryText=query),

@@ -88,11 +88,24 @@ properties:
 
       title:
         title: Alert Title
+        type: string
         tide.mdr.parameter: detectionAction.alertTemplate.title
         description: |
           Name of the alert triggered by the custom detection rule. By
           default, the name of the MDR will be used, but this parameter allows
           to override it. 
+
+      description:
+        title: Alert Description
+        type: string
+        tide.mdr.parameter: detectionAction.alertTemplate.description
+        description: |
+          Detailed description of the alert triggered by the custom detection rule.
+          This text provides context about the detection and helps analysts understand
+          the nature of the threat.
+
+          By default, the description of the MDR will be used, but this parameter
+          allows to override it.
 
       category:
         title: Threat Category

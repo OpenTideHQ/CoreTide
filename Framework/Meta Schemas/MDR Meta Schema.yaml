@@ -122,7 +122,7 @@ properties:
                 system:
                   title: Target system for the search
                   type: string
-                  tide.config.systems::enabled: True 
+                  description: On which system the query should run
                 
                 query:
                   title: Supporting Search Query

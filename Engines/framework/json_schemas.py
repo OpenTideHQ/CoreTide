@@ -134,7 +134,7 @@ class FetchEnums:
                     enums.append(enum)
                     descriptions.append(description)
             else:
-                enum = f"{logsource.system}{logsource.name}"
+                enum = f"{logsource.system}::{logsource.name}"
                 enums.append(enum)
                 descriptions.append(base_description)
         

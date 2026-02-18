@@ -111,9 +111,9 @@ class FetchEnums:
                 for asset_name in logsource.assets:
                     if asset := asset_map.get(asset_name):
                         base_description += f"""
-- **{asset.name}**
-- _Criticality_: {asset.criticality}
-- _Description_: {asset.description}"""
+**{asset.name}**
+> - _Criticality_: {asset.criticality}
+> - _Description_: {asset.description}"""
                         
                         if asset.custom_details:
                             base_description += "\n  - _Custom Details_:"

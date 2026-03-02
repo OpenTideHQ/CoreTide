@@ -46,15 +46,15 @@ keys:
   tide.vocab.stages: os
   description: Microsoft Windows desktop editions
 - id: 928e08d8-099d-4e9f-ae5f-238e5f8d8a6d
-  name: Windows::11
+  name: Windows::Desktop::11
   tide.vocab.stages: os
   description: Microsoft Windows 11
 - id: 1f747933-08bb-484d-8404-24ee42d423f1
-  name: Windows::10
+  name: Windows::Desktop::10
   tide.vocab.stages: os
   description: Microsoft Windows 10
 - id: 54a016b9-5ad0-4384-8aab-e4fcca742aca
-  name: Windows::8
+  name: Windows::Desktop::8
   tide.vocab.stages: os
   description: Microsoft Windows 8 / 8.1
 - id: b732758f-1f84-4c0a-9de0-9983f631fd45
@@ -62,23 +62,23 @@ keys:
   tide.vocab.stages: os
   description: Microsoft Windows Server editions
 - id: af6005c7-0f90-4fef-b789-774353335718
-  name: Windows::Server 2025
+  name: Windows::Server::2025
   tide.vocab.stages: os
   description: Microsoft Windows Server 2025
 - id: 00c43f02-c4a1-4456-a853-9a6ad7798160
-  name: Windows::Server 2022
+  name: Windows::Server::2022
   tide.vocab.stages: os
   description: Microsoft Windows Server 2022
 - id: 9d7ac4e0-fba1-4b93-ba37-088426cd0fa8
-  name: Windows::Server 2019
+  name: Windows::Server::2019
   tide.vocab.stages: os
   description: Microsoft Windows Server 2019
 - id: 0219639a-caed-4321-867e-4b895ee28867
-  name: Windows::Server 2016
+  name: Windows::Server::2016
   tide.vocab.stages: os
   description: Microsoft Windows Server 2016
 - id: 4f442f52-963d-4368-a31d-ee7ca764dcf5
-  name: Windows::Server 2012
+  name: Windows::Server::2012
   tide.vocab.stages: os
   description: Microsoft Windows Server 2012 / 2012 R2
 - id: 9a7651ee-21fc-4f40-913e-5aadced08662
@@ -86,29 +86,29 @@ keys:
   tide.vocab.stages: os
   description: Apple macOS operating systems (all versions)
 - id: 16a7e37a-7701-4e93-99a9-85a327ea2101
-  name: macOS::Sequoia 15
+  name: macOS::15
   tide.vocab.stages: os
-  description: Apple macOS Sequoia (version 15)
+  description: Apple macOS 15 (Sequoia)
 - id: 556f3857-1b86-456c-85bc-cfce4f3b02fe
-  name: macOS::Sonoma 14
+  name: macOS::14
   tide.vocab.stages: os
-  description: Apple macOS Sonoma (version 14)
+  description: Apple macOS 14 (Sonoma)
 - id: 63fc1c61-3c61-426d-9be8-f7e042189381
-  name: macOS::Ventura 13
+  name: macOS::13
   tide.vocab.stages: os
-  description: Apple macOS Ventura (version 13)
+  description: Apple macOS 13 (Ventura)
 - id: e82f26f4-c37c-4ecd-b21e-8d66896c209e
-  name: macOS::Monterey 12
+  name: macOS::12
   tide.vocab.stages: os
-  description: Apple macOS Monterey (version 12)
+  description: Apple macOS 12 (Monterey)
 - id: 8d7aaf03-0b23-4401-9e59-dc3a45712022
-  name: macOS::Big Sur 11
+  name: macOS::11
   tide.vocab.stages: os
-  description: Apple macOS Big Sur (version 11)
+  description: Apple macOS 11 (Big Sur)
 - id: c3e09076-e8d3-4f85-97ea-6b5558797f78
-  name: macOS::Catalina 10.15
+  name: macOS::10.15
   tide.vocab.stages: os
-  description: Apple macOS Catalina (version 10.15)
+  description: Apple macOS 10.15 (Catalina)
 - id: 882041e5-d167-41c2-b15f-752d7843b241
   name: Linux
   tide.vocab.stages: os
@@ -118,15 +118,15 @@ keys:
   tide.vocab.stages: os
   description: Red Hat Enterprise Linux (all versions)
 - id: 4a528cad-b648-4089-ba7c-d7a5f3c8a30d
-  name: Linux::RHEL 9
+  name: Linux::RHEL::9
   tide.vocab.stages: os
   description: Red Hat Enterprise Linux 9
 - id: 65e23d16-fd5b-4f24-a729-c28ecb85a1f4
-  name: Linux::RHEL 8
+  name: Linux::RHEL::8
   tide.vocab.stages: os
   description: Red Hat Enterprise Linux 8
 - id: 85cfc3a6-3a44-489a-ab76-7e2048af5112
-  name: Linux::RHEL 7
+  name: Linux::RHEL::7
   tide.vocab.stages: os
   description: Red Hat Enterprise Linux 7
 - id: fa2d4804-da28-4d88-a829-925bb00698b3
@@ -134,15 +134,15 @@ keys:
   tide.vocab.stages: os
   description: Canonical Ubuntu Linux (all versions)
 - id: 5a8462bc-47ea-4839-bdf1-fee33a5ba4ac
-  name: Linux::Ubuntu 24.04 LTS
+  name: Linux::Ubuntu::24.04 LTS
   tide.vocab.stages: os
   description: Ubuntu 24.04 LTS (Noble Numbat)
 - id: 7adc1e27-f0b5-424f-a356-333a03e474e4
-  name: Linux::Ubuntu 22.04 LTS
+  name: Linux::Ubuntu::22.04 LTS
   tide.vocab.stages: os
   description: Ubuntu 22.04 LTS (Jammy Jellyfish)
 - id: a9b02cb6-5c75-4295-a4a4-36d1ef092cd5
-  name: Linux::Ubuntu 20.04 LTS
+  name: Linux::Ubuntu::20.04 LTS
   tide.vocab.stages: os
   description: Ubuntu 20.04 LTS (Focal Fossa)
 - id: 33ce9cc1-eae5-4828-9cd1-00a986d74201
@@ -150,11 +150,11 @@ keys:
   tide.vocab.stages: os
   description: Debian GNU/Linux (all versions)
 - id: e4f5174c-d616-4337-a7ae-f708cf07772a
-  name: Linux::Debian 12
+  name: Linux::Debian::12
   tide.vocab.stages: os
   description: Debian 12 (Bookworm)
 - id: be45e96f-9b69-41ec-ac94-5994b720c48f
-  name: Linux::Debian 11
+  name: Linux::Debian::11
   tide.vocab.stages: os
   description: Debian 11 (Bullseye)
 - id: b85473d1-2524-4d75-a266-6e6864e89f59
@@ -254,7 +254,7 @@ keys:
   tide.vocab.stages: os
   description: Oracle Solaris operating system
 - id: 3c5f53c0-9745-4b33-ad18-b7e109bfb3ab
-  name: Solaris::Oracle Solaris 11
+  name: Solaris::11
   tide.vocab.stages: os
   description: Oracle Solaris 11
 - id: c1798267-848d-4950-8e29-80cce22a3b40
@@ -266,15 +266,15 @@ keys:
   tide.vocab.stages: os
   description: Google Android mobile operating system (all versions)
 - id: 46d15af4-38e1-46a6-87d8-d71884b9acdd
-  name: Mobile::Android 15
+  name: Mobile::Android::15
   tide.vocab.stages: os
   description: Google Android 15 mobile operating system
 - id: 006d915b-6fc8-4c99-a9a7-9d70c940da7a
-  name: Mobile::Android 14
+  name: Mobile::Android::14
   tide.vocab.stages: os
   description: Google Android 14 mobile operating system
 - id: 7bc6e645-acfb-41a9-b776-3dc90cad7cca
-  name: Mobile::Android 13
+  name: Mobile::Android::13
   tide.vocab.stages: os
   description: Google Android 13 mobile operating system
 - id: 02fb8aa6-4336-4444-8067-2f4143ce11fe
@@ -282,15 +282,15 @@ keys:
   tide.vocab.stages: os
   description: Apple iOS mobile operating system (all versions)
 - id: 53bc609c-1e37-415e-bfbe-d33f45b47ccb
-  name: Mobile::iOS 18
+  name: Mobile::iOS::18
   tide.vocab.stages: os
   description: Apple iOS 18 mobile operating system for iPhone
 - id: 0781f066-1833-4b8a-9f89-90a58164b319
-  name: Mobile::iOS 17
+  name: Mobile::iOS::17
   tide.vocab.stages: os
   description: Apple iOS 17 mobile operating system for iPhone
 - id: bdecb8c4-5599-4f0f-a9f7-db884677750e
-  name: Mobile::iOS 16
+  name: Mobile::iOS::16
   tide.vocab.stages: os
   description: Apple iOS 16 mobile operating system for iPhone
 - id: 038f1111-102b-408b-a29c-9913f81bcf5e
@@ -333,28 +333,24 @@ keys:
   name: Embedded::Tizen
   tide.vocab.stages: os
   description: Samsung Tizen operating system
-- id: e2a3bb74-4d84-4a00-9668-d3b78382e506
-  name: Legacy
-  tide.vocab.stages: os
-  description: End-of-life operating systems no longer receiving security updates
 - id: 00368711-3e5c-4555-920c-aa13fe50efb2
-  name: Legacy::Windows XP
+  name: Windows::Desktop::XP
   tide.vocab.stages: os
   description: Microsoft Windows XP (end-of-life)
 - id: 1bc6791e-4846-488f-855e-dedc0a44bcdc
-  name: Legacy::Windows Vista
+  name: Windows::Desktop::Vista
   tide.vocab.stages: os
   description: Microsoft Windows Vista (end-of-life)
 - id: 52589d43-5cdf-4170-9fd7-fceac772bd83
-  name: Legacy::Windows 7
+  name: Windows::Desktop::7
   tide.vocab.stages: os
   description: Microsoft Windows 7 (end-of-life)
 - id: 41262b5b-0c68-4ccb-8bad-27384316d3c6
-  name: Legacy::Windows 2000
+  name: Windows::Desktop::2000
   tide.vocab.stages: os
   description: Microsoft Windows 2000 (end-of-life)
 - id: 4498e34c-cbec-40f7-bc4e-d7f81197f870
-  name: Legacy::Windows Server 2008
+  name: Windows::Server::2008
   tide.vocab.stages: os
   description: Microsoft Windows Server 2008 / 2008 R2 (end-of-life)
 - id: b49fa330-d3b4-40b4-a50e-b1e1ad844252
@@ -1621,10 +1617,6 @@ keys:
   name: Google Cloud::Analytics::Dataflow
   tide.vocab.stages: cloud
   description: Google Cloud Dataflow stream and batch processing
-- id: 2c11d05d-5ae7-4a05-a48a-369cd7edf642
-  name: Google Cloud::Analytics::Pub/Sub
-  tide.vocab.stages: cloud
-  description: Google Cloud Pub/Sub messaging service
 - id: 767b3d4a-a3fc-436c-833b-d981bd779071
   name: Google Cloud::Management
   tide.vocab.stages: cloud
@@ -3049,10 +3041,6 @@ keys:
   name: Google Cloud::Developer Tools::Cloud Build
   tide.vocab.stages: cloud
   description: Google Cloud Build serverless CI/CD platform
-- id: 4df1bb70-c904-4454-a044-d7f9a81f23ec
-  name: Google Cloud::Developer Tools::Artifact Registry
-  tide.vocab.stages: cloud
-  description: Google Cloud Artifact Registry for container images and language packages
 - id: 053d9b1c-ee20-40d6-973d-7ec3fb63ad96
   name: Google Cloud::Networking::Cloud Interconnect
   tide.vocab.stages: cloud
@@ -3165,14 +3153,6 @@ keys:
   name: Netlify
   tide.vocab.stages: application
   description: Netlify web development platform for deploying and managing modern web projects
-- id: d690b561-e3d1-4a9b-9fc2-52ddbd150a00
-  name: Collaboration::Slack
-  tide.vocab.stages: application
-  description: Slack enterprise messaging and collaboration platform
-- id: cc050e0f-9425-43be-bf8b-de13c808bfc7
-  name: Collaboration::Zoom
-  tide.vocab.stages: application
-  description: Zoom video conferencing and unified communications platform
 - id: d0d5d836-23e9-4324-8f16-c9980774602e
   name: Duo Security::Multi-Factor Authentication
   tide.vocab.stages: authentication
@@ -3185,19 +3165,7 @@ keys:
   name: Entra ID::External ID
   tide.vocab.stages: authentication
   description: Microsoft Entra External ID for customer and partner identity management
-- id: 28b4a1c4-6a2a-46ea-b718-1a88bb02acef
-  name: gRPC
-  tide.vocab.stages: protocol
-  description: gRPC high-performance remote procedure call framework for service-to-service communication
 - id: bd7a0122-645d-4e33-b0cf-fd899f771b93
-  name: GraphQL
+  name: Application Layer::GraphQL
   tide.vocab.stages: protocol
   description: GraphQL API query language and runtime for flexible data retrieval
-- id: 5375d63f-e9bb-42f2-9043-84b3bb164f87
-  name: WebSocket
-  tide.vocab.stages: protocol
-  description: WebSocket protocol for full-duplex communication over a single TCP connection
-- id: 65ad8d65-d3e4-41cc-b45c-05855de3a537
-  name: QUIC
-  tide.vocab.stages: protocol
-  description: QUIC transport protocol for low-latency encrypted connections (HTTP/3)

@@ -818,23 +818,23 @@ keys:
   tide.vocab.stages: application
   description: Puppet infrastructure and configuration management
 - id: 5af7ed14-d132-4391-a8df-6a716dc5c71f
-  name: AI & ML
+  name: AI
   tide.vocab.stages: application
   description: Artificial intelligence and machine learning applications
 - id: 0c929728-ac2e-4199-bf02-c7572b1c1f86
-  name: AI & ML::ChatGPT
+  name: AI::ChatGPT
   tide.vocab.stages: application
   description: OpenAI ChatGPT conversational AI
 - id: 93c43298-4aff-4782-93c9-5aaa91afb2c6
-  name: AI & ML::GitHub Copilot
+  name: AI::GitHub Copilot
   tide.vocab.stages: application
   description: GitHub Copilot AI code assistant
 - id: 1b17f6f5-99d5-4af9-8a71-748fc5460916
-  name: AI & ML::Amazon Bedrock
+  name: AI::Amazon Bedrock
   tide.vocab.stages: application
   description: Amazon Bedrock foundation model service
 - id: a6650e31-b680-4445-a150-98a50876a2d6
-  name: AI & ML::Google Vertex AI
+  name: AI::Google Vertex AI
   tide.vocab.stages: application
   description: Google Cloud Vertex AI machine learning platform
 - id: 9c778ee3-2ee2-4bd0-a43d-24bd552ef630

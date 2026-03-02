@@ -22,10 +22,6 @@ MODEL_DOC_TEMPLATE = '''{frontmatter}
 
 {expand_description}
 
-{targeted_assets}
-
-{visibility}
-
 ---
 
 ## 🕸️ Relations
@@ -44,6 +40,8 @@ MODEL_DOC_TEMPLATE = '''{frontmatter}
 ## Model Data
 
 {data_table}
+
+{threat_surface}
 
 {references}
 

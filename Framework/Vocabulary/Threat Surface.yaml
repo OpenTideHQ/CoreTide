@@ -1353,6 +1353,51 @@ keys:
     tide.vocab.stages: authentication
     description: RSA SecurID multi-factor authentication
 
+  # --- OneLogin ---
+  - id: SRF0367
+    name: OneLogin
+    tide.vocab.stages: authentication
+    description: OneLogin cloud-based identity and access management platform
+
+  # --- ForgeRock ---
+  - id: SRF0368
+    name: ForgeRock
+    tide.vocab.stages: authentication
+    description: ForgeRock identity platform for consumer and workforce IAM
+
+  # --- SailPoint ---
+  - id: SRF0369
+    name: SailPoint
+    tide.vocab.stages: authentication
+    description: SailPoint identity governance and administration (IGA) platform
+
+  - id: SRF0370
+    name: SailPoint::IdentityNow
+    tide.vocab.stages: authentication
+    description: SailPoint IdentityNow cloud identity governance
+
+  # --- Delinea ---
+  - id: SRF0371
+    name: Delinea
+    tide.vocab.stages: authentication
+    description: Delinea privileged access management (formerly Thycotic and Centrify)
+
+  - id: SRF0372
+    name: Delinea::Secret Server
+    tide.vocab.stages: authentication
+    description: Delinea Secret Server enterprise password vault
+
+  - id: SRF0373
+    name: Delinea::Privilege Manager
+    tide.vocab.stages: authentication
+    description: Delinea Privilege Manager endpoint least-privilege and application control
+
+  # --- AWS IAM Identity Center ---
+  - id: SRF0374
+    name: AWS IAM Identity Center
+    tide.vocab.stages: authentication
+    description: AWS IAM Identity Center single sign-on for AWS accounts (formerly AWS SSO)
+
   # --- Authentication Protocols ---
   - id: SRF0360
     name: SAML
@@ -2120,6 +2165,58 @@ keys:
     name: OCI::Autonomous Database
     tide.vocab.stages: cloud
     description: Oracle Autonomous Database
+
+  - id: SRF0654
+    name: OCI::Networking
+    tide.vocab.stages: cloud
+    description: Oracle Cloud networking services (VCN, load balancers, DNS)
+
+  - id: SRF0655
+    name: OCI::Identity
+    tide.vocab.stages: cloud
+    description: Oracle Cloud Identity and Access Management
+
+  - id: SRF0656
+    name: OCI::Container Engine
+    tide.vocab.stages: cloud
+    description: Oracle Container Engine for Kubernetes (OKE)
+
+  - id: SRF0657
+    name: OCI::Functions
+    tide.vocab.stages: cloud
+    description: Oracle Cloud Functions serverless compute
+
+  - id: SRF0658
+    name: OCI::Cloud Guard
+    tide.vocab.stages: cloud
+    description: Oracle Cloud Guard security posture management
+
+  - id: SRF0659
+    name: OCI::Logging
+    tide.vocab.stages: cloud
+    description: Oracle Cloud Logging and log analytics
+
+  # --- Azure Containers ---
+  - id: SRF0555
+    name: Azure::Containers
+    tide.vocab.stages: cloud
+    description: Azure container services
+
+  - id: SRF0556
+    name: Azure::Containers::Container Registry
+    tide.vocab.stages: cloud
+    description: Azure Container Registry (ACR) container image registry
+
+  # --- Google Cloud Containers ---
+  - id: SRF0648
+    name: Google Cloud::Containers
+    tide.vocab.stages: cloud
+    description: Google Cloud container services
+
+  - id: SRF0649
+    name: Google Cloud::Containers::Artifact Registry
+    tide.vocab.stages: cloud
+    description: Google Artifact Registry container and package repository
 
   # --- Cloud-agnostic ---
   - id: SRF0660
@@ -3251,6 +3348,70 @@ keys:
     name: Agriculture::Smart Irrigation
     tide.vocab.stages: iot
     description: IoT-connected smart irrigation systems
+
+  # --- Printers & MFPs ---
+  - id: SRF1055
+    name: Printers
+    tide.vocab.stages: iot
+    description: Network-connected printers and multi-function peripherals
+
+  - id: SRF1056
+    name: Printers::Network Printers
+    tide.vocab.stages: iot
+    description: Enterprise network-connected printers (often exposing print protocols and web interfaces)
+
+  - id: SRF1057
+    name: Printers::Multi-Function Peripherals
+    tide.vocab.stages: iot
+    description: Multi-function devices combining print, scan, fax and copy capabilities
+
+  # --- Point of Sale ---
+  - id: SRF1060
+    name: Point of Sale
+    tide.vocab.stages: iot
+    description: Point-of-sale terminals and payment processing devices
+
+  - id: SRF1061
+    name: Point of Sale::Payment Terminals
+    tide.vocab.stages: iot
+    description: Card payment terminals and chip readers
+
+  - id: SRF1062
+    name: Point of Sale::Self-Service Kiosks
+    tide.vocab.stages: iot
+    description: Self-service kiosks with payment and interaction capabilities
+
+  # --- Drones & UAV ---
+  - id: SRF1065
+    name: Drones
+    tide.vocab.stages: iot
+    description: Unmanned aerial vehicles and drone systems
+
+  - id: SRF1066
+    name: Drones::Commercial UAV
+    tide.vocab.stages: iot
+    description: Commercial and enterprise unmanned aerial vehicles
+
+  - id: SRF1067
+    name: Drones::Drone Controllers
+    tide.vocab.stages: iot
+    description: Ground control stations and drone management software
+
+  # --- Smart Grid ---
+  - id: SRF1070
+    name: Smart Grid
+    tide.vocab.stages: iot
+    description: Smart grid and energy metering infrastructure
+
+  - id: SRF1071
+    name: Smart Grid::Smart Meters
+    tide.vocab.stages: iot
+    description: IoT-connected smart electricity and utility meters
+
+  - id: SRF1072
+    name: Smart Grid::Energy Management
+    tide.vocab.stages: iot
+    description: Energy distribution and demand management systems
 
   # ============================================================
   # PROTOCOLS (protocol::)

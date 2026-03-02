@@ -32,6 +32,8 @@ from Engines.modules.documentation_components import (
     cve_doc,
     actors_doc,
     model_data_table,
+    targeted_assets_doc,
+    visibility_doc,
 )
 from Engines.modules.files import safe_file_name
 from Engines.modules.graphs import relationships_graph, chaining_graph
@@ -76,6 +78,8 @@ def documentation(model):
     expand_header = ""
     expand_description = ""
     expand_graphs = ""
+    targeted_assets = ""
+    visibility = ""
 
     actors_sightings = ""
 
@@ -161,6 +165,12 @@ def documentation(model):
                 FOLD.format("Expand chaining data", chain_table)
             )
 
+        # Targeted assets and visibility based on threat surface
+        tvm_surface = model[model_datafield].get("surface")
+        if tvm_surface:
+            targeted_assets = targeted_assets_doc(tvm_surface)
+            visibility = visibility_doc(tvm_surface)
+
     data_table, tags = model_data_table(model[model_datafield], model_uuid)
 
     if DOCUMENTATION_TARGET is CIEnvironment.CIPlatforms.GitlabCI:
@@ -179,6 +189,8 @@ def documentation(model):
                                     metadata=metadata,
                                     description=description,
                                     expand_description=expand_description,
+                                    targeted_assets=targeted_assets,
+                                    visibility=visibility,
                                     relation_graph=relation_graph,
                                     relation_table=relation_table,
                                     expand_graphs=expand_graphs,

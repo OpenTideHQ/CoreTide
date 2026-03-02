@@ -48,6 +48,12 @@ lookup_metadata = "Lookup Metadata Meta Schema.yaml"
 [recomposition]
 systems = "MDR Systems Deployment"
 
+[config_metaschemas]
+visibility = "Configurations/visibility.meta.yaml"
+
+[config_json_schemas]
+visibility = "Configurations/visibility.schema.json"
+
 [json_schemas]
 tvm = "TVM Schema.json"
 dom = "Detection Objective.schema.json"

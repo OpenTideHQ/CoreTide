@@ -134,6 +134,14 @@ properties:
           type: object
           description: Optional open-ended dictionary for asset-specific metadata with custom key-value pairs
           additionalProperties: true
+        surface:
+          title: Threat Surface
+          type: array
+          description: Threat surface categories that this asset is exposed to, linking the asset to Threat Vector Models targeting the same surface areas
+          tide.vocab: true
+          tide.vocab.scoped: true
+          items:
+            type: string
 
   detectors:
     type: array

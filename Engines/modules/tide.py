@@ -1345,6 +1345,8 @@ class DataTide:
             metaschemas = dict(Index["metaschemas"])
             recomposition = dict(Index["recomposition"])
             json_schemas = dict(Index["json_schemas"])
+            config_metaschemas = dict(Index.get("config_metaschemas", {}))
+            config_json_schemas = dict(Index.get("config_json_schemas", {}))
             data_fields = dict(Index["data_fields"])
             templates = dict(Index["templates"])
 

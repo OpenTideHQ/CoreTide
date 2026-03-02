@@ -22,6 +22,10 @@ MODEL_DOC_TEMPLATE = '''{frontmatter}
 
 {expand_description}
 
+{targeted_assets}
+
+{visibility}
+
 ---
 
 ## 🕸️ Relations

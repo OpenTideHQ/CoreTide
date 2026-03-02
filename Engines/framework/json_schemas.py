@@ -853,6 +853,51 @@ def run():
 
     log("SUCCESS", "Generated all JSON Schemas")
 
+    # Configuration Schemas
+    # Configuration meta schemas live under Configurations/ subdirectories
+    # and may use tide.* keywords for vocabulary resolution
+    config_metaschemas = GLOBAL_CONFIG.config_metaschemas
+    config_json_schemas = GLOBAL_CONFIG.config_json_schemas
+
+    if config_metaschemas:
+        log("TITLE", "Configuration Schema Assembler")
+        log(
+            "INFO",
+            "Generates JSON Schemas from configuration meta schema files, "
+            "dynamically looking up Vocabulary values where applicable.",
+        )
+
+        for meta in config_metaschemas:
+            if meta in config_json_schemas:
+
+                yaml_input = METASCHEMAS_FOLDER / config_metaschemas[meta]
+                json_output = JSON_SCHEMA_FOLDER / config_json_schemas[meta]
+
+                parsing = yaml.safe_load(open(yaml_input, encoding="utf-8"))
+                placeholders = parsing.get("tide.placeholders") or {}
+
+                log("ONGOING", "Generating config schema for : " + str(yaml_input))
+
+                # Generate Schema (resolves tide.vocab and other tide.* keywords)
+                generated = gen_json_schema(parsing)
+
+                # Removes the OpenTide reserved schema keys
+                cleaned = remove_tide_keywords(generated)
+
+                # Export JSON Schemas
+                log("ONGOING", "Exporting generated schema to : " + str(json_output))
+                output = json.dumps(cleaned, indent=4, sort_keys=False, default=str)
+                for placeholder in placeholders:
+                    log("ONGOING", f"Replacing all occurence of placeholder {placeholder} with value {placeholders[placeholder]}")
+                    output = output.replace(f"${placeholder}", placeholders[placeholder])
+
+                output_file = open((json_output), "w", encoding="utf-8")
+                output_file.write(output)
+                output_file.close()
+                log("SUCCESS", "Correctly exported")
+
+        log("SUCCESS", "Generated all Configuration Schemas")
+
 
 if __name__ == "__main__":
     run()

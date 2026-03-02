@@ -55,6 +55,9 @@ class Configurations:
             custom_details: Optional[Mapping[str,str]] = None
             """Additional custom attributes for the asset"""
 
+            surface: Optional[Sequence[str]] = None
+            """Threat surface categories this asset is exposed to, linking to Threat Vector Models"""
+
         @dataclass
         class LogSource:
             """Defines a specific log source that can be queried for detection purposes."""

@@ -214,7 +214,7 @@ keys:
   - id: SRF0032
     name: Linux::CentOS
     tide.vocab.stages: os
-    description: CentOS Linux (legacy, end-of-life)
+    description: CentOS Linux (end-of-life; see Rocky Linux / AlmaLinux for successors, CentOS Stream for rolling variant)
 
   - id: SRF0033
     name: Linux::Rocky Linux
@@ -234,7 +234,7 @@ keys:
   - id: SRF0036
     name: Linux::Oracle Linux
     tide.vocab.stages: os
-    description: Oracle Linux
+    description: Oracle Linux enterprise distribution (RHEL-compatible with Unbreakable Enterprise Kernel)
 
   - id: SRF0037
     name: Linux::SUSE
@@ -348,17 +348,17 @@ keys:
   - id: SRF0058
     name: Mobile::Android 15
     tide.vocab.stages: os
-    description: Android 15
+    description: Google Android 15 mobile operating system
 
   - id: SRF0059
     name: Mobile::Android 14
     tide.vocab.stages: os
-    description: Android 14
+    description: Google Android 14 mobile operating system
 
   - id: SRF0060
     name: Mobile::Android 13
     tide.vocab.stages: os
-    description: Android 13
+    description: Google Android 13 mobile operating system
 
   - id: SRF0061
     name: Mobile::iOS
@@ -368,17 +368,17 @@ keys:
   - id: SRF0062
     name: Mobile::iOS 18
     tide.vocab.stages: os
-    description: Apple iOS 18
+    description: Apple iOS 18 mobile operating system for iPhone
 
   - id: SRF0063
     name: Mobile::iOS 17
     tide.vocab.stages: os
-    description: Apple iOS 17
+    description: Apple iOS 17 mobile operating system for iPhone
 
   - id: SRF0064
     name: Mobile::iOS 16
     tide.vocab.stages: os
-    description: Apple iOS 16
+    description: Apple iOS 16 mobile operating system for iPhone
 
   - id: SRF0065
     name: Mobile::iPadOS
@@ -464,15 +464,20 @@ keys:
     description: Microsoft Windows Server 2008 / 2008 R2 (end-of-life)
 
   # --- Miscellaneous OS ---
+  - id: SRF0083
+    name: Miscellaneous
+    tide.vocab.stages: os
+    description: Miscellaneous and proprietary Unix-family operating systems
+
   - id: SRF0081
     name: Miscellaneous::IBM AIX
     tide.vocab.stages: os
-    description: IBM AIX Unix operating system
+    description: IBM AIX Unix operating system for Power Systems
 
   - id: SRF0082
     name: Miscellaneous::HP-UX
     tide.vocab.stages: os
-    description: Hewlett Packard HP-UX Unix operating system
+    description: Hewlett Packard Enterprise HP-UX Unix operating system
 
   # ============================================================
   # APPLICATIONS (application::)
@@ -490,9 +495,9 @@ keys:
     description: Microsoft Office productivity applications (Word, Excel, PowerPoint, etc.)
 
   - id: SRF0102
-    name: Microsoft::Office 365
+    name: Microsoft::Microsoft 365
     tide.vocab.stages: application
-    description: Microsoft Office 365 cloud-based productivity suite
+    description: Microsoft 365 cloud-based productivity suite (formerly Office 365)
 
   - id: SRF0103
     name: Microsoft::Word
@@ -584,7 +589,7 @@ keys:
   - id: SRF0120
     name: Atlassian::Bitbucket
     tide.vocab.stages: application
-    description: Atlassian Bitbucket code hosting and CI/CD
+    description: Atlassian Bitbucket (see also Code Repositories::Bitbucket for repository-focused context)
 
   # --- Communication ---
   - id: SRF0121
@@ -646,7 +651,7 @@ keys:
   - id: SRF0132
     name: Code Repositories::Bitbucket
     tide.vocab.stages: application
-    description: Atlassian Bitbucket code hosting
+    description: Atlassian Bitbucket as a code repository and source control platform
 
   - id: SRF0133
     name: Code Repositories::Azure DevOps
@@ -1221,7 +1226,7 @@ keys:
   - id: SRF0322
     name: Okta::Multi-Factor Authentication
     tide.vocab.stages: authentication
-    description: Okta MFA
+    description: Okta Verify and push-based multi-factor authentication service
 
   - id: SRF0323
     name: Okta::Advanced Server Access
@@ -2295,7 +2300,7 @@ keys:
   - id: SRF0741
     name: Virtualisation::VMware ESXi
     tide.vocab.stages: infrastructure
-    description: VMware ESXi bare-metal hypervisor
+    description: Broadcom VMware ESXi bare-metal Type 1 hypervisor
 
   - id: SRF0742
     name: Virtualisation::Microsoft Hyper-V
@@ -2722,7 +2727,7 @@ keys:
   - id: SRF0909
     name: Endpoint Protection::Carbon Black
     tide.vocab.stages: security
-    description: VMware Carbon Black endpoint security
+    description: Broadcom Carbon Black endpoint detection and response (formerly VMware Carbon Black)
 
   - id: SRF0910
     name: Endpoint Protection::ESET
@@ -2738,7 +2743,7 @@ keys:
   - id: SRF0916
     name: SIEM::Splunk
     tide.vocab.stages: security
-    description: Splunk Enterprise / Splunk Cloud SIEM
+    description: Cisco Splunk Enterprise / Splunk Cloud SIEM platform
 
   - id: SRF0917
     name: SIEM::Microsoft Sentinel
@@ -2779,7 +2784,7 @@ keys:
   - id: SRF0927
     name: SOAR::Splunk SOAR
     tide.vocab.stages: security
-    description: Splunk SOAR (formerly Phantom)
+    description: Cisco Splunk SOAR security orchestration and automation (formerly Phantom)
 
   - id: SRF0928
     name: SOAR::Tines
@@ -2928,15 +2933,20 @@ keys:
     tide.vocab.stages: security
     description: Data Loss Prevention solutions
 
+  - id: SRF0964
+    name: Data Protection::Encryption
+    tide.vocab.stages: security
+    description: Disk and data encryption technologies
+
   - id: SRF0962
     name: Data Protection::Encryption::BitLocker
     tide.vocab.stages: security
-    description: Microsoft BitLocker drive encryption
+    description: Microsoft BitLocker full-disk and volume encryption
 
   - id: SRF0963
     name: Data Protection::Encryption::VeraCrypt
     tide.vocab.stages: security
-    description: VeraCrypt disk encryption software
+    description: VeraCrypt open-source disk encryption software (TrueCrypt successor)
 
   # --- Network Security ---
   - id: SRF0965
@@ -2944,15 +2954,20 @@ keys:
     tide.vocab.stages: security
     description: Network-layer security appliances and solutions
 
+  - id: SRF0971
+    name: Network Security::IDS
+    tide.vocab.stages: security
+    description: Intrusion detection and prevention systems
+
   - id: SRF0966
     name: Network Security::IDS::Snort
     tide.vocab.stages: security
-    description: Snort open-source intrusion detection system
+    description: Cisco Snort open-source intrusion detection system
 
   - id: SRF0967
     name: Network Security::IDS::Suricata
     tide.vocab.stages: security
-    description: Suricata open-source IDS/IPS
+    description: Suricata open-source network threat detection engine (IDS/IPS)
 
   - id: SRF0968
     name: Network Security::WAF
@@ -2974,6 +2989,64 @@ keys:
     name: Deception
     tide.vocab.stages: security
     description: Deception technology and honeypots
+
+  # --- XDR ---
+  - id: SRF0976
+    name: XDR
+    tide.vocab.stages: security
+    description: Extended Detection and Response platforms unifying endpoint, network and cloud telemetry
+
+  - id: SRF0977
+    name: XDR::Palo Alto Cortex XDR
+    tide.vocab.stages: security
+    description: Palo Alto Networks Cortex XDR extended detection and response
+
+  - id: SRF0978
+    name: XDR::Microsoft Defender XDR
+    tide.vocab.stages: security
+    description: Microsoft Defender XDR (formerly Microsoft 365 Defender)
+
+  - id: SRF0979
+    name: XDR::Trend Micro Vision One
+    tide.vocab.stages: security
+    description: Trend Micro Vision One XDR platform
+
+  # --- CASB ---
+  - id: SRF0980
+    name: CASB
+    tide.vocab.stages: security
+    description: Cloud Access Security Broker solutions for cloud application visibility and control
+
+  - id: SRF0981
+    name: CASB::Microsoft Defender for Cloud Apps
+    tide.vocab.stages: security
+    description: Microsoft Defender for Cloud Apps CASB (formerly MCAS)
+
+  - id: SRF0982
+    name: CASB::Netskope
+    tide.vocab.stages: security
+    description: Netskope cloud security and CASB platform
+
+  - id: SRF0983
+    name: CASB::Zscaler CASB
+    tide.vocab.stages: security
+    description: Zscaler cloud access security broker
+
+  # --- ASM ---
+  - id: SRF0984
+    name: Attack Surface Management
+    tide.vocab.stages: security
+    description: External attack surface management and internet exposure discovery
+
+  - id: SRF0985
+    name: Attack Surface Management::Censys
+    tide.vocab.stages: security
+    description: Censys internet-wide scanning and attack surface management
+
+  - id: SRF0986
+    name: Attack Surface Management::Shodan
+    tide.vocab.stages: security
+    description: Shodan internet-connected device search engine
 
   # ============================================================
   # IoT & EMBEDDED (iot::)
@@ -3527,3 +3600,49 @@ keys:
     name: Routing::RIP
     tide.vocab.stages: protocol
     description: Routing Information Protocol
+
+  # --- Missing High-Priority Protocols ---
+  - id: SRF1200
+    name: Application Layer::DHCP
+    tide.vocab.stages: protocol
+    description: Dynamic Host Configuration Protocol for automatic IP address assignment
+
+  - id: SRF1201
+    name: Application Layer::SIP
+    tide.vocab.stages: protocol
+    description: Session Initiation Protocol for VoIP and multimedia sessions
+
+  - id: SRF1202
+    name: Application Layer::RADIUS
+    tide.vocab.stages: protocol
+    description: Remote Authentication Dial-In User Service network access protocol
+
+  - id: SRF1203
+    name: Application Layer::TFTP
+    tide.vocab.stages: protocol
+    description: Trivial File Transfer Protocol (lightweight, no authentication)
+
+  - id: SRF1204
+    name: Application Layer::WinRM
+    tide.vocab.stages: protocol
+    description: Windows Remote Management protocol (WS-Management based)
+
+  - id: SRF1205
+    name: Application Layer::WMI
+    tide.vocab.stages: protocol
+    description: Windows Management Instrumentation remote management protocol
+
+  - id: SRF1206
+    name: Domain Name System::mDNS
+    tide.vocab.stages: protocol
+    description: Multicast DNS zero-configuration name resolution (frequently abused for lateral movement)
+
+  - id: SRF1207
+    name: Domain Name System::LLMNR
+    tide.vocab.stages: protocol
+    description: Link-Local Multicast Name Resolution (commonly exploited for credential interception)
+
+  - id: SRF1208
+    name: Transport Layer::SCTP
+    tide.vocab.stages: protocol
+    description: Stream Control Transmission Protocol (multi-homing capable transport)

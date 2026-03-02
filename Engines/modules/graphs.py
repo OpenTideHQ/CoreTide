@@ -225,7 +225,7 @@ def chaining_graph(tvm):
     # metadata present in the model
     graph_properties = {
         "cve": {"relation": "exploits", "direction": "to", "shape": "flag"},
-        "platforms": {"relation": "targets", "direction": "to", "shape": "database"},
+        "surface": {"relation": "targets", "direction": "to", "shape": "database"},
         "actors" : {"relation" : "performs", "direction": "from", "shape": "hexagon"}  
     }
 

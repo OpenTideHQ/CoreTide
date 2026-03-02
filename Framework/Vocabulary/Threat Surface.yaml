@@ -1,0 +1,3529 @@
+name: Threat Surface
+field: surface
+description: >-
+  Hierarchical scoping of the technologies, systems and environments applicable
+  to a threat vector. Uses scoped '::' delimited categories via stages.
+  Replaces the deprecated targets, platforms and domains vocabularies.
+icon: 🌐
+
+stages:
+  - id: os
+    name: Operating Systems
+    icon: 💻
+    description: Operating systems and runtime environments providing kernel-level or container-level execution
+
+  - id: application
+    name: Applications
+    icon: 📦
+    description: User-facing, developer-facing and enterprise software applications
+
+  - id: authentication
+    name: Authentication & Identity
+    icon: 🔐
+    description: Identity providers, directory services, privileged access management and authentication protocols
+
+  - id: cloud
+    name: Cloud Services
+    icon: ☁️
+    description: Cloud provider service catalogue entries across AWS, Azure, GCP and others
+
+  - id: infrastructure
+    name: Infrastructure
+    icon: 🏗️
+    description: Physical and virtual infrastructure including networking, compute, storage, orchestration and industrial systems
+
+  - id: security
+    name: Security Tooling
+    icon: 🛡️
+    description: Defensive security tooling including endpoint protection, SIEM, SOAR, vulnerability management and forensics
+
+  - id: iot
+    name: IoT & Embedded
+    icon: 📡
+    description: Internet of Things devices, embedded systems and connected consumer or industrial devices
+
+  - id: protocol
+    name: Protocols
+    icon: 🔌
+    description: Network, communication and authentication protocols where the threat targets the protocol itself
+
+keys:
+
+  # ============================================================
+  # OPERATING SYSTEMS (os::)
+  # ============================================================
+
+  # --- Windows ---
+  - id: SRF0001
+    name: Windows
+    tide.vocab.stages: os
+    description: Microsoft Windows operating systems (all versions)
+
+  - id: SRF0002
+    name: Windows::Desktop
+    tide.vocab.stages: os
+    description: Microsoft Windows desktop editions
+
+  - id: SRF0003
+    name: Windows::11
+    tide.vocab.stages: os
+    description: Microsoft Windows 11
+
+  - id: SRF0004
+    name: Windows::10
+    tide.vocab.stages: os
+    description: Microsoft Windows 10
+
+  - id: SRF0005
+    name: Windows::8
+    tide.vocab.stages: os
+    description: Microsoft Windows 8 / 8.1
+
+  - id: SRF0006
+    name: Windows::Server
+    tide.vocab.stages: os
+    description: Microsoft Windows Server editions
+
+  - id: SRF0007
+    name: Windows::Server 2025
+    tide.vocab.stages: os
+    description: Microsoft Windows Server 2025
+
+  - id: SRF0008
+    name: Windows::Server 2022
+    tide.vocab.stages: os
+    description: Microsoft Windows Server 2022
+
+  - id: SRF0009
+    name: Windows::Server 2019
+    tide.vocab.stages: os
+    description: Microsoft Windows Server 2019
+
+  - id: SRF0010
+    name: Windows::Server 2016
+    tide.vocab.stages: os
+    description: Microsoft Windows Server 2016
+
+  - id: SRF0011
+    name: Windows::Server 2012
+    tide.vocab.stages: os
+    description: Microsoft Windows Server 2012 / 2012 R2
+
+  # --- macOS ---
+  - id: SRF0012
+    name: macOS
+    tide.vocab.stages: os
+    description: Apple macOS operating systems (all versions)
+
+  - id: SRF0013
+    name: macOS::Sequoia 15
+    tide.vocab.stages: os
+    description: Apple macOS Sequoia (version 15)
+
+  - id: SRF0014
+    name: macOS::Sonoma 14
+    tide.vocab.stages: os
+    description: Apple macOS Sonoma (version 14)
+
+  - id: SRF0015
+    name: macOS::Ventura 13
+    tide.vocab.stages: os
+    description: Apple macOS Ventura (version 13)
+
+  - id: SRF0016
+    name: macOS::Monterey 12
+    tide.vocab.stages: os
+    description: Apple macOS Monterey (version 12)
+
+  - id: SRF0017
+    name: macOS::Big Sur 11
+    tide.vocab.stages: os
+    description: Apple macOS Big Sur (version 11)
+
+  - id: SRF0018
+    name: macOS::Catalina 10.15
+    tide.vocab.stages: os
+    description: Apple macOS Catalina (version 10.15)
+
+  # --- Linux ---
+  - id: SRF0019
+    name: Linux
+    tide.vocab.stages: os
+    description: Linux-based operating systems (all distributions)
+
+  - id: SRF0020
+    name: Linux::RHEL
+    tide.vocab.stages: os
+    description: Red Hat Enterprise Linux (all versions)
+
+  - id: SRF0021
+    name: Linux::RHEL 9
+    tide.vocab.stages: os
+    description: Red Hat Enterprise Linux 9
+
+  - id: SRF0022
+    name: Linux::RHEL 8
+    tide.vocab.stages: os
+    description: Red Hat Enterprise Linux 8
+
+  - id: SRF0023
+    name: Linux::RHEL 7
+    tide.vocab.stages: os
+    description: Red Hat Enterprise Linux 7
+
+  - id: SRF0024
+    name: Linux::Ubuntu
+    tide.vocab.stages: os
+    description: Canonical Ubuntu Linux (all versions)
+
+  - id: SRF0025
+    name: Linux::Ubuntu 24.04 LTS
+    tide.vocab.stages: os
+    description: Ubuntu 24.04 LTS (Noble Numbat)
+
+  - id: SRF0026
+    name: Linux::Ubuntu 22.04 LTS
+    tide.vocab.stages: os
+    description: Ubuntu 22.04 LTS (Jammy Jellyfish)
+
+  - id: SRF0027
+    name: Linux::Ubuntu 20.04 LTS
+    tide.vocab.stages: os
+    description: Ubuntu 20.04 LTS (Focal Fossa)
+
+  - id: SRF0028
+    name: Linux::Debian
+    tide.vocab.stages: os
+    description: Debian GNU/Linux (all versions)
+
+  - id: SRF0029
+    name: Linux::Debian 12
+    tide.vocab.stages: os
+    description: Debian 12 (Bookworm)
+
+  - id: SRF0030
+    name: Linux::Debian 11
+    tide.vocab.stages: os
+    description: Debian 11 (Bullseye)
+
+  - id: SRF0031
+    name: Linux::Fedora
+    tide.vocab.stages: os
+    description: Fedora Linux (all versions)
+
+  - id: SRF0032
+    name: Linux::CentOS
+    tide.vocab.stages: os
+    description: CentOS Linux (legacy, end-of-life)
+
+  - id: SRF0033
+    name: Linux::Rocky Linux
+    tide.vocab.stages: os
+    description: Rocky Linux (CentOS replacement)
+
+  - id: SRF0034
+    name: Linux::AlmaLinux
+    tide.vocab.stages: os
+    description: AlmaLinux (CentOS replacement)
+
+  - id: SRF0035
+    name: Linux::Amazon Linux
+    tide.vocab.stages: os
+    description: Amazon Linux (optimised for AWS)
+
+  - id: SRF0036
+    name: Linux::Oracle Linux
+    tide.vocab.stages: os
+    description: Oracle Linux
+
+  - id: SRF0037
+    name: Linux::SUSE
+    tide.vocab.stages: os
+    description: SUSE Linux Enterprise (all versions)
+
+  - id: SRF0038
+    name: Linux::openSUSE
+    tide.vocab.stages: os
+    description: openSUSE community distribution
+
+  - id: SRF0039
+    name: Linux::Arch Linux
+    tide.vocab.stages: os
+    description: Arch Linux rolling-release distribution
+
+  - id: SRF0040
+    name: Linux::Alpine Linux
+    tide.vocab.stages: os
+    description: Alpine Linux (minimal, commonly used in containers)
+
+  - id: SRF0041
+    name: Linux::Kali Linux
+    tide.vocab.stages: os
+    description: Kali Linux (penetration testing distribution)
+
+  - id: SRF0042
+    name: Linux::Gentoo
+    tide.vocab.stages: os
+    description: Gentoo Linux (source-based distribution)
+
+  - id: SRF0043
+    name: Linux::Manjaro
+    tide.vocab.stages: os
+    description: Manjaro Linux (Arch-based distribution)
+
+  - id: SRF0044
+    name: Linux::Slackware
+    tide.vocab.stages: os
+    description: Slackware Linux
+
+  # --- Container Runtimes ---
+  - id: SRF0045
+    name: Container Runtime
+    tide.vocab.stages: os
+    description: Container runtime environments providing process-level isolation
+
+  - id: SRF0046
+    name: Container Runtime::Docker
+    tide.vocab.stages: os
+    description: Docker Engine container runtime
+
+  - id: SRF0047
+    name: Container Runtime::containerd
+    tide.vocab.stages: os
+    description: containerd industry-standard container runtime
+
+  - id: SRF0048
+    name: Container Runtime::Podman
+    tide.vocab.stages: os
+    description: Podman daemonless container runtime
+
+  - id: SRF0049
+    name: Container Runtime::CRI-O
+    tide.vocab.stages: os
+    description: CRI-O lightweight container runtime for Kubernetes
+
+  # --- BSD ---
+  - id: SRF0050
+    name: BSD
+    tide.vocab.stages: os
+    description: BSD-family operating systems
+
+  - id: SRF0051
+    name: BSD::FreeBSD
+    tide.vocab.stages: os
+    description: FreeBSD operating system
+
+  - id: SRF0052
+    name: BSD::OpenBSD
+    tide.vocab.stages: os
+    description: OpenBSD security-focused operating system
+
+  - id: SRF0053
+    name: BSD::NetBSD
+    tide.vocab.stages: os
+    description: NetBSD portable operating system
+
+  # --- Solaris ---
+  - id: SRF0054
+    name: Solaris
+    tide.vocab.stages: os
+    description: Oracle Solaris operating system
+
+  - id: SRF0055
+    name: Solaris::Oracle Solaris 11
+    tide.vocab.stages: os
+    description: Oracle Solaris 11
+
+  # --- Mobile ---
+  - id: SRF0056
+    name: Mobile
+    tide.vocab.stages: os
+    description: Mobile operating systems (Android, iOS)
+
+  - id: SRF0057
+    name: Mobile::Android
+    tide.vocab.stages: os
+    description: Google Android mobile operating system (all versions)
+
+  - id: SRF0058
+    name: Mobile::Android 15
+    tide.vocab.stages: os
+    description: Android 15
+
+  - id: SRF0059
+    name: Mobile::Android 14
+    tide.vocab.stages: os
+    description: Android 14
+
+  - id: SRF0060
+    name: Mobile::Android 13
+    tide.vocab.stages: os
+    description: Android 13
+
+  - id: SRF0061
+    name: Mobile::iOS
+    tide.vocab.stages: os
+    description: Apple iOS mobile operating system (all versions)
+
+  - id: SRF0062
+    name: Mobile::iOS 18
+    tide.vocab.stages: os
+    description: Apple iOS 18
+
+  - id: SRF0063
+    name: Mobile::iOS 17
+    tide.vocab.stages: os
+    description: Apple iOS 17
+
+  - id: SRF0064
+    name: Mobile::iOS 16
+    tide.vocab.stages: os
+    description: Apple iOS 16
+
+  - id: SRF0065
+    name: Mobile::iPadOS
+    tide.vocab.stages: os
+    description: Apple iPadOS (distinct from iOS for tablet devices)
+
+  # --- ChromeOS ---
+  - id: SRF0066
+    name: ChromeOS
+    tide.vocab.stages: os
+    description: Google ChromeOS (Chromebook operating system)
+
+  # --- Embedded ---
+  - id: SRF0067
+    name: Embedded
+    tide.vocab.stages: os
+    description: Embedded and real-time operating systems
+
+  - id: SRF0068
+    name: Embedded::Windows IoT
+    tide.vocab.stages: os
+    description: Microsoft Windows IoT editions
+
+  - id: SRF0069
+    name: Embedded::FreeRTOS
+    tide.vocab.stages: os
+    description: FreeRTOS real-time operating system
+
+  - id: SRF0070
+    name: Embedded::VxWorks
+    tide.vocab.stages: os
+    description: Wind River VxWorks real-time operating system
+
+  - id: SRF0071
+    name: Embedded::Yocto
+    tide.vocab.stages: os
+    description: Yocto Project embedded Linux build system
+
+  - id: SRF0072
+    name: Embedded::Raspberry Pi OS
+    tide.vocab.stages: os
+    description: Raspberry Pi OS (formerly Raspbian)
+
+  - id: SRF0073
+    name: Embedded::QNX
+    tide.vocab.stages: os
+    description: BlackBerry QNX real-time operating system
+
+  - id: SRF0074
+    name: Embedded::Tizen
+    tide.vocab.stages: os
+    description: Samsung Tizen operating system
+
+  # --- Legacy ---
+  - id: SRF0075
+    name: Legacy
+    tide.vocab.stages: os
+    description: End-of-life operating systems no longer receiving security updates
+
+  - id: SRF0076
+    name: Legacy::Windows XP
+    tide.vocab.stages: os
+    description: Microsoft Windows XP (end-of-life)
+
+  - id: SRF0077
+    name: Legacy::Windows Vista
+    tide.vocab.stages: os
+    description: Microsoft Windows Vista (end-of-life)
+
+  - id: SRF0078
+    name: Legacy::Windows 7
+    tide.vocab.stages: os
+    description: Microsoft Windows 7 (end-of-life)
+
+  - id: SRF0079
+    name: Legacy::Windows 2000
+    tide.vocab.stages: os
+    description: Microsoft Windows 2000 (end-of-life)
+
+  - id: SRF0080
+    name: Legacy::Windows Server 2008
+    tide.vocab.stages: os
+    description: Microsoft Windows Server 2008 / 2008 R2 (end-of-life)
+
+  # --- Miscellaneous OS ---
+  - id: SRF0081
+    name: Miscellaneous::IBM AIX
+    tide.vocab.stages: os
+    description: IBM AIX Unix operating system
+
+  - id: SRF0082
+    name: Miscellaneous::HP-UX
+    tide.vocab.stages: os
+    description: Hewlett Packard HP-UX Unix operating system
+
+  # ============================================================
+  # APPLICATIONS (application::)
+  # ============================================================
+
+  # --- Microsoft ---
+  - id: SRF0100
+    name: Microsoft
+    tide.vocab.stages: application
+    description: Microsoft application ecosystem
+
+  - id: SRF0101
+    name: Microsoft::Office Suite
+    tide.vocab.stages: application
+    description: Microsoft Office productivity applications (Word, Excel, PowerPoint, etc.)
+
+  - id: SRF0102
+    name: Microsoft::Office 365
+    tide.vocab.stages: application
+    description: Microsoft Office 365 cloud-based productivity suite
+
+  - id: SRF0103
+    name: Microsoft::Word
+    tide.vocab.stages: application
+    description: Microsoft Word document editor
+
+  - id: SRF0104
+    name: Microsoft::Excel
+    tide.vocab.stages: application
+    description: Microsoft Excel spreadsheet application
+
+  - id: SRF0105
+    name: Microsoft::PowerPoint
+    tide.vocab.stages: application
+    description: Microsoft PowerPoint presentation software
+
+  - id: SRF0106
+    name: Microsoft::Teams
+    tide.vocab.stages: application
+    description: Microsoft Teams communication and collaboration platform
+
+  - id: SRF0107
+    name: Microsoft::SharePoint
+    tide.vocab.stages: application
+    description: Microsoft SharePoint document management and collaboration
+
+  - id: SRF0108
+    name: Microsoft::Outlook
+    tide.vocab.stages: application
+    description: Microsoft Outlook email client
+
+  - id: SRF0109
+    name: Microsoft::OneDrive
+    tide.vocab.stages: application
+    description: Microsoft OneDrive cloud file storage
+
+  - id: SRF0110
+    name: Microsoft::Intune
+    tide.vocab.stages: application
+    description: Microsoft Intune endpoint management
+
+  - id: SRF0111
+    name: Microsoft::Power Platform
+    tide.vocab.stages: application
+    description: Microsoft Power Platform (Power Apps, Power Automate, Power BI)
+
+  - id: SRF0112
+    name: Microsoft::Dynamics 365
+    tide.vocab.stages: application
+    description: Microsoft Dynamics 365 ERP and CRM platform
+
+  - id: SRF0113
+    name: Microsoft::System Center
+    tide.vocab.stages: application
+    description: Microsoft System Center enterprise management suite
+
+  - id: SRF0114
+    name: Microsoft::Exchange
+    tide.vocab.stages: application
+    description: Microsoft Exchange email and calendaring platform
+
+  # --- Google ---
+  - id: SRF0115
+    name: Google Workspace
+    tide.vocab.stages: application
+    description: Google Workspace (Gmail, Docs, Drive, Calendar, Meet)
+
+  - id: SRF0116
+    name: Google Analytics
+    tide.vocab.stages: application
+    description: Google Analytics web analytics platform
+
+  # --- Atlassian ---
+  - id: SRF0117
+    name: Atlassian
+    tide.vocab.stages: application
+    description: Atlassian product suite
+
+  - id: SRF0118
+    name: Atlassian::Jira
+    tide.vocab.stages: application
+    description: Atlassian Jira issue and project tracking
+
+  - id: SRF0119
+    name: Atlassian::Confluence
+    tide.vocab.stages: application
+    description: Atlassian Confluence team wiki and documentation
+
+  - id: SRF0120
+    name: Atlassian::Bitbucket
+    tide.vocab.stages: application
+    description: Atlassian Bitbucket code hosting and CI/CD
+
+  # --- Communication ---
+  - id: SRF0121
+    name: Communication
+    tide.vocab.stages: application
+    description: Communication and collaboration applications
+
+  - id: SRF0122
+    name: Communication::Slack
+    tide.vocab.stages: application
+    description: Slack team messaging platform
+
+  - id: SRF0123
+    name: Communication::Zoom
+    tide.vocab.stages: application
+    description: Zoom video conferencing
+
+  - id: SRF0124
+    name: Communication::Discord
+    tide.vocab.stages: application
+    description: Discord messaging and voice platform
+
+  - id: SRF0125
+    name: Communication::Signal
+    tide.vocab.stages: application
+    description: Signal encrypted messaging
+
+  - id: SRF0126
+    name: Communication::Webex
+    tide.vocab.stages: application
+    description: Cisco Webex conferencing and collaboration
+
+  # --- Code Repositories ---
+  - id: SRF0127
+    name: Code Repositories
+    tide.vocab.stages: application
+    description: Source code hosting and version control platforms
+
+  - id: SRF0128
+    name: Code Repositories::GitHub
+    tide.vocab.stages: application
+    description: GitHub source code hosting and collaboration
+
+  - id: SRF0129
+    name: Code Repositories::GitHub Enterprise
+    tide.vocab.stages: application
+    description: GitHub Enterprise Server (self-hosted)
+
+  - id: SRF0130
+    name: Code Repositories::GitLab
+    tide.vocab.stages: application
+    description: GitLab DevOps lifecycle tool
+
+  - id: SRF0131
+    name: Code Repositories::GitLab Self-Managed
+    tide.vocab.stages: application
+    description: GitLab Self-Managed (on-premises)
+
+  - id: SRF0132
+    name: Code Repositories::Bitbucket
+    tide.vocab.stages: application
+    description: Atlassian Bitbucket code hosting
+
+  - id: SRF0133
+    name: Code Repositories::Azure DevOps
+    tide.vocab.stages: application
+    description: Microsoft Azure DevOps source control and pipelines
+
+  # --- CRM ---
+  - id: SRF0134
+    name: CRM
+    tide.vocab.stages: application
+    description: Customer Relationship Management platforms
+
+  - id: SRF0135
+    name: CRM::Salesforce
+    tide.vocab.stages: application
+    description: Salesforce CRM platform
+
+  - id: SRF0136
+    name: CRM::HubSpot
+    tide.vocab.stages: application
+    description: HubSpot CRM and marketing platform
+
+  - id: SRF0137
+    name: CRM::Zoho CRM
+    tide.vocab.stages: application
+    description: Zoho CRM platform
+
+  # --- ERP ---
+  - id: SRF0138
+    name: ERP
+    tide.vocab.stages: application
+    description: Enterprise Resource Planning systems
+
+  - id: SRF0139
+    name: ERP::SAP
+    tide.vocab.stages: application
+    description: SAP ERP platform
+
+  - id: SRF0140
+    name: ERP::Oracle ERP
+    tide.vocab.stages: application
+    description: Oracle ERP Cloud / E-Business Suite
+
+  - id: SRF0141
+    name: ERP::NetSuite
+    tide.vocab.stages: application
+    description: Oracle NetSuite cloud ERP
+
+  # --- Database Management ---
+  - id: SRF0142
+    name: Database Management
+    tide.vocab.stages: application
+    description: Database management systems
+
+  - id: SRF0143
+    name: Database Management::MySQL
+    tide.vocab.stages: application
+    description: MySQL relational database
+
+  - id: SRF0144
+    name: Database Management::PostgreSQL
+    tide.vocab.stages: application
+    description: PostgreSQL open-source relational database
+
+  - id: SRF0145
+    name: Database Management::Oracle Database
+    tide.vocab.stages: application
+    description: Oracle Database management system
+
+  - id: SRF0146
+    name: Database Management::MongoDB
+    tide.vocab.stages: application
+    description: MongoDB NoSQL document database
+
+  - id: SRF0147
+    name: Database Management::Microsoft SQL Server
+    tide.vocab.stages: application
+    description: Microsoft SQL Server relational database
+
+  - id: SRF0148
+    name: Database Management::MariaDB
+    tide.vocab.stages: application
+    description: MariaDB open-source relational database
+
+  - id: SRF0149
+    name: Database Management::Cassandra
+    tide.vocab.stages: application
+    description: Apache Cassandra distributed database
+
+  - id: SRF0150
+    name: Database Management::Redis
+    tide.vocab.stages: application
+    description: Redis in-memory data store
+
+  - id: SRF0151
+    name: Database Management::Elasticsearch
+    tide.vocab.stages: application
+    description: Elasticsearch distributed search and analytics engine
+
+  # --- Web Servers ---
+  - id: SRF0152
+    name: Web Servers
+    tide.vocab.stages: application
+    description: HTTP servers and reverse proxies
+
+  - id: SRF0153
+    name: Web Servers::Apache HTTP
+    tide.vocab.stages: application
+    description: Apache HTTP Server
+
+  - id: SRF0154
+    name: Web Servers::NGINX
+    tide.vocab.stages: application
+    description: NGINX web server and reverse proxy
+
+  - id: SRF0155
+    name: Web Servers::IIS
+    tide.vocab.stages: application
+    description: Microsoft Internet Information Services
+
+  - id: SRF0156
+    name: Web Servers::Caddy
+    tide.vocab.stages: application
+    description: Caddy automatic HTTPS web server
+
+  - id: SRF0157
+    name: Web Servers::Traefik
+    tide.vocab.stages: application
+    description: Traefik cloud-native reverse proxy and load balancer
+
+  # --- ServiceNow ---
+  - id: SRF0158
+    name: ServiceNow
+    tide.vocab.stages: application
+    description: ServiceNow IT service management and workflow platform
+
+  # --- File Sharing ---
+  - id: SRF0159
+    name: File Sharing
+    tide.vocab.stages: application
+    description: Cloud file sharing and storage services
+
+  - id: SRF0160
+    name: File Sharing::Dropbox
+    tide.vocab.stages: application
+    description: Dropbox cloud file storage
+
+  - id: SRF0161
+    name: File Sharing::Box
+    tide.vocab.stages: application
+    description: Box cloud content management
+
+  - id: SRF0162
+    name: File Sharing::Google Drive
+    tide.vocab.stages: application
+    description: Google Drive cloud file storage
+
+  # --- Business Intelligence ---
+  - id: SRF0163
+    name: BI
+    tide.vocab.stages: application
+    description: Business intelligence and analytics platforms
+
+  - id: SRF0164
+    name: BI::Tableau
+    tide.vocab.stages: application
+    description: Salesforce Tableau data visualisation
+
+  - id: SRF0165
+    name: BI::Power BI
+    tide.vocab.stages: application
+    description: Microsoft Power BI business analytics
+
+  - id: SRF0166
+    name: BI::Looker
+    tide.vocab.stages: application
+    description: Google Looker data analytics platform
+
+  # --- Development: CI/CD ---
+  - id: SRF0170
+    name: Development
+    tide.vocab.stages: application
+    description: Software development tools and platforms
+
+  - id: SRF0171
+    name: Development::CI/CD
+    tide.vocab.stages: application
+    description: Continuous integration and continuous delivery platforms
+
+  - id: SRF0172
+    name: Development::CI/CD::Jenkins
+    tide.vocab.stages: application
+    description: Jenkins open-source automation server
+
+  - id: SRF0173
+    name: Development::CI/CD::GitHub Actions
+    tide.vocab.stages: application
+    description: GitHub Actions CI/CD workflow automation
+
+  - id: SRF0174
+    name: Development::CI/CD::GitLab CI/CD
+    tide.vocab.stages: application
+    description: GitLab CI/CD integrated pipeline engine
+
+  - id: SRF0175
+    name: Development::CI/CD::Azure Pipelines
+    tide.vocab.stages: application
+    description: Azure DevOps Pipelines CI/CD service
+
+  - id: SRF0176
+    name: Development::CI/CD::CircleCI
+    tide.vocab.stages: application
+    description: CircleCI cloud-based CI/CD platform
+
+  - id: SRF0177
+    name: Development::CI/CD::Travis CI
+    tide.vocab.stages: application
+    description: Travis CI hosted CI/CD service
+
+  - id: SRF0178
+    name: Development::CI/CD::TeamCity
+    tide.vocab.stages: application
+    description: JetBrains TeamCity build management and CI server
+
+  - id: SRF0179
+    name: Development::CI/CD::ArgoCD
+    tide.vocab.stages: application
+    description: ArgoCD declarative GitOps continuous delivery for Kubernetes
+
+  - id: SRF0180
+    name: Development::CI/CD::Tekton
+    tide.vocab.stages: application
+    description: Tekton cloud-native CI/CD pipeline framework
+
+  # --- Development: IDEs ---
+  - id: SRF0181
+    name: Development::IDEs
+    tide.vocab.stages: application
+    description: Integrated development environments
+
+  - id: SRF0182
+    name: Development::IDEs::Visual Studio Code
+    tide.vocab.stages: application
+    description: Microsoft Visual Studio Code editor
+
+  - id: SRF0183
+    name: Development::IDEs::IntelliJ IDEA
+    tide.vocab.stages: application
+    description: JetBrains IntelliJ IDEA Java/polyglot IDE
+
+  - id: SRF0184
+    name: Development::IDEs::Eclipse
+    tide.vocab.stages: application
+    description: Eclipse Foundation IDE
+
+  - id: SRF0185
+    name: Development::IDEs::Xcode
+    tide.vocab.stages: application
+    description: Apple Xcode IDE for macOS/iOS development
+
+  - id: SRF0186
+    name: Development::IDEs::Android Studio
+    tide.vocab.stages: application
+    description: Google Android Studio IDE
+
+  # --- Development: Package Management ---
+  - id: SRF0187
+    name: Development::Package Management
+    tide.vocab.stages: application
+    description: Software package managers and registries
+
+  - id: SRF0188
+    name: Development::Package Management::npm
+    tide.vocab.stages: application
+    description: npm JavaScript package manager
+
+  - id: SRF0189
+    name: Development::Package Management::PyPI
+    tide.vocab.stages: application
+    description: Python Package Index (pip)
+
+  - id: SRF0190
+    name: Development::Package Management::Maven
+    tide.vocab.stages: application
+    description: Apache Maven Java build and dependency management
+
+  - id: SRF0191
+    name: Development::Package Management::NuGet
+    tide.vocab.stages: application
+    description: NuGet .NET package manager
+
+  - id: SRF0192
+    name: Development::Package Management::Cargo
+    tide.vocab.stages: application
+    description: Cargo Rust package manager
+
+  - id: SRF0193
+    name: Development::Package Management::Go Modules
+    tide.vocab.stages: application
+    description: Go Modules dependency management
+
+  - id: SRF0194
+    name: Development::Package Management::Helm
+    tide.vocab.stages: application
+    description: Helm Kubernetes package manager
+
+  # --- Development: Artefact Registries ---
+  - id: SRF0195
+    name: Development::Artefact Registries
+    tide.vocab.stages: application
+    description: Container image and artefact registries
+
+  - id: SRF0196
+    name: Development::Artefact Registries::Docker Hub
+    tide.vocab.stages: application
+    description: Docker Hub container image registry
+
+  - id: SRF0197
+    name: Development::Artefact Registries::JFrog Artifactory
+    tide.vocab.stages: application
+    description: JFrog Artifactory universal artefact repository
+
+  - id: SRF0198
+    name: Development::Artefact Registries::Nexus Repository
+    tide.vocab.stages: application
+    description: Sonatype Nexus Repository manager
+
+  - id: SRF0199
+    name: Development::Artefact Registries::GitHub Packages
+    tide.vocab.stages: application
+    description: GitHub Packages package and container registry
+
+  # --- Development: Code Analysis ---
+  - id: SRF0200
+    name: Development::Code Analysis
+    tide.vocab.stages: application
+    description: Static analysis, SAST and software composition analysis tools
+
+  - id: SRF0201
+    name: Development::Code Analysis::SonarQube
+    tide.vocab.stages: application
+    description: SonarQube code quality and security analysis
+
+  - id: SRF0202
+    name: Development::Code Analysis::Snyk
+    tide.vocab.stages: application
+    description: Snyk developer security platform
+
+  - id: SRF0203
+    name: Development::Code Analysis::Checkmarx
+    tide.vocab.stages: application
+    description: Checkmarx application security testing
+
+  - id: SRF0204
+    name: Development::Code Analysis::Semgrep
+    tide.vocab.stages: application
+    description: Semgrep lightweight static analysis
+
+  - id: SRF0205
+    name: Development::Code Analysis::CodeQL
+    tide.vocab.stages: application
+    description: GitHub CodeQL semantic code analysis
+
+  - id: SRF0206
+    name: Development::Code Analysis::Trivy
+    tide.vocab.stages: application
+    description: Aqua Trivy vulnerability scanner for containers and IaC
+
+  # --- Development: Version Control ---
+  - id: SRF0207
+    name: Development::Version Control
+    tide.vocab.stages: application
+    description: Version control systems
+
+  - id: SRF0208
+    name: Development::Version Control::Git
+    tide.vocab.stages: application
+    description: Git distributed version control system
+
+  - id: SRF0209
+    name: Development::Version Control::Subversion
+    tide.vocab.stages: application
+    description: Apache Subversion centralised version control
+
+  # --- Infrastructure as Code ---
+  - id: SRF0210
+    name: Infrastructure as Code
+    tide.vocab.stages: application
+    description: Infrastructure as Code tools and configuration management
+
+  - id: SRF0211
+    name: Infrastructure as Code::Terraform
+    tide.vocab.stages: application
+    description: HashiCorp Terraform infrastructure provisioning
+
+  - id: SRF0212
+    name: Infrastructure as Code::Pulumi
+    tide.vocab.stages: application
+    description: Pulumi cloud infrastructure as code
+
+  - id: SRF0213
+    name: Infrastructure as Code::Ansible
+    tide.vocab.stages: application
+    description: Red Hat Ansible automation and configuration management
+
+  - id: SRF0214
+    name: Infrastructure as Code::Chef
+    tide.vocab.stages: application
+    description: Chef infrastructure automation
+
+  - id: SRF0215
+    name: Infrastructure as Code::Puppet
+    tide.vocab.stages: application
+    description: Puppet infrastructure and configuration management
+
+  # --- AI & ML Applications ---
+  - id: SRF0216
+    name: AI & ML
+    tide.vocab.stages: application
+    description: Artificial intelligence and machine learning applications
+
+  - id: SRF0217
+    name: AI & ML::ChatGPT
+    tide.vocab.stages: application
+    description: OpenAI ChatGPT conversational AI
+
+  - id: SRF0218
+    name: AI & ML::GitHub Copilot
+    tide.vocab.stages: application
+    description: GitHub Copilot AI code assistant
+
+  - id: SRF0219
+    name: AI & ML::Amazon Bedrock
+    tide.vocab.stages: application
+    description: Amazon Bedrock foundation model service
+
+  - id: SRF0220
+    name: AI & ML::Google Vertex AI
+    tide.vocab.stages: application
+    description: Google Cloud Vertex AI machine learning platform
+
+  # --- HRM ---
+  - id: SRF0221
+    name: HRM
+    tide.vocab.stages: application
+    description: Human resource management systems
+
+  - id: SRF0222
+    name: HRM::Workday
+    tide.vocab.stages: application
+    description: Workday cloud-based HRM and finance
+
+  - id: SRF0223
+    name: HRM::SAP SuccessFactors
+    tide.vocab.stages: application
+    description: SAP SuccessFactors human capital management
+
+  # --- Customer Support ---
+  - id: SRF0224
+    name: Customer Support
+    tide.vocab.stages: application
+    description: Customer support and helpdesk platforms
+
+  - id: SRF0225
+    name: Customer Support::Zendesk
+    tide.vocab.stages: application
+    description: Zendesk customer service software
+
+  - id: SRF0226
+    name: Customer Support::Freshdesk
+    tide.vocab.stages: application
+    description: Freshworks Freshdesk customer support
+
+  # --- Finance ---
+  - id: SRF0227
+    name: Finance
+    tide.vocab.stages: application
+    description: Finance and accounting applications
+
+  - id: SRF0228
+    name: Finance::SAP
+    tide.vocab.stages: application
+    description: SAP Financial Accounting modules
+
+  - id: SRF0229
+    name: Finance::QuickBooks
+    tide.vocab.stages: application
+    description: Intuit QuickBooks accounting software
+
+  # ============================================================
+  # AUTHENTICATION & IDENTITY (authentication::)
+  # ============================================================
+
+  # --- Entra ID (formerly Azure AD) ---
+  - id: SRF0300
+    name: Entra ID
+    tide.vocab.stages: authentication
+    description: Microsoft Entra ID (formerly Azure Active Directory)
+
+  - id: SRF0301
+    name: Entra ID::Single Sign-On
+    tide.vocab.stages: authentication
+    description: Microsoft Entra ID SSO capability
+
+  - id: SRF0302
+    name: Entra ID::Multi-Factor Authentication
+    tide.vocab.stages: authentication
+    description: Microsoft Entra ID MFA
+
+  - id: SRF0303
+    name: Entra ID::Conditional Access
+    tide.vocab.stages: authentication
+    description: Microsoft Entra ID Conditional Access policies
+
+  - id: SRF0304
+    name: Entra ID::Privileged Identity Management
+    tide.vocab.stages: authentication
+    description: Microsoft Entra ID PIM for just-in-time privileged access
+
+  - id: SRF0305
+    name: Entra ID::B2C
+    tide.vocab.stages: authentication
+    description: Microsoft Entra ID B2C (Business to Consumer identity)
+
+  - id: SRF0306
+    name: Entra ID::B2B
+    tide.vocab.stages: authentication
+    description: Microsoft Entra ID B2B (Business to Business identity)
+
+  # --- Active Directory ---
+  - id: SRF0310
+    name: Active Directory
+    tide.vocab.stages: authentication
+    description: Microsoft Active Directory on-premises directory services
+
+  - id: SRF0311
+    name: Active Directory::Domain Services
+    tide.vocab.stages: authentication
+    description: Active Directory Domain Services (AD DS)
+
+  - id: SRF0312
+    name: Active Directory::Federation Services
+    tide.vocab.stages: authentication
+    description: Active Directory Federation Services (AD FS)
+
+  - id: SRF0313
+    name: Active Directory::Certificate Services
+    tide.vocab.stages: authentication
+    description: Active Directory Certificate Services (AD CS)
+
+  - id: SRF0314
+    name: Active Directory::Group Policy
+    tide.vocab.stages: authentication
+    description: Active Directory Group Policy Objects (GPO)
+
+  - id: SRF0315
+    name: Active Directory::Lightweight Directory Services
+    tide.vocab.stages: authentication
+    description: Active Directory Lightweight Directory Services (AD LDS)
+
+  # --- Okta ---
+  - id: SRF0320
+    name: Okta
+    tide.vocab.stages: authentication
+    description: Okta identity and access management platform
+
+  - id: SRF0321
+    name: Okta::Single Sign-On
+    tide.vocab.stages: authentication
+    description: Okta SSO capability
+
+  - id: SRF0322
+    name: Okta::Multi-Factor Authentication
+    tide.vocab.stages: authentication
+    description: Okta MFA
+
+  - id: SRF0323
+    name: Okta::Advanced Server Access
+    tide.vocab.stages: authentication
+    description: Okta Advanced Server Access (zero-trust server access)
+
+  # --- Ping Identity ---
+  - id: SRF0324
+    name: Ping Identity
+    tide.vocab.stages: authentication
+    description: Ping Identity federation and access management
+
+  - id: SRF0325
+    name: Ping Identity::PingFederate
+    tide.vocab.stages: authentication
+    description: PingFederate enterprise federation server
+
+  # --- Auth0 ---
+  - id: SRF0326
+    name: Auth0
+    tide.vocab.stages: authentication
+    description: Okta Auth0 (developer-focused identity platform)
+
+  - id: SRF0327
+    name: Auth0::Universal Login
+    tide.vocab.stages: authentication
+    description: Auth0 Universal Login
+
+  # --- Duo Security ---
+  - id: SRF0330
+    name: Duo Security
+    tide.vocab.stages: authentication
+    description: Cisco Duo Security multi-factor authentication
+
+  - id: SRF0331
+    name: Duo Security::Duo Mobile
+    tide.vocab.stages: authentication
+    description: Duo Mobile authenticator application
+
+  - id: SRF0332
+    name: Duo Security::Device Trust
+    tide.vocab.stages: authentication
+    description: Duo Security Device Trust endpoint verification
+
+  # --- CyberArk ---
+  - id: SRF0335
+    name: CyberArk
+    tide.vocab.stages: authentication
+    description: CyberArk privileged access management
+
+  - id: SRF0336
+    name: CyberArk::Enterprise Password Vault
+    tide.vocab.stages: authentication
+    description: CyberArk Enterprise Password Vault
+
+  - id: SRF0337
+    name: CyberArk::Privileged Access Security
+    tide.vocab.stages: authentication
+    description: CyberArk Privileged Access Security solution
+
+  - id: SRF0338
+    name: CyberArk::Secrets Manager
+    tide.vocab.stages: authentication
+    description: CyberArk Secrets Manager (application credentials)
+
+  # --- BeyondTrust ---
+  - id: SRF0340
+    name: BeyondTrust
+    tide.vocab.stages: authentication
+    description: BeyondTrust privileged access management
+
+  - id: SRF0341
+    name: BeyondTrust::Password Safe
+    tide.vocab.stages: authentication
+    description: BeyondTrust Password Safe credential management
+
+  - id: SRF0342
+    name: BeyondTrust::Privileged Remote Access
+    tide.vocab.stages: authentication
+    description: BeyondTrust Privileged Remote Access
+
+  # --- Wallix ---
+  - id: SRF0345
+    name: Wallix
+    tide.vocab.stages: authentication
+    description: Wallix privileged access management
+
+  - id: SRF0346
+    name: Wallix::Bastion
+    tide.vocab.stages: authentication
+    description: Wallix Bastion PAM gateway
+
+  # --- Thales ---
+  - id: SRF0348
+    name: Thales
+    tide.vocab.stages: authentication
+    description: Thales identity and access management solutions
+
+  - id: SRF0349
+    name: Thales::SafeNet Trusted Access
+    tide.vocab.stages: authentication
+    description: Thales SafeNet Trusted Access cloud IAM
+
+  # --- HashiCorp Vault ---
+  - id: SRF0350
+    name: HashiCorp Vault
+    tide.vocab.stages: authentication
+    description: HashiCorp Vault secrets management and data protection
+
+  # --- Google Identity ---
+  - id: SRF0351
+    name: Google Identity
+    tide.vocab.stages: authentication
+    description: Google Cloud Identity platform
+
+  - id: SRF0352
+    name: Google Identity::Cloud Identity
+    tide.vocab.stages: authentication
+    description: Google Cloud Identity directory and device management
+
+  # --- RSA SecurID ---
+  - id: SRF0353
+    name: RSA SecurID
+    tide.vocab.stages: authentication
+    description: RSA SecurID multi-factor authentication
+
+  # --- Authentication Protocols ---
+  - id: SRF0360
+    name: SAML
+    tide.vocab.stages: authentication
+    description: Security Assertion Markup Language federation protocol
+
+  - id: SRF0361
+    name: OAuth / OIDC
+    tide.vocab.stages: authentication
+    description: OAuth 2.0 and OpenID Connect authorisation/authentication protocols
+
+  - id: SRF0362
+    name: LDAP
+    tide.vocab.stages: authentication
+    description: Lightweight Directory Access Protocol
+
+  - id: SRF0363
+    name: RADIUS
+    tide.vocab.stages: authentication
+    description: Remote Authentication Dial-In User Service
+
+  - id: SRF0364
+    name: Kerberos
+    tide.vocab.stages: authentication
+    description: Kerberos network authentication protocol
+
+  - id: SRF0365
+    name: FIDO2 / WebAuthn
+    tide.vocab.stages: authentication
+    description: FIDO2 and WebAuthn passwordless authentication standards
+
+  - id: SRF0366
+    name: NTLM
+    tide.vocab.stages: authentication
+    description: NT LAN Manager authentication protocol (legacy)
+
+  # ============================================================
+  # CLOUD SERVICES (cloud::)
+  # ============================================================
+
+  # --- AWS ---
+  - id: SRF0400
+    name: AWS
+    tide.vocab.stages: cloud
+    description: Amazon Web Services cloud platform
+
+  # AWS Compute
+  - id: SRF0401
+    name: AWS::Compute
+    tide.vocab.stages: cloud
+    description: AWS compute services
+
+  - id: SRF0402
+    name: AWS::Compute::EC2
+    tide.vocab.stages: cloud
+    description: Amazon Elastic Compute Cloud (virtual servers)
+
+  - id: SRF0403
+    name: AWS::Compute::Lambda
+    tide.vocab.stages: cloud
+    description: AWS Lambda serverless compute
+
+  - id: SRF0404
+    name: AWS::Compute::ECS
+    tide.vocab.stages: cloud
+    description: Amazon Elastic Container Service
+
+  - id: SRF0405
+    name: AWS::Compute::EKS
+    tide.vocab.stages: cloud
+    description: Amazon Elastic Kubernetes Service
+
+  - id: SRF0406
+    name: AWS::Compute::Fargate
+    tide.vocab.stages: cloud
+    description: AWS Fargate serverless compute for containers
+
+  - id: SRF0407
+    name: AWS::Compute::Lightsail
+    tide.vocab.stages: cloud
+    description: Amazon Lightsail simplified virtual servers
+
+  - id: SRF0408
+    name: AWS::Compute::Batch
+    tide.vocab.stages: cloud
+    description: AWS Batch managed batch processing
+
+  # AWS Storage
+  - id: SRF0410
+    name: AWS::Storage
+    tide.vocab.stages: cloud
+    description: AWS storage services
+
+  - id: SRF0411
+    name: AWS::Storage::S3
+    tide.vocab.stages: cloud
+    description: Amazon Simple Storage Service (object storage)
+
+  - id: SRF0412
+    name: AWS::Storage::EBS
+    tide.vocab.stages: cloud
+    description: Amazon Elastic Block Store (block storage)
+
+  - id: SRF0413
+    name: AWS::Storage::EFS
+    tide.vocab.stages: cloud
+    description: Amazon Elastic File System (managed NFS)
+
+  - id: SRF0414
+    name: AWS::Storage::Glacier
+    tide.vocab.stages: cloud
+    description: Amazon S3 Glacier archival storage
+
+  # AWS Database
+  - id: SRF0420
+    name: AWS::Database
+    tide.vocab.stages: cloud
+    description: AWS database services
+
+  - id: SRF0421
+    name: AWS::Database::RDS
+    tide.vocab.stages: cloud
+    description: Amazon Relational Database Service
+
+  - id: SRF0422
+    name: AWS::Database::DynamoDB
+    tide.vocab.stages: cloud
+    description: Amazon DynamoDB NoSQL database
+
+  - id: SRF0423
+    name: AWS::Database::Aurora
+    tide.vocab.stages: cloud
+    description: Amazon Aurora MySQL/PostgreSQL-compatible database
+
+  - id: SRF0424
+    name: AWS::Database::Redshift
+    tide.vocab.stages: cloud
+    description: Amazon Redshift data warehouse
+
+  - id: SRF0425
+    name: AWS::Database::ElastiCache
+    tide.vocab.stages: cloud
+    description: Amazon ElastiCache in-memory caching
+
+  - id: SRF0426
+    name: AWS::Database::DocumentDB
+    tide.vocab.stages: cloud
+    description: Amazon DocumentDB (MongoDB-compatible)
+
+  # AWS Networking
+  - id: SRF0430
+    name: AWS::Networking
+    tide.vocab.stages: cloud
+    description: AWS networking services
+
+  - id: SRF0431
+    name: AWS::Networking::VPC
+    tide.vocab.stages: cloud
+    description: Amazon Virtual Private Cloud
+
+  - id: SRF0432
+    name: AWS::Networking::Route 53
+    tide.vocab.stages: cloud
+    description: Amazon Route 53 DNS and domain registration
+
+  - id: SRF0433
+    name: AWS::Networking::CloudFront
+    tide.vocab.stages: cloud
+    description: Amazon CloudFront content delivery network
+
+  - id: SRF0434
+    name: AWS::Networking::API Gateway
+    tide.vocab.stages: cloud
+    description: Amazon API Gateway
+
+  - id: SRF0435
+    name: AWS::Networking::Elastic Load Balancing
+    tide.vocab.stages: cloud
+    description: AWS Elastic Load Balancing
+
+  - id: SRF0436
+    name: AWS::Networking::Direct Connect
+    tide.vocab.stages: cloud
+    description: AWS Direct Connect dedicated network connection
+
+  - id: SRF0437
+    name: AWS::Networking::Transit Gateway
+    tide.vocab.stages: cloud
+    description: AWS Transit Gateway central network hub
+
+  # AWS Security
+  - id: SRF0440
+    name: AWS::Security
+    tide.vocab.stages: cloud
+    description: AWS security services
+
+  - id: SRF0441
+    name: AWS::Security::IAM
+    tide.vocab.stages: cloud
+    description: AWS Identity and Access Management
+
+  - id: SRF0442
+    name: AWS::Security::GuardDuty
+    tide.vocab.stages: cloud
+    description: Amazon GuardDuty threat detection
+
+  - id: SRF0443
+    name: AWS::Security::Security Hub
+    tide.vocab.stages: cloud
+    description: AWS Security Hub centralised security findings
+
+  - id: SRF0444
+    name: AWS::Security::CloudTrail
+    tide.vocab.stages: cloud
+    description: AWS CloudTrail API activity logging
+
+  - id: SRF0445
+    name: AWS::Security::KMS
+    tide.vocab.stages: cloud
+    description: AWS Key Management Service
+
+  - id: SRF0446
+    name: AWS::Security::Secrets Manager
+    tide.vocab.stages: cloud
+    description: AWS Secrets Manager credential storage
+
+  - id: SRF0447
+    name: AWS::Security::WAF
+    tide.vocab.stages: cloud
+    description: AWS Web Application Firewall
+
+  - id: SRF0448
+    name: AWS::Security::Shield
+    tide.vocab.stages: cloud
+    description: AWS Shield DDoS protection
+
+  - id: SRF0449
+    name: AWS::Security::Cognito
+    tide.vocab.stages: cloud
+    description: Amazon Cognito user identity and access
+
+  - id: SRF0450
+    name: AWS::Security::Inspector
+    tide.vocab.stages: cloud
+    description: Amazon Inspector automated vulnerability management
+
+  - id: SRF0451
+    name: AWS::Security::Macie
+    tide.vocab.stages: cloud
+    description: Amazon Macie sensitive data discovery
+
+  - id: SRF0452
+    name: AWS::Security::Security Lake
+    tide.vocab.stages: cloud
+    description: Amazon Security Lake centralised security data lake
+
+  # AWS Management
+  - id: SRF0455
+    name: AWS::Management
+    tide.vocab.stages: cloud
+    description: AWS management and governance services
+
+  - id: SRF0456
+    name: AWS::Management::CloudWatch
+    tide.vocab.stages: cloud
+    description: Amazon CloudWatch monitoring and observability
+
+  - id: SRF0457
+    name: AWS::Management::Systems Manager
+    tide.vocab.stages: cloud
+    description: AWS Systems Manager operations management
+
+  - id: SRF0458
+    name: AWS::Management::Config
+    tide.vocab.stages: cloud
+    description: AWS Config resource configuration tracking
+
+  - id: SRF0459
+    name: AWS::Management::Organizations
+    tide.vocab.stages: cloud
+    description: AWS Organizations multi-account management
+
+  # AWS Containers
+  - id: SRF0460
+    name: AWS::Containers
+    tide.vocab.stages: cloud
+    description: AWS container services
+
+  - id: SRF0461
+    name: AWS::Containers::ECR
+    tide.vocab.stages: cloud
+    description: Amazon Elastic Container Registry
+
+  # AWS Analytics
+  - id: SRF0462
+    name: AWS::Analytics
+    tide.vocab.stages: cloud
+    description: AWS analytics services
+
+  - id: SRF0463
+    name: AWS::Analytics::Athena
+    tide.vocab.stages: cloud
+    description: Amazon Athena serverless query service
+
+  - id: SRF0464
+    name: AWS::Analytics::Kinesis
+    tide.vocab.stages: cloud
+    description: Amazon Kinesis real-time data streaming
+
+  - id: SRF0465
+    name: AWS::Analytics::Glue
+    tide.vocab.stages: cloud
+    description: AWS Glue serverless data integration
+
+  # AWS IoT
+  - id: SRF0466
+    name: AWS::IoT
+    tide.vocab.stages: cloud
+    description: AWS Internet of Things services
+
+  - id: SRF0467
+    name: AWS::IoT::IoT Core
+    tide.vocab.stages: cloud
+    description: AWS IoT Core managed MQTT broker
+
+  - id: SRF0468
+    name: AWS::IoT::Greengrass
+    tide.vocab.stages: cloud
+    description: AWS IoT Greengrass edge computing
+
+  # --- Azure ---
+  - id: SRF0500
+    name: Azure
+    tide.vocab.stages: cloud
+    description: Microsoft Azure cloud platform
+
+  # Azure Compute
+  - id: SRF0501
+    name: Azure::Compute
+    tide.vocab.stages: cloud
+    description: Azure compute services
+
+  - id: SRF0502
+    name: Azure::Compute::Virtual Machines
+    tide.vocab.stages: cloud
+    description: Azure Virtual Machines
+
+  - id: SRF0503
+    name: Azure::Compute::App Services
+    tide.vocab.stages: cloud
+    description: Azure App Services web application hosting
+
+  - id: SRF0504
+    name: Azure::Compute::Azure Functions
+    tide.vocab.stages: cloud
+    description: Azure Functions serverless compute
+
+  - id: SRF0505
+    name: Azure::Compute::Container Instances
+    tide.vocab.stages: cloud
+    description: Azure Container Instances
+
+  - id: SRF0506
+    name: Azure::Compute::Container Apps
+    tide.vocab.stages: cloud
+    description: Azure Container Apps managed containers
+
+  - id: SRF0507
+    name: Azure::Compute::Kubernetes Service
+    tide.vocab.stages: cloud
+    description: Azure Kubernetes Service (AKS)
+
+  - id: SRF0508
+    name: Azure::Compute::Service Fabric
+    tide.vocab.stages: cloud
+    description: Azure Service Fabric distributed systems platform
+
+  - id: SRF0509
+    name: Azure::Compute::Azure Arc
+    tide.vocab.stages: cloud
+    description: Azure Arc hybrid and multi-cloud management
+
+  # Azure Storage
+  - id: SRF0510
+    name: Azure::Storage
+    tide.vocab.stages: cloud
+    description: Azure storage services
+
+  - id: SRF0511
+    name: Azure::Storage::Blob Storage
+    tide.vocab.stages: cloud
+    description: Azure Blob Storage (object storage)
+
+  - id: SRF0512
+    name: Azure::Storage::File Storage
+    tide.vocab.stages: cloud
+    description: Azure Files managed file shares
+
+  - id: SRF0513
+    name: Azure::Storage::Data Lake Storage
+    tide.vocab.stages: cloud
+    description: Azure Data Lake Storage for big data analytics
+
+  # Azure Database
+  - id: SRF0515
+    name: Azure::Database
+    tide.vocab.stages: cloud
+    description: Azure database services
+
+  - id: SRF0516
+    name: Azure::Database::SQL Database
+    tide.vocab.stages: cloud
+    description: Azure SQL Database
+
+  - id: SRF0517
+    name: Azure::Database::Cosmos DB
+    tide.vocab.stages: cloud
+    description: Azure Cosmos DB globally distributed multi-model database
+
+  - id: SRF0518
+    name: Azure::Database::SQL Managed Instance
+    tide.vocab.stages: cloud
+    description: Azure SQL Managed Instance
+
+  # Azure Networking
+  - id: SRF0520
+    name: Azure::Networking
+    tide.vocab.stages: cloud
+    description: Azure networking services
+
+  - id: SRF0521
+    name: Azure::Networking::Virtual Network
+    tide.vocab.stages: cloud
+    description: Azure Virtual Network (VNet)
+
+  - id: SRF0522
+    name: Azure::Networking::Application Gateway
+    tide.vocab.stages: cloud
+    description: Azure Application Gateway and WAF
+
+  - id: SRF0523
+    name: Azure::Networking::Load Balancer
+    tide.vocab.stages: cloud
+    description: Azure Load Balancer
+
+  - id: SRF0524
+    name: Azure::Networking::ExpressRoute
+    tide.vocab.stages: cloud
+    description: Azure ExpressRoute dedicated private connection
+
+  - id: SRF0525
+    name: Azure::Networking::Azure DNS
+    tide.vocab.stages: cloud
+    description: Azure DNS hosting
+
+  - id: SRF0526
+    name: Azure::Networking::Azure Bastion
+    tide.vocab.stages: cloud
+    description: Azure Bastion secure RDP/SSH access
+
+  - id: SRF0527
+    name: Azure::Networking::Azure Firewall
+    tide.vocab.stages: cloud
+    description: Azure Firewall network security
+
+  # Azure Security
+  - id: SRF0530
+    name: Azure::Security
+    tide.vocab.stages: cloud
+    description: Azure security services
+
+  - id: SRF0531
+    name: Azure::Security::Entra ID
+    tide.vocab.stages: cloud
+    description: Microsoft Entra ID in Azure (cloud identity)
+
+  - id: SRF0532
+    name: Azure::Security::Key Vault
+    tide.vocab.stages: cloud
+    description: Azure Key Vault secrets and key management
+
+  - id: SRF0533
+    name: Azure::Security::Sentinel
+    tide.vocab.stages: cloud
+    description: Microsoft Sentinel cloud-native SIEM and SOAR
+
+  - id: SRF0534
+    name: Azure::Security::Defender for Cloud
+    tide.vocab.stages: cloud
+    description: Microsoft Defender for Cloud multi-cloud security posture
+
+  - id: SRF0535
+    name: Azure::Security::Purview
+    tide.vocab.stages: cloud
+    description: Microsoft Purview data governance and compliance
+
+  - id: SRF0536
+    name: Azure::Security::Azure Policy
+    tide.vocab.stages: cloud
+    description: Azure Policy governance and compliance enforcement
+
+  - id: SRF0537
+    name: Azure::Security::DDoS Protection
+    tide.vocab.stages: cloud
+    description: Azure DDoS Protection
+
+  # Azure Management
+  - id: SRF0540
+    name: Azure::Management
+    tide.vocab.stages: cloud
+    description: Azure management and governance
+
+  - id: SRF0541
+    name: Azure::Management::Monitor
+    tide.vocab.stages: cloud
+    description: Azure Monitor observability platform
+
+  - id: SRF0542
+    name: Azure::Management::Automation
+    tide.vocab.stages: cloud
+    description: Azure Automation runbooks and DSC
+
+  - id: SRF0543
+    name: Azure::Management::Resource Manager
+    tide.vocab.stages: cloud
+    description: Azure Resource Manager (ARM) deployment and management
+
+  # Azure Analytics
+  - id: SRF0545
+    name: Azure::Analytics
+    tide.vocab.stages: cloud
+    description: Azure analytics services
+
+  - id: SRF0546
+    name: Azure::Analytics::Synapse Analytics
+    tide.vocab.stages: cloud
+    description: Azure Synapse Analytics integrated analytics
+
+  - id: SRF0547
+    name: Azure::Analytics::Data Factory
+    tide.vocab.stages: cloud
+    description: Azure Data Factory data integration
+
+  - id: SRF0548
+    name: Azure::Analytics::Log Analytics
+    tide.vocab.stages: cloud
+    description: Azure Log Analytics workspace
+
+  # Azure IoT
+  - id: SRF0550
+    name: Azure::IoT
+    tide.vocab.stages: cloud
+    description: Azure IoT services
+
+  - id: SRF0551
+    name: Azure::IoT::IoT Hub
+    tide.vocab.stages: cloud
+    description: Azure IoT Hub device connectivity
+
+  - id: SRF0552
+    name: Azure::IoT::IoT Edge
+    tide.vocab.stages: cloud
+    description: Azure IoT Edge device intelligence
+
+  - id: SRF0553
+    name: Azure::IoT::Digital Twins
+    tide.vocab.stages: cloud
+    description: Azure Digital Twins modelling service
+
+  # --- Google Cloud ---
+  - id: SRF0600
+    name: Google Cloud
+    tide.vocab.stages: cloud
+    description: Google Cloud Platform (GCP)
+
+  # GCP Compute
+  - id: SRF0601
+    name: Google Cloud::Compute
+    tide.vocab.stages: cloud
+    description: Google Cloud compute services
+
+  - id: SRF0602
+    name: Google Cloud::Compute::Compute Engine
+    tide.vocab.stages: cloud
+    description: Google Compute Engine virtual machines
+
+  - id: SRF0603
+    name: Google Cloud::Compute::App Engine
+    tide.vocab.stages: cloud
+    description: Google App Engine managed application hosting
+
+  - id: SRF0604
+    name: Google Cloud::Compute::Cloud Functions
+    tide.vocab.stages: cloud
+    description: Google Cloud Functions serverless compute
+
+  - id: SRF0605
+    name: Google Cloud::Compute::Cloud Run
+    tide.vocab.stages: cloud
+    description: Google Cloud Run serverless containers
+
+  - id: SRF0606
+    name: Google Cloud::Compute::Kubernetes Engine
+    tide.vocab.stages: cloud
+    description: Google Kubernetes Engine (GKE)
+
+  # GCP Storage
+  - id: SRF0610
+    name: Google Cloud::Storage
+    tide.vocab.stages: cloud
+    description: Google Cloud storage services
+
+  - id: SRF0611
+    name: Google Cloud::Storage::Cloud Storage
+    tide.vocab.stages: cloud
+    description: Google Cloud Storage (object storage)
+
+  - id: SRF0612
+    name: Google Cloud::Storage::Filestore
+    tide.vocab.stages: cloud
+    description: Google Filestore managed NFS
+
+  # GCP Database
+  - id: SRF0615
+    name: Google Cloud::Database
+    tide.vocab.stages: cloud
+    description: Google Cloud database services
+
+  - id: SRF0616
+    name: Google Cloud::Database::Cloud SQL
+    tide.vocab.stages: cloud
+    description: Google Cloud SQL managed relational databases
+
+  - id: SRF0617
+    name: Google Cloud::Database::Cloud Spanner
+    tide.vocab.stages: cloud
+    description: Google Cloud Spanner globally distributed database
+
+  - id: SRF0618
+    name: Google Cloud::Database::Firestore
+    tide.vocab.stages: cloud
+    description: Google Cloud Firestore NoSQL document database
+
+  - id: SRF0619
+    name: Google Cloud::Database::Bigtable
+    tide.vocab.stages: cloud
+    description: Google Cloud Bigtable NoSQL wide-column database
+
+  # GCP Networking
+  - id: SRF0620
+    name: Google Cloud::Networking
+    tide.vocab.stages: cloud
+    description: Google Cloud networking services
+
+  - id: SRF0621
+    name: Google Cloud::Networking::VPC
+    tide.vocab.stages: cloud
+    description: Google Cloud Virtual Private Cloud
+
+  - id: SRF0622
+    name: Google Cloud::Networking::Cloud Load Balancing
+    tide.vocab.stages: cloud
+    description: Google Cloud Load Balancing
+
+  - id: SRF0623
+    name: Google Cloud::Networking::Cloud CDN
+    tide.vocab.stages: cloud
+    description: Google Cloud CDN content delivery
+
+  - id: SRF0624
+    name: Google Cloud::Networking::Cloud DNS
+    tide.vocab.stages: cloud
+    description: Google Cloud DNS
+
+  # GCP Security
+  - id: SRF0630
+    name: Google Cloud::Security
+    tide.vocab.stages: cloud
+    description: Google Cloud security services
+
+  - id: SRF0631
+    name: Google Cloud::Security::Cloud IAM
+    tide.vocab.stages: cloud
+    description: Google Cloud IAM identity and access management
+
+  - id: SRF0632
+    name: Google Cloud::Security::Security Command Center
+    tide.vocab.stages: cloud
+    description: Google Security Command Center
+
+  - id: SRF0633
+    name: Google Cloud::Security::Cloud Armor
+    tide.vocab.stages: cloud
+    description: Google Cloud Armor DDoS and WAF
+
+  - id: SRF0634
+    name: Google Cloud::Security::Chronicle
+    tide.vocab.stages: cloud
+    description: Google Chronicle security analytics (SIEM)
+
+  - id: SRF0635
+    name: Google Cloud::Security::BeyondCorp Enterprise
+    tide.vocab.stages: cloud
+    description: Google BeyondCorp zero-trust access
+
+  - id: SRF0636
+    name: Google Cloud::Security::Key Management
+    tide.vocab.stages: cloud
+    description: Google Cloud Key Management Service
+
+  # GCP Analytics
+  - id: SRF0640
+    name: Google Cloud::Analytics
+    tide.vocab.stages: cloud
+    description: Google Cloud analytics services
+
+  - id: SRF0641
+    name: Google Cloud::Analytics::BigQuery
+    tide.vocab.stages: cloud
+    description: Google BigQuery serverless data warehouse
+
+  - id: SRF0642
+    name: Google Cloud::Analytics::Dataflow
+    tide.vocab.stages: cloud
+    description: Google Cloud Dataflow stream and batch processing
+
+  - id: SRF0643
+    name: Google Cloud::Analytics::Pub/Sub
+    tide.vocab.stages: cloud
+    description: Google Cloud Pub/Sub messaging service
+
+  # GCP Management
+  - id: SRF0645
+    name: Google Cloud::Management
+    tide.vocab.stages: cloud
+    description: Google Cloud management services
+
+  - id: SRF0646
+    name: Google Cloud::Management::Cloud Monitoring
+    tide.vocab.stages: cloud
+    description: Google Cloud Monitoring
+
+  - id: SRF0647
+    name: Google Cloud::Management::Cloud Logging
+    tide.vocab.stages: cloud
+    description: Google Cloud Logging
+
+  # --- Oracle Cloud ---
+  - id: SRF0650
+    name: OCI
+    tide.vocab.stages: cloud
+    description: Oracle Cloud Infrastructure
+
+  - id: SRF0651
+    name: OCI::Compute
+    tide.vocab.stages: cloud
+    description: Oracle Cloud Compute services
+
+  - id: SRF0652
+    name: OCI::Object Storage
+    tide.vocab.stages: cloud
+    description: Oracle Cloud Object Storage
+
+  - id: SRF0653
+    name: OCI::Autonomous Database
+    tide.vocab.stages: cloud
+    description: Oracle Autonomous Database
+
+  # --- Cloud-agnostic ---
+  - id: SRF0660
+    name: Serverless
+    tide.vocab.stages: cloud
+    description: Cloud-agnostic serverless compute (when not provider-specific)
+
+  - id: SRF0661
+    name: CDN
+    tide.vocab.stages: cloud
+    description: Cloud-agnostic content delivery network
+
+  - id: SRF0662
+    name: Object Storage
+    tide.vocab.stages: cloud
+    description: Cloud-agnostic object storage
+
+  # ============================================================
+  # INFRASTRUCTURE (infrastructure::)
+  # ============================================================
+
+  # --- Firewalls ---
+  - id: SRF0700
+    name: Firewalls
+    tide.vocab.stages: infrastructure
+    description: Network firewall appliances and software
+
+  - id: SRF0701
+    name: Firewalls::Palo Alto Networks
+    tide.vocab.stages: infrastructure
+    description: Palo Alto Networks next-generation firewalls
+
+  - id: SRF0702
+    name: Firewalls::Cisco ASA
+    tide.vocab.stages: infrastructure
+    description: Cisco ASA firewall appliance
+
+  - id: SRF0703
+    name: Firewalls::Fortinet FortiGate
+    tide.vocab.stages: infrastructure
+    description: Fortinet FortiGate next-generation firewall
+
+  - id: SRF0704
+    name: Firewalls::Check Point
+    tide.vocab.stages: infrastructure
+    description: Check Point firewall and security gateway
+
+  - id: SRF0705
+    name: Firewalls::SonicWall
+    tide.vocab.stages: infrastructure
+    description: SonicWall network security appliance
+
+  - id: SRF0706
+    name: Firewalls::Juniper SRX
+    tide.vocab.stages: infrastructure
+    description: Juniper SRX Series firewall
+
+  # --- VPN ---
+  - id: SRF0710
+    name: VPN
+    tide.vocab.stages: infrastructure
+    description: Virtual Private Network solutions
+
+  - id: SRF0711
+    name: VPN::OpenVPN
+    tide.vocab.stages: infrastructure
+    description: OpenVPN open-source VPN solution
+
+  - id: SRF0712
+    name: VPN::Cisco AnyConnect
+    tide.vocab.stages: infrastructure
+    description: Cisco AnyConnect Secure Mobility Client
+
+  - id: SRF0713
+    name: VPN::Palo Alto GlobalProtect
+    tide.vocab.stages: infrastructure
+    description: Palo Alto Networks GlobalProtect VPN
+
+  - id: SRF0714
+    name: VPN::Fortinet FortiClient
+    tide.vocab.stages: infrastructure
+    description: Fortinet FortiClient VPN
+
+  - id: SRF0715
+    name: VPN::Ivanti Connect Secure
+    tide.vocab.stages: infrastructure
+    description: Ivanti Connect Secure (formerly Pulse Secure) VPN
+
+  - id: SRF0716
+    name: VPN::WireGuard
+    tide.vocab.stages: infrastructure
+    description: WireGuard modern VPN protocol and implementation
+
+  # --- Proxy ---
+  - id: SRF0720
+    name: Proxy
+    tide.vocab.stages: infrastructure
+    description: Web proxy and content filtering solutions
+
+  - id: SRF0721
+    name: Proxy::Squid
+    tide.vocab.stages: infrastructure
+    description: Squid caching web proxy
+
+  - id: SRF0722
+    name: Proxy::Zscaler
+    tide.vocab.stages: infrastructure
+    description: Zscaler cloud security proxy
+
+  - id: SRF0723
+    name: Proxy::Blue Coat
+    tide.vocab.stages: infrastructure
+    description: Broadcom (Blue Coat) ProxySG web security
+
+  # --- Remote Access ---
+  - id: SRF0725
+    name: Remote Access
+    tide.vocab.stages: infrastructure
+    description: Remote access solutions (non-VPN)
+
+  - id: SRF0726
+    name: Remote Access::Citrix
+    tide.vocab.stages: infrastructure
+    description: Citrix Virtual Apps and Desktops
+
+  - id: SRF0727
+    name: Remote Access::RDP
+    tide.vocab.stages: infrastructure
+    description: Microsoft Remote Desktop Protocol gateway/service
+
+  - id: SRF0728
+    name: Remote Access::TeamViewer
+    tide.vocab.stages: infrastructure
+    description: TeamViewer remote access and support
+
+  - id: SRF0729
+    name: Remote Access::AnyDesk
+    tide.vocab.stages: infrastructure
+    description: AnyDesk remote desktop software
+
+  # --- Orchestration (containers) ---
+  - id: SRF0730
+    name: Orchestration
+    tide.vocab.stages: infrastructure
+    description: Container orchestration and workload management platforms
+
+  - id: SRF0731
+    name: Orchestration::Kubernetes
+    tide.vocab.stages: infrastructure
+    description: Kubernetes container orchestration platform
+
+  - id: SRF0732
+    name: Orchestration::OpenShift
+    tide.vocab.stages: infrastructure
+    description: Red Hat OpenShift Kubernetes platform
+
+  - id: SRF0733
+    name: Orchestration::Docker Swarm
+    tide.vocab.stages: infrastructure
+    description: Docker Swarm container orchestration
+
+  - id: SRF0734
+    name: Orchestration::Nomad
+    tide.vocab.stages: infrastructure
+    description: HashiCorp Nomad workload orchestrator
+
+  - id: SRF0735
+    name: Orchestration::Rancher
+    tide.vocab.stages: infrastructure
+    description: SUSE Rancher Kubernetes management
+
+  # --- Virtual Machine Hosts ---
+  - id: SRF0740
+    name: Virtualisation
+    tide.vocab.stages: infrastructure
+    description: Virtualisation hypervisors and platforms
+
+  - id: SRF0741
+    name: Virtualisation::VMware ESXi
+    tide.vocab.stages: infrastructure
+    description: VMware ESXi bare-metal hypervisor
+
+  - id: SRF0742
+    name: Virtualisation::Microsoft Hyper-V
+    tide.vocab.stages: infrastructure
+    description: Microsoft Hyper-V hypervisor
+
+  - id: SRF0743
+    name: Virtualisation::KVM
+    tide.vocab.stages: infrastructure
+    description: Kernel-based Virtual Machine (KVM) Linux hypervisor
+
+  - id: SRF0744
+    name: Virtualisation::Xen
+    tide.vocab.stages: infrastructure
+    description: Xen open-source hypervisor
+
+  - id: SRF0745
+    name: Virtualisation::Proxmox VE
+    tide.vocab.stages: infrastructure
+    description: Proxmox Virtual Environment
+
+  # --- Routers ---
+  - id: SRF0750
+    name: Routers
+    tide.vocab.stages: infrastructure
+    description: Network routers
+
+  - id: SRF0751
+    name: Routers::Cisco
+    tide.vocab.stages: infrastructure
+    description: Cisco IOS/IOS-XE based routers
+
+  - id: SRF0752
+    name: Routers::Juniper
+    tide.vocab.stages: infrastructure
+    description: Juniper Networks routers
+
+  - id: SRF0753
+    name: Routers::MikroTik
+    tide.vocab.stages: infrastructure
+    description: MikroTik RouterOS routers
+
+  - id: SRF0754
+    name: Routers::Arista
+    tide.vocab.stages: infrastructure
+    description: Arista Networks routers
+
+  # --- Switches ---
+  - id: SRF0755
+    name: Switches
+    tide.vocab.stages: infrastructure
+    description: Network switches
+
+  - id: SRF0756
+    name: Switches::Cisco
+    tide.vocab.stages: infrastructure
+    description: Cisco Catalyst and Nexus switches
+
+  - id: SRF0757
+    name: Switches::Juniper
+    tide.vocab.stages: infrastructure
+    description: Juniper Networks switches
+
+  - id: SRF0758
+    name: Switches::Aruba
+    tide.vocab.stages: infrastructure
+    description: HPE Aruba network switches
+
+  # --- Load Balancers ---
+  - id: SRF0760
+    name: Load Balancers
+    tide.vocab.stages: infrastructure
+    description: Application and network load balancers
+
+  - id: SRF0761
+    name: Load Balancers::F5 BIG-IP
+    tide.vocab.stages: infrastructure
+    description: F5 BIG-IP application delivery controller
+
+  - id: SRF0762
+    name: Load Balancers::HAProxy
+    tide.vocab.stages: infrastructure
+    description: HAProxy open-source load balancer
+
+  - id: SRF0763
+    name: Load Balancers::Citrix ADC
+    tide.vocab.stages: infrastructure
+    description: Citrix ADC (formerly NetScaler) application delivery
+
+  # --- DNS ---
+  - id: SRF0765
+    name: DNS
+    tide.vocab.stages: infrastructure
+    description: DNS infrastructure and services
+
+  - id: SRF0766
+    name: DNS::BIND
+    tide.vocab.stages: infrastructure
+    description: ISC BIND DNS server
+
+  - id: SRF0767
+    name: DNS::Microsoft DNS
+    tide.vocab.stages: infrastructure
+    description: Microsoft Windows DNS Server
+
+  - id: SRF0768
+    name: DNS::Infoblox
+    tide.vocab.stages: infrastructure
+    description: Infoblox DDI (DNS, DHCP, IPAM)
+
+  - id: SRF0769
+    name: DNS::Cloudflare DNS
+    tide.vocab.stages: infrastructure
+    description: Cloudflare DNS services
+
+  # --- Email ---
+  - id: SRF0770
+    name: Email
+    tide.vocab.stages: infrastructure
+    description: Email infrastructure and services
+
+  - id: SRF0771
+    name: Email::Exchange Server
+    tide.vocab.stages: infrastructure
+    description: Microsoft Exchange Server (on-premises)
+
+  - id: SRF0772
+    name: Email::Exchange Online
+    tide.vocab.stages: infrastructure
+    description: Microsoft Exchange Online (cloud-hosted)
+
+  - id: SRF0773
+    name: Email::Postfix
+    tide.vocab.stages: infrastructure
+    description: Postfix open-source mail transfer agent
+
+  - id: SRF0774
+    name: Email::Proofpoint
+    tide.vocab.stages: infrastructure
+    description: Proofpoint email security gateway
+
+  - id: SRF0775
+    name: Email::Mimecast
+    tide.vocab.stages: infrastructure
+    description: Mimecast email security and resilience
+
+  # --- Storage ---
+  - id: SRF0780
+    name: Storage
+    tide.vocab.stages: infrastructure
+    description: Enterprise storage systems
+
+  - id: SRF0781
+    name: Storage::Dell EMC
+    tide.vocab.stages: infrastructure
+    description: Dell EMC storage arrays
+
+  - id: SRF0782
+    name: Storage::NetApp
+    tide.vocab.stages: infrastructure
+    description: NetApp storage systems
+
+  - id: SRF0783
+    name: Storage::Pure Storage
+    tide.vocab.stages: infrastructure
+    description: Pure Storage all-flash arrays
+
+  # --- Wireless ---
+  - id: SRF0785
+    name: Wireless
+    tide.vocab.stages: infrastructure
+    description: Wireless networking infrastructure
+
+  - id: SRF0786
+    name: Wireless::Wi-Fi Access Points
+    tide.vocab.stages: infrastructure
+    description: Wi-Fi access points and controllers
+
+  - id: SRF0787
+    name: Wireless::Wireless Controllers
+    tide.vocab.stages: infrastructure
+    description: Wireless LAN controllers
+
+  # --- Monitoring ---
+  - id: SRF0790
+    name: Monitoring
+    tide.vocab.stages: infrastructure
+    description: Infrastructure monitoring and observability
+
+  - id: SRF0791
+    name: Monitoring::Prometheus
+    tide.vocab.stages: infrastructure
+    description: Prometheus open-source monitoring
+
+  - id: SRF0792
+    name: Monitoring::Grafana
+    tide.vocab.stages: infrastructure
+    description: Grafana observability and dashboards
+
+  - id: SRF0793
+    name: Monitoring::Datadog
+    tide.vocab.stages: infrastructure
+    description: Datadog cloud monitoring platform
+
+  - id: SRF0794
+    name: Monitoring::Nagios
+    tide.vocab.stages: infrastructure
+    description: Nagios infrastructure monitoring
+
+  - id: SRF0795
+    name: Monitoring::Zabbix
+    tide.vocab.stages: infrastructure
+    description: Zabbix enterprise monitoring solution
+
+  - id: SRF0796
+    name: Monitoring::SolarWinds
+    tide.vocab.stages: infrastructure
+    description: SolarWinds IT management and monitoring
+
+  # --- Backup and Recovery ---
+  - id: SRF0800
+    name: Backup and Recovery
+    tide.vocab.stages: infrastructure
+    description: Data backup and disaster recovery solutions
+
+  - id: SRF0801
+    name: Backup and Recovery::Veeam
+    tide.vocab.stages: infrastructure
+    description: Veeam Backup & Replication
+
+  - id: SRF0802
+    name: Backup and Recovery::Commvault
+    tide.vocab.stages: infrastructure
+    description: Commvault data protection
+
+  - id: SRF0803
+    name: Backup and Recovery::Veritas NetBackup
+    tide.vocab.stages: infrastructure
+    description: Veritas NetBackup enterprise backup
+
+  - id: SRF0804
+    name: Backup and Recovery::Rubrik
+    tide.vocab.stages: infrastructure
+    description: Rubrik cloud data management
+
+  # --- Certificate ---
+  - id: SRF0810
+    name: Certificate
+    tide.vocab.stages: infrastructure
+    description: Certificate and PKI infrastructure
+
+  - id: SRF0811
+    name: Certificate::AD CS
+    tide.vocab.stages: infrastructure
+    description: Active Directory Certificate Services
+
+  - id: SRF0812
+    name: Certificate::Let's Encrypt
+    tide.vocab.stages: infrastructure
+    description: Let's Encrypt automated certificate authority
+
+  - id: SRF0813
+    name: Certificate::DigiCert
+    tide.vocab.stages: infrastructure
+    description: DigiCert TLS/SSL certificate authority
+
+  # --- Industrial ---
+  - id: SRF0820
+    name: Industrial
+    tide.vocab.stages: infrastructure
+    description: Industrial control systems and operational technology
+
+  - id: SRF0821
+    name: Industrial::SCADA
+    tide.vocab.stages: infrastructure
+    description: Supervisory Control and Data Acquisition systems
+
+  - id: SRF0822
+    name: Industrial::SCADA::Siemens SIMATIC
+    tide.vocab.stages: infrastructure
+    description: Siemens SIMATIC SCADA platform
+
+  - id: SRF0823
+    name: Industrial::SCADA::Schneider Electric EcoStruxure
+    tide.vocab.stages: infrastructure
+    description: Schneider Electric EcoStruxure SCADA
+
+  - id: SRF0824
+    name: Industrial::SCADA::Rockwell Automation FactoryTalk
+    tide.vocab.stages: infrastructure
+    description: Rockwell Automation FactoryTalk SCADA
+
+  - id: SRF0825
+    name: Industrial::PLC
+    tide.vocab.stages: infrastructure
+    description: Programmable Logic Controllers
+
+  - id: SRF0826
+    name: Industrial::PLC::Siemens S7
+    tide.vocab.stages: infrastructure
+    description: Siemens S7 series PLC
+
+  - id: SRF0827
+    name: Industrial::PLC::Allen-Bradley ControlLogix
+    tide.vocab.stages: infrastructure
+    description: Rockwell Allen-Bradley ControlLogix PLC
+
+  - id: SRF0828
+    name: Industrial::PLC::Schneider Electric Modicon
+    tide.vocab.stages: infrastructure
+    description: Schneider Electric Modicon PLC
+
+  - id: SRF0829
+    name: Industrial::DCS
+    tide.vocab.stages: infrastructure
+    description: Distributed Control Systems
+
+  - id: SRF0830
+    name: Industrial::DCS::Honeywell Experion
+    tide.vocab.stages: infrastructure
+    description: Honeywell Experion DCS
+
+  - id: SRF0831
+    name: Industrial::DCS::Emerson DeltaV
+    tide.vocab.stages: infrastructure
+    description: Emerson DeltaV DCS
+
+  - id: SRF0832
+    name: Industrial::DCS::ABB 800xA
+    tide.vocab.stages: infrastructure
+    description: ABB System 800xA DCS
+
+  - id: SRF0833
+    name: Industrial::HMI
+    tide.vocab.stages: infrastructure
+    description: Human Machine Interface systems
+
+  - id: SRF0834
+    name: Industrial::HMI::Siemens WinCC
+    tide.vocab.stages: infrastructure
+    description: Siemens WinCC HMI/SCADA
+
+  - id: SRF0835
+    name: Industrial::BMS
+    tide.vocab.stages: infrastructure
+    description: Building Management Systems
+
+  - id: SRF0836
+    name: Industrial::Energy Management
+    tide.vocab.stages: infrastructure
+    description: Industrial energy management systems
+
+  - id: SRF0837
+    name: Industrial::Safety Instrumented Systems
+    tide.vocab.stages: infrastructure
+    description: Safety Instrumented Systems (SIS) for process safety
+
+  # --- Data Centre ---
+  - id: SRF0840
+    name: Data Centre
+    tide.vocab.stages: infrastructure
+    description: Data centre infrastructure
+
+  - id: SRF0841
+    name: Data Centre::Cisco UCS
+    tide.vocab.stages: infrastructure
+    description: Cisco Unified Computing System
+
+  - id: SRF0842
+    name: Data Centre::Dell VxRail
+    tide.vocab.stages: infrastructure
+    description: Dell VxRail hyperconverged infrastructure
+
+  # ============================================================
+  # SECURITY TOOLING (security::)
+  # ============================================================
+
+  # --- Endpoint Protection ---
+  - id: SRF0900
+    name: Endpoint Protection
+    tide.vocab.stages: security
+    description: Endpoint detection and response / anti-malware solutions
+
+  - id: SRF0901
+    name: Endpoint Protection::CrowdStrike Falcon
+    tide.vocab.stages: security
+    description: CrowdStrike Falcon endpoint protection platform
+
+  - id: SRF0902
+    name: Endpoint Protection::Microsoft Defender for Endpoint
+    tide.vocab.stages: security
+    description: Microsoft Defender for Endpoint EDR/antivirus
+
+  - id: SRF0903
+    name: Endpoint Protection::SentinelOne
+    tide.vocab.stages: security
+    description: SentinelOne Singularity endpoint protection
+
+  - id: SRF0904
+    name: Endpoint Protection::Sophos Intercept X
+    tide.vocab.stages: security
+    description: Sophos Intercept X endpoint protection
+
+  - id: SRF0905
+    name: Endpoint Protection::Trend Micro Apex One
+    tide.vocab.stages: security
+    description: Trend Micro Apex One endpoint security
+
+  - id: SRF0906
+    name: Endpoint Protection::Symantec Endpoint Protection
+    tide.vocab.stages: security
+    description: Broadcom Symantec Endpoint Protection
+
+  - id: SRF0907
+    name: Endpoint Protection::Kaspersky Endpoint Security
+    tide.vocab.stages: security
+    description: Kaspersky Endpoint Security
+
+  - id: SRF0908
+    name: Endpoint Protection::Bitdefender GravityZone
+    tide.vocab.stages: security
+    description: Bitdefender GravityZone endpoint security
+
+  - id: SRF0909
+    name: Endpoint Protection::Carbon Black
+    tide.vocab.stages: security
+    description: VMware Carbon Black endpoint security
+
+  - id: SRF0910
+    name: Endpoint Protection::ESET
+    tide.vocab.stages: security
+    description: ESET Endpoint Security
+
+  # --- SIEM ---
+  - id: SRF0915
+    name: SIEM
+    tide.vocab.stages: security
+    description: Security Information and Event Management platforms
+
+  - id: SRF0916
+    name: SIEM::Splunk
+    tide.vocab.stages: security
+    description: Splunk Enterprise / Splunk Cloud SIEM
+
+  - id: SRF0917
+    name: SIEM::Microsoft Sentinel
+    tide.vocab.stages: security
+    description: Microsoft Sentinel cloud-native SIEM
+
+  - id: SRF0918
+    name: SIEM::IBM QRadar
+    tide.vocab.stages: security
+    description: IBM QRadar SIEM
+
+  - id: SRF0919
+    name: SIEM::Elastic Security
+    tide.vocab.stages: security
+    description: Elastic Security SIEM
+
+  - id: SRF0920
+    name: SIEM::LogRhythm
+    tide.vocab.stages: security
+    description: LogRhythm SIEM platform
+
+  - id: SRF0921
+    name: SIEM::Google Chronicle
+    tide.vocab.stages: security
+    description: Google Chronicle security analytics SIEM
+
+  # --- SOAR ---
+  - id: SRF0925
+    name: SOAR
+    tide.vocab.stages: security
+    description: Security Orchestration, Automation and Response
+
+  - id: SRF0926
+    name: SOAR::Cortex XSOAR
+    tide.vocab.stages: security
+    description: Palo Alto Cortex XSOAR (formerly Demisto)
+
+  - id: SRF0927
+    name: SOAR::Splunk SOAR
+    tide.vocab.stages: security
+    description: Splunk SOAR (formerly Phantom)
+
+  - id: SRF0928
+    name: SOAR::Tines
+    tide.vocab.stages: security
+    description: Tines no-code security automation
+
+  - id: SRF0929
+    name: SOAR::Shuffle
+    tide.vocab.stages: security
+    description: Shuffle open-source SOAR
+
+  # --- NDR ---
+  - id: SRF0930
+    name: NDR
+    tide.vocab.stages: security
+    description: Network Detection and Response solutions
+
+  - id: SRF0931
+    name: NDR::Vectra
+    tide.vocab.stages: security
+    description: Vectra AI network detection and response
+
+  - id: SRF0932
+    name: NDR::Darktrace
+    tide.vocab.stages: security
+    description: Darktrace AI-powered network defence
+
+  - id: SRF0933
+    name: NDR::ExtraHop
+    tide.vocab.stages: security
+    description: ExtraHop Reveal(x) network detection
+
+  # --- Vulnerability Management ---
+  - id: SRF0935
+    name: Vulnerability Management
+    tide.vocab.stages: security
+    description: Vulnerability scanning and management tools
+
+  - id: SRF0936
+    name: Vulnerability Management::Qualys
+    tide.vocab.stages: security
+    description: Qualys vulnerability management platform
+
+  - id: SRF0937
+    name: Vulnerability Management::Tenable
+    tide.vocab.stages: security
+    description: Tenable Nessus / Tenable.io vulnerability scanner
+
+  - id: SRF0938
+    name: Vulnerability Management::Rapid7 InsightVM
+    tide.vocab.stages: security
+    description: Rapid7 InsightVM vulnerability management
+
+  # --- Cloud Security ---
+  - id: SRF0940
+    name: Cloud Security
+    tide.vocab.stages: security
+    description: Cloud security posture management and workload protection
+
+  - id: SRF0941
+    name: Cloud Security::Wiz
+    tide.vocab.stages: security
+    description: Wiz cloud security platform
+
+  - id: SRF0942
+    name: Cloud Security::Prisma Cloud
+    tide.vocab.stages: security
+    description: Palo Alto Prisma Cloud CNAPP
+
+  - id: SRF0943
+    name: Cloud Security::Orca Security
+    tide.vocab.stages: security
+    description: Orca Security agentless cloud security
+
+  # --- Email Security ---
+  - id: SRF0945
+    name: Email Security
+    tide.vocab.stages: security
+    description: Email security and anti-phishing solutions
+
+  - id: SRF0946
+    name: Email Security::Proofpoint
+    tide.vocab.stages: security
+    description: Proofpoint email security
+
+  - id: SRF0947
+    name: Email Security::Mimecast
+    tide.vocab.stages: security
+    description: Mimecast email security
+
+  - id: SRF0948
+    name: Email Security::Microsoft Defender for Office 365
+    tide.vocab.stages: security
+    description: Microsoft Defender for Office 365 email protection
+
+  # --- Forensic Analysis ---
+  - id: SRF0950
+    name: Forensic Analysis
+    tide.vocab.stages: security
+    description: Digital forensics and investigation tools
+
+  - id: SRF0951
+    name: Forensic Analysis::Autopsy
+    tide.vocab.stages: security
+    description: Autopsy open-source digital forensics platform
+
+  - id: SRF0952
+    name: Forensic Analysis::Magnet AXIOM
+    tide.vocab.stages: security
+    description: Magnet AXIOM digital forensics and incident response
+
+  - id: SRF0953
+    name: Forensic Analysis::Cellebrite
+    tide.vocab.stages: security
+    description: Cellebrite mobile forensics
+
+  # --- Threat Intelligence ---
+  - id: SRF0955
+    name: Threat Intelligence
+    tide.vocab.stages: security
+    description: Threat intelligence platforms and feeds
+
+  - id: SRF0956
+    name: Threat Intelligence::MISP
+    tide.vocab.stages: security
+    description: MISP open-source threat intelligence platform
+
+  - id: SRF0957
+    name: Threat Intelligence::Recorded Future
+    tide.vocab.stages: security
+    description: Recorded Future intelligence platform
+
+  - id: SRF0958
+    name: Threat Intelligence::Mandiant
+    tide.vocab.stages: security
+    description: Mandiant (Google) threat intelligence
+
+  # --- Data Protection ---
+  - id: SRF0960
+    name: Data Protection
+    tide.vocab.stages: security
+    description: Data loss prevention and encryption solutions
+
+  - id: SRF0961
+    name: Data Protection::DLP
+    tide.vocab.stages: security
+    description: Data Loss Prevention solutions
+
+  - id: SRF0962
+    name: Data Protection::Encryption::BitLocker
+    tide.vocab.stages: security
+    description: Microsoft BitLocker drive encryption
+
+  - id: SRF0963
+    name: Data Protection::Encryption::VeraCrypt
+    tide.vocab.stages: security
+    description: VeraCrypt disk encryption software
+
+  # --- Network Security ---
+  - id: SRF0965
+    name: Network Security
+    tide.vocab.stages: security
+    description: Network-layer security appliances and solutions
+
+  - id: SRF0966
+    name: Network Security::IDS::Snort
+    tide.vocab.stages: security
+    description: Snort open-source intrusion detection system
+
+  - id: SRF0967
+    name: Network Security::IDS::Suricata
+    tide.vocab.stages: security
+    description: Suricata open-source IDS/IPS
+
+  - id: SRF0968
+    name: Network Security::WAF
+    tide.vocab.stages: security
+    description: Web Application Firewalls (generic)
+
+  - id: SRF0969
+    name: Network Security::WAF::Cloudflare WAF
+    tide.vocab.stages: security
+    description: Cloudflare Web Application Firewall
+
+  - id: SRF0970
+    name: Network Security::WAF::Imperva
+    tide.vocab.stages: security
+    description: Imperva Web Application Firewall
+
+  # --- Deception ---
+  - id: SRF0975
+    name: Deception
+    tide.vocab.stages: security
+    description: Deception technology and honeypots
+
+  # ============================================================
+  # IoT & EMBEDDED (iot::)
+  # ============================================================
+
+  # --- Smart Home ---
+  - id: SRF1000
+    name: Smart Home
+    tide.vocab.stages: iot
+    description: Consumer smart home devices and ecosystems
+
+  - id: SRF1001
+    name: Smart Home::Amazon Echo
+    tide.vocab.stages: iot
+    description: Amazon Echo smart speaker and Alexa ecosystem
+
+  - id: SRF1002
+    name: Smart Home::Google Home
+    tide.vocab.stages: iot
+    description: Google Home / Nest smart devices
+
+  - id: SRF1003
+    name: Smart Home::Apple HomeKit
+    tide.vocab.stages: iot
+    description: Apple HomeKit smart home ecosystem
+
+  - id: SRF1004
+    name: Smart Home::Smart Locks
+    tide.vocab.stages: iot
+    description: IoT-connected smart locks
+
+  - id: SRF1005
+    name: Smart Home::Smart Cameras
+    tide.vocab.stages: iot
+    description: IoT-connected security cameras
+
+  # --- Wearables ---
+  - id: SRF1010
+    name: Wearables
+    tide.vocab.stages: iot
+    description: Wearable connected devices
+
+  - id: SRF1011
+    name: Wearables::Apple Watch
+    tide.vocab.stages: iot
+    description: Apple Watch smartwatch
+
+  - id: SRF1012
+    name: Wearables::Fitbit
+    tide.vocab.stages: iot
+    description: Fitbit fitness trackers
+
+  # --- Cameras ---
+  - id: SRF1015
+    name: Cameras
+    tide.vocab.stages: iot
+    description: Network-connected cameras and surveillance systems
+
+  - id: SRF1016
+    name: Cameras::CCTV
+    tide.vocab.stages: iot
+    description: Closed-circuit television surveillance systems
+
+  - id: SRF1017
+    name: Cameras::IP Cameras
+    tide.vocab.stages: iot
+    description: Internet Protocol cameras
+
+  # --- Medical Devices ---
+  - id: SRF1020
+    name: Medical Devices
+    tide.vocab.stages: iot
+    description: Connected medical and healthcare devices
+
+  - id: SRF1021
+    name: Medical Devices::Infusion Pumps
+    tide.vocab.stages: iot
+    description: Network-connected infusion pump systems
+
+  - id: SRF1022
+    name: Medical Devices::Patient Monitors
+    tide.vocab.stages: iot
+    description: IoT-connected patient monitoring systems
+
+  - id: SRF1023
+    name: Medical Devices::MRI/CT Systems
+    tide.vocab.stages: iot
+    description: Connected MRI and CT imaging systems
+
+  # --- Automotive ---
+  - id: SRF1025
+    name: Automotive
+    tide.vocab.stages: iot
+    description: Connected vehicle and automotive IoT systems
+
+  - id: SRF1026
+    name: Automotive::Connected Cars
+    tide.vocab.stages: iot
+    description: Internet-connected vehicle systems
+
+  - id: SRF1027
+    name: Automotive::Vehicle Telematics
+    tide.vocab.stages: iot
+    description: Vehicle telematics and fleet management
+
+  - id: SRF1028
+    name: Automotive::V2X Communication
+    tide.vocab.stages: iot
+    description: Vehicle-to-Everything communication
+
+  # --- Smart Building ---
+  - id: SRF1030
+    name: Smart Building
+    tide.vocab.stages: iot
+    description: Smart building automation and management
+
+  - id: SRF1031
+    name: Smart Building::HVAC
+    tide.vocab.stages: iot
+    description: Connected HVAC systems
+
+  - id: SRF1032
+    name: Smart Building::Access Control
+    tide.vocab.stages: iot
+    description: IoT-connected physical access control
+
+  - id: SRF1033
+    name: Smart Building::Lighting Systems
+    tide.vocab.stages: iot
+    description: Smart lighting and management systems
+
+  # --- Consumer Electronics ---
+  - id: SRF1035
+    name: Consumer Electronics
+    tide.vocab.stages: iot
+    description: Connected consumer electronic devices
+
+  - id: SRF1036
+    name: Consumer Electronics::Smart TV
+    tide.vocab.stages: iot
+    description: Internet-connected smart televisions
+
+  - id: SRF1037
+    name: Consumer Electronics::Gaming Consoles
+    tide.vocab.stages: iot
+    description: Network-connected gaming consoles
+
+  - id: SRF1038
+    name: Consumer Electronics::Smart Speakers
+    tide.vocab.stages: iot
+    description: IoT-connected smart speakers
+
+  # --- Embedded Systems ---
+  - id: SRF1040
+    name: Embedded Systems
+    tide.vocab.stages: iot
+    description: Embedded hardware platforms and microcontrollers
+
+  - id: SRF1041
+    name: Embedded Systems::Arduino
+    tide.vocab.stages: iot
+    description: Arduino microcontroller platform
+
+  - id: SRF1042
+    name: Embedded Systems::Raspberry Pi
+    tide.vocab.stages: iot
+    description: Raspberry Pi single-board computer
+
+  - id: SRF1043
+    name: Embedded Systems::ESP8266
+    tide.vocab.stages: iot
+    description: Espressif ESP8266 Wi-Fi microcontroller
+
+  # --- Industrial IoT ---
+  - id: SRF1045
+    name: Industrial IoT
+    tide.vocab.stages: iot
+    description: Industrial Internet of Things devices and gateways
+
+  - id: SRF1046
+    name: Industrial IoT::IoT Gateways
+    tide.vocab.stages: iot
+    description: Industrial IoT edge gateways
+
+  - id: SRF1047
+    name: Industrial IoT::Smart Sensors
+    tide.vocab.stages: iot
+    description: Industrial smart sensors and instrumentation
+
+  # --- Agriculture ---
+  - id: SRF1050
+    name: Agriculture
+    tide.vocab.stages: iot
+    description: Agricultural IoT and precision farming devices
+
+  - id: SRF1051
+    name: Agriculture::Precision Farming
+    tide.vocab.stages: iot
+    description: IoT-enabled precision farming systems
+
+  - id: SRF1052
+    name: Agriculture::Smart Irrigation
+    tide.vocab.stages: iot
+    description: IoT-connected smart irrigation systems
+
+  # ============================================================
+  # PROTOCOLS (protocol::)
+  # ============================================================
+
+  # --- Application Layer ---
+  - id: SRF1100
+    name: Application Layer
+    tide.vocab.stages: protocol
+    description: Application-layer network protocols
+
+  - id: SRF1101
+    name: Application Layer::HTTP
+    tide.vocab.stages: protocol
+    description: Hypertext Transfer Protocol
+
+  - id: SRF1102
+    name: Application Layer::HTTPS
+    tide.vocab.stages: protocol
+    description: HTTP over TLS (secure)
+
+  - id: SRF1103
+    name: Application Layer::FTP
+    tide.vocab.stages: protocol
+    description: File Transfer Protocol
+
+  - id: SRF1104
+    name: Application Layer::SSH
+    tide.vocab.stages: protocol
+    description: Secure Shell protocol
+
+  - id: SRF1105
+    name: Application Layer::SMTP
+    tide.vocab.stages: protocol
+    description: Simple Mail Transfer Protocol
+
+  - id: SRF1106
+    name: Application Layer::IMAP
+    tide.vocab.stages: protocol
+    description: Internet Message Access Protocol
+
+  - id: SRF1107
+    name: Application Layer::POP3
+    tide.vocab.stages: protocol
+    description: Post Office Protocol v3
+
+  - id: SRF1108
+    name: Application Layer::LDAP
+    tide.vocab.stages: protocol
+    description: Lightweight Directory Access Protocol
+
+  - id: SRF1109
+    name: Application Layer::RDP
+    tide.vocab.stages: protocol
+    description: Remote Desktop Protocol
+
+  - id: SRF1110
+    name: Application Layer::SNMP
+    tide.vocab.stages: protocol
+    description: Simple Network Management Protocol
+
+  - id: SRF1111
+    name: Application Layer::Telnet
+    tide.vocab.stages: protocol
+    description: Telnet remote terminal protocol (unencrypted)
+
+  - id: SRF1112
+    name: Application Layer::NFS
+    tide.vocab.stages: protocol
+    description: Network File System protocol
+
+  - id: SRF1113
+    name: Application Layer::SMB
+    tide.vocab.stages: protocol
+    description: Server Message Block file sharing protocol
+
+  - id: SRF1114
+    name: Application Layer::WebSocket
+    tide.vocab.stages: protocol
+    description: WebSocket full-duplex communication protocol
+
+  - id: SRF1115
+    name: Application Layer::gRPC
+    tide.vocab.stages: protocol
+    description: gRPC remote procedure call framework
+
+  # --- Transport Layer ---
+  - id: SRF1120
+    name: Transport Layer
+    tide.vocab.stages: protocol
+    description: Transport-layer network protocols
+
+  - id: SRF1121
+    name: Transport Layer::TCP
+    tide.vocab.stages: protocol
+    description: Transmission Control Protocol
+
+  - id: SRF1122
+    name: Transport Layer::UDP
+    tide.vocab.stages: protocol
+    description: User Datagram Protocol
+
+  - id: SRF1123
+    name: Transport Layer::QUIC
+    tide.vocab.stages: protocol
+    description: QUIC transport protocol (HTTP/3 transport)
+
+  # --- Network Layer ---
+  - id: SRF1130
+    name: Network Layer
+    tide.vocab.stages: protocol
+    description: Network-layer protocols
+
+  - id: SRF1131
+    name: Network Layer::IPv4
+    tide.vocab.stages: protocol
+    description: Internet Protocol version 4
+
+  - id: SRF1132
+    name: Network Layer::IPv6
+    tide.vocab.stages: protocol
+    description: Internet Protocol version 6
+
+  - id: SRF1133
+    name: Network Layer::ICMP
+    tide.vocab.stages: protocol
+    description: Internet Control Message Protocol
+
+  - id: SRF1134
+    name: Network Layer::IPsec
+    tide.vocab.stages: protocol
+    description: Internet Protocol Security suite
+
+  - id: SRF1135
+    name: Network Layer::GRE
+    tide.vocab.stages: protocol
+    description: Generic Routing Encapsulation tunnelling
+
+  # --- Industrial Protocols ---
+  - id: SRF1140
+    name: Industrial
+    tide.vocab.stages: protocol
+    description: Industrial control and automation protocols
+
+  - id: SRF1141
+    name: Industrial::Modbus
+    tide.vocab.stages: protocol
+    description: Modbus serial and TCP communication protocol
+
+  - id: SRF1142
+    name: Industrial::OPC UA
+    tide.vocab.stages: protocol
+    description: OPC Unified Architecture machine-to-machine protocol
+
+  - id: SRF1143
+    name: Industrial::DNP3
+    tide.vocab.stages: protocol
+    description: Distributed Network Protocol 3 (SCADA communications)
+
+  - id: SRF1144
+    name: Industrial::PROFINET
+    tide.vocab.stages: protocol
+    description: PROFINET industrial Ethernet standard
+
+  - id: SRF1145
+    name: Industrial::EtherNet/IP
+    tide.vocab.stages: protocol
+    description: EtherNet/IP industrial network protocol
+
+  - id: SRF1146
+    name: Industrial::BACnet
+    tide.vocab.stages: protocol
+    description: BACnet building automation and control protocol
+
+  - id: SRF1147
+    name: Industrial::IEC 61850
+    tide.vocab.stages: protocol
+    description: IEC 61850 power utility automation standard
+
+  - id: SRF1148
+    name: Industrial::CAN
+    tide.vocab.stages: protocol
+    description: Controller Area Network vehicle/industrial bus
+
+  # --- Wireless Protocols ---
+  - id: SRF1150
+    name: Wireless
+    tide.vocab.stages: protocol
+    description: Wireless communication protocols
+
+  - id: SRF1151
+    name: Wireless::Wi-Fi
+    tide.vocab.stages: protocol
+    description: IEEE 802.11 wireless networking
+
+  - id: SRF1152
+    name: Wireless::Bluetooth
+    tide.vocab.stages: protocol
+    description: Bluetooth short-range wireless protocol
+
+  - id: SRF1153
+    name: Wireless::Zigbee
+    tide.vocab.stages: protocol
+    description: Zigbee low-power wireless mesh networking
+
+  - id: SRF1154
+    name: Wireless::LoRaWAN
+    tide.vocab.stages: protocol
+    description: LoRaWAN long-range low-power wireless
+
+  - id: SRF1155
+    name: Wireless::NFC
+    tide.vocab.stages: protocol
+    description: Near Field Communication
+
+  - id: SRF1156
+    name: Wireless::Z-Wave
+    tide.vocab.stages: protocol
+    description: Z-Wave home automation wireless protocol
+
+  # --- DNS Protocols ---
+  - id: SRF1160
+    name: Domain Name System
+    tide.vocab.stages: protocol
+    description: DNS protocol family
+
+  - id: SRF1161
+    name: Domain Name System::DNS
+    tide.vocab.stages: protocol
+    description: Domain Name System resolution protocol
+
+  - id: SRF1162
+    name: Domain Name System::DNSSEC
+    tide.vocab.stages: protocol
+    description: DNS Security Extensions
+
+  - id: SRF1163
+    name: Domain Name System::DoH
+    tide.vocab.stages: protocol
+    description: DNS over HTTPS
+
+  - id: SRF1164
+    name: Domain Name System::DoT
+    tide.vocab.stages: protocol
+    description: DNS over TLS
+
+  # --- VPN Protocols ---
+  - id: SRF1170
+    name: VPN
+    tide.vocab.stages: protocol
+    description: VPN tunnelling protocols
+
+  - id: SRF1171
+    name: VPN::IPsec
+    tide.vocab.stages: protocol
+    description: IPsec VPN tunnel protocol
+
+  - id: SRF1172
+    name: VPN::WireGuard
+    tide.vocab.stages: protocol
+    description: WireGuard VPN protocol
+
+  - id: SRF1173
+    name: VPN::OpenVPN
+    tide.vocab.stages: protocol
+    description: OpenVPN protocol
+
+  - id: SRF1174
+    name: VPN::SSL VPN
+    tide.vocab.stages: protocol
+    description: SSL/TLS-based VPN protocol
+
+  # --- Security Protocols ---
+  - id: SRF1180
+    name: Security
+    tide.vocab.stages: protocol
+    description: Cryptographic and security protocols
+
+  - id: SRF1181
+    name: Security::TLS
+    tide.vocab.stages: protocol
+    description: Transport Layer Security protocol
+
+  - id: SRF1182
+    name: Security::Kerberos
+    tide.vocab.stages: protocol
+    description: Kerberos authentication protocol
+
+  - id: SRF1183
+    name: Security::NTLM
+    tide.vocab.stages: protocol
+    description: NT LAN Manager authentication protocol
+
+  - id: SRF1184
+    name: Security::OAuth
+    tide.vocab.stages: protocol
+    description: OAuth authorisation protocol
+
+  - id: SRF1185
+    name: Security::SAML
+    tide.vocab.stages: protocol
+    description: Security Assertion Markup Language protocol
+
+  - id: SRF1186
+    name: Security::OpenID Connect
+    tide.vocab.stages: protocol
+    description: OpenID Connect identity protocol
+
+  # --- Messaging Protocols ---
+  - id: SRF1190
+    name: Messaging
+    tide.vocab.stages: protocol
+    description: Message queuing and pub/sub protocols
+
+  - id: SRF1191
+    name: Messaging::MQTT
+    tide.vocab.stages: protocol
+    description: Message Queuing Telemetry Transport (IoT messaging)
+
+  - id: SRF1192
+    name: Messaging::AMQP
+    tide.vocab.stages: protocol
+    description: Advanced Message Queuing Protocol
+
+  - id: SRF1193
+    name: Messaging::Kafka
+    tide.vocab.stages: protocol
+    description: Apache Kafka distributed event streaming
+
+  # --- Routing Protocols ---
+  - id: SRF1195
+    name: Routing
+    tide.vocab.stages: protocol
+    description: Network routing protocols
+
+  - id: SRF1196
+    name: Routing::BGP
+    tide.vocab.stages: protocol
+    description: Border Gateway Protocol
+
+  - id: SRF1197
+    name: Routing::OSPF
+    tide.vocab.stages: protocol
+    description: Open Shortest Path First routing
+
+  - id: SRF1198
+    name: Routing::RIP
+    tide.vocab.stages: protocol
+    description: Routing Information Protocol

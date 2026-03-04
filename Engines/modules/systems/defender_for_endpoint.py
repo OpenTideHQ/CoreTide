@@ -169,37 +169,38 @@ class DefenderForEndpointService:
 
         return rule
 
-    def validate_query(self, query:str)->dict | bool:
+    def run_hunting_query(self, query:str, timespan:str="PT1H")->dict:
         """
-        Performs a query against the MDE tenant to validate if the query is able to run.
-        Timespan gets forced to one hour to avoid any performance hits.
-        Returns the full response body on success (dict), or False on failure.
+        Runs a hunting query against the MDE tenant via the runHuntingQuery
+        Graph API endpoint.
+        Returns the full JSON response body on success.
+        Raises on permission or query execution errors.
         """
         request = self.session.post(url=self.HUNTING_QUERY_ENDPOINT,
                                     verify=self.tenant_config.setup.ssl,
                                     json={"Query" : query,
-                                          "Timespan": "PT1H"})
+                                          "Timespan": timespan})
         
         if request.status_code == 200:
             log("SUCCESS", 
                 "Query was able to run on tenant", self.tenant_config.name)
             return request.json()
-        else:
-            if request.status_code == 403:
-                log("FATAL", 
-                    f"Missing permissions to run query against tenant {self.tenant_config.name} - Error Code {request.status_code}",
-                    str(request.json()),
-                    "Add the permissions mentionsed above to the service principal to fix this")
-                raise Exception
-
-            error_message = request.json().get("error", {}).get("message") or request.json()
-            print(request.json())
-
+        
+        if request.status_code == 403:
             log("FATAL", 
-                f"Error Code {request.status_code} - {error_message}",
-                "The query could not run due to a syntax error. Confirm that it can run on the console and try again",
-                query)
-            return False
+                f"Missing permissions to run query against tenant {self.tenant_config.name} - Error Code {request.status_code}",
+                str(request.json()),
+                "Add the permissions mentionsed above to the service principal to fix this")
+            raise Exception
+
+        error_message = request.json().get("error", {}).get("message") or request.json()
+        print(request.json())
+
+        log("FATAL", 
+            f"Error Code {request.status_code} - {error_message}",
+            "The query could not run due to a syntax error. Confirm that it can run on the console and try again",
+            query)
+        raise Exception
 
     def create_detection_rule(self, rule:DetectionRule)->int:
         

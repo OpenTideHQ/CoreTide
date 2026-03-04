@@ -17,8 +17,6 @@ from Engines.modules.systems.defender_for_endpoint import DefenderForEndpointSer
 
 # Per Microsoft documentation for MDE custom detection rules:
 # https://learn.microsoft.com/en-us/defender-xdr/custom-detection-rules
-# "For Microsoft Defender for Endpoint tables, the Timestamp, DeviceId,
-# and ReportId columns must appear in the same event"
 MDE_REQUIRED_COLUMNS = {"Timestamp", "DeviceId", "ReportId"}
 
 class DefenderForEndpointValidateQuery(ValidateQuery):
@@ -33,19 +31,18 @@ class DefenderForEndpointValidateQuery(ValidateQuery):
         query = config.query
         mdr_name = mdr.name
         mdr_uuid = mdr.metadata.uuid
-        
-        validation = service.validate_query(query)
-        if not validation:
+
+        # Step 1 — Run the query to validate it can execute
+        try:
+            response = service.run_hunting_query(query)
+        except Exception:
             os.environ["VALIDATION_ERROR_RAISED"] = "True"
             return
 
-        # The runHuntingQuery response includes a schema array describing
-        # the columns present in the query output. Verify that the required
-        # MDE columns (Timestamp, DeviceId, ReportId) are present.
+        # Step 2 — Check the returned schema for required columns
         returned_columns = {
-            col["Name"] for col in validation.get("schema", [])
+            col["Name"] for col in response.get("schema", [])
         }
-
         missing = MDE_REQUIRED_COLUMNS - returned_columns
         if missing:
             log("FATAL",

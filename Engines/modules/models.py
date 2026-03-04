@@ -49,10 +49,11 @@ class DetectionSystems(Enum):
 class DeploymentStrategy(Enum):
     STAGING = "Deployment allowed during a Pull (or Merge) Request Pipeline"
     PRODUCTION = "Deployment allowed during a Default Branch Pipeline"
-    FULL = auto()
+    FULL = "Deployment allowed during both Pull (or Merge) Request Pipeline and Default Branch Pipeline"
     ALWAYS = "Deployment allowed during both Pull (or Merge) Request Pipeline and Default Branch Pipeline"
     MANUAL = "Deployment allowed during both Pull (or Merge) Request Pipeline and Default Branch Pipeline, but only when explictely specified under tenants"
-    DEBUG = auto()
+    DEBUG = "Deployment used for debugging and testing purposes only"
+
 
     @staticmethod
     def load_from_environment():

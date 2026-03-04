@@ -2,7 +2,6 @@ import os
 import sys
 import git
 
-from cbc_sdk.rest_api import CBCloudAPI
 from typing import Sequence, Union
 
 sys.path.append(str(git.Repo(".", search_parent_directories=True).working_dir))
@@ -15,6 +14,8 @@ from Engines.modules.models import (TideModels,
                                     DeploymentStrategy,) 
 from Engines.modules.deployment import TideDeployment
 from Engines.modules.systems.defender_for_endpoint import DefenderForEndpointService
+from Engines.validation.kql import validate_mde_required_columns
+
 
 class DefenderForEndpointValidateQuery(ValidateQuery):
 
@@ -26,7 +27,21 @@ class DefenderForEndpointValidateQuery(ValidateQuery):
         if not config: 
             raise
         query = config.query
-        
+        mdr_name = mdr.name
+        mdr_uuid = mdr.metadata.uuid
+
+        # Pre-flight validation: required columns for MDE custom detections
+        is_valid, missing_columns = validate_mde_required_columns(query)
+        if not is_valid:
+            log("FATAL",
+                f"MDE custom detection query is missing required columns: {', '.join(missing_columns)}",
+                f"{mdr_name} ({mdr_uuid})",
+                "Per Microsoft documentation, MDE custom detection queries must include "
+                "Timestamp, DeviceId, and ReportId columns in the output. "
+                "See: https://learn.microsoft.com/en-us/defender-xdr/custom-detection-rules")
+            os.environ["VALIDATION_ERROR_RAISED"] = "True"
+            return
+
         validation = service.validate_query(query)
         if not validation:
             os.environ["VALIDATION_ERROR_RAISED"] = "True" 

@@ -219,14 +219,14 @@ def validate_mde_required_columns(query: str) -> tuple[bool, list[str]]:
         clause = operator_match.group(2).strip()
 
         if operator in ("project", "project-keep"):
-            output_cols = _extract_output_columns(clause)
+            projected_cols = _extract_output_columns(clause)
             # Check for wildcard patterns that match required columns
             for token in _extract_tokens_raw(clause):
                 ident = re.match(r"(\S+)", token)
                 if ident and _has_wildcard(ident.group(1)):
-                    output_cols |= _matches_any_required(ident.group(1))
+                    projected_cols |= _matches_any_required(ident.group(1))
             for col in MDE_REQUIRED_COLUMNS:
-                required_available[col] = col in output_cols
+                required_available[col] = col in projected_cols
 
         elif operator == "project-away":
             removed_cols = _extract_output_columns(clause)
@@ -257,16 +257,16 @@ def validate_mde_required_columns(query: str) -> tuple[bool, list[str]]:
 
         elif operator == "summarize":
             by_parts = re.split(r"\bby\b", clause, maxsplit=1, flags=re.IGNORECASE)
-            output_cols: set[str] = set()
+            summarize_cols: set[str] = set()
             for part in by_parts:
-                output_cols |= _extract_output_columns(part)
+                summarize_cols |= _extract_output_columns(part)
             for col in MDE_REQUIRED_COLUMNS:
-                required_available[col] = col in output_cols
+                required_available[col] = col in summarize_cols
 
         elif operator == "distinct":
-            output_cols = _extract_output_columns(clause)
+            distinct_cols = _extract_output_columns(clause)
             for col in MDE_REQUIRED_COLUMNS:
-                required_available[col] = col in output_cols
+                required_available[col] = col in distinct_cols
 
     missing = sorted(col for col, avail in required_available.items() if not avail)
     return (len(missing) == 0, missing)

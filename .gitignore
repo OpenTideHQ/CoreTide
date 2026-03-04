@@ -2,4 +2,3 @@
 __pycache__/
 *.py[cod]
 *sentinel-repo
-.pytest_cache/

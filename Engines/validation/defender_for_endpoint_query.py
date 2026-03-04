@@ -14,8 +14,12 @@ from Engines.modules.models import (TideModels,
                                     DeploymentStrategy,) 
 from Engines.modules.deployment import TideDeployment
 from Engines.modules.systems.defender_for_endpoint import DefenderForEndpointService
-from Engines.validation.kql import validate_mde_required_columns
 
+# Per Microsoft documentation for MDE custom detection rules:
+# https://learn.microsoft.com/en-us/defender-xdr/custom-detection-rules
+# "For Microsoft Defender for Endpoint tables, the Timestamp, DeviceId,
+# and ReportId columns must appear in the same event"
+MDE_REQUIRED_COLUMNS = {"Timestamp", "DeviceId", "ReportId"}
 
 class DefenderForEndpointValidateQuery(ValidateQuery):
 
@@ -29,22 +33,28 @@ class DefenderForEndpointValidateQuery(ValidateQuery):
         query = config.query
         mdr_name = mdr.name
         mdr_uuid = mdr.metadata.uuid
+        
+        validation = service.validate_query(query)
+        if not validation:
+            os.environ["VALIDATION_ERROR_RAISED"] = "True"
+            return
 
-        # Pre-flight validation: required columns for MDE custom detections
-        is_valid, missing_columns = validate_mde_required_columns(query)
-        if not is_valid:
+        # The runHuntingQuery response includes a schema array describing
+        # the columns present in the query output. Verify that the required
+        # MDE columns (Timestamp, DeviceId, ReportId) are present.
+        returned_columns = {
+            col["Name"] for col in validation.get("schema", [])
+        }
+
+        missing = MDE_REQUIRED_COLUMNS - returned_columns
+        if missing:
             log("FATAL",
-                f"MDE custom detection query is missing required columns: {', '.join(missing_columns)}",
+                f"MDE custom detection query is missing required columns: {', '.join(sorted(missing))}",
                 f"{mdr_name} ({mdr_uuid})",
                 "Per Microsoft documentation, MDE custom detection queries must include "
                 "Timestamp, DeviceId, and ReportId columns in the output. "
                 "See: https://learn.microsoft.com/en-us/defender-xdr/custom-detection-rules")
             os.environ["VALIDATION_ERROR_RAISED"] = "True"
-            return
-
-        validation = service.validate_query(query)
-        if not validation:
-            os.environ["VALIDATION_ERROR_RAISED"] = "True" 
 
 
     def validate(self,

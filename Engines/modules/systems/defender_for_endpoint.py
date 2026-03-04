@@ -169,10 +169,11 @@ class DefenderForEndpointService:
 
         return rule
 
-    def validate_query(self, query:str)->bool:
+    def validate_query(self, query:str)->dict | bool:
         """
         Performs a query against the MDE tenant to validate if the query is able to run.
-        Timespan gets forced to one hour to avoid any performance hits. 
+        Timespan gets forced to one hour to avoid any performance hits.
+        Returns the full response body on success (dict), or False on failure.
         """
         request = self.session.post(url=self.HUNTING_QUERY_ENDPOINT,
                                     verify=self.tenant_config.setup.ssl,
@@ -182,7 +183,7 @@ class DefenderForEndpointService:
         if request.status_code == 200:
             log("SUCCESS", 
                 "Query was able to run on tenant", self.tenant_config.name)
-            return True
+            return request.json()
         else:
             if request.status_code == 403:
                 log("FATAL", 

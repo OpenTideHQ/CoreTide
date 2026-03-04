@@ -3,6 +3,11 @@ name: Validation
 on:
   workflow_call:
     inputs:
+      coretide_repo:
+        type: string
+        description: "GitHub repository (owner/name) to clone CoreTide from"
+        required: false
+        default: OpenTideHQ/CoreTide
       coretide_path:
         type: string
         description: "Path where CoreTide needs to be cloned into"
@@ -48,7 +53,7 @@ jobs:
       - name: Checkout CoreTide
         uses: actions/checkout@v4
         with:
-          repository: OpenTideHQ/CoreTide
+          repository: ${{ inputs.coretide_repo }}
           path: ${{ inputs.coretide_path }}
           ref: refs/heads/${{ inputs.coretide_ref }}
 
@@ -69,7 +74,7 @@ jobs:
       - name: Checkout CoreTide
         uses: actions/checkout@v4
         with:
-          repository: OpenTideHQ/CoreTide
+          repository: ${{ inputs.coretide_repo }}
           path: ${{ inputs.coretide_path }}
           ref: refs/heads/${{ inputs.coretide_ref }}
 
@@ -100,7 +105,7 @@ jobs:
       - name: Checkout CoreTide
         uses: actions/checkout@v4
         with:
-          repository: OpenTideHQ/CoreTide
+          repository: ${{ inputs.coretide_repo }}
           path: ${{ inputs.coretide_path }}
           ref: refs/heads/${{ inputs.coretide_ref }}
 

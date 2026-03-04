@@ -23,13 +23,6 @@ from Engines.validation.kql import (
 
 
 # ---------------------------------------------------------------------------
-# Helper constants
-# ---------------------------------------------------------------------------
-VALID = True
-INVALID = False
-
-
-# ---------------------------------------------------------------------------
 # Tests: validate_mde_required_columns – valid queries
 # ---------------------------------------------------------------------------
 class TestValidQueries:
@@ -282,6 +275,18 @@ class TestNormalizeKql:
         assert "/*" not in result
         assert "*/" not in result
 
+    def test_preserves_url_in_string(self):
+        """Double-slash in a URL string must not be treated as a comment."""
+        query = 'Table | where URL == "http://evil.com/path"'
+        result = _normalize_kql(query)
+        assert '"http://evil.com/path"' in result
+
+    def test_preserves_doubled_quotes(self):
+        """KQL doubled-quote escapes must not break string tracking."""
+        query = 'Table | where Name == "ab""cd"'
+        result = _normalize_kql(query)
+        assert '"ab""cd"' in result
+
 
 class TestExtractMainQuery:
     def test_no_let_statements(self):
@@ -374,3 +379,78 @@ class TestEdgeCases:
         is_valid, missing = validate_mde_required_columns(query)
         assert is_valid is False
         assert set(missing) == {"Timestamp", "DeviceId", "ReportId"}
+
+    def test_url_in_where_clause_preserved(self):
+        """A URL containing // in a string must not corrupt comment stripping."""
+        query = """DeviceProcessEvents
+| where RemoteUrl == "http://evil.com/malware"
+| project Timestamp, DeviceId, ReportId, RemoteUrl
+"""
+        is_valid, missing = validate_mde_required_columns(query)
+        assert is_valid is True
+        assert missing == []
+
+    def test_doubled_quotes_in_string(self):
+        """KQL doubled-quote escape inside a string must not break parsing."""
+        query = """DeviceProcessEvents
+| where Name == "ab""cd"
+| project Timestamp, DeviceId, ReportId
+"""
+        is_valid, missing = validate_mde_required_columns(query)
+        assert is_valid is True
+        assert missing == []
+
+    def test_project_away_wildcard_removes_required(self):
+        """Wildcard in project-away that matches a required column."""
+        query = """DeviceProcessEvents
+| project-away Device*
+"""
+        is_valid, missing = validate_mde_required_columns(query)
+        assert is_valid is False
+        assert "DeviceId" in missing
+
+    def test_project_away_wildcard_no_match(self):
+        """Wildcard in project-away that does not match any required column."""
+        query = """DeviceProcessEvents
+| project-away Initiating*
+"""
+        is_valid, missing = validate_mde_required_columns(query)
+        assert is_valid is True
+        assert missing == []
+
+    def test_summarize_without_by_clause(self):
+        """summarize count() with no by-clause removes all original columns."""
+        query = """DeviceProcessEvents
+| summarize count()
+"""
+        is_valid, missing = validate_mde_required_columns(query)
+        assert is_valid is False
+        assert set(missing) == {"Timestamp", "DeviceId", "ReportId"}
+
+    def test_project_with_alias_function(self):
+        """project Timestamp = bin(Timestamp, 1h) keeps the alias name."""
+        query = """DeviceProcessEvents
+| project Timestamp = bin(Timestamp, 1h), DeviceId, ReportId
+"""
+        is_valid, missing = validate_mde_required_columns(query)
+        assert is_valid is True
+        assert missing == []
+
+    def test_multiple_project_stages(self):
+        """Only the last project's output matters for the final schema."""
+        query = """DeviceProcessEvents
+| project Timestamp, DeviceId, ReportId, ProcessName, FileName
+| project Timestamp, DeviceId, ReportId
+"""
+        is_valid, missing = validate_mde_required_columns(query)
+        assert is_valid is True
+        assert missing == []
+
+    def test_union_as_first_operator(self):
+        """Union preserves columns from source tables."""
+        query = """DeviceProcessEvents
+| union DeviceNetworkEvents
+"""
+        is_valid, missing = validate_mde_required_columns(query)
+        assert is_valid is True
+        assert missing == []

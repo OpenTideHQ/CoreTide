@@ -14,16 +14,69 @@ https://learn.microsoft.com/en-us/defender-xdr/custom-detection-rules
 """
 
 import re
+from fnmatch import fnmatch
 
 # Required output columns for MDE custom detection rules
 MDE_REQUIRED_COLUMNS = frozenset({"Timestamp", "DeviceId", "ReportId"})
 
 
 def _normalize_kql(query: str) -> str:
-    """Remove comments and normalize a KQL query for analysis."""
-    query = re.sub(r"//.*?$", "", query, flags=re.MULTILINE)
-    query = re.sub(r"/\*.*?\*/", "", query, flags=re.DOTALL)
-    return query
+    """Remove comments from a KQL query while preserving string literals.
+
+    Handles single-line (``//``) and multi-line (``/* … */``) comments
+    without corrupting strings that contain ``//`` or ``/*`` sequences
+    (e.g. URLs).
+    """
+    result: list[str] = []
+    i = 0
+    length = len(query)
+    in_string = False
+    string_char = ""
+
+    while i < length:
+        ch = query[i]
+
+        if in_string:
+            result.append(ch)
+            # Handle doubled-quote escapes in KQL (e.g. "ab""cd")
+            if ch == string_char:
+                if i + 1 < length and query[i + 1] == string_char:
+                    result.append(query[i + 1])
+                    i += 2
+                    continue
+                in_string = False
+            i += 1
+            continue
+
+        # Start of a string literal
+        if ch in ('"', "'"):
+            in_string = True
+            string_char = ch
+            result.append(ch)
+            i += 1
+            continue
+
+        # Single-line comment
+        if ch == "/" and i + 1 < length and query[i + 1] == "/":
+            # Skip until end of line
+            while i < length and query[i] != "\n":
+                i += 1
+            continue
+
+        # Multi-line comment
+        if ch == "/" and i + 1 < length and query[i + 1] == "*":
+            i += 2  # skip /*
+            while i < length:
+                if query[i] == "*" and i + 1 < length and query[i + 1] == "/":
+                    i += 2  # skip */
+                    break
+                i += 1
+            continue
+
+        result.append(ch)
+        i += 1
+
+    return "".join(result)
 
 
 def _extract_main_query(query: str) -> str:
@@ -38,19 +91,35 @@ def _extract_main_query(query: str) -> str:
 
 
 def _split_respecting_nesting(text: str, delimiter: str) -> list[str]:
-    """Split *text* by *delimiter*, respecting string literals and parentheses."""
+    """Split *text* by *delimiter*, respecting string literals and parentheses.
+
+    KQL doubled-quote escapes (``""``) are handled so that a ``""`` inside
+    a string does not prematurely terminate the literal.
+    """
     parts: list[str] = []
     current: list[str] = []
     depth = 0
     in_string = False
     string_char = ""
+    i = 0
+    length = len(text)
 
-    for ch in text:
+    while i < length:
+        ch = text[i]
+
         if in_string:
             current.append(ch)
             if ch == string_char:
+                # Peek ahead for doubled-quote escape
+                if i + 1 < length and text[i + 1] == string_char:
+                    current.append(text[i + 1])
+                    i += 2
+                    continue
                 in_string = False
-        elif ch in ('"', "'"):
+            i += 1
+            continue
+
+        if ch in ('"', "'"):
             in_string = True
             string_char = ch
             current.append(ch)
@@ -65,6 +134,8 @@ def _split_respecting_nesting(text: str, delimiter: str) -> list[str]:
             current = []
         else:
             current.append(ch)
+
+        i += 1
 
     remainder = "".join(current).strip()
     if remainder:
@@ -102,6 +173,21 @@ def _extract_output_columns(clause: str) -> set[str]:
     return columns
 
 
+def _has_wildcard(token: str) -> bool:
+    """Return True if *token* contains glob-style wildcards."""
+    return "*" in token or "?" in token
+
+
+def _matches_any_required(pattern: str) -> set[str]:
+    """Return the subset of MDE_REQUIRED_COLUMNS matched by *pattern*."""
+    return {col for col in MDE_REQUIRED_COLUMNS if fnmatch(col, pattern)}
+
+
+def _extract_tokens_raw(clause: str) -> list[str]:
+    """Extract raw comma-separated tokens from a clause (untrimmed identifiers)."""
+    return [p.strip() for p in _split_respecting_nesting(clause, ",") if p.strip()]
+
+
 def validate_mde_required_columns(query: str) -> tuple[bool, list[str]]:
     """
     Validate that an MDE custom detection KQL query preserves the required
@@ -134,11 +220,21 @@ def validate_mde_required_columns(query: str) -> tuple[bool, list[str]]:
 
         if operator in ("project", "project-keep"):
             output_cols = _extract_output_columns(clause)
+            # Check for wildcard patterns that match required columns
+            for token in _extract_tokens_raw(clause):
+                ident = re.match(r"(\S+)", token)
+                if ident and _has_wildcard(ident.group(1)):
+                    output_cols |= _matches_any_required(ident.group(1))
             for col in MDE_REQUIRED_COLUMNS:
                 required_available[col] = col in output_cols
 
         elif operator == "project-away":
             removed_cols = _extract_output_columns(clause)
+            # Check for wildcard patterns that match required columns
+            for token in _extract_tokens_raw(clause):
+                ident = re.match(r"(\S+)", token)
+                if ident and _has_wildcard(ident.group(1)):
+                    removed_cols |= _matches_any_required(ident.group(1))
             for col in MDE_REQUIRED_COLUMNS:
                 if col in removed_cols:
                     required_available[col] = False

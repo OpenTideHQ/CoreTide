@@ -38,7 +38,7 @@ attack_layer = "ATT&CK Navigator Layer.json"
 table = "Objects Table.csv"
 
 [metaschemas]
-tvm = "TVM Meta Schema.yaml"
+tvm = "Threat Vector.metaschema.yaml"
 dom = "Detection Objective.metaschema.yaml"
 cdm = "CDM Meta Schema.yaml"
 mdr = "MDR Meta Schema.yaml"
@@ -47,6 +47,12 @@ lookup_metadata = "Lookup Metadata Meta Schema.yaml"
 
 [recomposition]
 systems = "MDR Systems Deployment"
+
+[config_metaschemas]
+visibility = "Configurations/visibility.meta.yaml"
+
+[config_json_schemas]
+visibility = "Configurations/visibility.schema.json"
 
 [json_schemas]
 tvm = "TVM Schema.json"

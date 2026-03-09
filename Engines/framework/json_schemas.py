@@ -1,12 +1,11 @@
+from __future__ import annotations
+
 import yaml
 import os
 import git
 import json
 from pathlib import Path
 import sys
-
-from typing import Literal, Tuple
-from io import StringIO
 
 sys.path.append(str(git.Repo(".", search_parent_directories=True).working_dir))
 
@@ -24,6 +23,11 @@ VOCAB_INDEX = DataTide.Vocabularies.Index
 CONFIG_INDEX = DataTide.Configurations.Index
 PATHS = resolve_paths()
 
+# Vocabulary Extensions — user-defined entries injected at schema compilation
+# Loaded from [vocabulary] section in schema.toml
+SCHEMA_CONFIG = CONFIG_INDEX.get("schema", {})
+VOCAB_EXTENSIONS = SCHEMA_CONFIG.get("vocabulary", {})
+
 # Configuration settings fetching routine
 METASCHEMAS_FOLDER = Path(PATHS["metaschemas"])
 VOCABS_FOLDER = Path(PATHS["vocabularies"])
@@ -33,10 +37,85 @@ TIDE_MODELS = DataTide.Configurations.Global.objects
 SUBSCHEMAS_PATH = Path(PATHS["subschemas"])
 RECOMPOSITION = GLOBAL_CONFIG.recomposition
 
-STAGE_DESCRIPTION_LIMIT = 300
 
+class EnumResolver:
+    """Resolves all dynamic enum values for JSON Schema generation.
 
-DROPDOWN_TEMPLATE = """
+    Nested classes handle each data source — vocabularies, visibility
+    configuration, deployment statuses, etc. — while shared formatting
+    utilities live on the outer class.
+
+    Usage::
+
+        EnumResolver.Vocabulary("surface", stages="os").resolve()
+        EnumResolver.Logsources().resolve()
+        EnumResolver.Detectors().resolve()
+        EnumResolver.Statuses().resolve()
+        EnumResolver.Parameters("systems.splunk.indexes").resolve()
+        EnumResolver.SystemTenants("splunk").resolve()
+    """
+
+    # ------------------------------------------------------------------
+    # Shared visibility helpers
+    # ------------------------------------------------------------------
+
+    @staticmethod
+    def _visibility():
+        """Return the visibility configuration, or ``None``."""
+        return DataTide.Configurations.Visibility.visibility
+
+    @staticmethod
+    def _asset_map(visibility_data):
+        """Build ``{name: asset}`` lookup from visibility assets."""
+        if visibility_data and visibility_data.assets:
+            return {a.name: a for a in visibility_data.assets}
+        return {}
+
+    @staticmethod
+    def _format_asset(asset_name: str, asset_map: dict) -> str:
+        """Format a single asset entry as markdown."""
+        asset = asset_map.get(asset_name)
+        if not asset:
+            return (
+                f"\n- ⚠️ **{asset_name}**"
+                f"\n  - _Warning_: Asset not found in configuration"
+                f"\n  - _Action Required_: Define this asset in the assets section"
+            )
+        text = (
+            f"\n- **{asset.name}**"
+            f"\n  - _Criticality_: {asset.criticality}"
+            f"\n  - _Description_: {asset.description}"
+        )
+        if asset.custom_details:
+            text += "\n  - _Custom Details_:"
+            for k, v in asset.custom_details.items():
+                text += f"\n    - {k}: {v}"
+        return text
+
+    # ==================================================================
+    # Vocabulary
+    # ==================================================================
+
+    class Vocabulary:
+        """Resolve vocabulary entries into JSON Schema enum arrays.
+
+        Reads entries from the core vocabulary index and any user-defined
+        extensions (``[vocabulary]`` in ``schema.toml``), producing
+        parallel lists of enum values and their markdown descriptions.
+
+        Handles three patterns:
+
+        * **Model vocabularies** (keyed by id) — all entries emitted with
+          optional scope-prefixing and VS Code search hints.
+        * **General, non-scoped** — entries filtered by stages, emitted
+          with their name as the value.
+        * **General, scoped** — entries expanded to ``stage::name`` per
+          matching stage.
+        """
+
+        _STAGE_DESC_LIMIT = 300
+
+        _DROPDOWN = """
 ### {icon} {name}
 
 {id_icon} **Identifier** : `{identifier}`
@@ -54,516 +133,389 @@ _Vocabulary_ : `{source_vocab}`
 {description}
 """
 
-FOLDABLE = """
-<details><summary>{}</summary>
+        _HINT_ABBREVS = (
+            (" and ", " & "), (" without ", " w/o "), (" with ", " w/ "),
+            (" to ", " "), (" of ", " "), (" a ", " "), (" an ", " "),
+            ("Use", " "), ("used", " "), ("Using", " "),
+        )
 
-{}
-
-</details>
-""".strip()
-    
-class FetchEnums:
-    """Utility class for fetching configuration data and formatting it for JSON schemas.
-    
-    Provides static methods to retrieve log sources and statuses from TIDE configuration,
-    returning them as tuples of (enum_values, markdown_descriptions).
-    """
-
-    @staticmethod
-    def logsources() -> None | tuple[list[str], list[str]]:
-        """Retrieve log source entries with formatted descriptions.
-        
-        Returns:
-            tuple[list[str], list[str]]: (identifiers, markdown_descriptions)
-            None: If no log sources are configured.
-            
-        Example:
-            >>> fetch_logsources()
-            (
-                ['splunk::tenant1::windows_logs', 'splunk::tenant2::windows_logs'],
-                ['### Windows Event Logs\n**System**: Splunk\n**Tenant**: tenant1\n...']
+        def __init__(
+            self,
+            vocab: str,
+            stages: str | list | None = None,
+            no_wrap: bool = False,
+            scoped: bool = False,
+        ):
+            self.vocab = vocab
+            self.scoped = scoped
+            self.no_wrap = no_wrap
+            self.filter_stages: list | None = (
+                [stages] if isinstance(stages, str) else stages
             )
-        """
-        # Early return if no configuration exists
-        visibility_data = DataTide.Configurations.Visibility.visibility
-        if not visibility_data or not visibility_data.logsources:
-            return None 
-        
-        # Initialize our return lists
-        enums = []
-        descriptions = []
-        
-        # Build a mapping of asset names to their details for quick lookup (assets are optional)
-        asset_map = {}
-        if visibility_data.assets:
-            asset_map = {asset.name: asset for asset in visibility_data.assets}
-        
-        for logsource in visibility_data.logsources:
-            # Format base markdown template for this log source
-            base_description = f"""### {logsource.name}
-**System**: {logsource.system}
-**Description**: {logsource.description}
+            self.enum: list[str] = []
+            self.enum_description: list[str] = []
+            self._hints: list[str] = []
+            self._hints_enabled = False
 
-"""
-            # Add asset information if available
-            if logsource.assets:
-                base_description += "### Associated Assets:\n"
-                for asset_name in logsource.assets:
-                    if asset := asset_map.get(asset_name):
-                        base_description += f"""
-**{asset.name}**
-> - _Criticality_: {asset.criticality}
-> - _Description_: {asset.description}"""
-                        
-                        if asset.custom_details:
-                            base_description += "\n  - _Custom Details_:"
-                            for key, value in asset.custom_details.items():
-                                base_description += f"\n    - {key}: {value}"
-                        base_description += "\n"
-                    else:
-                        base_description += f"""
-- ⚠️ **{asset_name}**
-- _Warning_: Asset not found in configuration
-- _Action Required_: Define this asset in the assets section"""
-            
-            # Generate entries for each tenant if specified, otherwise just one entry
-            if tenants := logsource.tenants:
-                for tenant in tenants:
-                    enum = f"{logsource.system}::{tenant}::{logsource.name}"
-                    description = base_description.replace("**System**:", f"**System**: {logsource.system}\n**Tenant**: {tenant}")
-                    enums.append(enum)
-                    descriptions.append(description)
-            else:
-                enum = f"{logsource.system}::{logsource.name}"
-                enums.append(enum)
-                descriptions.append(base_description)
-        
-        return enums, descriptions
+        # --- Public API -----------------------------------------------
 
-    @staticmethod
-    def detectors() -> None | tuple[list[str], list[str]]:
-        """Retrieve external detector entries with formatted descriptions.
-        
-        Returns:
-            tuple[list[str], list[str]]: (identifiers, markdown_descriptions)
-            None: If no detectors are configured.
-            
-        Example:
-            >>> fetch_detectors()
-            (
-                ['guardduty::unauthorized_access', 'sentinel::suspicious_login'],
-                ['### GuardDuty Finding\n**Name**: UnauthorizedAccess...\n']
-            )
-        """
-        # Early return if no configuration exists
-        visibility_data = DataTide.Configurations.Visibility.visibility
-        if not visibility_data or not visibility_data.detectors:
-            return None 
-        
-        # Initialize our return lists
-        enums = []
-        descriptions = []
-        
-        # Build a mapping of asset names to their details for quick lookup (assets are optional)
-        asset_map = {}
-        if visibility_data.assets:
-            asset_map = {asset.name: asset for asset in visibility_data.assets}
-        
-        for detector in visibility_data.detectors:
-            # Format base markdown template for this detector
-            base_description = f"""### {detector.name}
-**Description**: {detector.description}
+        def resolve(self) -> tuple[list[str], list[str]]:
+            """Resolve core + extension entries → ``(enum, descriptions)``."""
+            log("DEBUG", "Resolving vocab enums for", self.vocab)
+            self._ingest(VOCAB_INDEX.get(self.vocab))
+            self._ingest_extensions()
+            return self._finalise()
 
-"""
-            # Add references if available
-            if detector.references:
-                base_description += "### References:\n"
-                for ref in detector.references:
-                    base_description += f"- {ref}\n"
-                base_description += "\n"
-            
-            # Add asset information if available
-            if detector.assets:
-                base_description += "### Monitored Assets:\n"
-                for asset_name in detector.assets:
-                    if asset := asset_map.get(asset_name):
-                        base_description += f"""
-- **{asset.name}**
-  - _Criticality_: {asset.criticality}
-  - _Description_: {asset.description}"""
-                        
-                        if asset.custom_details:
-                            base_description += "\n  - _Custom Details_:"
-                            for key, value in asset.custom_details.items():
-                                base_description += f"\n    - {key}: {value}"
-                        base_description += "\n"
-                    else:
-                        base_description += f"""
-- ⚠️ **{asset_name}**
-  - _Warning_: Asset not found in configuration
-  - _Action Required_: Define this asset in the assets section
-"""
-            
-            enums.append(detector.name)
-            descriptions.append(base_description)
-        
-        return enums, descriptions
+        # --- Ingestion ------------------------------------------------
 
-    @staticmethod
-    def statuses()->Tuple[list[str], list[str]]:
-        status_config = DataTide.Configurations.Deployment.statuses
-        statuses = list()
-        statuses_descriptions = list()
+        def _ingest(self, vocab_data: dict | None):
+            """Ingest entries from a vocabulary data dict (core index)."""
+            if not vocab_data:
+                log("WARNING", "Could not retrieve vocabulary", self.vocab)
+                return
+            metadata = vocab_data["metadata"]
+            self._hints_enabled = metadata.get("vocab.search_hints", True)
+            is_model = metadata.get("model") or (self.vocab in TIDE_MODELS)
+            self._process(vocab_data["entries"], is_model=is_model)
 
-        for status in status_config:
-            statuses.append(status.name)
-            strategy = status.strategy.name #type: ignore
-            description = f"**Strategy** : `{strategy}` - _{StatusStrategy[strategy].value}_"
-            description += f"\n\n{status.description}"
-            statuses_descriptions.append(description)
+        def _ingest_extensions(self):
+            """Ingest user-defined extensions from ``schema.toml``."""
+            extensions = VOCAB_EXTENSIONS.get(self.vocab, [])
+            if not extensions:
+                return
+            log("DEBUG", f"Processing {len(extensions)} extension(s) for", self.vocab)
+            ext_meta = VOCAB_INDEX.get(self.vocab, {}).get("metadata", {})
+            is_model = ext_meta.get("model") or (self.vocab in TIDE_MODELS)
 
-        return statuses, statuses_descriptions
+            key_field = "id" if is_model else "name"
+            normalised = {}
+            for ext in extensions:
+                d = ext.copy()
+                key = d.pop(key_field, None)
+                if not key:
+                    log("WARNING", f"Extension missing '{key_field}'", self.vocab)
+                    continue
+                normalised[key] = d
+            self._process(normalised, is_model=is_model)
 
-    @staticmethod
-    def config_parameter_list(dot_path:str)->list:
-        config_index = DataTide.Configurations.Index
-        config_path = dot_path.split(".")
-        key = config_path[0]
-        while key != config_path[-1]:
-            
-            if key == "tenants":
-                print(config_index)
-                parameter_list = []
-                parameter_key = config_path[config_path.index(key) + 1] 
-                for tenant in config_index["tenants"]:
-                    tenant_name = tenant.get("name").strip()                
-                    if parameter_key in tenant.get("parameters", {}):
-                        parameter_list.extend([tenant_name + "::" + item.strip() for item in tenant["parameters"][parameter_key]])
-                return parameter_list
-            
-            if key in config_index:
-                config_index = config_index[key]
-                key = config_path[config_path.index(key) + 1]
-            else:
-                raise ValueError(f"Key : {key} could not be found in path {dot_path}")
-        
-        if type(config_index[key]) is list:
-            return config_index[key]
-        else:
-            raise ValueError(f"Config path {dot_path} must be a valid path to a list parameter")
-
-    @staticmethod
-    def config_system_tenants_list(system:str)->Tuple[list[str], list[str]]:
-        system_config_index = DataTide.Configurations.Index
-        system_config = system_config_index.get("systems", {}).get(system)
-        
-        if not system_config:
-            log("FATAL",
-                f"Could not retrieve an available configuration for system {system}",
-                f"Indexed Configurations : {str(system_config_index.keys())}")
-            raise ValueError(f"Missing configuration for system {system}")
-        
-        tenants:list[dict] = system_config.get("tenants")
-        
-        if not tenants:
-            log("FATAL",
-                "Cannot retrieve a tenants section within the system configuration",
-                str(system_config))
-            raise ValueError(f"System Configuration for {system} does not contain a tenants section")
-        
-        tenants_list = list()
-        tenants_descriptions = list()
-        
-        for tenant_config in tenants:
-            tenant_name = tenant_config.get("name")
-            tenant_description = tenant_config.get("description", "No Description")
-            if tenant_name:
-                log("INFO",
-                    f"Discovered tenant definition {tenant_name}",
-                    tenant_config.get("description", ""))
-                tenants_descriptions.append(tenant_description)
-                tenants_list.append(tenant_name)            
-            else:
-                log("FATAL",
-                "Cannot retrieve a tenant name in tenant definition",
-                str(tenant_config))
-                raise ValueError(f"Missing name field in tenant definition")
-
-        return tenants_list, tenants_descriptions
-
-def stage_documentation(field: str, stages: str | list) -> str:
-
-    vocab_stages = VOCAB_INDEX[field]["metadata"].get("stages")
-    stages = [stages] if type(stages) is str else stages
-    if not vocab_stages:
-        log("WARNING", f"Could not find stages in vocabulary {field}")
-        return ""
-
-    stage_doc = str()
-
-    for stage in stages:
-        stage_name = stage_icon = stage_description = ""
-
-        for stage_data in vocab_stages:
-            if type(stage_data) is dict:  # Need to interop with older style vocabs
-                stage_identifier = stage_data.get("id") or stage_data.get("name")
-                if (type(stage_data) is dict) and stage_identifier == stage:
-                    stage_name = stage_data.get("name") or ""
-                    stage_icon = stage_data.get("icon") or ""
-                    stage_description = stage_data["description"]
-
-        if stage_description:
-            if not stage_name:
-                stage_name = stage
-            if len(stage_description) > STAGE_DESCRIPTION_LIMIT:
-                stage_description = stage_description[:STAGE_DESCRIPTION_LIMIT] + "..."
-
-            stage_doc += (
-                f"\n\n{stage_icon} **{stage_name}** : _{stage_description.strip()}_"
-            )
-
-    return stage_doc
-
-
-def make_markdown_dropdown(name, key, field=""):
-
-    identifier = key.get("id") or name
-    name = key.get("name") or name
-
-    if name.islower():
-        name.title()
-
-    icon = (
-        key.get("icon")
-        or VOCAB_INDEX.get(field, {}).get("metadata", {}).get("icon")
-        or ICONS.get(field)
-        or ""
-    )
-
-    source_vocab = VOCAB_INDEX.get(field, {}).get("metadata", {}).get("name")
-    link = key.get("link") or ""
-
-    stage = key.get("tide.vocab.stages") or ""
-    tlp = key.get("tlp") or ""
-    description = key.get("description") or ""
-
-    criticality = ""
-    id_icon = ICONS["id"]
-
-    if (get_type(identifier, mute=True) or "") in TIDE_MODELS:
-        criticality = key.get("criticality")
-        crit_icon = get_icon("criticality")
-        if not criticality:
-            crit_value_icon = ""
-            criticality = "No Criticality Assigned"
-        else:
-            crit_value_icon = get_vocab_entry("criticality", criticality, "icon")
-        criticality = f"{crit_icon} **Criticality** : {crit_value_icon} {criticality}"
-    
-    if tlp:
-        tlp = f" | **{get_icon(tlp, vocab='tlp')}TLP:{tlp.upper()}**"
-    if stage:
-        stage_description = stage_documentation(field, stage)
-        if stage_description:
-            stage = "{}".format(stage_description)
-        else:
-            if type(stage) == list:
-                stage = ", ".join(stage)
-            stage = "`{}`".format(stage)
-
-    dropdown = DROPDOWN_TEMPLATE.format(
-        icon=icon,
-        name=name,
-        id_icon=id_icon,
-        identifier=identifier,
-        source_vocab=source_vocab,
-        criticality=criticality,
-        tlp=tlp,
-        stage=stage,
-        link=link,
-        description=description
-    )
-
-    return dropdown
-
-
-def gen_lib_schema(
-    vocab: str,
-    stages: str | list | None = None,
-    no_wrap: bool = False,
-    scoped: bool = False,
-) -> list | Tuple[list, list]:
-    """
-    Returns all the possible values and description for a given field
-
-    Parameters
-    ----------
-    field : vocab field to return the possible values
-    stages : (optional) return only vocabulary entries belonging to the stages defined
-
-    Returns
-    -------
-    array : returns an array of dictionaries, each one being a possible
-            value and accompanying documentation
-
-    """
-
-    # Structure for anyOf
-    array = []
-    buffer = {}
-
-    # Structure for enum
-    log("DEBUG", "Generating schema for vocab", vocab)
-    enum = []
-    enum_description = []
-    enum_helper = []
-    # Loops through all vocabulary files
-    if vocab not in VOCAB_INDEX:
-        log("WARNING", "Could not retrieve vocabulary", vocab)
-    else:
-        # Edge case for possible model references, there is no description
-        # in that case, only the id which is what the user needs to input
-        # and the name used as a description.
-        # Search Hints only set to False if explicitely done from vocabulary
-        search_hints = VOCAB_INDEX[vocab]["metadata"].get("vocab.search_hints", True)
-        if (VOCAB_INDEX[vocab]["metadata"].get("model")) or (vocab in TIDE_MODELS):
-            for key in VOCAB_INDEX[vocab]["entries"]:
-                value = key
-                key_data = VOCAB_INDEX[vocab]["entries"][key]
-                buffer["const"] = value
-
-                dropdown = make_markdown_dropdown(key, key_data, field=vocab)
-                buffer["description"] = key_data.get("description") or ""
-                buffer["markdownDescription"] = dropdown
-
-                # Handle if scoped
-                if scoped:
-                    stage = key_data.get("tide.vocab.stages")
-                    if stage:
-                        value = stage + "::" + key
-
-                tips = (key_data.get("name") or "") 
-                if key_data.get("alias"):
-                    tips += ", " + ", ".join(key_data["alias"])
-                helper = value + " #" + tips.strip()
-                if not no_wrap:
-                    if len(helper) > 60:
-                        helper = (
-                            helper.replace(" and ", " & ")
-                            .replace(" without ", " w/o ")
-                            .replace(" with ", " w/ ")
-                            .replace(" to ", " ")
-                            .replace(" of ", " ")
-                            .replace(" a ", " ")
-                            .replace(" an ", " ")
-                            .replace("Use", " ")
-                            .replace("used", " ")
-                            .replace("Using", " ")
-                        )
-
-                # Due to line breaks in vscode
-                copied = buffer.copy()
-                array.append(copied)
-
-
-                if value not in enum:
-                    enum.append(value)
-                    if search_hints:
-                        enum_helper.append(helper)
-                    enum_description.append(dropdown)
-                else:
-                    log(
-                        "INFO",
-                        f"Skipping value from vocab : {vocab} as cannot handle duplicates"
-                        "when generating json schema with enums",
-                        value,
-                    )
-
-        # General case where ID is not required
-        else:
-
-            for key in VOCAB_INDEX[vocab]["entries"]:
-                key_data = VOCAB_INDEX[vocab]["entries"][key]
-                value_stages = key_data.get("tide.vocab.stages", [])
-
-                # Normalizing to arrays so we can compare
-                value_stages = (
-                    [value_stages] if type(value_stages) is not list else value_stages
-                )
-                stages = [stages] if (type(stages) is not list and stages) else stages
-
-                # If there are stages passed, we filter out the vocab key stages that
-                # do not match
-                if stages:
-                    value_stages = [s for s in value_stages if s in stages]
-
-                # Addresses the following scenarios (non-scoped keys):
-                # 1 : Stages were passed, and they match the ones on the vocab key
-                # 1b : The key stages do not match the stages passed
-                # 2 : No stages were passed at all, we can proceed
-                if ((stages and value_stages) or not stages) and not scoped:
+        def _process(self, entries: dict, *, is_model: bool):
+            """Iterate entries and emit enum values."""
+            for key, data in entries.items():
+                if is_model:
                     value = key
-                    buffer["const"] = value
-
-                    dropdown = make_markdown_dropdown(key, key_data, field=vocab)
-
-                    buffer["description"] = key_data.get("description") or ""
-                    buffer["markdownDescription"] = dropdown
-
-                    copied = buffer.copy()
-                    array.append(copied)
-
-                    if value not in enum:
-                        enum.append(value)
-                        enum_description.append(dropdown)
-                    else:
-                        log(
-                            "INFO",
-                            f"Skipping value from vocab : {vocab} as cannot handle duplicates"
-                            "when generating json schema with enums",
-                            value,
-                        )
-
-                elif scoped and value_stages:
-                    for stage in value_stages:
-                        value = stage + "::" + key
-
-                        buffer["const"] = value
-
-                        # Allows scoped keys to each have their respective
-                        # Stage documentation
-                        temp_key_data = key_data.copy()
-                        temp_key_data["tide.vocab.stages"] = stage
-
-                        dropdown = make_markdown_dropdown(
-                            key, temp_key_data, field=vocab
-                        )
-
-                        buffer["description"] = key_data.get("description") or ""
-                        buffer["markdownDescription"] = dropdown
-
-                        copied = buffer.copy()
-                        array.append(copied)
-
-                        if value not in enum:
-                            enum.append(value)
-                            enum_description.append(dropdown)
-                        else:
-                            log(
-                                "INFO",
-                                f"Skipping value from vocab : {vocab} as cannot handle duplicates"
-                                "when generating json schema with enums",
-                                value,
+                    if self.scoped and data.get("tide.vocab.stages"):
+                        value = data["tide.vocab.stages"] + "::" + key
+                    if self._emit(value, key, data) and self._hints_enabled:
+                        self._hints.append(self._search_hint(value, data))
+                else:
+                    raw = data.get("tide.vocab.stages", [])
+                    stages = [raw] if not isinstance(raw, list) else raw
+                    matching = (
+                        [s for s in stages if s in self.filter_stages]
+                        if self.filter_stages else stages
+                    )
+                    if not self.scoped:
+                        if not self.filter_stages or matching:
+                            self._emit(key, key, data)
+                    elif matching:
+                        for stage in matching:
+                            self._emit(
+                                stage + "::" + key, key,
+                                {**data, "tide.vocab.stages": stage},
                             )
 
-    if not enum:
-        enum = [""]
-    if enum_helper and search_hints:
-        enum.extend(enum_helper)
-        enum_description.extend(enum_description)
+        def _emit(self, value: str, entry_key: str, data: dict) -> bool:
+            """Append *value* if not already present (de-duplicate)."""
+            if value in self.enum:
+                log("INFO", f"Skipping duplicate in vocab {self.vocab}", value)
+                return False
+            self.enum.append(value)
+            self.enum_description.append(self._dropdown(entry_key, data))
+            return True
 
-    return enum, enum_description
+        def _finalise(self) -> tuple[list[str], list[str]]:
+            if not self.enum:
+                self.enum = [""]
+            if self._hints and self._hints_enabled:
+                self.enum.extend(self._hints)
+                self.enum_description.extend(self.enum_description)
+            return self.enum, self.enum_description
 
+        # --- Formatting -----------------------------------------------
+
+        def _search_hint(self, value: str, data: dict) -> str:
+            tips = data.get("name") or ""
+            if data.get("alias"):
+                tips += ", " + ", ".join(data["alias"])
+            hint = value + " #" + tips.strip()
+            if not self.no_wrap and len(hint) > 60:
+                for old, new in self._HINT_ABBREVS:
+                    hint = hint.replace(old, new)
+            return hint
+
+        def _dropdown(self, name: str, key: dict) -> str:
+            identifier = key.get("id") or name
+            display = key.get("name") or name
+            if display.islower():
+                display = display.title()
+
+            icon = (
+                key.get("icon")
+                or VOCAB_INDEX.get(self.vocab, {}).get("metadata", {}).get("icon")
+                or ICONS.get(self.vocab)
+                or ""
+            )
+            source_vocab = (
+                VOCAB_INDEX.get(self.vocab, {}).get("metadata", {}).get("name")
+            )
+            link = key.get("link") or ""
+            stage = key.get("tide.vocab.stages") or ""
+            tlp = key.get("tlp") or ""
+            description = key.get("description") or ""
+
+            criticality = ""
+            if (get_type(identifier, mute=True) or "") in TIDE_MODELS:
+                crit = key.get("criticality")
+                crit_icon = get_icon("criticality")
+                if not crit:
+                    criticality = (
+                        f"{crit_icon} **Criticality** : No Criticality Assigned"
+                    )
+                else:
+                    crit_value_icon = get_vocab_entry("criticality", crit, "icon")
+                    criticality = (
+                        f"{crit_icon} **Criticality** : {crit_value_icon} {crit}"
+                    )
+
+            if tlp:
+                tlp = f" | **{get_icon(tlp, vocab='tlp')}TLP:{tlp.upper()}**"
+            if stage:
+                stage_text = self._stage_doc(stage)
+                if stage_text:
+                    stage = stage_text
+                else:
+                    stage = "`{}`".format(
+                        ", ".join(stage) if isinstance(stage, list) else stage
+                    )
+
+            return self._DROPDOWN.format(
+                icon=icon, name=display, id_icon=ICONS["id"],
+                identifier=identifier, source_vocab=source_vocab,
+                criticality=criticality, tlp=tlp, stage=stage,
+                link=link, description=description,
+            )
+
+        def _stage_doc(self, stages: str | list) -> str:
+            vocab_stages = (
+                VOCAB_INDEX.get(self.vocab, {})
+                .get("metadata", {}).get("stages")
+            )
+            if not vocab_stages:
+                log("WARNING", f"Could not find stages in vocabulary {self.vocab}")
+                return ""
+            if isinstance(stages, str):
+                stages = [stages]
+            parts: list[str] = []
+            for stage in stages:
+                for sd in vocab_stages:
+                    if not isinstance(sd, dict):
+                        continue
+                    if (sd.get("id") or sd.get("name")) != stage:
+                        continue
+                    s_name = sd.get("name") or stage
+                    s_icon = sd.get("icon") or ""
+                    s_desc = sd["description"].strip()
+                    limit = EnumResolver.Vocabulary._STAGE_DESC_LIMIT
+                    if len(s_desc) > limit:
+                        s_desc = s_desc[:limit] + "..."
+                    parts.append(f"\n\n{s_icon} **{s_name}** : _{s_desc}_")
+                    break
+            return "".join(parts)
+
+    # ==================================================================
+    # Logsources
+    # ==================================================================
+
+    class Logsources:
+        """Resolve log source entries from visibility configuration."""
+
+        def resolve(self) -> None | tuple[list[str], list[str]]:
+            visibility = EnumResolver._visibility()
+            if not visibility or not visibility.logsources:
+                return None
+            asset_map = EnumResolver._asset_map(visibility)
+            enums: list[str] = []
+            descriptions: list[str] = []
+
+            for ls in visibility.logsources:
+                base = (
+                    f"### {ls.name}\n"
+                    f"**System**: {ls.system}\n"
+                    f"**Description**: {ls.description}\n\n"
+                )
+                if ls.assets:
+                    base += "### Associated Assets:\n"
+                    for a in ls.assets:
+                        base += EnumResolver._format_asset(a, asset_map) + "\n"
+
+                if ls.tenants:
+                    for tenant in ls.tenants:
+                        enums.append(f"{ls.system}::{tenant}::{ls.name}")
+                        descriptions.append(base.replace(
+                            "**System**:",
+                            f"**System**: {ls.system}\n**Tenant**: {tenant}",
+                        ))
+                else:
+                    enums.append(f"{ls.system}::{ls.name}")
+                    descriptions.append(base)
+
+            return enums, descriptions
+
+    # ==================================================================
+    # Detectors
+    # ==================================================================
+
+    class Detectors:
+        """Resolve external detector entries from visibility configuration."""
+
+        def resolve(self) -> None | tuple[list[str], list[str]]:
+            visibility = EnumResolver._visibility()
+            if not visibility or not visibility.detectors:
+                return None
+            asset_map = EnumResolver._asset_map(visibility)
+            enums: list[str] = []
+            descriptions: list[str] = []
+
+            for det in visibility.detectors:
+                base = (
+                    f"### {det.name}\n"
+                    f"**Description**: {det.description}\n\n"
+                )
+                if det.references:
+                    base += "### References:\n"
+                    for ref in det.references:
+                        base += f"- {ref}\n"
+                    base += "\n"
+                if det.assets:
+                    base += "### Monitored Assets:\n"
+                    for a in det.assets:
+                        base += EnumResolver._format_asset(a, asset_map) + "\n"
+
+                enums.append(det.name)
+                descriptions.append(base)
+
+            return enums, descriptions
+
+    # ==================================================================
+    # Statuses
+    # ==================================================================
+
+    class Statuses:
+        """Resolve deployment statuses from configuration."""
+
+        def resolve(self) -> tuple[list[str], list[str]]:
+            enums: list[str] = []
+            descriptions: list[str] = []
+            for status in DataTide.Configurations.Deployment.statuses:
+                enums.append(status.name)
+                strategy = status.strategy.name  # type: ignore
+                desc = (
+                    f"**Strategy** : `{strategy}` "
+                    f"- _{StatusStrategy[strategy].value}_"
+                    f"\n\n{status.description}"
+                )
+                descriptions.append(desc)
+            return enums, descriptions
+
+    # ==================================================================
+    # Parameters
+    # ==================================================================
+
+    class Parameters:
+        """Resolve a configuration parameter list by dot-path."""
+
+        def __init__(self, dot_path: str):
+            self.dot_path = dot_path
+
+        def resolve(self) -> list:
+            config_index = DataTide.Configurations.Index
+            parts = self.dot_path.split(".")
+            key = parts[0]
+            while key != parts[-1]:
+                if key == "tenants":
+                    print(config_index)
+                    param_key = parts[parts.index(key) + 1]
+                    result: list[str] = []
+                    for tenant in config_index["tenants"]:
+                        name = tenant.get("name").strip()
+                        if param_key in tenant.get("parameters", {}):
+                            result.extend(
+                                name + "::" + i.strip()
+                                for i in tenant["parameters"][param_key]
+                            )
+                    return result
+                if key in config_index:
+                    config_index = config_index[key]
+                    key = parts[parts.index(key) + 1]
+                else:
+                    raise ValueError(
+                        f"Key : {key} could not be found in path {self.dot_path}"
+                    )
+            if type(config_index[key]) is list:
+                return config_index[key]
+            raise ValueError(
+                f"Config path {self.dot_path} must be a valid path to a list parameter"
+            )
+
+    # ==================================================================
+    # SystemTenants
+    # ==================================================================
+
+    class SystemTenants:
+        """Resolve system tenant entries from configuration."""
+
+        def __init__(self, system: str):
+            self.system = system
+
+        def resolve(self) -> tuple[list[str], list[str]]:
+            config = DataTide.Configurations.Index
+            system_config = config.get("systems", {}).get(self.system)
+            if not system_config:
+                log(
+                    "FATAL",
+                    f"Could not retrieve configuration for system {self.system}",
+                    f"Indexed Configurations : {str(config.keys())}",
+                )
+                raise ValueError(f"Missing configuration for system {self.system}")
+
+            tenants: list[dict] = system_config.get("tenants")
+            if not tenants:
+                log(
+                    "FATAL",
+                    "Cannot retrieve a tenants section within the system configuration",
+                    str(system_config),
+                )
+                raise ValueError(
+                    f"System Configuration for {self.system} "
+                    f"does not contain a tenants section"
+                )
+
+            enums: list[str] = []
+            descriptions: list[str] = []
+            for tc in tenants:
+                name = tc.get("name")
+                if not name:
+                    log(
+                        "FATAL",
+                        "Cannot retrieve a tenant name in tenant definition",
+                        str(tc),
+                    )
+                    raise ValueError("Missing name field in tenant definition")
+                log("INFO", f"Discovered tenant definition {name}",
+                    tc.get("description", ""))
+                enums.append(name)
+                descriptions.append(tc.get("description", "No Description"))
+            return enums, descriptions
 
 
 def remove_tide_keywords(dictionary:dict)->dict:
@@ -618,18 +570,24 @@ def recomposition_handler(entry_point):
 
 
 def gen_json_schema(dictionary):
-    """
-    Fills in all coretide defined fields by calling gen_lib_schema for
-    each field identified recursively by the coretide tag. It performs
-    recursive exploration by calling itself if the key is iself a dict.
+    """Recursively resolve OpenTide metaschema keywords into JSON Schema.
+
+    Walks *dictionary* depth-first and replaces ``tide.*`` annotated
+    fields with concrete JSON Schema constructs.  Vocabulary references
+    (``tide.vocab``) are resolved via :meth:`EnumResolver.Vocabulary.resolve`;
+    configuration-driven fields, recompositions and definitions are
+    handled inline.
+
+    Parameters
     ----------
-    dictionary : Nested dictionary to search into
+    dictionary : dict
+        A parsed metaschema (nested dict) to transform in-place.
 
     Returns
     -------
-    dictionary : Iteration of the dictionary where the explored depths
-                 has been dynamically mapped with coretide keys.
-
+    dict
+        The same *dictionary*, mutated with all ``tide.*`` keywords
+        resolved into standard JSON Schema properties.
     """
     dict_foo = dictionary.copy()
     icon = ""
@@ -688,7 +646,7 @@ def gen_json_schema(dictionary):
 
                 # Handles retrieval of logsources
                 if dict_foo[field].get("tide.config.visibility.logsources"):
-                    logsources_result = FetchEnums.logsources()
+                    logsources_result = EnumResolver.Logsources().resolve()
                     if logsources_result:
                         enums, descriptions = logsources_result
                         dictionary[field]["items"] = {}
@@ -698,7 +656,7 @@ def gen_json_schema(dictionary):
                 
                 # Handles retrieval of detectors
                 if dict_foo[field].get("tide.config.visibility.detectors"):
-                    detectors_result = FetchEnums.detectors()
+                    detectors_result = EnumResolver.Detectors().resolve()
                     if detectors_result:
                         enums, descriptions = detectors_result
                         if dict_foo[field].get("type") == "string":
@@ -713,7 +671,7 @@ def gen_json_schema(dictionary):
                 # Handles the case when a list of values has to be fetched from
                 # the configuration files.
                 if config_fetch:=dict_foo[field].get("tide.config.parameter-list"):
-                    values_list = FetchEnums.config_parameter_list(config_fetch)
+                    values_list = EnumResolver.Parameters(config_fetch).resolve()
                     if dict_foo[field].get("type") == "string":
                         dictionary[field]["enum"] = values_list
                     elif dict_foo[field].get("type") == "array":
@@ -734,7 +692,7 @@ def gen_json_schema(dictionary):
 
                 # Special handling to specifically get the available tenants
                 if system:=dict_foo[field].get("tide.config.system.tenants"):
-                    values_list, descriptions_list = FetchEnums.config_system_tenants_list(system)
+                    values_list, descriptions_list = EnumResolver.SystemTenants(system).resolve()
                     if dict_foo[field].get("type") == "string":
                         dictionary[field]["enum"] = values_list
                         dictionary[field]["markdownEnumDescriptions"] = descriptions_list
@@ -746,7 +704,7 @@ def gen_json_schema(dictionary):
 
                 # Special handling to specifically get the available statuses
                 if system:=dict_foo[field].get("tide.config.statuses"):
-                    values_list, descriptions_list = FetchEnums.statuses()
+                    values_list, descriptions_list = EnumResolver.Statuses().resolve()
                     if dict_foo[field].get("type") == "string":
                         dictionary[field]["enum"] = values_list
                         dictionary[field]["markdownEnumDescriptions"] = descriptions_list
@@ -776,12 +734,10 @@ def gen_json_schema(dictionary):
                     enum = []
                     markdown_enum = []
                     for vocab in vocabs:
-                        new_enum, new_markdown_enum = gen_lib_schema(
-                            vocab=vocab,
-                            no_wrap=hint_no_wrap,
-                            stages=stages,
-                            scoped=scoped,
-                        )
+                        new_enum, new_markdown_enum = EnumResolver.Vocabulary(
+                            vocab, stages=stages,
+                            no_wrap=hint_no_wrap, scoped=scoped,
+                        ).resolve()
                         enum.extend(new_enum)
                         markdown_enum.extend(new_markdown_enum)
                     temp["enum"] = enum
@@ -852,6 +808,51 @@ def run():
             log("SUCCESS", "Correctly exported")
 
     log("SUCCESS", "Generated all JSON Schemas")
+
+    # Configuration Schemas
+    # Configuration meta schemas live under Configurations/ subdirectories
+    # and may use tide.* keywords for vocabulary resolution
+    config_metaschemas = GLOBAL_CONFIG.config_metaschemas
+    config_json_schemas = GLOBAL_CONFIG.config_json_schemas
+
+    if config_metaschemas:
+        log("TITLE", "Configuration Schema Assembler")
+        log(
+            "INFO",
+            "Generates JSON Schemas from configuration meta schema files, "
+            "dynamically looking up Vocabulary values where applicable.",
+        )
+
+        for meta in config_metaschemas:
+            if meta in config_json_schemas:
+
+                yaml_input = METASCHEMAS_FOLDER / config_metaschemas[meta]
+                json_output = JSON_SCHEMA_FOLDER / config_json_schemas[meta]
+
+                parsing = yaml.safe_load(open(yaml_input, encoding="utf-8"))
+                placeholders = parsing.get("tide.placeholders") or {}
+
+                log("ONGOING", "Generating config schema for : " + str(yaml_input))
+
+                # Generate Schema (resolves tide.vocab and other tide.* keywords)
+                generated = gen_json_schema(parsing)
+
+                # Removes the OpenTide reserved schema keys
+                cleaned = remove_tide_keywords(generated)
+
+                # Export JSON Schemas
+                log("ONGOING", "Exporting generated schema to : " + str(json_output))
+                output = json.dumps(cleaned, indent=4, sort_keys=False, default=str)
+                for placeholder in placeholders:
+                    log("ONGOING", f"Replacing all occurence of placeholder {placeholder} with value {placeholders[placeholder]}")
+                    output = output.replace(f"${placeholder}", placeholders[placeholder])
+
+                output_file = open((json_output), "w", encoding="utf-8")
+                output_file.write(output)
+                output_file.close()
+                log("SUCCESS", "Correctly exported")
+
+        log("SUCCESS", "Generated all Configuration Schemas")
 
 
 if __name__ == "__main__":

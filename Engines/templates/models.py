@@ -41,6 +41,8 @@ MODEL_DOC_TEMPLATE = '''{frontmatter}
 
 {data_table}
 
+{threat_surface}
+
 {references}
 
 {tags}

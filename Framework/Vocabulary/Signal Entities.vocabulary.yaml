@@ -28,6 +28,7 @@ keys:
 
   - id: 44156a4d-2b7b-4835-b6c3-9f329b81dbd0
     name: User
+    tide.vocab.stages:
       - host
       - cloud
     description: |

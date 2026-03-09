@@ -1747,12 +1747,16 @@ keys:
     description: Juniper SRX Series firewall
   - id: 1ed1f361-1137-467b-bab4-5c2e2b781b05
     name: VPN
-    tide.vocab.stages: Infrastructure
-    description: Virtual Private Network solutions
+    tide.vocab.stages:
+      - Infrastructure
+      - Protocol
+    description: Virtual Private Network solutions and tunnelling protocols
   - id: 174fb956-9f39-4ecc-b642-fb18ee61fb06
     name: VPN::OpenVPN
-    tide.vocab.stages: Infrastructure
-    description: OpenVPN open-source VPN solution
+    tide.vocab.stages:
+      - Infrastructure
+      - Protocol
+    description: OpenVPN open-source VPN solution and protocol
   - id: f2e4d12e-19ef-4952-a081-797bf8cad88a
     name: VPN::Cisco AnyConnect
     tide.vocab.stages: Infrastructure
@@ -1771,7 +1775,9 @@ keys:
     description: Ivanti Connect Secure (formerly Pulse Secure) VPN
   - id: 8a893a65-c1b2-4d0c-a557-9941ea72960d
     name: VPN::WireGuard
-    tide.vocab.stages: Infrastructure
+    tide.vocab.stages:
+      - Infrastructure
+      - Protocol
     description: WireGuard modern VPN protocol and implementation
   - id: 1d180ccc-da1d-4f51-88b9-9381228ff16c
     name: Proxy
@@ -1971,8 +1977,10 @@ keys:
     description: Pure Storage all-flash arrays
   - id: 742a255c-39e8-49cc-a345-5dc15b43bff3
     name: Wireless
-    tide.vocab.stages: Infrastructure
-    description: Wireless networking infrastructure
+    tide.vocab.stages:
+      - Infrastructure
+      - Protocol
+    description: Wireless networking infrastructure and communication protocols
   - id: 14eb2890-4521-4202-bd63-1b9295c957b9
     name: Wireless::Wi-Fi Access Points
     tide.vocab.stages: Infrastructure
@@ -2047,8 +2055,10 @@ keys:
     description: DigiCert TLS/SSL certificate authority
   - id: 0e990ec9-e5ef-442a-b70f-d6ca6ae4566f
     name: Industrial
-    tide.vocab.stages: Infrastructure
-    description: Industrial control systems and operational technology
+    tide.vocab.stages:
+      - Infrastructure
+      - Protocol
+    description: Industrial control systems, operational technology and automation protocols
   - id: 2fdfd858-ee48-4fda-8627-e295cb4e7333
     name: Industrial::SCADA
     tide.vocab.stages: Infrastructure
@@ -2769,10 +2779,6 @@ keys:
     name: Network Layer::GRE
     tide.vocab.stages: Protocol
     description: Generic Routing Encapsulation tunnelling
-  - id: aec2d696-abc1-4124-acf9-715b08795b19
-    name: Industrial
-    tide.vocab.stages: Protocol
-    description: Industrial control and automation protocols
   - id: 84783203-4db5-4db2-b6c0-7cb3deccd3bf
     name: Industrial::Modbus
     tide.vocab.stages: Protocol
@@ -2805,10 +2811,6 @@ keys:
     name: Industrial::CAN
     tide.vocab.stages: Protocol
     description: Controller Area Network vehicle/industrial bus
-  - id: 440e692c-772b-44d1-8e9c-051a1adc0b39
-    name: Wireless
-    tide.vocab.stages: Protocol
-    description: Wireless communication protocols
   - id: 5ba08ba1-220a-4d71-b430-aa9c53725f27
     name: Wireless::Wi-Fi
     tide.vocab.stages: Protocol
@@ -2853,22 +2855,10 @@ keys:
     name: Domain Name System::DoT
     tide.vocab.stages: Protocol
     description: DNS over TLS
-  - id: b5405d5d-b9b4-404e-b2b7-c09303f64d8f
-    name: VPN
-    tide.vocab.stages: Protocol
-    description: VPN tunnelling protocols
   - id: 008aab51-79d3-4905-b9c7-d9cdc1a2d57e
     name: VPN::IPsec
     tide.vocab.stages: Protocol
     description: IPsec VPN tunnel protocol
-  - id: 563f845d-aa4d-4861-afef-90c8bd64df92
-    name: VPN::WireGuard
-    tide.vocab.stages: Protocol
-    description: WireGuard VPN protocol
-  - id: bd90f821-a846-4ed7-8071-d799aac48fe1
-    name: VPN::OpenVPN
-    tide.vocab.stages: Protocol
-    description: OpenVPN protocol
   - id: 43891e9f-480b-4728-9853-0da15cb9a9dc
     name: VPN::SSL VPN
     tide.vocab.stages: Protocol

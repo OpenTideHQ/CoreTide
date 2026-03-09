@@ -38,7 +38,7 @@ attack_layer = "ATT&CK Navigator Layer.json"
 table = "Objects Table.csv"
 
 [metaschemas]
-tvm = "TVM Meta Schema.yaml"
+tvm = "Threat Vector.metaschema.yaml"
 dom = "Detection Objective.metaschema.yaml"
 cdm = "CDM Meta Schema.yaml"
 mdr = "MDR Meta Schema.yaml"

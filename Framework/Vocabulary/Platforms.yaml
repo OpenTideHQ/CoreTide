@@ -87,10 +87,6 @@ keys:
   - id: PFM0028
     name: PowerShell
     description: Placeholder
-  - id: PFM1024
-    name: EU Login
-    tlp: red
-    description: Placeholder
   - id: PFM0030
     name: VMWare
     description: Placeholder
@@ -293,7 +289,7 @@ keys:
     link: https://www.bacnetinternational.org/
   - id: PFM0079
     name: PROFINET
-    description: PROFINET is an industry standard for industrial Ethernet, primarily used with Siemens and other European automation equipment.
+    description: PROFINET is an industry standard for industrial Ethernet, primarily used with Siemens and other fropean automation equipment.
     link: https://www.profibus.com/technology/profinet
   - id: PFM0080
     name: IEC 61850

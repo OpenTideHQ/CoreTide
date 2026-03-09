@@ -113,8 +113,8 @@ properties:
         markdownDescription: |
           Hierarchical scoping of technologies and environments applicable to the threat vector.
 
-          Uses scoped `category::target` notation. Available categories: `os`, `application`, `authentication`, `cloud`, `infrastructure`, `security`, `iot`, `protocol`.
-        example: os::Windows
+          Uses scoped `category::target` notation. Available categories: `OS`, `Application`, `Authentication`, `Cloud`, `Infrastructure`, `Security`, `IoT`, `Protocol`.
+        example: OS::Windows
 
       domains:
         title: Domains [DEPRECATED]

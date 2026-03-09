@@ -16,5 +16,17 @@
 "mdr::exclusions::reason" = """
 """
 
-[external]
-technologies = [""]
+[vocabulary]
+# Vocabulary Extensions
+# Allows users to inject custom entries into vocabularies at schema
+# compilation time. Extensions appear in JSON Schema enums and VS Code
+# autocomplete alongside core vocabulary entries.
+#
+# Each sub-key matches a vocabulary field name (e.g. surface, techniques).
+# Entries follow the same structure as vocabulary keys items.
+#
+# Example:
+# [[vocabulary.surface]]
+# name = "cloud::OVHcloud"
+# description = "OVHcloud public cloud services"
+# "tide.vocab.stages" = "cloud"

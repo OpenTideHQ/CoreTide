@@ -24,6 +24,11 @@ VOCAB_INDEX = DataTide.Vocabularies.Index
 CONFIG_INDEX = DataTide.Configurations.Index
 PATHS = resolve_paths()
 
+# Vocabulary Extensions — user-defined entries injected at schema compilation
+# Loaded from [vocabulary] section in schema.toml
+SCHEMA_CONFIG = CONFIG_INDEX.get("schema", {})
+VOCAB_EXTENSIONS = SCHEMA_CONFIG.get("vocabulary", {})
+
 # Configuration settings fetching routine
 METASCHEMAS_FOLDER = Path(PATHS["metaschemas"])
 VOCABS_FOLDER = Path(PATHS["vocabularies"])
@@ -555,6 +560,65 @@ def gen_lib_schema(
                                 "when generating json schema with enums",
                                 value,
                             )
+
+    # Vocabulary Extensions — inject user-defined entries from schema.toml
+    # These entries are appended after core vocabulary entries, allowing
+    # instance-specific customisation without modifying vocabulary files.
+    extensions = VOCAB_EXTENSIONS.get(vocab, [])
+    if extensions:
+        log("DEBUG", f"Processing {len(extensions)} vocabulary extension(s) for", vocab)
+        vocab_metadata = VOCAB_INDEX.get(vocab, {}).get("metadata", {})
+        is_model_vocab = vocab_metadata.get("model") or (vocab in TIDE_MODELS)
+
+        for ext_entry in extensions:
+            ext_data = ext_entry.copy()
+
+            if is_model_vocab:
+                key = ext_data.pop("id", None)
+                if not key:
+                    log("WARNING", "Vocabulary extension for model vocab missing 'id'", vocab)
+                    continue
+            else:
+                key = ext_data.pop("name", None)
+                if not key:
+                    log("WARNING", "Vocabulary extension missing 'name'", vocab)
+                    continue
+
+            key_data = ext_data
+            value_stages = key_data.get("tide.vocab.stages", [])
+            value_stages = [value_stages] if type(value_stages) is not list else value_stages
+            local_stages = [stages] if (type(stages) is not list and stages) else stages
+
+            # Apply stages filtering (same logic as core entries)
+            if local_stages:
+                value_stages = [s for s in value_stages if s in local_stages]
+
+            if ((local_stages and value_stages) or not local_stages) and not scoped:
+                value = key
+                buffer["const"] = value
+                dropdown = make_markdown_dropdown(key, key_data, field=vocab)
+                buffer["description"] = key_data.get("description") or ""
+                buffer["markdownDescription"] = dropdown
+                copied = buffer.copy()
+                array.append(copied)
+                if value not in enum:
+                    enum.append(value)
+                    enum_description.append(dropdown)
+
+            elif scoped and value_stages:
+                for stage in value_stages:
+                    value = stage + "::" + key
+                    buffer["const"] = value
+                    temp_key_data = key_data.copy()
+                    temp_key_data["tide.vocab.stages"] = stage
+                    dropdown = make_markdown_dropdown(key, temp_key_data, field=vocab)
+                    buffer["description"] = key_data.get("description") or ""
+                    buffer["markdownDescription"] = dropdown
+                    copied = buffer.copy()
+                    array.append(copied)
+                    if value not in enum:
+                        enum.append(value)
+                        enum_description.append(dropdown)
 
     if not enum:
         enum = [""]

@@ -45,7 +45,6 @@ properties:
     required:
       - att&ck
       - terrain
-      - surface
       - severity
       - leverage
       - impact
@@ -109,6 +108,7 @@ properties:
         type: array
         tide.vocab: true
         tide.vocab.scoped: true
+        tide.template.force-required: true
         description: Hierarchical scoping of technologies and environments applicable to the threat vector, using category::target notation
         markdownDescription: |
           Hierarchical scoping of technologies and environments applicable to the threat vector.

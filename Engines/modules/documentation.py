@@ -424,6 +424,9 @@ def make_vocab_link(field, key):
 
     key = (get_icon(key, vocab=field, parent_icon=False) or "") + " " + key
 
+    if entry is None:
+        return f"`{key}`"
+
     if "link" in entry.keys():
         link = "[`" + key + "`]" + "(" + entry["link"] + ")"
     elif vocab_reference is not None:

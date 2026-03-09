@@ -5,8 +5,7 @@ import json
 from pathlib import Path
 import sys
 
-from typing import Literal, Tuple
-from io import StringIO
+from typing import Tuple
 
 sys.path.append(str(git.Repo(".", search_parent_directories=True).working_dir))
 
@@ -38,35 +37,7 @@ TIDE_MODELS = DataTide.Configurations.Global.objects
 SUBSCHEMAS_PATH = Path(PATHS["subschemas"])
 RECOMPOSITION = GLOBAL_CONFIG.recomposition
 
-STAGE_DESCRIPTION_LIMIT = 300
 
-
-DROPDOWN_TEMPLATE = """
-### {icon} {name}
-
-{id_icon} **Identifier** : `{identifier}`
-
-_Vocabulary_ : `{source_vocab}`
-
-{criticality} {tlp}
-
-{stage}
-
-{link}
-
----
-
-{description}
-"""
-
-FOLDABLE = """
-<details><summary>{}</summary>
-
-{}
-
-</details>
-""".strip()
-    
 class FetchEnums:
     """Utility class for fetching configuration data and formatting it for JSON schemas.
     
@@ -296,360 +267,255 @@ class FetchEnums:
 
         return tenants_list, tenants_descriptions
 
-def stage_documentation(field: str, stages: str | list) -> str:
 
-    vocab_stages = VOCAB_INDEX[field]["metadata"].get("stages")
-    stages = [stages] if type(stages) is str else stages
-    if not vocab_stages:
-        log("WARNING", f"Could not find stages in vocabulary {field}")
-        return ""
+class VocabResolver:
+    """Resolves vocabulary entries into JSON Schema enum arrays.
 
-    stage_doc = str()
+    Converts core vocabulary YAML entries and user-defined extensions
+    (``[vocabulary]`` in ``schema.toml``) into the parallel
+    ``enum`` / ``markdownEnumDescriptions`` lists consumed by JSON Schema.
 
-    for stage in stages:
-        stage_name = stage_icon = stage_description = ""
+    Handles three vocabulary patterns:
 
-        for stage_data in vocab_stages:
-            if type(stage_data) is dict:  # Need to interop with older style vocabs
-                stage_identifier = stage_data.get("id") or stage_data.get("name")
-                if (type(stage_data) is dict) and stage_identifier == stage:
-                    stage_name = stage_data.get("name") or ""
-                    stage_icon = stage_data.get("icon") or ""
-                    stage_description = stage_data["description"]
-
-        if stage_description:
-            if not stage_name:
-                stage_name = stage
-            if len(stage_description) > STAGE_DESCRIPTION_LIMIT:
-                stage_description = stage_description[:STAGE_DESCRIPTION_LIMIT] + "..."
-
-            stage_doc += (
-                f"\n\n{stage_icon} **{stage_name}** : _{stage_description.strip()}_"
-            )
-
-    return stage_doc
-
-
-def make_markdown_dropdown(name, key, field=""):
-
-    identifier = key.get("id") or name
-    name = key.get("name") or name
-
-    if name.islower():
-        name.title()
-
-    icon = (
-        key.get("icon")
-        or VOCAB_INDEX.get(field, {}).get("metadata", {}).get("icon")
-        or ICONS.get(field)
-        or ""
-    )
-
-    source_vocab = VOCAB_INDEX.get(field, {}).get("metadata", {}).get("name")
-    link = key.get("link") or ""
-
-    stage = key.get("tide.vocab.stages") or ""
-    tlp = key.get("tlp") or ""
-    description = key.get("description") or ""
-
-    criticality = ""
-    id_icon = ICONS["id"]
-
-    if (get_type(identifier, mute=True) or "") in TIDE_MODELS:
-        criticality = key.get("criticality")
-        crit_icon = get_icon("criticality")
-        if not criticality:
-            crit_value_icon = ""
-            criticality = "No Criticality Assigned"
-        else:
-            crit_value_icon = get_vocab_entry("criticality", criticality, "icon")
-        criticality = f"{crit_icon} **Criticality** : {crit_value_icon} {criticality}"
-    
-    if tlp:
-        tlp = f" | **{get_icon(tlp, vocab='tlp')}TLP:{tlp.upper()}**"
-    if stage:
-        stage_description = stage_documentation(field, stage)
-        if stage_description:
-            stage = "{}".format(stage_description)
-        else:
-            if type(stage) == list:
-                stage = ", ".join(stage)
-            stage = "`{}`".format(stage)
-
-    dropdown = DROPDOWN_TEMPLATE.format(
-        icon=icon,
-        name=name,
-        id_icon=id_icon,
-        identifier=identifier,
-        source_vocab=source_vocab,
-        criticality=criticality,
-        tlp=tlp,
-        stage=stage,
-        link=link,
-        description=description
-    )
-
-    return dropdown
-
-
-# ---------------------------------------------------------------------------
-# Vocabulary → JSON Schema enum resolution
-# ---------------------------------------------------------------------------
-# The following helpers and main function convert vocabulary entries (from
-# core YAML files and user-defined extensions in schema.toml) into the
-# parallel enum / markdownEnumDescriptions arrays consumed by JSON Schema.
-# ---------------------------------------------------------------------------
-
-
-def _normalize_stages(stages: str | list | None) -> list | None:
-    """Normalize a stages parameter to a list, or ``None`` if unset."""
-    if stages is None:
-        return None
-    return [stages] if type(stages) is not list else stages
-
-
-def _get_entry_stages(key_data: dict) -> list:
-    """Extract and normalize the ``tide.vocab.stages`` value from an entry."""
-    raw = key_data.get("tide.vocab.stages", [])
-    return [raw] if type(raw) is not list else raw
-
-
-def _match_stages(entry_stages: list, filter_stages: list | None) -> list:
-    """Return only the entry stages that pass *filter_stages*.
-
-    If no filter is set, all entry stages are returned unchanged.
-    """
-    if not filter_stages:
-        return entry_stages
-    return [s for s in entry_stages if s in filter_stages]
-
-
-def _shorten_search_hint(hint: str) -> str:
-    """Apply common abbreviations to keep VS Code search hints concise."""
-    return (
-        hint.replace(" and ", " & ")
-        .replace(" without ", " w/o ")
-        .replace(" with ", " w/ ")
-        .replace(" to ", " ")
-        .replace(" of ", " ")
-        .replace(" a ", " ")
-        .replace(" an ", " ")
-        .replace("Use", " ")
-        .replace("used", " ")
-        .replace("Using", " ")
-    )
-
-
-def _build_search_hint(value: str, key_data: dict, no_wrap: bool) -> str:
-    """Build a VS Code search hint string from entry metadata."""
-    tips = key_data.get("name") or ""
-    if key_data.get("alias"):
-        tips += ", " + ", ".join(key_data["alias"])
-    hint = value + " #" + tips.strip()
-    if not no_wrap and len(hint) > 60:
-        hint = _shorten_search_hint(hint)
-    return hint
-
-
-def _emit_enum_value(
-    value: str,
-    entry_key: str,
-    key_data: dict,
-    vocab: str,
-    enum: list,
-    enum_description: list,
-) -> bool:
-    """Append a single value to the enum collectors (de-duplicated).
-
-    Parameters
-    ----------
-    value : The enum string that will appear in the JSON Schema.
-    entry_key : The vocabulary entry key (name or id) for the dropdown.
-    key_data : The entry's metadata dict.
-    vocab : The vocabulary field name (for the dropdown source label).
-    enum : Mutable list of enum values to append to.
-    enum_description : Mutable list of markdown descriptions to append to.
-
-    Returns
-    -------
-    bool
-        ``True`` if the value was appended, ``False`` if it was a duplicate.
-    """
-    dropdown = make_markdown_dropdown(entry_key, key_data, field=vocab)
-    if value not in enum:
-        enum.append(value)
-        enum_description.append(dropdown)
-        return True
-    log(
-        "INFO",
-        f"Skipping duplicate in vocab {vocab} during schema generation",
-        value,
-    )
-    return False
-
-
-def _emit_scoped_values(
-    entry_key: str,
-    key_data: dict,
-    matching_stages: list,
-    vocab: str,
-    enum: list,
-    enum_description: list,
-) -> None:
-    """Emit one scoped ``stage::entry_key`` value per matching stage."""
-    for stage in matching_stages:
-        scoped_data = key_data.copy()
-        scoped_data["tide.vocab.stages"] = stage
-        value = stage + "::" + entry_key
-        _emit_enum_value(value, entry_key, scoped_data, vocab, enum, enum_description)
-
-
-def resolve_vocab_enums(
-    vocab: str,
-    stages: str | list | None = None,
-    no_wrap: bool = False,
-    scoped: bool = False,
-) -> Tuple[list[str], list[str]]:
-    """Resolve vocabulary entries into JSON Schema enum arrays.
-
-    Reads entries from the core vocabulary index and any user-defined
-    vocabulary extensions (``[vocabulary]`` in ``schema.toml``), producing
-    parallel lists of enum values and their markdown descriptions for
-    JSON Schema generation.
-
-    The function handles three vocabulary patterns:
-
-    * **Model vocabularies** (keyed by id) — all entries are emitted with
-      optional scope prefixing and VS Code search hints.
-    * **General vocabularies, non-scoped** — entries are filtered by stages
-      and emitted with their name as the value.
-    * **General vocabularies, scoped** — entries are expanded to one
+    * **Model vocabularies** (keyed by id) — all entries emitted with
+      optional scope-prefixing and VS Code search hints.
+    * **General vocabularies, non-scoped** — entries filtered by stages,
+      emitted with their name as the value.
+    * **General vocabularies, scoped** — entries expanded to one
       ``stage::name`` value per matching stage.
 
-    Parameters
-    ----------
-    vocab : The vocabulary field name to resolve (e.g. ``'surface'``,
-        ``'techniques'``).
-    stages : Optional stage filter(s). When provided, only entries whose
-        ``tide.vocab.stages`` intersect with *stages* are included.
-    no_wrap : When ``True``, disables shortening of long search hint strings.
-    scoped : When ``True``, emits values as ``stage::name`` instead of
-        plain ``name``.
+    Usage::
 
-    Returns
-    -------
-    tuple[list[str], list[str]]
-        ``(enum_values, markdown_descriptions)`` — parallel lists ready
-        for injection into a JSON Schema ``enum`` / ``markdownEnumDescriptions``.
+        enum, descriptions = VocabResolver("surface", stages="os").resolve()
     """
-    log("DEBUG", "Resolving vocab enums for", vocab)
 
-    enum: list[str] = []
-    enum_description: list[str] = []
-    enum_helper: list[str] = []
-    search_hints = False
-    filter_stages = _normalize_stages(stages)
+    STAGE_DESCRIPTION_LIMIT = 300
 
-    # ------------------------------------------------------------------
-    # Phase 1 — Core vocabulary entries
-    # ------------------------------------------------------------------
-    if vocab not in VOCAB_INDEX:
-        log("WARNING", "Could not retrieve vocabulary", vocab)
-    else:
-        metadata = VOCAB_INDEX[vocab]["metadata"]
-        entries = VOCAB_INDEX[vocab]["entries"]
-        is_model = metadata.get("model") or (vocab in TIDE_MODELS)
-        search_hints = metadata.get("vocab.search_hints", True)
+    DROPDOWN_TEMPLATE = """
+### {icon} {name}
 
-        if is_model:
-            # Model vocabularies are keyed by id; every entry is emitted
-            # with optional scope-prefixing and search hints.
-            for entry_key, key_data in entries.items():
-                value = entry_key
-                if scoped:
-                    stage = key_data.get("tide.vocab.stages")
-                    if stage:
-                        value = stage + "::" + entry_key
+{id_icon} **Identifier** : `{identifier}`
 
-                added = _emit_enum_value(
-                    value, entry_key, key_data, vocab, enum, enum_description
-                )
-                if added and search_hints:
-                    enum_helper.append(
-                        _build_search_hint(value, key_data, no_wrap)
-                    )
-        else:
-            # General vocabularies are keyed by name; stage filtering and
-            # scoped expansion apply.
-            for entry_key, key_data in entries.items():
-                entry_stages = _get_entry_stages(key_data)
-                matching = _match_stages(entry_stages, filter_stages)
+_Vocabulary_ : `{source_vocab}`
 
-                if not scoped:
-                    # Non-scoped: emit when stages match or no filter set
-                    if (filter_stages and matching) or not filter_stages:
-                        _emit_enum_value(
-                            entry_key, entry_key, key_data,
-                            vocab, enum, enum_description,
-                        )
-                elif matching:
-                    # Scoped: expand one value per matching stage
-                    _emit_scoped_values(
-                        entry_key, key_data, matching,
-                        vocab, enum, enum_description,
-                    )
+{criticality} {tlp}
+
+{stage}
+
+{link}
+
+---
+
+{description}
+"""
+
+    _HINT_ABBREVS = (
+        (" and ", " & "), (" without ", " w/o "), (" with ", " w/ "),
+        (" to ", " "), (" of ", " "), (" a ", " "), (" an ", " "),
+        ("Use", " "), ("used", " "), ("Using", " "),
+    )
+
+    def __init__(
+        self,
+        vocab: str,
+        stages: str | list | None = None,
+        no_wrap: bool = False,
+        scoped: bool = False,
+    ):
+        self.vocab = vocab
+        self.scoped = scoped
+        self.no_wrap = no_wrap
+        self.filter_stages: list | None = (
+            [stages] if isinstance(stages, str) else stages
+        )
+        self.enum: list[str] = []
+        self.enum_description: list[str] = []
+        self._hints: list[str] = []
+        self._hints_enabled = False
 
     # ------------------------------------------------------------------
-    # Phase 2 — Vocabulary extensions from schema.toml
+    # Public API
     # ------------------------------------------------------------------
-    extensions = VOCAB_EXTENSIONS.get(vocab, [])
-    if extensions:
-        log("DEBUG", f"Processing {len(extensions)} vocabulary extension(s) for", vocab)
-        ext_metadata = VOCAB_INDEX.get(vocab, {}).get("metadata", {})
-        is_model = ext_metadata.get("model") or (vocab in TIDE_MODELS)
 
-        for ext_entry in extensions:
-            ext_data = ext_entry.copy()
+    def resolve(self) -> tuple[list[str], list[str]]:
+        """Resolve core + extension entries, return ``(enum, descriptions)``."""
+        log("DEBUG", "Resolving vocab enums for", self.vocab)
+        self._process_core()
+        self._process_extensions()
+        return self._finalise()
 
-            # Determine entry key based on vocabulary type
+    # ------------------------------------------------------------------
+    # Entry processing
+    # ------------------------------------------------------------------
+
+    def _process_core(self):
+        """Process entries from the core vocabulary index."""
+        if self.vocab not in VOCAB_INDEX:
+            log("WARNING", "Could not retrieve vocabulary", self.vocab)
+            return
+        metadata = VOCAB_INDEX[self.vocab]["metadata"]
+        self._hints_enabled = metadata.get("vocab.search_hints", True)
+        is_model = metadata.get("model") or (self.vocab in TIDE_MODELS)
+        self._process_entries(
+            VOCAB_INDEX[self.vocab]["entries"], is_model=is_model
+        )
+
+    def _process_extensions(self):
+        """Process user-defined entries from ``[vocabulary]`` in ``schema.toml``."""
+        extensions = VOCAB_EXTENSIONS.get(self.vocab, [])
+        if not extensions:
+            return
+        log(
+            "DEBUG",
+            f"Processing {len(extensions)} vocabulary extension(s) for",
+            self.vocab,
+        )
+        ext_meta = VOCAB_INDEX.get(self.vocab, {}).get("metadata", {})
+        is_model = ext_meta.get("model") or (self.vocab in TIDE_MODELS)
+
+        # Normalise list-of-dicts → {key: data} to match core format
+        key_field = "id" if is_model else "name"
+        normalised = {}
+        for ext in extensions:
+            d = ext.copy()
+            key = d.pop(key_field, None)
+            if not key:
+                log("WARNING", f"Vocabulary extension missing '{key_field}'", self.vocab)
+                continue
+            normalised[key] = d
+        self._process_entries(normalised, is_model=is_model)
+
+    def _process_entries(self, entries: dict, *, is_model: bool):
+        """Iterate entries and emit enum values according to vocabulary type."""
+        for key, data in entries.items():
             if is_model:
-                entry_key = ext_data.pop("id", None)
-                if not entry_key:
-                    log("WARNING", "Vocabulary extension for model vocab missing 'id'", vocab)
-                    continue
+                value = key
+                if self.scoped and data.get("tide.vocab.stages"):
+                    value = data["tide.vocab.stages"] + "::" + key
+                if self._emit(value, key, data) and self._hints_enabled:
+                    self._hints.append(self._search_hint(value, data))
             else:
-                entry_key = ext_data.pop("name", None)
-                if not entry_key:
-                    log("WARNING", "Vocabulary extension missing 'name'", vocab)
-                    continue
+                raw = data.get("tide.vocab.stages", [])
+                entry_stages = [raw] if not isinstance(raw, list) else raw
+                matching = (
+                    [s for s in entry_stages if s in self.filter_stages]
+                    if self.filter_stages else entry_stages
+                )
+                if not self.scoped:
+                    if not self.filter_stages or matching:
+                        self._emit(key, key, data)
+                elif matching:
+                    for stage in matching:
+                        self._emit(
+                            stage + "::" + key, key,
+                            {**data, "tide.vocab.stages": stage},
+                        )
 
-            key_data = ext_data
-            entry_stages = _get_entry_stages(key_data)
-            matching = _match_stages(entry_stages, filter_stages)
+    def _emit(self, value: str, entry_key: str, key_data: dict) -> bool:
+        """Append *value* to the enum collectors if not already present."""
+        if value in self.enum:
+            log("INFO", f"Skipping duplicate in vocab {self.vocab}", value)
+            return False
+        self.enum.append(value)
+        self.enum_description.append(self._dropdown(entry_key, key_data))
+        return True
 
-            if not scoped:
-                if (filter_stages and matching) or not filter_stages:
-                    _emit_enum_value(
-                        entry_key, entry_key, key_data,
-                        vocab, enum, enum_description,
-                    )
-            elif matching:
-                _emit_scoped_values(
-                    entry_key, key_data, matching,
-                    vocab, enum, enum_description,
+    def _finalise(self) -> tuple[list[str], list[str]]:
+        """Apply empty fallback and merge search hints into enum."""
+        if not self.enum:
+            self.enum = [""]
+        if self._hints and self._hints_enabled:
+            self.enum.extend(self._hints)
+            self.enum_description.extend(self.enum_description)
+        return self.enum, self.enum_description
+
+    # ------------------------------------------------------------------
+    # Formatting
+    # ------------------------------------------------------------------
+
+    def _search_hint(self, value: str, key_data: dict) -> str:
+        """Build a VS Code search hint string from entry metadata."""
+        tips = key_data.get("name") or ""
+        if key_data.get("alias"):
+            tips += ", " + ", ".join(key_data["alias"])
+        hint = value + " #" + tips.strip()
+        if not self.no_wrap and len(hint) > 60:
+            for old, new in self._HINT_ABBREVS:
+                hint = hint.replace(old, new)
+        return hint
+
+    def _dropdown(self, name: str, key: dict) -> str:
+        """Format a vocabulary entry as a markdown dropdown for VS Code."""
+        identifier = key.get("id") or name
+        display = key.get("name") or name
+        if display.islower():
+            display = display.title()
+
+        icon = (
+            key.get("icon")
+            or VOCAB_INDEX.get(self.vocab, {}).get("metadata", {}).get("icon")
+            or ICONS.get(self.vocab)
+            or ""
+        )
+        source_vocab = VOCAB_INDEX.get(self.vocab, {}).get("metadata", {}).get("name")
+        link = key.get("link") or ""
+        stage = key.get("tide.vocab.stages") or ""
+        tlp = key.get("tlp") or ""
+        description = key.get("description") or ""
+
+        criticality = ""
+        if (get_type(identifier, mute=True) or "") in TIDE_MODELS:
+            crit = key.get("criticality")
+            crit_icon = get_icon("criticality")
+            if not crit:
+                criticality = f"{crit_icon} **Criticality** : No Criticality Assigned"
+            else:
+                crit_value_icon = get_vocab_entry("criticality", crit, "icon")
+                criticality = f"{crit_icon} **Criticality** : {crit_value_icon} {crit}"
+
+        if tlp:
+            tlp = f" | **{get_icon(tlp, vocab='tlp')}TLP:{tlp.upper()}**"
+        if stage:
+            stage_text = self._stage_doc(self.vocab, stage)
+            if stage_text:
+                stage = stage_text
+            else:
+                stage = "`{}`".format(
+                    ", ".join(stage) if isinstance(stage, list) else stage
                 )
 
-    # ------------------------------------------------------------------
-    # Finalise
-    # ------------------------------------------------------------------
-    if not enum:
-        enum = [""]
-    if enum_helper and search_hints:
-        enum.extend(enum_helper)
-        enum_description.extend(enum_description)
+        return self.DROPDOWN_TEMPLATE.format(
+            icon=icon, name=display, id_icon=ICONS["id"],
+            identifier=identifier, source_vocab=source_vocab,
+            criticality=criticality, tlp=tlp, stage=stage,
+            link=link, description=description,
+        )
 
-    return enum, enum_description
-
+    @staticmethod
+    def _stage_doc(field: str, stages: str | list) -> str:
+        """Format stage metadata from a vocabulary as a markdown string."""
+        vocab_stages = VOCAB_INDEX.get(field, {}).get("metadata", {}).get("stages")
+        if not vocab_stages:
+            log("WARNING", f"Could not find stages in vocabulary {field}")
+            return ""
+        if isinstance(stages, str):
+            stages = [stages]
+        parts: list[str] = []
+        for stage in stages:
+            for stage_data in vocab_stages:
+                if not isinstance(stage_data, dict):
+                    continue
+                stage_id = stage_data.get("id") or stage_data.get("name")
+                if stage_id != stage:
+                    continue
+                s_name = stage_data.get("name") or stage
+                s_icon = stage_data.get("icon") or ""
+                s_desc = stage_data["description"].strip()
+                if len(s_desc) > VocabResolver.STAGE_DESCRIPTION_LIMIT:
+                    s_desc = s_desc[:VocabResolver.STAGE_DESCRIPTION_LIMIT] + "..."
+                parts.append(f"\n\n{s_icon} **{s_name}** : _{s_desc}_")
+                break
+        return "".join(parts)
 
 
 def remove_tide_keywords(dictionary:dict)->dict:
@@ -708,7 +574,7 @@ def gen_json_schema(dictionary):
 
     Walks *dictionary* depth-first and replaces ``tide.*`` annotated
     fields with concrete JSON Schema constructs.  Vocabulary references
-    (``tide.vocab``) are resolved via :func:`resolve_vocab_enums`;
+    (``tide.vocab``) are resolved via :meth:`VocabResolver.resolve`;
     configuration-driven fields, recompositions and definitions are
     handled inline.
 
@@ -868,12 +734,10 @@ def gen_json_schema(dictionary):
                     enum = []
                     markdown_enum = []
                     for vocab in vocabs:
-                        new_enum, new_markdown_enum = resolve_vocab_enums(
-                            vocab=vocab,
-                            no_wrap=hint_no_wrap,
-                            stages=stages,
-                            scoped=scoped,
-                        )
+                        new_enum, new_markdown_enum = VocabResolver(
+                            vocab, stages=stages,
+                            no_wrap=hint_no_wrap, scoped=scoped,
+                        ).resolve()
                         enum.extend(new_enum)
                         markdown_enum.extend(new_markdown_enum)
                     temp["enum"] = enum

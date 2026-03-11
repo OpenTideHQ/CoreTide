@@ -61,15 +61,6 @@ class SplunkEngineInit(ABC):
         self.LOOKUPS_METADATA_INDEX = DataTide.Lookups.metadata
         self.LOOKUPS_INDEX = DataTide.Lookups.lookups["splunk"]
 
-    def configure_proxy(self):
-        """Applies the proxy configuration for this system.
-        Called before operational methods (deploy/validate) to avoid
-        global proxy state conflicts during plugin loading."""
-        if self.PROXY_ENABLED:
-            Proxy.set_proxy()
-        else:
-            Proxy.unset_proxy()
-
         self.ALERT_SEVERITY_MAPPING = {
             "Informational": 2,
             "Low": 3,
@@ -92,6 +83,15 @@ class SplunkEngineInit(ABC):
         log("INFO", "SSL has been set to",
         str(self.SSL_ENABLED),
         "This can be adjusted in splunk.toml with the setup.ssl keyword")
+
+    def configure_proxy(self):
+        """Applies the proxy configuration for this system.
+        Called before operational methods (deploy/validate) to avoid
+        global proxy state conflicts during plugin loading."""
+        if self.PROXY_ENABLED:
+            Proxy.set_proxy()
+        else:
+            Proxy.unset_proxy()
 
 def correct_timerange_mode(timerange:str)->Literal["random", "current", "custom"]:
     corrected_timerange:Literal["random", "current", "custom"]

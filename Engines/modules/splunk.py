@@ -48,15 +48,6 @@ class SplunkEngineInit(ABC):
 
         self.PROXY_ENABLED = SPLUNK_SETUP["proxy"]
 
-    def configure_proxy(self):
-        """Applies the proxy configuration for this system.
-        Called before operational methods (deploy/validate) to avoid
-        global proxy state conflicts during plugin loading."""
-        if self.PROXY_ENABLED:
-            Proxy.set_proxy()
-        else:
-            Proxy.unset_proxy()
-
         self.CORRELATION_SEARCHES = SPLUNK_SETUP["correlation_searches"]
         self.SPLUNK_ACTIONS = SPLUNK_SETUP["actions_enabled"]
         self.STATUS_MODIFIERS = SPLUNK_CONFIG.modifiers
@@ -69,6 +60,15 @@ class SplunkEngineInit(ABC):
         
         self.LOOKUPS_METADATA_INDEX = DataTide.Lookups.metadata
         self.LOOKUPS_INDEX = DataTide.Lookups.lookups["splunk"]
+
+    def configure_proxy(self):
+        """Applies the proxy configuration for this system.
+        Called before operational methods (deploy/validate) to avoid
+        global proxy state conflicts during plugin loading."""
+        if self.PROXY_ENABLED:
+            Proxy.set_proxy()
+        else:
+            Proxy.unset_proxy()
 
         self.ALERT_SEVERITY_MAPPING = {
             "Informational": 2,

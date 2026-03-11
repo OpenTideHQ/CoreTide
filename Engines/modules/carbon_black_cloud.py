@@ -82,7 +82,13 @@ class CarbonBlackCloudEngineInit(ABC):
             "Critical": 10,
         }
 
-        if CBC_SETUP["proxy"]:
+        self.PROXY_ENABLED = CBC_SETUP["proxy"]
+
+    def configure_proxy(self):
+        """Applies the proxy configuration for this system.
+        Called before operational methods (deploy/validate) to avoid
+        global proxy state conflicts during plugin loading."""
+        if self.PROXY_ENABLED:
             Proxy.set_proxy()
         else:
             Proxy.unset_proxy()

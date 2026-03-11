@@ -43,6 +43,8 @@ class SplunkMetadataDeploy(SplunkEngineInit, DeployMetadata):
         if not deployment:
             raise Exception("DEPLOYMENT NOT FOUND")
 
+        self.configure_proxy()
+
         if not lookup_name.endswith(".csv"):
             lookup_name += ".csv"
 

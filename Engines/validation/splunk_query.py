@@ -84,6 +84,8 @@ class SplunkValidateQuery(SplunkEngineInit, ValidateQuery):
         if not deployment:
             raise Exception("DEPLOYMENT NOT FOUND")
 
+        self.configure_proxy()
+
         service = connect_splunk(
                 host=self.SPLUNK_URL,
                 port=self.SPLUNK_PORT,

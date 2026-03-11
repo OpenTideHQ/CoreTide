@@ -48,7 +48,9 @@ class SplunkLookupsDeploy(SplunkEngineInit, DeployLookups):
     def deploy(self, deployment: list[str]):
         if not deployment:
             raise Exception("DEPLOYMENT NOT FOUND")
-        
+
+        self.configure_proxy()
+
         log("ONGOING", "Splunk Lookup Deployer")
         log(
             "INFO",

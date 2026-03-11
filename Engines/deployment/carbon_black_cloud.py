@@ -246,6 +246,8 @@ class CarbonBlackCloudDeploy(CarbonBlackCloudEngineInit, DeployMDR):
         if not deployment:
             raise Exception("DEPLOYMENT NOT FOUND")
 
+        self.configure_proxy()
+
         # Start deployment routine
         for mdr in deployment:
             mdr_data = DataTide.Models.mdr[mdr]

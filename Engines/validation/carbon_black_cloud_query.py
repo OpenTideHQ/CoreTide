@@ -38,7 +38,9 @@ class CarbonBlackCloudValidateQuery(CarbonBlackCloudEngineInit, ValidateQuery):
     def validate(self, deployment: list[str]):
         if not deployment:
             raise Exception("DEPLOYMENT NOT FOUND")
-        
+
+        self.configure_proxy()
+
         ORG_KEY = self.CBC_SECRETS[self.VALIDATION_ORGANIZATION]["org_key"]
         TOKEN = self.CBC_SECRETS[self.VALIDATION_ORGANIZATION]["token"]
 

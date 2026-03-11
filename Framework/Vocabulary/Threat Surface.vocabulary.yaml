@@ -1751,6 +1751,10 @@ keys:
       - Infrastructure
       - Protocol
     description: Virtual Private Network solutions and tunnelling protocols
+  - id: c7281dbe-ef86-4c06-aaeb-f573178f701a
+    name: VPN::IPSEC
+    tide.vocab.stages: Protocol
+    description: Internet Protocol Security (IPsec)
   - id: 174fb956-9f39-4ecc-b642-fb18ee61fb06
     name: VPN::OpenVPN
     tide.vocab.stages:
@@ -1773,6 +1777,10 @@ keys:
     name: VPN::Ivanti Connect Secure
     tide.vocab.stages: Infrastructure
     description: Ivanti Connect Secure (formerly Pulse Secure) VPN
+  - id: 83df622c-f157-4356-aa70-832b4c79b74a
+    name: VPN::strongSwan
+    tide.vocab.stages: Infrastructure
+    description: Open-source, modular and portable IPsec-based VPN solution
   - id: 8a893a65-c1b2-4d0c-a557-9941ea72960d
     name: VPN::WireGuard
     tide.vocab.stages:

@@ -269,6 +269,23 @@ def get_vocab_stage_details(vocabulary:str, stage_identifier:str)->None|Tuple[st
     
     return None
 
+def strip_vocab_stage_prefix(vocab: str, identifier: str) -> str:
+    """Strip a leading stage prefix from a vocabulary identifier.
+
+    Staged vocabularies (e.g. *surface*) store entries without the stage
+    prefix in VOCAB_INDEX, but callers may supply stage-prefixed values
+    such as ``OS::Windows::Desktop``.  This helper returns the key as it
+    appears in the index (``Windows::Desktop``).
+    """
+    if "::" in identifier and vocab in VOCAB_INDEX:
+        stages = VOCAB_INDEX[vocab]["metadata"].get("stages") or []
+        stage_ids = {s["id"] for s in stages if "id" in s}
+        first_segment = identifier.split("::")[0]
+        if first_segment in stage_ids:
+            return identifier.split("::", 1)[1]
+    return identifier
+
+
 def get_vocab_entry(vocab, identifier, field=None, newlines=False):
     """
     Returns data for a particular entry of a voacbulary.
@@ -280,7 +297,7 @@ def get_vocab_entry(vocab, identifier, field=None, newlines=False):
     if vocab not in VOCAB_INDEX.keys():
         return ""
 
-    identifier = identifier.split("::")[-1] if "::" in identifier else identifier
+    identifier = strip_vocab_stage_prefix(vocab, identifier)
 
     if identifier in VOCAB_INDEX[vocab]["entries"].keys():
         entry_data = VOCAB_INDEX[vocab]["entries"][identifier]

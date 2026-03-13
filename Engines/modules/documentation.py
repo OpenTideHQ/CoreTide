@@ -11,6 +11,7 @@ from Engines.modules.framework import (
     model_value,
     get_value_metaschema,
     get_vocab_entry,
+    strip_vocab_stage_prefix,
 )
 from Engines.modules.logs import log
 from Engines.modules.tide import DataTide
@@ -161,7 +162,8 @@ def get_icon(
 
     elif vocab and vocab in VOCAB_INDEX.keys():
         vocab_data = VOCAB_INDEX[vocab]["entries"]
-        entry = vocab_data.get(value) or {}
+        lookup_value = strip_vocab_stage_prefix(vocab, value)
+        entry = vocab_data.get(lookup_value) or {}
 
         if "icon" in entry.keys():
             return entry["icon"]
@@ -419,7 +421,8 @@ def make_vocab_link(field, key):
     if field not in VOCAB_INDEX.keys():
         return key
 
-    entry = VOCAB_INDEX[field]["entries"].get(key)
+    lookup_key = strip_vocab_stage_prefix(field, key)
+    entry = VOCAB_INDEX[field]["entries"].get(lookup_key)
     vocab_reference = VOCAB_INDEX[field]["metadata"].get("reference")
 
     key = (get_icon(key, vocab=field, parent_icon=False) or "") + " " + key

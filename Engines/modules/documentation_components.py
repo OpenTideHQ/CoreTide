@@ -457,10 +457,11 @@ def _surface_matches(tvm_surfaces: list[str], asset_surfaces: list[str]) -> list
 def threat_surface_doc(tvm_surface: list[str]) -> str:
     """Generate a unified Threat Surface documentation section for a TVM.
     
-    Renders three sub-sections:
-    1. Surface entries — enriched display of the TVM's threat surface values
-    2. Targeted Assets — visibility assets whose surface overlaps with the TVM
-    3. Detection Visibility — log sources and detectors covering targeted assets
+    Renders:
+    1. Surface entries with descriptions directly under the heading
+    2. Targeted Assets table with inline visibility status
+    3. Detection sources detail (log sources / detectors) in a collapsible
+       section, only when coverage exists
     
     Args:
         tvm_surface: List of threat surface vocabulary entries from the TVM
@@ -473,93 +474,106 @@ def threat_surface_doc(tvm_surface: list[str]) -> str:
     
     sections = []
     
-    # 1. Surface entries with enriched descriptions
+    # Surface entries with descriptions — listed directly, no sub-header
     surface_entries = []
     for entry in tvm_surface:
         entry_link = make_vocab_link("surface", entry)
         entry_description = get_vocab_description("surface", entry).replace("\n", " ")
         if entry_description:
-            surface_entries.append(f"- {entry_link} : {entry_description}")
+            surface_entries.append(f"- {entry_link} — {entry_description}")
         else:
             surface_entries.append(f"- {entry_link}")
     
     surface_list = "\n".join(surface_entries)
-    sections.append(f"### 🌐 Surface Entries\n\n{surface_list}")
+    sections.append(surface_list)
     
-    # 2. Targeted assets via surface intersection
+    # Targeted assets with inline visibility status
     visibility = CONFIG.Visibility
     if visibility and visibility.assets:
-        asset_data = []
+        # Build lookup of log sources and detectors per asset
+        ls_by_asset: dict[str, list[str]] = {}
+        if visibility.logsources:
+            for ls in visibility.logsources:
+                if ls.assets:
+                    for a in ls.assets:
+                        ls_by_asset.setdefault(a, []).append(ls.name)
+        
+        det_by_asset: dict[str, list[str]] = {}
+        if visibility.detectors:
+            for det in visibility.detectors:
+                if det.assets:
+                    for a in det.assets:
+                        det_by_asset.setdefault(a, []).append(det.name)
+        
+        asset_rows = []
         matched_asset_names = set()
+        covered_assets = set()
         for asset in visibility.assets:
             if not asset.surface:
                 continue
             matches = _surface_matches(tvm_surface, list(asset.surface))
             if matches:
                 matched_asset_names.add(asset.name)
-                asset_data.append({
+                has_ls = asset.name in ls_by_asset
+                has_det = asset.name in det_by_asset
+                if has_ls or has_det:
+                    visibility_status = "✅ Covered"
+                    covered_assets.add(asset.name)
+                else:
+                    visibility_status = "⚠️ Blind Spot"
+                asset_rows.append({
                     "Asset": asset.name,
                     "Criticality": asset.criticality,
-                    "Description": (asset.description or "")[:120],
                     "Matching Surface": ", ".join(matches),
+                    "Visibility": visibility_status,
                 })
         
-        if asset_data:
-            table = pd.DataFrame(asset_data).to_markdown(index=False)
+        if asset_rows:
+            table = pd.DataFrame(asset_rows).to_markdown(index=False)
             sections.append(f"### 🎯 Targeted Assets\n\n{table}")
             
-            # 3. Detection visibility — log sources and detectors for matched assets
-            logsource_data = []
-            if visibility.logsources:
-                for ls in visibility.logsources:
-                    if ls.assets:
-                        covered = [a for a in ls.assets if a in matched_asset_names]
-                        if covered:
-                            logsource_data.append({
-                                "Log Source": ls.name,
-                                "System": ls.system,
-                                "Covered Assets": ", ".join(covered),
-                            })
-            
-            detector_data = []
-            if visibility.detectors:
-                for det in visibility.detectors:
-                    if det.assets:
-                        covered = [a for a in det.assets if a in matched_asset_names]
-                        if covered:
-                            detector_data.append({
-                                "Detector": det.name,
-                                "Covered Assets": ", ".join(covered),
-                            })
-            
-            vis_sections = []
-            if logsource_data:
-                ls_table = pd.DataFrame(logsource_data).to_markdown(index=False)
-                vis_sections.append(f"#### 📡 Log Sources\n\n{ls_table}")
-            
-            if detector_data:
-                det_table = pd.DataFrame(detector_data).to_markdown(index=False)
-                vis_sections.append(f"#### 🛡️ External Detectors\n\n{det_table}")
-            
-            # Blind spots
-            covered_by_ls = set()
-            for entry in logsource_data:
-                covered_by_ls.update(entry["Covered Assets"].split(", "))
-            covered_by_det = set()
-            for entry in detector_data:
-                covered_by_det.update(entry["Covered Assets"].split(", "))
-            all_covered = covered_by_ls | covered_by_det
-            blind_spots = matched_asset_names - all_covered
-            
-            if blind_spots:
-                blind_list = "\n".join([f"- ⚠️ {name}" for name in sorted(blind_spots)])
-                vis_sections.append(f"#### 🔍 Blind Spots\n\nThe following targeted assets have no associated log sources or detectors:\n\n{blind_list}")
-            
-            if vis_sections:
-                vis_body = "\n\n".join(vis_sections)
-                sections.append(f"### 👁️ Detection Visibility\n\n{vis_body}")
-            elif matched_asset_names:
-                sections.append("### 👁️ Detection Visibility\n\nNo log sources or detectors are mapped to the targeted assets.")
+            # Detection sources detail — only if any coverage exists
+            if covered_assets:
+                detail_parts = []
+                
+                # Log sources for matched assets
+                logsource_data = []
+                if visibility.logsources:
+                    for ls in visibility.logsources:
+                        if ls.assets:
+                            covered = [a for a in ls.assets if a in matched_asset_names]
+                            if covered:
+                                logsource_data.append({
+                                    "Log Source": ls.name,
+                                    "System": ls.system,
+                                    "Covered Assets": ", ".join(covered),
+                                })
+                
+                if logsource_data:
+                    ls_table = pd.DataFrame(logsource_data).to_markdown(index=False)
+                    detail_parts.append(f"#### 📡 Log Sources\n\n{ls_table}")
+                
+                # Detectors for matched assets
+                detector_data = []
+                if visibility.detectors:
+                    for det in visibility.detectors:
+                        if det.assets:
+                            covered = [a for a in det.assets if a in matched_asset_names]
+                            if covered:
+                                detector_data.append({
+                                    "Detector": det.name,
+                                    "Covered Assets": ", ".join(covered),
+                                })
+                
+                if detector_data:
+                    det_table = pd.DataFrame(detector_data).to_markdown(index=False)
+                    detail_parts.append(f"#### 🛡️ External Detectors\n\n{det_table}")
+                
+                if detail_parts:
+                    detail_body = "\n\n".join(detail_parts)
+                    sections.append(f"### 👁️ Detection Sources\n\n{detail_body}")
+        else:
+            sections.append("_No assets in the visibility configuration match this threat surface._")
     
     body = "\n\n".join(sections)
     return f"\n\n## 🌐 Threat Surface\n\n{body}\n"

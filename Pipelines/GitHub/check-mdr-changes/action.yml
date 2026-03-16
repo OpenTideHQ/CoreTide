@@ -11,12 +11,18 @@ runs:
       id: detect_mdr_changes
       shell: bash
       run: |
-          # List files changed in the last commit
-          CHANGED=$(git diff --name-only HEAD^ HEAD)
-          echo "Changed files: $CHANGED"
-          # Grep for the directory with a leading ^ to avoid false positives
-          if echo "$CHANGED" | grep -q '^Objects/Detection Rules/'; then
-            echo "CHANGES=true" >> $GITHUB_OUTPUT
+          # List files changed in the last commit compared to parent.
+          # The parent must exist
+          if git rev-parse HEAD^ >/dev/null 2>&1; then
+            CHANGED=$(git diff --name-only HEAD^ HEAD)
+            
+            echo "Changed files: $CHANGED"
+            # Grep for the directory with a leading ^ to avoid false positives
+            if echo "$CHANGED" | grep -q '^Objects/Detection Rules/'; then
+              echo "CHANGES=true" >> $GITHUB_OUTPUT
+            else
+              echo "CHANGES=false" >> $GITHUB_OUTPUT
+            fi
           else
             echo "CHANGES=false" >> $GITHUB_OUTPUT
           fi

@@ -11,12 +11,22 @@ runs:
       id: detect_mdr_changes
       shell: bash
       run: |
-          # List files changed in the last commit
-          CHANGED=$(git diff --name-only HEAD^ HEAD)
-          echo "Changed files: $CHANGED"
-          # Grep for the directory with a leading ^ to avoid false positives
-          if echo "$CHANGED" | grep -q '^Objects/Detection Rules/'; then
-            echo "CHANGES=true" >> $GITHUB_OUTPUT
-          else
-            echo "CHANGES=false" >> $GITHUB_OUTPUT
-          fi
+        # Ensure the parent commit exists
+        if ! git rev-parse HEAD^ >/dev/null 2>&1; then
+          echo "::warning::Cannot compute diff because HEAD has no parent commit."
+          echo "::warning::This usually happens when the InitTide template is cloned for the first time and is expected."
+          echo "::warning::On subsequent commits, this should not appear."
+          echo "CHANGES=false" >> "$GITHUB_OUTPUT"
+          exit 0
+        fi
+
+        # List files changed in the last commit
+        CHANGED=$(git diff --name-only HEAD^ HEAD)
+        echo "Changed files: $CHANGED"
+
+        # Grep for the directory with a leading ^ to avoid false positives
+        if echo "$CHANGED" | grep -q '^Objects/Detection Rules/'; then
+          echo "CHANGES=true" >> "$GITHUB_OUTPUT"
+        else
+          echo "CHANGES=false" >> "$GITHUB_OUTPUT"
+        fi

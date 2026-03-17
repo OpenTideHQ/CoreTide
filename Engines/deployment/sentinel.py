@@ -19,7 +19,7 @@ from Engines.modules.models import (TideModels,
                                     TideConfigs,TenantDeployment,
                                     DeploymentStrategy,
                                     StatusStrategy) 
-from Engines.modules.deployment import TideDeployment, check_status
+from Engines.modules.deployment import TideDeployment, check_status, compile_kql_query
 from Engines.modules.errors import TideErrors
 
 from azure.mgmt.securityinsight import SecurityInsights
@@ -41,42 +41,12 @@ class SentinelDeploy(DeployMDR):
         rule.enabled = True
 
         # Handle Query and Exclusions
-        let_statements = []
-        exclusions_queries = []
-
-        if exclusions:=configuration.exclusions:
-            for exclusion in exclusions:
-                # Applies exclusion if scoped tenant is matching with ongoing deployment
-                # or if no tenant is specified
-                if (exclusion.tenant == tenant) or (not exclusion.tenant):
-                    log("INFO", "Applying exclusion", exclusion.query)
-                    exclusions_queries.append(exclusion.query)
-
-                    # Handles adding additional let statements
-                    if exclusion.let:
-                        for variable, value in exclusion.let.items():
-                            statement = f"let {variable} = {value};"
-                            log("INFO", "Applying let statement", statement)
-                            let_statements.append(statement)
-                            
-        
-        let_block = "\n".join(let_statements)
-        exclusions_block = "\n".join(exclusions_queries)
-        query = configuration.query
-        
-        if let_statements:
-            query = let_block + "\n" + query
-        if exclusions_queries:
-            query = query + "\n" + exclusions_block
-        
-        log("INFO", "Final compiled query")
-        print(query)
-        
+        query = compile_kql_query(configuration.query, configuration.exclusions, tenant)
+        log("INFO", "Final compiled query", query)
         rule.query = query
 
         if check_status(status) is StatusStrategy.DISABLEMENT:
             rule.enabled = False
-
 
         # Handle Template Metadata
         if configuration.template:

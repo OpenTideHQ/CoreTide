@@ -401,8 +401,8 @@ class TideModels:
                 class Exclusion:
                     query: str
                     reason: str
-                    let: Optional[Mapping[str,str]]
-                    tenant: Optional[str]=None
+                    tenant: Optional[str] = None
+                    let: Optional[Mapping[str, Any]] = None
                     
                 schema: str
                 alert: Alert
@@ -520,8 +520,8 @@ class TideModels:
                 class Exclusion:
                     query: str
                     reason: str
-                    let: Optional[Mapping[str,str]]
-                    tenant: Optional[str]=None
+                    tenant: Optional[str] = None
+                    let: Optional[Mapping[str, Any]] = None
 
                 query: str
                 scheduling: Scheduling

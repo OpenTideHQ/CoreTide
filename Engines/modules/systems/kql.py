@@ -1,11 +1,16 @@
-from typing import Optional, Sequence
+from typing import Optional, Sequence, Union
 
 from Engines.modules.logs import log
+from Engines.modules.models import TideModels
+
+MDE_Exclusion = TideModels.MDR.Configurations.DefenderForEndpoint.Exclusion
+Sentinel_Exclusion = TideModels.MDR.Configurations.Sentinel.Exclusion
+KQLExclusion = Union[MDE_Exclusion, Sentinel_Exclusion]
 
 
 def compile_kql_query(
     base_query: str,
-    exclusions: Optional[Sequence],
+    exclusions: Optional[Sequence[KQLExclusion]],
     tenant: str,
 ) -> str:
     """Compile a KQL query by prepending let statements and appending exclusion filters.

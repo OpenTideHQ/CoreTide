@@ -6,5 +6,9 @@ runs:
     - name: Running Object Validation
       shell: bash
       run: |
+        echo "::group::Object Schema Validation"
+        echo "::notice::Starting OpenTide object validation"
         cd coretide/Orchestration
         python validate.py
+        echo "::endgroup::"
+        echo "::notice::Object validation completed successfully"

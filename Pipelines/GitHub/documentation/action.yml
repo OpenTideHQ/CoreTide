@@ -15,58 +15,73 @@ runs:
       id: move_wiki
       shell: bash
       run: |
+        echo "::notice::Moving wiki repo into CoreTide path"
         mv ${{inputs.wiki_repo_name}} ./${{inputs.coretide_path}}
     - name: Generate Tide Index
       id: generate_index
       shell: bash
       run: |
+        echo "::group::Generate Tide Index"
         cd ${{inputs.coretide_path}}/Engines/indexing/
         export GENERATE_INDEX_FILE=True
         python ./indexer.py
+        echo "::endgroup::"
+        echo "::notice::Tide index generated"
     - name: Copy Index to Wiki
       id: copy_index
       shell: bash
       run: |
+        echo "::notice::Copying index to wiki repository"
         cd ${{inputs.coretide_path}}
         cp index.json ./${{ inputs.wiki_repo_name }}/
     - name: Handle staging index
       id: reconciliate_staging_index
       shell: bash
       run: |
-        ls -lah
+        echo "::group::Handle Staging Index"
         cd ${{inputs.coretide_path}}
-        if [ -e ${{ inputs.wiki_repo_name }}/staging_index.json ]
-          then cp ${{ inputs.wiki_repo_name }}/staging_index.json ./
+        if [ -e ${{ inputs.wiki_repo_name }}/staging_index.json ]; then
+          echo "::notice::Staging index found — copying for reconciliation"
+          cp ${{ inputs.wiki_repo_name }}/staging_index.json ./
+        else
+          echo "::warning::No staging index found — skipping reconciliation"
         fi
-        ls -lah
+        echo "::endgroup::"
     - name: Documentation Toolchain
       id: documentation_toolchain
       shell: bash
       run: |
+        echo "::group::Documentation Toolchain"
         cd ${{inputs.coretide_path}}/Orchestration
         python document.py
+        echo "::endgroup::"
+        echo "::notice::Documentation generation completed"
     - name: Copy Documentation in Wiki 
       id: copy_documentation
       shell: bash
       run: |
+        echo "::notice::Copying documentation to wiki repository"
         cd ${{inputs.coretide_path}}
         cp -fr wiki/. ./${{ inputs.wiki_repo_name }}/
     - name: Move Back Wiki Repo to resources
       id: move_back_wiki
       shell: bash
       run: |
+        echo "::notice::Moving wiki repo back to resources"
         mv ${{inputs.coretide_path}}/${{ inputs.wiki_repo_name }} ./${{ inputs.wiki_repo_name }}/
     - name: Commit documentation
       id: commit_documentation
       shell: bash
       run: |
+        echo "::group::Commit Documentation"
         cd ${{ inputs.wiki_repo_name }}
-        ls -lR
-        [[ $(git status --porcelain) ]] || { echo "No changes, exiting"; exit 0; }
+        [[ $(git status --porcelain) ]] || { echo "::warning::No documentation changes to commit — skipping"; echo "::endgroup::"; exit 0; }
         git config user.name "github-actions[bot]"
         git config user.email "github-actions[bot]@users.noreply.github.com"
-        echo "Updated files, commiting"
+        echo "::notice::Documentation changes detected — committing"
         git pull origin ${{ inputs.wiki_repo_branch }}
         git add -A
         git commit -m "CoreTide Staging Documentation Automation [skip ci]"
         git push origin HEAD:${{ inputs.wiki_repo_branch }}
+        echo "::endgroup::"
+        echo "::notice::Documentation committed and pushed"

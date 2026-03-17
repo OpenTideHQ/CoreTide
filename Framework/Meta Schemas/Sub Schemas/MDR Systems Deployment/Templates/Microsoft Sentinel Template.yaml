@@ -1,4 +1,4 @@
-  schema: sentinel::2.3
+  schema: sentinel::2.4
   status: 
   #contributors:
     #-
@@ -53,3 +53,12 @@
   
   query: |
     ...
+  
+  #exclusions:
+    #- tenant: 
+      #reason: |
+        #...
+      #let:
+        #variable: 
+      #query: |
+        #...

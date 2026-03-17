@@ -34,7 +34,7 @@ properties:
     title: Schema identifier and version
     type: string
     description: Identifier of the schema at its current version 
-    default: sentinel::2.3
+    default: sentinel::2.4
     tide.template.force-required: True
 
   status: 
@@ -1923,3 +1923,58 @@ properties:
     tide.template.spacer: true # Forces the template synthesis to add a space
     description: Scheduled query in KQL language
     example: 'SignInLogs | evaluate bag_unpack(LocationDetails)'
+
+  exclusions:
+    title: Tenant-Scoped Exclusions
+    type: array
+    description: |
+      This section adds exclusions, using queries that will be appended to the final
+      query deployed in a per-tenant fashion, and fully documented.
+      You may remove the tenant field, in which case the exclusion will apply to all
+      tenants.
+      You may add multiple exclusion section for the same tenant - in which case they 
+      will be appended in the order that they appear. 
+    tide.template.spacer: true 
+    items:
+      type: object
+      required:
+        - reason
+        - query
+      properties:
+        tenant:
+          title: Tenant
+          type: string
+          description: |
+            The tenant to which the exclusion applied. Remove if the exclusion should
+            be applied to all tenants. 
+          tide.config.system.tenants: sentinel
+        
+        reason:
+          title: Exclusion Reason
+          type: string
+          description: |
+            Document why the exclusion was added
+          tide.template.multiline: true
+          tide.template.config.default: schema.templates.mdr::exclusions::reason
+
+        let:
+          title: KQL let bindings
+          description: |
+            Optional map of KQL variables to be declared for this exclusion. Each
+            key will be emitted as a `let` statement and can be referenced in the
+            `query` field. Values must be strings and will be inserted verbatim.
+          type: object
+          tide.template.spacer: False
+          patternProperties:
+            "^[A-Za-z0-9_-]+$":
+              example: variable
+              type: string
+          additionalProperties: False
+
+        query:
+          title: Exclusion KQL 
+          type: string
+          description: |
+            Write here the exclusion query, that will be appended to the base query
+          tide.template.multiline: true
+          tide.template.no-space: true

@@ -13,6 +13,7 @@ from Engines.modules.models import (TideModels,
                                     DeploymentStrategy,
                                     StatusStrategy) 
 from Engines.modules.deployment import TideDeployment, check_status
+from Engines.modules.systems.kql import compile_kql_query
 from Engines.modules.logs import log
 
 from Engines.modules.systems.defender_for_endpoint import (DetectionRule,
@@ -143,19 +144,10 @@ class DefenderForEndpointDeploy(DeployMDR):
         
         # Check if the rule is enabled or disabled
         is_enabled = False if check_status(mdr_config.status) is StatusStrategy.DISABLEMENT else True
-        
+
         # Handle Query and Exclusions
-        query = mdr_config.query
-        if exclusions:=mdr_config.exclusions:
-            for exclusion in exclusions:
-                # Applies exclusion if scoped tenant is matching with ongoing deployment
-                # or if no tenant is specified
-                if (exclusion.tenant == tenant) or (not exclusion.tenant):
-                    log("INFO", "Applying exclusion", exclusion.query)
-                    query += exclusion.query
-        
-        log("INFO", "Final compiled query")
-        print(query)
+        query = compile_kql_query(mdr_config.query, mdr_config.exclusions, tenant)
+        log("INFO", "Final compiled query", query)
 
         # Compile Detection Rule
         rule = DetectionRule(displayName=data.name,

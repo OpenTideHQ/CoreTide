@@ -425,7 +425,8 @@ class TideModels:
                 class Exclusion:
                     query: str
                     reason: str
-                    tenant: Optional[str]=None
+                    tenant: Optional[str] = None
+                    let: Optional[Mapping[str, Any]] = None
                     
                 schema: str
                 alert: Alert
@@ -539,9 +540,17 @@ class TideModels:
                     entity: str
                     mappings: Sequence[MappingEntry]
 
+                @dataclass
+                class Exclusion:
+                    query: str
+                    reason: str
+                    tenant: Optional[str] = None
+                    let: Optional[Mapping[str, Any]] = None
+
                 query: str
                 scheduling: Scheduling
                 alert: Alert
+                exclusions: Optional[Sequence[Exclusion]] = None
                 template: Optional[Template] = None
                 trigger: Optional[Trigger] = None
                 grouping: Optional[Grouping] = None

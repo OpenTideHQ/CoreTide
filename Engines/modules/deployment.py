@@ -142,6 +142,7 @@ def check_status(status_name:str)->StatusStrategy:
         f"Available statuses in deployment.toml : {statuses_definitions}")
     raise Exception
 
+
 def make_deploy_plan(
     plan: DeploymentStrategy,
     wide_scope=False,

@@ -20,6 +20,7 @@ from Engines.modules.models import (TideModels,
                                     DeploymentStrategy,
                                     StatusStrategy) 
 from Engines.modules.deployment import TideDeployment, check_status
+from Engines.modules.systems.kql import compile_kql_query
 from Engines.modules.errors import TideErrors
 
 from azure.mgmt.securityinsight import SecurityInsights
@@ -29,7 +30,8 @@ class SentinelDeploy(DeployMDR):
 
     def compile_deployment(self,
                            service: SecurityInsights,
-                           data:TideModels.MDR):
+                           data:TideModels.MDR,
+                           tenant:str):
 
         rule = service.alert_rules.models.ScheduledAlertRule()
         
@@ -38,11 +40,14 @@ class SentinelDeploy(DeployMDR):
             raise Exception
         status = configuration.status
         rule.enabled = True
-        rule.query = configuration.query
+
+        # Handle Query and Exclusions
+        query = compile_kql_query(configuration.query, configuration.exclusions, tenant)
+        log("INFO", "Final compiled query", query)
+        rule.query = query
 
         if check_status(status) is StatusStrategy.DISABLEMENT:
             rule.enabled = False
-
 
         # Handle Template Metadata
         if configuration.template:
@@ -248,7 +253,8 @@ class SentinelDeploy(DeployMDR):
 
         log("ONGOING", "Compiling Scheduled Alert Object")
         alert_rule = self.compile_deployment(data=data,
-                                             service=service)
+                                             service=service,
+                                             tenant=tenant_config.name)
 
         log("INFO", "Deploying rule to Sentinel")
         service.alert_rules.create_or_update(

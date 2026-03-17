@@ -462,6 +462,13 @@ class SystemLoader:
                     )
                 )
 
+        exclusions = mdr_config.pop("exclusions", None)
+        if exclusions:
+            exclusions_data = []
+            for exclusion in exclusions:
+                exclusions_data.append(Sentinel.Exclusion(**exclusion))
+            exclusions = exclusions_data
+
         return Sentinel(
             schema=base_config.schema,
             status=base_config.status,
@@ -474,7 +481,8 @@ class SystemLoader:
             scheduling=scheduling,
             alert=alert,
             grouping=grouping,
-            entities=entities
+            entities=entities,
+            exclusions=exclusions
         )
 
     @staticmethod

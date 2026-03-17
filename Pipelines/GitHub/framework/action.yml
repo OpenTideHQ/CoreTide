@@ -28,7 +28,7 @@ runs:
         echo "::notice::Checking for framework changes to commit"
 
         changes=$(git status --porcelain -- . ':!$CORETIDE_PATH' ':!coretide')
-        echo "$changes"
+        echo "::debug::Porcelain status: $changes"
 
         if [[ -z "$changes" ]]; then
           echo "::warning::No changes detected — skipping commit"

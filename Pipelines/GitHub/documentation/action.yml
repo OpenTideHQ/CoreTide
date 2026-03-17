@@ -81,7 +81,7 @@ runs:
         echo "::notice::Documentation changes detected — committing"
         git pull origin ${{ inputs.wiki_repo_branch }}
         git add -A
-        git commit -m "CoreTide Staging Documentation Automation [skip ci]"
+        git commit -m "CoreTide Documentation Automation [skip ci]"
         git push origin HEAD:${{ inputs.wiki_repo_branch }}
         echo "::endgroup::"
         echo "::notice::Documentation committed and pushed"

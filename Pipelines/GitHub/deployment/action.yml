@@ -26,7 +26,7 @@ runs:
     - name: MDR Promotion
       id: mdr_promotion
       shell: bash
-      if: ${{ inputs.deployment_plan }} == "PRODUCTION"
+      if: ${{ inputs.deployment_plan == 'PRODUCTION' }}
       env:
         CORETIDE_PATH: ${{ inputs.coretide_path }}
       run: |
@@ -34,7 +34,7 @@ runs:
         echo "::notice::Checking for MDR changes to promote"
 
         changes=$(git status --porcelain -- . ':!$CORETIDE_PATH' ':!coretide')
-        echo "$changes"
+        echo "::debug::Porcelain status: $changes"
 
         if [[ -z "$changes" ]]; then
           echo "::warning::No changes detected — skipping MDR promotion"

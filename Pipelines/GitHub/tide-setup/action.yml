@@ -16,7 +16,7 @@ runs:
   using: "composite"
   steps:
   
-    - name: Set up Python 3.12
+    - name: Set up Python
       uses: actions/setup-python@v5
       with:
         python-version: ${{ inputs.python_version }}
@@ -24,17 +24,24 @@ runs:
     - name: Install requirements
       shell: bash
       run: |
+        echo "::group::Installing Python requirements"
         pip install -r ${{ inputs.requirements_file }}
+        echo "::endgroup::"
+        echo "::notice::Python requirements installed successfully"
 
     - name: Configure Git
       shell: bash
       run: |
+        echo "::group::Configuring Git identity"
         git config --global user.name "${{ github.actor }}"
         git config --global user.email "${{ github.actor }}@users.noreply.github.com"
+        echo "::endgroup::"
+        echo "::notice::Git configured for ${{ github.actor }}"
 
     - name: Restore env vars from string
       shell: bash
       run: |
+        echo "::group::Restoring environment variables"
         decoded_secrets=$(echo $opentide_secrets | xxd -ps -r)
         IFS=';' read -ra KV <<< $decoded_secrets
         for pair in "${KV[@]}"; do
@@ -42,5 +49,7 @@ runs:
             echo "$pair" >> $GITHUB_ENV
           fi
         done
+        echo "::endgroup::"
+        echo "::notice::Environment variables restored"
       env:
         opentide_secrets: ${{ inputs.opentide_secrets }}

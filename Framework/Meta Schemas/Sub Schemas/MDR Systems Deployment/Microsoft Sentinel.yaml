@@ -1947,7 +1947,7 @@ properties:
           description: |
             The tenant to which the exclusion applied. Remove if the exclusion should
             be applied to all tenants. 
-          tide.config.system.tenants: defender_for_endpoint
+          tide.config.system.tenants: sentinel
         
         reason:
           title: Exclusion Reason

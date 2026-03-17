@@ -12,7 +12,8 @@ from Engines.modules.plugins import DeployMDR
 from Engines.modules.models import (TideModels,
                                     DeploymentStrategy,
                                     StatusStrategy) 
-from Engines.modules.deployment import TideDeployment, check_status, compile_kql_query
+from Engines.modules.deployment import TideDeployment, check_status
+from Engines.modules.systems.kql import compile_kql_query
 from Engines.modules.logs import log
 
 from Engines.modules.systems.defender_for_endpoint import (DetectionRule,

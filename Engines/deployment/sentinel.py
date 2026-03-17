@@ -19,7 +19,8 @@ from Engines.modules.models import (TideModels,
                                     TideConfigs,TenantDeployment,
                                     DeploymentStrategy,
                                     StatusStrategy) 
-from Engines.modules.deployment import TideDeployment, check_status, compile_kql_query
+from Engines.modules.deployment import TideDeployment, check_status
+from Engines.modules.systems.kql import compile_kql_query
 from Engines.modules.errors import TideErrors
 
 from azure.mgmt.securityinsight import SecurityInsights

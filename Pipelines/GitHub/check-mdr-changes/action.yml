@@ -14,7 +14,8 @@ runs:
         # Ensure the parent commit exists
         if ! git rev-parse HEAD^ >/dev/null 2>&1; then
           echo "::warning::Cannot compute diff because HEAD has no parent commit."
-          echo "::warning::This usually happens with shallow clones (fetch-depth=1) or the first repository commit."
+          echo "::warning::This usually happens when the InitTide template is cloned for the first time and is expected. On subsequent commits, this should not appear."
+          echo "::warning::On subsequent commits, this should not appear."
           echo "CHANGES=false" >> "$GITHUB_OUTPUT"
           exit 0
         fi

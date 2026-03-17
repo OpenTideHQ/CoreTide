@@ -190,17 +190,15 @@ class DefenderForEndpointService:
             log("FATAL", 
                 f"Missing permissions to run query against tenant {self.tenant_config.name} - Error Code {request.status_code}",
                 str(request.json()),
-                "Add the permissions mentionsed above to the service principal to fix this")
-            raise Exception
+                "Add the permissions mentioned above to the service principal to fix this")
+            raise Exception(f"Permission denied (403) on tenant {self.tenant_config.name}")
 
         error_message = request.json().get("error", {}).get("message") or request.json()
-        print(request.json())
-
-        log("FATAL", 
+        log("FATAL",
             f"Error Code {request.status_code} - {error_message}",
             "The query could not run due to a syntax error. Confirm that it can run on the console and try again",
             query)
-        raise Exception
+        raise Exception(f"Hunting query failed with status {request.status_code}: {error_message}")
 
     def create_detection_rule(self, rule:DetectionRule)->int:
         

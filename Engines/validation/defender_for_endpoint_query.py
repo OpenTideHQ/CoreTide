@@ -27,7 +27,7 @@ class DefenderForEndpointValidateQuery(ValidateQuery):
         
         config = mdr.configurations.defender_for_endpoint
         if not config: 
-            raise
+            raise ValueError(f"Missing MDE configuration for {mdr.name}")
         query = config.query
         mdr_name = mdr.name
         mdr_uuid = mdr.metadata.uuid
@@ -40,9 +40,12 @@ class DefenderForEndpointValidateQuery(ValidateQuery):
             return
 
         # Step 2 — Check the returned schema for required columns
+        # Graph API returns lowercase keys ("name"), XDR API uses PascalCase ("Name")
         returned_columns = {
-            col["Name"] for col in response.get("schema", [])
+            col.get("name") or col.get("Name")
+            for col in response.get("schema", response.get("Schema", []))
         }
+        returned_columns.discard(None)
         missing = MDE_REQUIRED_COLUMNS - returned_columns
         if missing:
             log("FATAL",

@@ -546,22 +546,22 @@ class Proxy:
         proxy_host = PROXY_CONFIG.get("proxy_host")
         proxy_port = PROXY_CONFIG.get("proxy_port")
 
-            if proxy_host and proxy_port:
-                if proxy_user and proxy_pass:
-                    proxy = f"http://{proxy_user}:{proxy_pass}@{proxy_host}:{proxy_port}"
-                else:
-                    proxy = f"http://{proxy_host}:{proxy_port}"
-
-                os.environ["HTTP_PROXY"] = proxy
-                os.environ["HTTPS_PROXY"] = proxy
-                log("SUCCESS", "Proxy environment setup successful")
+        if proxy_host and proxy_port:
+            if proxy_user and proxy_pass:
+                proxy = f"http://{proxy_user}:{proxy_pass}@{proxy_host}:{proxy_port}"
             else:
-                log(
-                    "FAILURE",
-                    "Could not retrieve mandatory proxy host and port",
-                    "Control that proxy_host and proxy_port are entered in CI variables",
-                    "proxy_user and proxy_password are optional",
-                )
+                proxy = f"http://{proxy_host}:{proxy_port}"
+
+            os.environ["HTTP_PROXY"] = proxy
+            os.environ["HTTPS_PROXY"] = proxy
+            log("SUCCESS", "Proxy environment setup successful")
+        else:
+            log(
+                "FAILURE",
+                "Could not retrieve mandatory proxy host and port",
+                "Control that proxy_host and proxy_port are entered in CI variables",
+                "proxy_user and proxy_password are optional",
+            )
 
     @staticmethod
     def unset_proxy():

@@ -524,22 +524,27 @@ def enabled_systems() -> list[str]:
 
 class Proxy:
     """
-    Simple class to encapulate configuring the proxy in
-    environment variables
+    Encapsulates proxy setup for environment variables.
+
+    Behavior:
+    - Requires proxy_host and proxy_port
+    - Uses proxy_user / proxy_password only when both are provided
+    - Supports unauthenticated proxy URLs for hosts behind transparent proxies
     """
 
     @staticmethod
     def set_proxy():
         if DebugEnvironment.ENABLED and not DebugEnvironment.PROXY_ENABLED:
-            pass
-        else:
-            log("ONGOING", "Setting environment proxy according to CI variables")
-            PROXY_CONFIG = DataTide.Configurations.Deployment.proxy
-            PROXY_CONFIG = HelperTide.fetch_config_envvar(PROXY_CONFIG)
-            proxy_user = PROXY_CONFIG.get("proxy_user")
-            proxy_pass = PROXY_CONFIG.get("proxy_password")
-            proxy_host = PROXY_CONFIG.get("proxy_host")
-            proxy_port = PROXY_CONFIG.get("proxy_port")
+            # Debug mode explicitly has proxy setup disabled
+            return
+
+        log("ONGOING", "Setting environment proxy according to CI variables")
+        PROXY_CONFIG = DataTide.Configurations.Deployment.proxy
+        PROXY_CONFIG = HelperTide.fetch_config_envvar(PROXY_CONFIG)
+        proxy_user = PROXY_CONFIG.get("proxy_user")
+        proxy_pass = PROXY_CONFIG.get("proxy_password")
+        proxy_host = PROXY_CONFIG.get("proxy_host")
+        proxy_port = PROXY_CONFIG.get("proxy_port")
 
             if proxy_host and proxy_port:
                 if proxy_user and proxy_pass:

@@ -49,6 +49,7 @@ class SplunkEngineInit(ABC):
         self.PROXY_ENABLED = SPLUNK_SETUP["proxy"]
 
         self.CORRELATION_SEARCHES = SPLUNK_SETUP["correlation_searches"]
+        self.ENTERPRISE_SECURITY = SPLUNK_SETUP.get("enterprise_security", False)
         self.SPLUNK_ACTIONS = SPLUNK_SETUP["actions_enabled"]
         self.STATUS_MODIFIERS = SPLUNK_CONFIG.modifiers
         self.SPLUNK_DEFAULT_ACTIONS = SPLUNK_SETUP.get("default_actions") or []        
@@ -256,12 +257,27 @@ def create_query(data: dict) -> str:
     """
     Automatically adds certain lines to the analyst defined SPL
     """
+    # TODO: DEPRECATED [splunk-mdrv4] — Use create_query_v4() for typed MDR objects
 
     # Backwards compatible with 1.0 data model
     uuid = data.get("uuid") or data["metadata"]["uuid"]
     mdr_splunk = data["configurations"]["splunk"]
     status = mdr_splunk["status"]
     spl = mdr_splunk["query"].strip()
+
+    macro = f'| eval MDR_UUID="{uuid}", MDR_status="{status}" \n|`soc_macro_auto_mdr_mapping(MDR_UUID)`'
+
+    return spl + "\n" + macro
+
+
+def create_query_v4(data) -> str:
+    """Build the final SPL query from a typed TideModels.MDR object.
+
+    Appends the standard MDR macro to the analyst-defined SPL query.
+    """
+    uuid = data.metadata.uuid
+    status = data.configurations.splunk.status
+    spl = data.configurations.splunk.query.strip()
 
     macro = f'| eval MDR_UUID="{uuid}", MDR_status="{status}" \n|`soc_macro_auto_mdr_mapping(MDR_UUID)`'
 

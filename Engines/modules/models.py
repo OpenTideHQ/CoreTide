@@ -177,7 +177,29 @@ class TideConfigs:
                 setup: Setup
         @dataclass
         class Splunk(SystemConfig):
-            ...
+
+            @dataclass
+            class Platform(SystemConfig.Platform):
+                pass
+            
+            @dataclass
+            class Tenant(SystemConfig.Tenant):
+
+                @dataclass
+                class Setup(SystemConfig.Tenant.Setup):
+                    url: str
+                    port: str
+                    app: str
+                    correlation_searches: bool
+                    allow_skew: str
+                    schedule_offset: int
+                    frequency_scheduling: str
+                    actions_enabled: Sequence[str]
+                    default_actions: Sequence[str]
+                    enterprise_security: bool
+                    token: str
+
+                setup: Setup
 
         @dataclass
         class CarbonBlackCloud(SystemConfig):
@@ -465,7 +487,106 @@ class TideModels:
 
             @dataclass
             class Splunk(TideDefinitionsModels.SystemConfigurationModel):
-                ...
+
+                @dataclass
+                class Scheduling:
+                    type: Optional[str] = None
+                    expires: Optional[str] = None
+
+                    @dataclass
+                    class Schedule:
+                        frequency: Optional[str] = None
+                        cron: Optional[str] = None
+                        custom_time: Optional[str] = None
+                    schedule: Optional[Schedule] = None
+
+                    @dataclass
+                    class Timerange:
+                        lookback: Optional[str] = None
+                        earliest: Optional[str] = None
+                        latest: Optional[str] = None
+                    timerange: Optional[Timerange] = None
+
+                @dataclass
+                class Trigger:
+                    condition: Optional[str] = None
+                    comparator: Optional[str] = None
+                    threshold: Optional[int] = None
+                    severity: Optional[int] = None
+                    custom_condition: Optional[str] = None
+                    type: Optional[str] = None
+
+                    @dataclass
+                    class Throttling:
+                        fields: Optional[Sequence[str]] = None
+                        duration: Optional[str] = None
+                        group_name: Optional[str] = None
+                    throttling: Optional[Throttling] = None
+
+                @dataclass
+                class Actions:
+
+                    @dataclass
+                    class Notable:
+                        @dataclass
+                        class Event:
+                            title: Optional[str] = None
+                            description: Optional[str] = None
+                        @dataclass
+                        class Drilldown:
+                            name: Optional[str] = None
+                            search: Optional[str] = None
+
+                        event: Optional[Event] = None
+                        drilldown: Optional[Drilldown] = None
+                        security_domain: Optional[str] = None
+
+                    @dataclass
+                    class Risk:
+                        @dataclass
+                        class RiskObject:
+                            field: str
+                            type: str
+                            score: int
+                        @dataclass
+                        class ThreatObject:
+                            field: str
+                            type: str
+
+                        message: Optional[str] = None
+                        risk_objects: Optional[Sequence[RiskObject]] = None
+                        threat_objects: Optional[Sequence[ThreatObject]] = None
+
+                    @dataclass
+                    class Email:
+                        to: Optional[str] = None
+                        cc: Optional[str] = None
+                        bcc: Optional[str] = None
+                        priority: Optional[str] = None
+                        subject: Optional[str] = None
+                        message: Optional[str] = None
+                        content_type: Optional[str] = None
+                        send_csv: Optional[bool] = None
+                        send_pdf: Optional[bool] = None
+                        inline_results: Optional[bool] = None
+
+                        @dataclass
+                        class Include:
+                            results_link: Optional[bool] = None
+                            search_string: Optional[bool] = None
+                            trigger_condition: Optional[bool] = None
+                            trigger_time: Optional[bool] = None
+                        include: Optional[Include] = None
+
+                    notable: Optional[Notable] = None
+                    risk: Optional[Risk] = None
+                    email: Optional[Email] = None
+
+                scheduling: Optional[Scheduling] = None
+                trigger: Optional[Trigger] = None
+                query: Optional[str] = None
+                correlation_search: Optional[bool] = None
+                actions: Optional[Actions] = None
 
             @dataclass
             class Sentinel(TideDefinitionsModels.SystemConfigurationModel):
@@ -618,7 +739,7 @@ class TideModels:
             sentinel_one: Optional[SentinelOne] = None
             crowdstrike: Optional[Crowdstrike] = None
             carbon_black_cloud: Optional[Mapping] = None
-            splunk: Optional[Mapping] = None
+            splunk: Optional[Union[Splunk, Mapping]] = None
             harfanglab: Optional[HarfangLab] = None
 
         name: str
@@ -643,7 +764,7 @@ class TenantDeployment:
 
     @dataclass
     class Splunk(TenantDeploymentModel):
-        tenant: TideConfigs.Systems.DefenderForEndpoint.Tenant
+        tenant: TideConfigs.Systems.Splunk.Tenant
 
     @dataclass
     class Sentinel(TenantDeploymentModel):

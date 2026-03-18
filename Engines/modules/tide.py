@@ -729,6 +729,135 @@ class SystemLoader:
             rule_id_bundle=rule_id_bundle if rule_id_bundle else None  # type: ignore
         )
 
+    @staticmethod
+    def splunk(mdr_config: dict[str, Any]) -> TideModels.MDR.Configurations.Splunk:
+        """Build a Splunk system configuration object from raw MDR config.
+
+        Parses scheduling, trigger, actions (notable, risk, email), and query
+        fields from a splunk::3.0 MDR configuration into the typed dataclass
+        hierarchy.
+
+        Args:
+            mdr_config: A mapping containing splunk configuration fields.
+
+        Returns:
+            A ``TideModels.MDR.Configurations.Splunk`` instance.
+        """
+        Splunk = TideModels.MDR.Configurations.Splunk
+
+        mdr_config, base_config = SystemLoader._base_configuration(mdr_config)
+
+        query = mdr_config.pop("query", None)
+        correlation_search = mdr_config.pop("correlation_search", None)
+
+        # Parse scheduling
+        scheduling = None
+        scheduling_data = mdr_config.pop("scheduling", None)
+        if scheduling_data:
+            schedule = None
+            schedule_data = scheduling_data.pop("schedule", None)
+            if schedule_data:
+                schedule = Splunk.Scheduling.Schedule(**schedule_data)
+
+            timerange = None
+            timerange_data = scheduling_data.pop("timerange", None)
+            if timerange_data:
+                timerange = Splunk.Scheduling.Timerange(**timerange_data)
+
+            scheduling = Splunk.Scheduling(
+                **scheduling_data,
+                schedule=schedule,
+                timerange=timerange
+            )
+
+        # Parse trigger
+        trigger = None
+        trigger_data = mdr_config.pop("trigger", None)
+        if trigger_data:
+            throttling = None
+            throttling_data = trigger_data.pop("throttling", None)
+            if throttling_data:
+                throttling = Splunk.Trigger.Throttling(**throttling_data)
+
+            trigger = Splunk.Trigger(
+                **trigger_data,
+                throttling=throttling
+            )
+
+        # Parse actions
+        actions = None
+        actions_data = mdr_config.pop("actions", None)
+        if actions_data:
+            notable = None
+            notable_data = actions_data.pop("notable", None)
+            if notable_data:
+                event = None
+                event_data = notable_data.pop("event", None)
+                if event_data:
+                    event = Splunk.Actions.Notable.Event(**event_data)
+
+                drilldown = None
+                drilldown_data = notable_data.pop("drilldown", None)
+                if drilldown_data:
+                    drilldown = Splunk.Actions.Notable.Drilldown(**drilldown_data)
+
+                notable = Splunk.Actions.Notable(
+                    **notable_data,
+                    event=event,
+                    drilldown=drilldown
+                )
+
+            risk = None
+            risk_data = actions_data.pop("risk", None)
+            if risk_data:
+                risk_objects = None
+                risk_objects_data = risk_data.pop("risk_objects", None)
+                if risk_objects_data:
+                    risk_objects = [Splunk.Actions.Risk.RiskObject(**ro) for ro in risk_objects_data]
+
+                threat_objects = None
+                threat_objects_data = risk_data.pop("threat_objects", None)
+                if threat_objects_data:
+                    threat_objects = [Splunk.Actions.Risk.ThreatObject(**to) for to in threat_objects_data]
+
+                risk = Splunk.Actions.Risk(
+                    **risk_data,
+                    risk_objects=risk_objects,
+                    threat_objects=threat_objects
+                )
+
+            email = None
+            email_data = actions_data.pop("email", None)
+            if email_data:
+                include = None
+                include_data = email_data.pop("include", None)
+                if include_data:
+                    include = Splunk.Actions.Email.Include(**include_data)
+
+                email = Splunk.Actions.Email(
+                    **email_data,
+                    include=include
+                )
+
+            actions = Splunk.Actions(
+                notable=notable,
+                risk=risk,
+                email=email
+            )
+
+        return Splunk(
+            schema=base_config.schema,
+            status=base_config.status,
+            contributors=base_config.contributors,
+            tenants=base_config.tenants,
+            flags=base_config.flags,
+            scheduling=scheduling,
+            trigger=trigger,
+            query=query,
+            correlation_search=correlation_search,
+            actions=actions
+        )
+
 
 class ConfigurationsLoader:
     @staticmethod
@@ -1005,6 +1134,14 @@ class TideLoader:
             configurations.crowdstrike = SystemLoader.crowdstrike(system_configurations.pop("crowdstrike"))
         if system_configurations.get("harfanglab"):
             configurations.harfanglab = SystemLoader.harfanglab(system_configurations.pop("harfanglab"))
+        if system_configurations.get("splunk"):
+            splunk_config = system_configurations.pop("splunk")
+            # Only route through SystemLoader for splunk::3.0 typed MDRs
+            if splunk_config.get("schema", "").startswith("splunk::3"):
+                configurations.splunk = SystemLoader.splunk(splunk_config)
+            else:
+                # TODO: DEPRECATED [splunk-mdrv4] — Pre-3.0 MDRs stay as raw Mapping for legacy deployer
+                configurations.splunk = splunk_config
 
         return TideModels.MDR(**mdr,
                                 metadata=metadata,
@@ -1024,6 +1161,9 @@ class TideLoader:
     @overload
     @staticmethod
     def load_platform_config(platform_config:dict, system:Literal[DetectionSystems.DEFENDER_FOR_ENDPOINT])->TideConfigs.Systems.DefenderForEndpoint.Platform: ...
+    @overload
+    @staticmethod
+    def load_platform_config(platform_config:dict, system:Literal[DetectionSystems.SPLUNK])->TideConfigs.Systems.Splunk.Platform: ...
     @overload
     @staticmethod
     def load_platform_config(platform_config:dict, system:Literal[DetectionSystems.HARFANGLAB])->TideConfigs.Systems.HarfangLab.Platform: ...
@@ -1071,6 +1211,9 @@ class TideLoader:
 
             case DetectionSystems.HARFANGLAB:
                 return TideConfigs.Systems.HarfangLab.Platform(**platform_config)
+
+            case DetectionSystems.SPLUNK:
+                return TideConfigs.Systems.Splunk.Platform(**platform_config)
 
             case _:
                 return SystemConfig.Platform(**platform_config)
@@ -1177,6 +1320,9 @@ class TideLoader:
 
                 case DetectionSystems.HARFANGLAB:
                     setup = TideConfigs.Systems.HarfangLab.Tenant.Setup(**setup_with_secrets)
+
+                case DetectionSystems.SPLUNK:
+                    setup = TideConfigs.Systems.Splunk.Tenant.Setup(**setup_with_secrets)
 
                 case _:
                     raise NotImplementedError(f"Platform {platform.name} is not recognized")
@@ -1397,11 +1543,26 @@ class DataTide:
             @dataclass(frozen=True)
             class Splunk:
                 Index = dict(IndexTide.load()["configurations"]["systems"]["splunk"])
-                tide = dict(Index["tide"])
-                setup = dict(Index["setup"])
-                secrets = dict(Index["secrets"])
-                defaults = dict(Index["defaults"])
-                modifiers = dict(Index.get("modifiers", {}))
+
+                if "platform" in Index:
+                    # New MDRv4 format: [platform]/[[tenants]]/[[modifiers]]
+                    raw = dict(Index)
+                    platform = TideLoader.load_platform_config(dict(raw["platform"]), DetectionSystems.SPLUNK)
+                    modifiers = TideLoader.load_modifiers_config(raw["modifiers"]) if raw.get("modifiers") else None
+                    tenants = TideLoader.load_tenants_config(raw["tenants"], DetectionSystems.SPLUNK) if raw.get("tenants") else None
+                    # Backwards compat aliases
+                    setup = dict(raw["tenants"][0]["setup"]) if raw.get("tenants") else {}
+                    secrets = {}
+                    defaults = {}
+                else:
+                    # TODO: DEPRECATED [splunk-mdrv4] — Legacy [tide] format. Remove after 2025-12-31.
+                    tide = dict(Index["tide"])
+                    setup = dict(Index["setup"])
+                    secrets = dict(Index["secrets"])
+                    defaults = dict(Index["defaults"])
+                    modifiers = dict(Index.get("modifiers", {}))
+                    platform = None
+                    tenants = None
 
             @dataclass(frozen=True)
             class CarbonBlackCloud:

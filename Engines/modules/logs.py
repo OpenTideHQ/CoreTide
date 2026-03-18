@@ -341,10 +341,10 @@ def log(
         log_message = ANSI.stripper(log_message)
 
     if category == "DEBUG" and os.getenv("TIDE_DEBUG_ENABLED"):
-        print(log_message)
+        print(log_message, flush=True)
 
     elif category != "DEBUG":
-        print(log_message)
+        print(log_message, flush=True)
 
 
 def coretide_intro():

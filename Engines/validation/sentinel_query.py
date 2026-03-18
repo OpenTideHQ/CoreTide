@@ -19,7 +19,7 @@ from Engines.modules.debug import DebugEnvironment
 from Engines.modules.tide import DataTide
 from Engines.modules.models import TideModels, TideConfigs, TenantDeployment
 from Engines.modules.errors import TideErrors
-from Engines.modules.deployment import TideDeployment, DetectionSystems, DeploymentStrategy
+from Engines.modules.deployment import TideDeployment, DetectionSystems, DeploymentStrategy, Proxy
 
 class SentinelValidateQuery(ValidateQuery):
 
@@ -114,6 +114,12 @@ class SentinelValidateQuery(ValidateQuery):
         for tenant_deployment in deployment.rule_deployment: #type: ignore
             tenant_deployment: TenantDeployment.Sentinel # Force assignment here as case switch in TideDeployment doesn't seem to resolve perfectly
             tenant_setup = tenant_deployment.tenant.setup
+
+            if tenant_setup.proxy:
+                Proxy.set_proxy()
+            else:
+                Proxy.unset_proxy()
+
             log("ONGOING",
                 "Acquiring Azure credentials for tenant",
                 tenant_deployment.tenant.name)

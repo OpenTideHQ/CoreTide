@@ -524,8 +524,12 @@ def enabled_systems() -> list[str]:
 
 class Proxy:
     """
-    Simple class to encapulate configuring the proxy in
-    environment variables
+    Encapsulates proxy setup for environment variables.
+
+    Behavior:
+    - Requires proxy_host and proxy_port
+    - Uses proxy_user / proxy_password only when both are provided
+    - Supports unauthenticated proxy URLs for hosts behind transparent proxies
     """
 
     @staticmethod

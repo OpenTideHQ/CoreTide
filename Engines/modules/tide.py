@@ -908,6 +908,48 @@ class SystemLoader:
             advanced=advanced
         )
 
+    @staticmethod
+    def carbon_black_cloud(mdr_config:dict[str, Any])->TideModels.MDR.Configurations.CarbonBlackCloud:
+        """Build a Carbon Black Cloud system configuration object from raw MDR config.
+
+        Transforms the provided mapping into a
+        ``TideModels.MDR.Configurations.CarbonBlackCloud`` instance by
+        extracting the base configuration values, resolving any external rule
+        id bundle, and mapping remaining fields to the typed dataclass.
+
+        Args:
+            mdr_config: A mapping containing Carbon Black Cloud configuration
+                fields as produced by the indexer or TOML loader.
+
+        Returns:
+            A ``TideModels.MDR.Configurations.CarbonBlackCloud`` instance.
+        """
+
+        CarbonBlackCloud = TideModels.MDR.Configurations.CarbonBlackCloud
+
+        mdr_config, base_config = SystemLoader._base_configuration(mdr_config)
+        mdr_config, rule_id_bundle = SystemLoader._external_rule_id(mdr_config)
+
+        query = mdr_config.pop("query")
+        organizations = mdr_config.pop("organizations", None) or mdr_config.pop("organization", None)
+        watchlist = mdr_config.pop("watchlist", None)
+        report = mdr_config.pop("report", None)
+        tags = mdr_config.pop("tags", None)
+
+        return CarbonBlackCloud(
+            schema=base_config.schema,
+            status=base_config.status,
+            contributors=base_config.contributors,
+            tenants=base_config.tenants,
+            flags=base_config.flags,
+            query=query,
+            organizations=organizations,
+            watchlist=watchlist,
+            report=report,
+            tags=tags,
+            rule_id_bundle=rule_id_bundle if rule_id_bundle else None  # type: ignore
+        )        )
+
 
 class ConfigurationsLoader:
     @staticmethod
@@ -1186,6 +1228,13 @@ class TideLoader:
             configurations.harfanglab = SystemLoader.harfanglab(system_configurations.pop("harfanglab"))
         if system_configurations.get("splunk"):
             configurations.splunk = SystemLoader.splunk(system_configurations.pop("splunk"))
+        if system_configurations.get("carbon_black_cloud"):
+            cbc_config = system_configurations.get("carbon_black_cloud")
+            if isinstance(cbc_config, dict) and cbc_config.get("schema", "").startswith("carbon_black_cloud::"):
+                configurations.carbon_black_cloud = SystemLoader.carbon_black_cloud(system_configurations.pop("carbon_black_cloud"))
+            else:
+                # TODO: DEPRECATED [carbon-black-cloud-mdrv4] — Legacy dict passthrough
+                configurations.carbon_black_cloud = system_configurations.pop("carbon_black_cloud")
 
         return TideModels.MDR(**mdr,
                                 metadata=metadata,
@@ -1208,6 +1257,9 @@ class TideLoader:
     @overload
     @staticmethod
     def load_platform_config(platform_config:dict, system:Literal[DetectionSystems.SPLUNK])->TideConfigs.Systems.Splunk.Platform: ...
+    @overload
+    @staticmethod
+    def load_platform_config(platform_config:dict, system:Literal[DetectionSystems.CARBON_BLACK_CLOUD])->TideConfigs.Systems.CarbonBlackCloud.Platform: ...
     @overload
     @staticmethod
     def load_platform_config(platform_config:dict, system:Literal[DetectionSystems.HARFANGLAB])->TideConfigs.Systems.HarfangLab.Platform: ...
@@ -1258,6 +1310,9 @@ class TideLoader:
 
             case DetectionSystems.SPLUNK:
                 return TideConfigs.Systems.Splunk.Platform(**platform_config)
+
+            case DetectionSystems.CARBON_BLACK_CLOUD:
+                return SystemConfig.Platform(**platform_config)
 
             case _:
                 return SystemConfig.Platform(**platform_config)
@@ -1367,6 +1422,9 @@ class TideLoader:
 
                 case DetectionSystems.SPLUNK:
                     setup = TideConfigs.Systems.Splunk.Tenant.Setup(**setup_with_secrets)
+
+                case DetectionSystems.CARBON_BLACK_CLOUD:
+                    setup = TideConfigs.Systems.CarbonBlackCloud.Tenant.Setup(**setup_with_secrets)
 
                 case _:
                     raise NotImplementedError(f"Platform {platform.name} is not recognized")
@@ -1613,10 +1671,16 @@ class DataTide:
                 Index = dict(
                     IndexTide.load()["configurations"]["systems"]["carbon_black_cloud"]
                 )
-                tide = dict(Index["tide"])
-                setup = dict(Index["setup"])
-                secrets = dict(Index["secrets"])
-                validation = dict(Index["validation"])
+                # New MDRv4 typed format
+                platform = TideLoader.load_platform_config(dict(Index["platform"]), DetectionSystems.CARBON_BLACK_CLOUD) if "platform" in Index else None
+                modifiers = TideLoader.load_modifiers_config(Index.get("modifiers", [])) if "platform" in Index else None
+                tenants = TideLoader.load_tenants_config(Index["tenants"], DetectionSystems.CARBON_BLACK_CLOUD) if "platform" in Index and "tenants" in Index else None
+
+                # TODO: DEPRECATED [carbon-black-cloud-mdrv4] — Legacy format
+                tide = dict(Index.get("tide", {}))
+                setup = dict(Index.get("setup", {}))
+                secrets = dict(Index.get("secrets", {}))
+                validation = dict(Index.get("validation", {}))
 
             @dataclass
             class Sentinel(TideConfigs.Systems.Sentinel):

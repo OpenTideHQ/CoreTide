@@ -1,3 +1,39 @@
+# === New MDRv4 Format ===
+
+[platform]
+enabled = false
+identifier = "carbon_black_cloud"
+name = "Carbon Black Cloud Enterprise EDR"
+subschema = "CBC EDR Sub Schema"
+description = """VMware Carbon Black Enterprise EDR is an advanced threat hunting
+and incident response solution delivering continuous visibility for top security
+operations centres (SOCs) and incident response (IR) teams."""
+flags = []
+
+# [[tenants]]
+# name = "org_name"
+# description = "Organisation description"
+# deployment = "PRODUCTION"
+# [tenants.setup]
+# proxy = false
+# ssl = true
+# url = "$CBC_URL"
+# org_key = "$CBC_ORG_KEY"
+# token = "$CBC_TOKEN"
+# watchlist = "CoreTide"
+# organizations = []
+
+# [[modifiers]]
+# name = "example_modifier"
+# description = "Example deployment modifier"
+# [modifiers.conditions]
+# status = ["Production"]
+# [modifiers.modifications]
+# key = "value"
+
+# === Legacy Format (deprecated) ===
+# TODO: DEPRECATED [carbon-black-cloud-mdrv4] — Remove after full migration
+
 [tide]
 enabled = false
 identifier = "carbon_black_cloud"

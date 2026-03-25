@@ -203,7 +203,21 @@ class TideConfigs:
 
         @dataclass
         class CarbonBlackCloud(SystemConfig):
-            ...
+
+            @dataclass
+            class Tenant(SystemConfig.Tenant):
+
+                @dataclass
+                class Setup(SystemConfig.Tenant.Setup):
+                    url: str
+                    org_key: str
+                    token: str
+                    watchlist: Optional[str] = None
+                    organizations: Optional[Sequence[str]] = None
+
+                setup: Setup
+
+            tenants: Optional[Sequence[Tenant]]
 
         @dataclass
         class SentinelOne(SystemConfig):
@@ -680,7 +694,12 @@ class TideModels:
 
             @dataclass
             class CarbonBlackCloud(TideDefinitionsModels.SystemConfigurationModel):
-                ...
+                query: str
+                organizations: Optional[Sequence[str]] = None
+                watchlist: Optional[str] = None
+                report: Optional[str] = None
+                tags: Optional[Sequence[str]] = None
+                rule_id_bundle: Optional[Mapping[str, str]] = None
 
             @dataclass
             class HarfangLab(TideDefinitionsModels.SystemConfigurationModel):
@@ -739,7 +758,7 @@ class TideModels:
             defender_for_endpoint: Optional[DefenderForEndpoint] = None
             sentinel_one: Optional[SentinelOne] = None
             crowdstrike: Optional[Crowdstrike] = None
-            carbon_black_cloud: Optional[Mapping] = None
+            carbon_black_cloud: Optional[Union[CarbonBlackCloud, Mapping]] = None
             splunk: Optional[Union[Splunk, Mapping]] = None
             harfanglab: Optional[HarfangLab] = None
 
@@ -773,7 +792,7 @@ class TenantDeployment:
 
     @dataclass
     class CarbonBlackCloud(TenantDeploymentModel):
-        tenant: TideConfigs.Systems.DefenderForEndpoint.Tenant
+        tenant: TideConfigs.Systems.CarbonBlackCloud.Tenant
 
     @dataclass
     class SentinelOne(TenantDeploymentModel):

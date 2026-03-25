@@ -662,8 +662,8 @@ class TideDeployment:
         match system:
             case DetectionSystems.SPLUNK:
                 return DataTide.Configurations.Systems.Splunk
-            # case DetectionSystems.CARBON_BLACK_CLOUD:
-            #    return DataTide.Configurations.Systems.CarbonBlackCloud
+            case DetectionSystems.CARBON_BLACK_CLOUD:
+                return DataTide.Configurations.Systems.CarbonBlackCloud
             case DetectionSystems.SENTINEL:
                 return DataTide.Configurations.Systems.Sentinel
             case DetectionSystems.DEFENDER_FOR_ENDPOINT:
@@ -693,6 +693,8 @@ class TideDeployment:
                 mdr_config = data.configurations.harfanglab
             case DetectionSystems.SPLUNK:
                 mdr_config = data.configurations.splunk
+            case DetectionSystems.CARBON_BLACK_CLOUD:
+                mdr_config = data.configurations.carbon_black_cloud
             case _:
                 log(
                     "FATAL",

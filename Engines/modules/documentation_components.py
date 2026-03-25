@@ -378,15 +378,6 @@ def tlp_doc(tlp_data: str, description: bool = True) -> str:
     return tlp_doc_markdown
 
 
-def classification_doc(classification_data: str) -> str:
-    classification_icon = get_icon("classification")
-    classification_rating_icon = get_icon(classification_data, vocab="tlp")
-    classification_description = get_vocab_description("tlp", classification_data)
-    classification_doc_markdown = f"{classification_icon} **TLP:{classification_data.upper()}** {classification_rating_icon} : {classification_description}"
-
-    return classification_doc_markdown
-
-
 def cve_doc(cve_list: list[str]) -> str:
     broken_cve = list()
     cve_data = str()

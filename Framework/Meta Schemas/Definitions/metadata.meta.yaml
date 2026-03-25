@@ -59,14 +59,6 @@ properties:
     description: "The Traffic Light Protocol - or short: TLP - was designed with the objective to create a favorable classification scheme for sharing sensitive information while keeping the control over its distribution at the same time." 
     example: green
 
-  classification:
-    title: Data Classification
-    type: string
-    tide.vocab: true
-    tide.template.hide: true
-    description: "Data Classification Marking"
-    example: SECRET UE/EU SECRET
-
   author:
     title: Model author
     type: string

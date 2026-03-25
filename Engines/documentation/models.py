@@ -24,7 +24,6 @@ from Engines.modules.documentation import (
 )
 from Engines.modules.documentation_components import (
     criticality_doc,
-    classification_doc,
     metadata_doc,
     reference_doc,
     tlp_doc,
@@ -100,11 +99,6 @@ def documentation(model):
     description = description.replace("\n", "\n> ")
 
     tlp = tlp_doc((model.get("metadata") or model["meta"])["tlp"])
-    classification = (model.get("metadata") or model["meta"]).get(
-        "classification"
-    ) or ""
-    if classification:
-        classification = classification_doc(classification)
 
     techniques = techniques_resolver(model_uuid, recursive=False)
     if techniques:

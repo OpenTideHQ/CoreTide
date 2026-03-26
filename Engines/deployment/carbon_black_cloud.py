@@ -9,11 +9,16 @@ sys.path.append(str(git.Repo(".", search_parent_directories=True).working_dir))
 from Engines.modules.framework import techniques_resolver
 from Engines.modules.logs import log
 from Engines.modules.debug import DebugEnvironment
-from Engines.modules.tide import DataTide
+from Engines.modules.tide import DataTide, DetectionSystems
 from Engines.modules.plugins import DeployMDR
 from Engines.modules.carbon_black_cloud import CarbonBlackCloudEngineInit
-from Engines.modules.deployment import check_status
-from Engines.modules.models import StatusStrategy, DeploymentStrategy, TideModels
+from Engines.modules.deployment import TideDeployment, check_status
+from Engines.modules.models import (StatusStrategy,
+                                    DeploymentStrategy,
+                                    TideModels,
+                                    TideConfigs,
+                                    TenantDeployment)
+from Engines.modules.systems.carbon_black_cloud import CarbonBlackCloudService
 
 from typing import Sequence, Optional
 
@@ -243,159 +248,122 @@ class CarbonBlackCloudDeploy(CarbonBlackCloudEngineInit, DeployMDR):
 
         return True
 
-    def deploy_mdr_v4(self, mdr: TideModels.MDR):
-        """MDRv4 typed deployment routine for a single MDR object.
+    def deploy_mdr_v4(self,
+                      data: TideModels.MDR,
+                      service: CBCloudAPI,
+                      tenant_config: TideConfigs.Systems.CarbonBlackCloud.Tenant):
+        """MDRv4 typed deployment routine for a single MDR on a single tenant.
 
-        Uses typed attribute access instead of dict-based access.
+        Follows the same architectural pattern as Sentinel, Defender for Endpoint,
+        etc. — each call deploys one MDR to one tenant.
         """
 
-        config = mdr.configurations.carbon_black_cloud
+        config = data.configurations.carbon_black_cloud
         if not config or not hasattr(config, "query"):
-            log("SKIP", "MDR does not contain a typed CBC configuration", mdr.name)
+            log("SKIP", "MDR does not contain a typed CBC configuration", data.name)
             return
 
-        custom_orgs = config.organizations
-        deploy_orgs = custom_orgs if custom_orgs else self.ORGANIZATIONS
+        uuid = data.metadata.uuid
+        name = data.name.strip()
+        description = data.description.strip()
+        status = config.status
+        query = config.query.replace("\n", " ")
 
-        for org in deploy_orgs:
-            log("ONGOING", f"Currently deploying MDR {mdr.name} on organisation", org)
+        deployment_action = False
+        removal = False
 
-            org = org.strip()
-            if org in self.CBC_SECRETS:
-                org_secrets = self.CBC_SECRETS[org]
-                org_key = org_secrets.get("org_key")
-                token = org_secrets.get("token")
+        if check_status(status) in (StatusStrategy.DISABLEMENT, StatusStrategy.DELETION):
+            removal = True
+        else:
+            deployment_action = True
+
+        tags = [config.status]
+
+        if data.detection_model:
+            techniques = techniques_resolver(uuid)
+            tags.append(data.detection_model)
+            tags.extend(techniques)
+
+        if config.tags:
+            tags.extend(config.tags)
+
+        severity = self.SEVERITY_MAPPING[data.response.alert_severity]
+
+        selected_watchlist = config.watchlist or self.DEFAULT_WATCHLIST
+        selected_report = config.report or name
+
+        watchlist_list = service.select(Watchlist)
+        report = None
+        watchlist = None
+
+        if watchlist_list:
+            for w in watchlist_list:
+                if w.name == selected_watchlist:
+                    watchlist = w
+
+            if watchlist:
+                for r in watchlist.reports:
+                    if r.title == selected_report:
+                        report = r
             else:
-                log(
-                    "FATAL",
-                    "Target organisation is not present in Secrets configuration",
-                    org,
-                    "Double check TOML config to ensure there is an org_key and token entry for this org",
-                )
-                raise Exception("Organisation not found in secrets")
-
-            if not org_key or not token:
-                log(
-                    "FATAL",
-                    "Missing org_key or token for organisation",
-                    org,
-                )
-                raise Exception("Missing credentials")
-
-            try:
-                service = CBCloudAPI(
-                    url=self.CBC_URL,
-                    token=token,
-                    org_key=org_key,
-                    ssl_verify=self.SSL_ENABLED
-                )
-                log("SUCCESS", "Successfully connected to Carbon Black Cloud on tenant", org)
-            except Exception as e:
                 raise Exception(
-                    f"⚠️ [FAILURE] Service could not be reached for organisation {org}"
-                ) from e
+                    f"⚠️ [FATAL] The CBC Deployer cannot create a detection in a non-"
+                    f"existent Watchlist: {selected_watchlist}. Make sure to create "
+                    "one on the console before retriggering the deployment"
+                )
 
-            uuid = mdr.metadata.uuid
-            name = mdr.name.strip()
-            description = mdr.description.strip()
-            status = config.status
-            query = config.query.replace("\n", " ")
+        ioc = IOC_V2.create_query(service, uuid, query)
 
-            deployment_action = False
-            removal = False
-
-            if check_status(status) in (StatusStrategy.DISABLEMENT, StatusStrategy.DELETION):
-                removal = True
-            else:
-                deployment_action = True
-
-            tags = [config.status]
-
-            if mdr.detection_model:
-                techniques = techniques_resolver(uuid)
-                tags.append(mdr.detection_model)
-                tags.extend(techniques)
-
-            if config.tags:
-                tags.extend(config.tags)
-
-            severity = self.SEVERITY_MAPPING[mdr.response.alert_severity]
-
-            selected_watchlist = config.watchlist or self.DEFAULT_WATCHLIST
-            selected_report = config.report or name
-
-            watchlist_list = service.select(Watchlist)
-            report = None
-            watchlist = None
-
-            if watchlist_list:
-                for w in watchlist_list:
-                    if w.name == selected_watchlist:
-                        watchlist = w
-
-                if watchlist:
-                    for r in watchlist.reports:
-                        if r.title == selected_report:
-                            report = r
-                else:
-                    raise Exception(
-                        f"⚠️ [FATAL] The CBC Deployer cannot create a detection in a non-"
-                        f"existent Watchlist: {selected_watchlist}. Make sure to create "
-                        "one on the console before retriggering the deployment"
-                    )
-
-            ioc = IOC_V2.create_query(service, uuid, query)
-
-            if report:
-                if selected_report == name:
-                    if deployment_action:
-                        report.remove_iocs_by_id(str(uuid))
-                        report.append_iocs([ioc])
-                        if severity != report.severity:
-                            report.update(description=description, tags=tags, severity=severity)
-                            log("INFO", "Upgraded severity for this report to align with MDR", str(severity))
-                        else:
-                            report.update(description=description, tags=tags)
-                        log("SUCCESS", "Rolled out IOC to report", selected_report)
-                    elif removal:
-                        report.delete()
-                        log("WARNING", "The report was deleted alongside the rule", selected_report)
-                else:
-                    if deployment_action:
-                        report.remove_iocs_by_id(uuid)
-                        report.append_iocs([ioc])
-                        tags.extend(t for t in report.tags if t not in tags)
-                        if severity > report.severity:
-                            report.update(description=description, tags=tags, severity=severity)
-                            log("INFO", "Upgraded severity for this report to align with MDR", str(severity))
-                        else:
-                            report.update(description=description, tags=tags)
-                        log("SUCCESS", "Deployed IOC to report", selected_report)
-                    elif removal:
-                        if len(report.iocs_) > 1:
-                            report.remove_iocs_by_id(uuid)
-                            report.update()
-                            log("SUCCESS", "Deleted IOC from report", selected_report)
-                        else:
-                            report.delete()
-                            log(
-                                "WARNING",
-                                "The specified report was automatically "
-                                "deleted as there were no other rules",
-                                selected_report,
-                            )
+        if report:
+            if selected_report == name:
+                if deployment_action:
+                    report.remove_iocs_by_id(str(uuid))
+                    report.append_iocs([ioc])
+                    if severity != report.severity:
+                        report.update(description=description, tags=tags, severity=severity)
+                        log("INFO", "Upgraded severity for this report to align with MDR", str(severity))
+                    else:
+                        report.update(description=description, tags=tags)
+                    log("SUCCESS", "Rolled out IOC to report", selected_report)
+                elif removal:
+                    report.delete()
+                    log("WARNING", "The report was deleted alongside the rule", selected_report)
             else:
                 if deployment_action:
-                    report_builder = Report.create(service, selected_report, description, severity)
-                    report_builder.add_ioc(ioc)
-                    for tag in tags:
-                        report_builder.add_tag(tag.strip())
-                    report = report_builder.build()
-                    report.save_watchlist()
-                    watchlist.add_reports([report])  # type: ignore
-                    log("SUCCESS", "Created report and deployed IOC", selected_report)
+                    report.remove_iocs_by_id(uuid)
+                    report.append_iocs([ioc])
+                    tags.extend(t for t in report.tags if t not in tags)
+                    if severity > report.severity:
+                        report.update(description=description, tags=tags, severity=severity)
+                        log("INFO", "Upgraded severity for this report to align with MDR", str(severity))
+                    else:
+                        report.update(description=description, tags=tags)
+                    log("SUCCESS", "Deployed IOC to report", selected_report)
                 elif removal:
-                    log("SKIP", "No report to delete, already removed from system", selected_report)
+                    if len(report.iocs_) > 1:
+                        report.remove_iocs_by_id(uuid)
+                        report.update()
+                        log("SUCCESS", "Deleted IOC from report", selected_report)
+                    else:
+                        report.delete()
+                        log(
+                            "WARNING",
+                            "The specified report was automatically "
+                            "deleted as there were no other rules",
+                            selected_report,
+                        )
+        else:
+            if deployment_action:
+                report_builder = Report.create(service, selected_report, description, severity)
+                report_builder.add_ioc(ioc)
+                for tag in tags:
+                    report_builder.add_tag(tag.strip())
+                report = report_builder.build()
+                report.save_watchlist()
+                watchlist.add_reports([report])  # type: ignore
+                log("SUCCESS", "Created report and deployed IOC", selected_report)
+            elif removal:
+                log("SKIP", "No report to delete, already removed from system", selected_report)
 
         return True
 
@@ -407,8 +375,7 @@ class CarbonBlackCloudDeploy(CarbonBlackCloudEngineInit, DeployMDR):
         self.configure_proxy()
 
         if mdr_deployment is not None:
-            # MDRv4 typed deployment path
-            # Normalise string UUIDs to typed MDR objects (orchestrator passes UUIDs)
+            # MDRv4 typed deployment path — aligned with TideDeployment contract
             loaded_mdr = []
             for mdr in mdr_deployment:
                 if type(mdr) is str:
@@ -421,11 +388,20 @@ class CarbonBlackCloudDeploy(CarbonBlackCloudEngineInit, DeployMDR):
                 log("SKIP", "No MDRs to deploy for Carbon Black Cloud")
                 return
 
-            for mdr in mdr_deployment:
-                if mdr.configurations.carbon_black_cloud and hasattr(mdr.configurations.carbon_black_cloud, "query"):
-                    self.deploy_mdr_v4(mdr)
-                else:
-                    log("SKIP", "🛑 Skipping as does not contain a typed CBC rule", mdr.name)
+            deployment_resolution = TideDeployment(
+                deployment=mdr_deployment,
+                system=DetectionSystems.CARBON_BLACK_CLOUD,
+                strategy=deployment_plan)
+
+            for tenant_deployment in deployment_resolution.rule_deployment:  # type: ignore
+                tenant_deployment: TenantDeployment.CarbonBlackCloud
+                log("ONGOING", "Currently targeting tenant", tenant_deployment.tenant.name)
+                cbc_service = CarbonBlackCloudService(tenant_deployment.tenant)
+                for mdr in tenant_deployment.rules:
+                    log("ONGOING", "Processing rule", mdr.name, mdr.metadata.uuid)
+                    self.deploy_mdr_v4(data=mdr,
+                                       service=cbc_service.service,
+                                       tenant_config=tenant_deployment.tenant)
 
         else:
             # TODO: DEPRECATED [carbon-black-cloud-mdrv4] — Legacy MDRv3 deployment path

@@ -290,10 +290,10 @@ class CarbonBlackCloudDeploy(CarbonBlackCloudEngineInit, DeployMDR):
                     ssl_verify=self.SSL_ENABLED
                 )
                 log("SUCCESS", "Successfully connected to Carbon Black Cloud on tenant", org)
-            except Exception:
+            except Exception as e:
                 raise Exception(
                     f"⚠️ [FAILURE] Service could not be reached for organisation {org}"
-                )
+                ) from e
 
             uuid = mdr.metadata.uuid
             name = mdr.name.strip()
@@ -408,6 +408,15 @@ class CarbonBlackCloudDeploy(CarbonBlackCloudEngineInit, DeployMDR):
 
         if mdr_deployment is not None:
             # MDRv4 typed deployment path
+            # Normalise string UUIDs to typed MDR objects (orchestrator passes UUIDs)
+            loaded_mdr = []
+            for mdr in mdr_deployment:
+                if type(mdr) is str:
+                    loaded_mdr.append(DataTide.Models.MDR[mdr])
+                elif type(mdr) is TideModels.MDR:
+                    loaded_mdr.append(mdr)
+            mdr_deployment = loaded_mdr
+
             if not mdr_deployment:
                 log("SKIP", "No MDRs to deploy for Carbon Black Cloud")
                 return

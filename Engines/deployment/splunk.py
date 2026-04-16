@@ -633,6 +633,11 @@ class SplunkDeploy(SplunkEngineInit, DeployMDR):
         )
         config["alert.managedBy"] = responders
 
+        # ── Advanced passthrough config ───────────────────────────────
+        if splunk_config.advanced:
+            for k, v in splunk_config.advanced.items():
+                config[k] = str(v)
+
         # ── Human-readable description ────────────────────────────────
         config["description"] = data.description or ""
 

@@ -587,6 +587,7 @@ class TideModels:
                 query: Optional[str] = None
                 correlation_search: Optional[bool] = None
                 actions: Optional[Actions] = None
+                advanced: Optional[Mapping[str, Any]] = None
 
             @dataclass
             class Sentinel(TideDefinitionsModels.SystemConfigurationModel):

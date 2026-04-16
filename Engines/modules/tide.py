@@ -733,9 +733,14 @@ class SystemLoader:
     def splunk(mdr_config: dict[str, Any]) -> TideModels.MDR.Configurations.Splunk:
         """Build a Splunk system configuration object from raw MDR config.
 
-        Parses scheduling, trigger, actions (notable, risk, email), and query
-        fields from a splunk::3.0 MDR configuration into the typed dataclass
-        hierarchy.
+        Accepts both the legacy flat layout (splunk::2.x) and the nested layout,
+        normalising the flat structure into the typed dataclass hierarchy.
+
+        Flat → nested normalisation:
+        - ``scheduling.{frequency,cron,custom_time}`` → ``scheduling.schedule.*``
+        - ``scheduling.lookback`` → ``scheduling.timerange.lookback``
+        - Top-level ``throttling`` / ``threshold`` → ``trigger.throttling`` / ``trigger.threshold``
+        - Top-level ``notable`` / ``risk`` → ``actions.notable`` / ``actions.risk``
 
         Args:
             mdr_config: A mapping containing splunk configuration fields.
@@ -749,10 +754,55 @@ class SystemLoader:
 
         query = mdr_config.pop("query", None)
         correlation_search = mdr_config.pop("correlation_search", None)
+        advanced = mdr_config.pop("advanced", None)
 
-        # Parse scheduling
-        scheduling = None
+        # ── Normalise flat v2.x scheduling into nested structure ──────
         scheduling_data = mdr_config.pop("scheduling", None)
+        if scheduling_data:
+            # Detect flat layout: schedule sub-keys live directly in scheduling
+            if "schedule" not in scheduling_data and (
+                "frequency" in scheduling_data
+                or "cron" in scheduling_data
+                or "custom_time" in scheduling_data
+            ):
+                schedule_dict: dict = {}
+                for k in ("frequency", "cron", "custom_time"):
+                    v = scheduling_data.pop(k, None)
+                    if v is not None:
+                        schedule_dict[k] = v
+                if schedule_dict:
+                    scheduling_data["schedule"] = schedule_dict
+
+            if "timerange" not in scheduling_data and "lookback" in scheduling_data:
+                scheduling_data["timerange"] = {"lookback": scheduling_data.pop("lookback")}
+
+        # ── Normalise flat v2.x trigger fields ────────────────────────
+        trigger_data = mdr_config.pop("trigger", None)
+        if trigger_data is None:
+            # Build trigger from top-level v2.x keys if present
+            throttling_data = mdr_config.pop("throttling", None)
+            threshold_val = mdr_config.pop("threshold", None)
+            if throttling_data or threshold_val is not None:
+                trigger_data = {}
+                if throttling_data:
+                    trigger_data["throttling"] = throttling_data
+                if threshold_val is not None:
+                    trigger_data["threshold"] = threshold_val
+
+        # ── Normalise flat v2.x actions fields ────────────────────────
+        actions_data = mdr_config.pop("actions", None)
+        if actions_data is None:
+            notable_data = mdr_config.pop("notable", None)
+            risk_data = mdr_config.pop("risk", None)
+            email_data = mdr_config.pop("email", None)
+            if notable_data or risk_data or email_data:
+                actions_data = {}
+                if notable_data:
+                    actions_data["notable"] = notable_data
+                if risk_data:
+                    actions_data["risk"] = risk_data
+                if email_data:
+                    actions_data["email"] = email_data
         if scheduling_data:
             schedule = None
             schedule_data = scheduling_data.pop("schedule", None)
@@ -855,7 +905,8 @@ class SystemLoader:
             trigger=trigger,
             query=query,
             correlation_search=correlation_search,
-            actions=actions
+            actions=actions,
+            advanced=advanced
         )
 
 
@@ -1135,13 +1186,7 @@ class TideLoader:
         if system_configurations.get("harfanglab"):
             configurations.harfanglab = SystemLoader.harfanglab(system_configurations.pop("harfanglab"))
         if system_configurations.get("splunk"):
-            splunk_config = system_configurations.pop("splunk")
-            # Only route through SystemLoader for splunk::3.0 typed MDRs
-            if splunk_config.get("schema", "").startswith("splunk::3"):
-                configurations.splunk = SystemLoader.splunk(splunk_config)
-            else:
-                # TODO: DEPRECATED [splunk-mdrv4] — Pre-3.0 MDRs stay as raw Mapping for legacy deployer
-                configurations.splunk = splunk_config
+            configurations.splunk = SystemLoader.splunk(system_configurations.pop("splunk"))
 
         return TideModels.MDR(**mdr,
                                 metadata=metadata,

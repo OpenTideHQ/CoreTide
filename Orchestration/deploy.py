@@ -82,7 +82,7 @@ for system in deployment_list:
                 system,
                 "Using MDRv3 standard methods")
             DeployTide.mdr[system].deploy(deployment=deployment_list[system])
-        except:
+        except TypeError:
             log("WARNING", "Switching to MDRv4 new methods")
             log("ONGOING",
                 "Deploying MDR for target system",

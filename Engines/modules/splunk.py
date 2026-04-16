@@ -35,7 +35,7 @@ class SplunkEngineInit(ABC):
         self.DEFAULT_CONFIG = SPLUNK_CONFIG.defaults
         self.DEPLOYER_IDENTIFIER = "splunk"
 
-        self.SSL_ENABLED:bool = SPLUNK_SETUP["ssl"]
+        self.SSL_ENABLED:bool = SPLUNK_SETUP.get("ssl", True)
         if self.DEBUG:
             self.SSL_ENABLED = DebugEnvironment.SSL_ENABLED
         self.SPLUNK_URL = SPLUNK_SETUP["url"]
@@ -44,7 +44,7 @@ class SplunkEngineInit(ABC):
         except:
             self.SPLUNK_PORT = SPLUNK_SETUP["port"]
         self.SPLUNK_APP = SPLUNK_SETUP["app"]
-        self.SPLUNK_TOKEN = SPLUNK_SECRETS["token"]
+        self.SPLUNK_TOKEN = SPLUNK_SECRETS.get("token", "")
 
         self.PROXY_ENABLED = SPLUNK_SETUP["proxy"]
 

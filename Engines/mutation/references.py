@@ -88,6 +88,13 @@ def run():
 
     for model_type in MODELS_SCOPE:
         folder = MODELS_FOLDER[model_type]
+        if not folder.exists():
+            log(
+                "WARNING",
+                "Model folder configured but not found, skipping",
+                f"{model_type} -> {folder}",
+            )
+            continue
         log("INFO", "Now processing all files under model type", model_type)
         for file in sorted(os.listdir(folder)):
             if not file.endswith(".yaml"):

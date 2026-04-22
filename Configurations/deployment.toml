@@ -47,6 +47,8 @@ enabled = true
 promotion_target = "PRODUCTION"
 
 [proxy]
+# proxy_user and proxy_password are optional: if both are present, auth is used,
+# otherwise the proxy is configured with host:port only
 proxy_user = "$PROXY_USER"
 proxy_password = "$PROXY_PASSWORD"
 proxy_host = "$PROXY_HOST"

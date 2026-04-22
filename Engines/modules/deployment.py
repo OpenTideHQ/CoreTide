@@ -524,34 +524,44 @@ def enabled_systems() -> list[str]:
 
 class Proxy:
     """
-    Simple class to encapulate configuring the proxy in
-    environment variables
+    Encapsulates proxy setup for environment variables.
+
+    Behavior:
+    - Requires proxy_host and proxy_port
+    - Uses proxy_user / proxy_password only when both are provided
+    - Supports unauthenticated proxy URLs for hosts behind transparent proxies
     """
 
     @staticmethod
     def set_proxy():
         if DebugEnvironment.ENABLED and not DebugEnvironment.PROXY_ENABLED:
-            pass
-        else:
-            log("ONGOING", "Setting environment proxy according to CI variables")
-            PROXY_CONFIG = DataTide.Configurations.Deployment.proxy
-            PROXY_CONFIG = HelperTide.fetch_config_envvar(PROXY_CONFIG)
-            proxy_user = PROXY_CONFIG["proxy_user"]
-            proxy_pass = PROXY_CONFIG["proxy_password"]
-            proxy_host = PROXY_CONFIG["proxy_host"]
-            proxy_port = PROXY_CONFIG["proxy_port"]
-            if proxy_host and proxy_port and proxy_user and proxy_pass:
+            # Debug mode explicitly has proxy setup disabled
+            return
+
+        log("ONGOING", "Setting environment proxy according to CI variables")
+        PROXY_CONFIG = DataTide.Configurations.Deployment.proxy
+        PROXY_CONFIG = HelperTide.fetch_config_envvar(PROXY_CONFIG)
+        proxy_user = PROXY_CONFIG.get("proxy_user")
+        proxy_pass = PROXY_CONFIG.get("proxy_password")
+        proxy_host = PROXY_CONFIG.get("proxy_host")
+        proxy_port = PROXY_CONFIG.get("proxy_port")
+
+        if proxy_host and proxy_port:
+            if proxy_user and proxy_pass:
                 proxy = f"http://{proxy_user}:{proxy_pass}@{proxy_host}:{proxy_port}"
-                os.environ["HTTP_PROXY"] = proxy
-                os.environ["HTTPS_PROXY"] = proxy
-                log("SUCCESS", "Proxy environment setup successful")
             else:
-                log(
-                    "FAILURE",
-                    "Could not retrieve all proxy information",
-                    "Control that all proxy infos are entered in CI variables",
-                    "Expects proxy_user, proxy_password, proxy_host and proxy_port",
-                )
+                proxy = f"http://{proxy_host}:{proxy_port}"
+
+            os.environ["HTTP_PROXY"] = proxy
+            os.environ["HTTPS_PROXY"] = proxy
+            log("SUCCESS", "Proxy environment setup successful")
+        else:
+            log(
+                "FAILURE",
+                "Could not retrieve mandatory proxy host and port",
+                "Control that proxy_host and proxy_port are entered in CI variables",
+                "proxy_user and proxy_password are optional",
+            )
 
     @staticmethod
     def unset_proxy():

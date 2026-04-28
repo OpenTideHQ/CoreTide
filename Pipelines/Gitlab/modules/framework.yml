@@ -17,5 +17,7 @@
     - if:  $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH
   needs:
     - 🔮 Validation Toolchain
+  variables:
+    FF_USE_NEW_BASH_EVAL_STRATEGY: "true"
   resource_group: synthesis
 

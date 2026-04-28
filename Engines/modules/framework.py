@@ -424,7 +424,6 @@ def childs(model_id: str) -> list:
         "dom": {"child_types": ["signal", "mdr"], "references": ["detection_model", "parent"]},
         "signal": {"child_types": ["mdr"], "references": ["detection_model"]},
         "cdm": {"child_types": ["mdr"], "references": ["detection_model"]},
-        "bdr": {"child_types": ["mdr"], "references": ["detection_model"]},
     }
 
     model_type = get_type(model_id)
@@ -544,9 +543,6 @@ def techniques_resolver(model_id: str, recursive=True) -> list:
     # Load Model Data
     model_body = MODELS_INDEX[model_type][model_id]
 
-    if model_type == "bdr":
-        return []  # Case for BDR, as they do not relate to a technique concept
-
     if model_type == "mdr":
         parent_id = model_body.get("detection_model") or model_body.get("tags", {}).get(
             "coretide"
@@ -596,7 +592,7 @@ def relations_downstream(id):
 
     tree = {}
     
-    if get_type(id) in ["signal", "cdm", "bdr"]:
+    if get_type(id) in ["signal", "cdm"]:
         tree = keep_active_mdr(childs(id))
     elif get_type(id) == "dom":
         for child in childs(id):

@@ -90,18 +90,6 @@ NAV_INDEX_FIELDS = {
         "collection",
         "artifacts",
     ],
-    "bdr": [
-        "uuid",
-        "name",
-        "criticality",
-        "tlp",
-        "description",
-        "modified"
-        "implementations",
-        "criticality",
-        "violation",
-        "domains",
-    ],
     "mdr": [
         "uuid",
         "name",

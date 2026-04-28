@@ -1222,8 +1222,6 @@ class DataTide:
         """Detection Objectives Signals Raw Index"""
         Signal = {uuid:TideLoader.load_signal(deepcopy(data)) for (uuid, data) in dict(Index.copy().get("signal", {})).items()} if signal else None 
         """Detection Objectives Signals Pre-Loaded Index"""
-        bdr = dict(Index["bdr"])
-        """Business Detection Rules Data Index"""
         cdm = dict(Index["cdm"])
         """Cyber Detection Models Data Index"""
         mdr = dict(Index["mdr"])
@@ -1233,7 +1231,7 @@ class DataTide:
         """Model Mapped Managed Detection Rules Data Index"""
         chaining = IndexTide.compute_chains(tvm)
         """Index of all chaining relationships"""
-        FlatIndex =  tvm | dom | signal | cdm | mdr | bdr
+        FlatIndex =  tvm | dom | signal | cdm | mdr
         """Flat Key Value pair structure of all UUIDs in the index"""
         files = dict(IndexTide.load()["files"])
     
@@ -1271,8 +1269,6 @@ class DataTide:
         """Cyber Detection Model JSON Schema"""
         mdr = dict(Index.get("mdr", {}))
         """Managed Detection Rule JSON Schema"""
-        bdr = dict(Index.get("bdr", {}))
-        """Business Detection Request JSON Schema"""
 
     @dataclass(frozen=True)
     class Templates:
@@ -1289,8 +1285,6 @@ class DataTide:
         """Cyber Detection Model Object Template"""
         mdr = str(Index.get("mdr"))
         """Managed Detection Rule Object Template"""
-        bdr = str(Index.get("bdr"))
-        """Business Detection Request Object Template"""
 
     @dataclass(frozen=True)
     class TideSchemas:
@@ -1313,8 +1307,6 @@ class DataTide:
         """Managed Detection Rule Tide Schema"""
         mdrv2 = dict(Index.get("mdrv2", {}))
         """DEPRECATED - Legacy MDR Version for backward compatibility use cases"""
-        bdr = dict(Index["bdr"])
-        """Business Detection Request Tide Schema"""
 
     @dataclass(frozen=True)
     class Lookups:
@@ -1401,7 +1393,6 @@ class DataTide:
                     dom = Index.get("dom")
                     cdm = Index["cdm"]
                     mdr = Index["mdr"]
-                    bdr = Index["bdr"]
                     lookups = Index["lookups"]
                     analytics = Index["analytics"]
                     snippet_file = Index["snippet_file"]

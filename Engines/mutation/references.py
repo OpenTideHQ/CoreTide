@@ -12,7 +12,7 @@ from Engines.modules.files import resolve_paths
 ROOT = Path(str(git.Repo(".", search_parent_directories=True).working_dir))
 
 PATHS = resolve_paths()
-MODELS_SCOPE = ["tvm", "cdm", "bdr", "mdr"]
+MODELS_SCOPE = ["tvm", "cdm", "mdr"]
 MODELS_FOLDER = dict()
 
 for model in MODELS_SCOPE:

@@ -302,9 +302,6 @@ def indexer(write_index=False) -> dict:
         objects_index = json.load(open(IndexPaths.OBJECTS_INDEX_PATH, encoding="utf-8"))
         indexes_index["objects"] = objects_index
         if objects_index:
-            if ("cdm" in objects_index) and ("bdr" in objects_index):
-                log("INFO", "Appending BDR to CDM in Model index as options")
-                objects_index["cdm"]["entries"].update(objects_index["bdr"]["entries"])
             index["vocabs"].update(objects_index)
     
     if not os.path.exists(IndexPaths.REVISIONS_INDEX_PATH):

@@ -122,10 +122,6 @@ def documentation(model):
         if DOCUMENTATION_TARGET is CIEnvironment.CIPlatforms.GitlabCI:
             GitlabMarkdown.negative_diff(relation_graph)
 
-    if model_type == "bdr":
-        justification = model[model_datafield]["justification"].replace("\n", "\n> ")
-        expand_description += f"\n\n## ❓ Justification \n\n > {justification}"
-
     if model_type == "cdm":
         tuning = model[model_datafield]["tuning"].replace("\n", "\n> ")
         expand_description += f"\n\n## 🔧 Tuning \n\n > {tuning}"

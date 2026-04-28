@@ -68,8 +68,6 @@ def run():
                     entry["criticality"] = object_data.get("objective", {}).get("priority")
                 case "cdm":
                     description = object_data.get("detection", {}).get("guidelines")
-                case "bdr":
-                    description = object_data.get("request", {}).get("description")
                 case "mdr":
                     description = object_data.get("description") or ""
                 case _:
@@ -120,15 +118,10 @@ def run():
     if not object_index.get("cdm"):
         object_index["cdm"] = {}
         object_index["cdm"]["entries"] = {}
-    if not object_index.get("bdr"):
-        object_index["bdr"] = {}
-        object_index["bdr"]["entries"] = {}
 
-    # This allows us to merge existing CDM and BDR indexes with the new DOM to allow
-    # MDRs to refer to both during the transitional period
+    # This allows us to merge existing CDM indexes with the new DOM during transition
 
     object_index["dom"]["entries"].update(object_index.get("cdm", {}).get("entries", {}))
-    object_index["dom"]["entries"].update(object_index.get("bdr", {}).get("entries", {}))
 
     with open(TIDE_INDEXES_PATH / INDEX_NAME, "w+", encoding="utf-8") as export:
         export.write("")

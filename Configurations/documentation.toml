@@ -1,4 +1,4 @@
-scope = [ "tvm", "cdm", "bdr" ]
+scope = [ "tvm", "cdm" ]
 skip_model_keys = ["description",
                             "guidelines",
                             "terrain",
@@ -34,7 +34,6 @@ dom = "Detection Objectives"
 signal = "Detection Objective Signals"
 cdm = "Detection Models"
 mdr = "Detection Rules"
-bdr = "Business Requests"
 lookup_metadata = "Lookup Metadata"
 
 [titles]
@@ -42,7 +41,6 @@ tvm = "Threat Vector Schema"
 cdm = "Detection Model Schema"
 dom = "Detection Objective Schema"
 mdr = "Detection Rules Schema"
-bdr = "Business Detection Schema"
 
 [icons]
 tvm = "☣️"
@@ -50,7 +48,6 @@ dom = "🎯"
 signal = "📡"
 cdm = "🛡️"
 mdr = "🚨"
-bdr = "🏛️"
 vocab = "📒"
 metaschema = "🏗️"
 lookups = "🔎"

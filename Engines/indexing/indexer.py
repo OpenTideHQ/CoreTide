@@ -300,12 +300,35 @@ def indexer(write_index=False) -> dict:
             "Should be generated in the next Framework generation pipeline run")
     else:
         objects_index = json.load(open(IndexPaths.OBJECTS_INDEX_PATH, encoding="utf-8"))
-        indexes_index["objects"] = objects_index
-        if objects_index:
-            if ("cdm" in objects_index) and ("bdr" in objects_index):
-                log("INFO", "Appending BDR to CDM in Model index as options")
-                objects_index["cdm"]["entries"].update(objects_index["bdr"]["entries"])
-            index["vocabs"].update(objects_index)
+        configured_objects = set(RESOLVED_CONFIGURATIONS["global"].get("objects", []))
+        filtered_objects_index = {}
+
+        for object_type, object_vocab in objects_index.items():
+            if object_type not in configured_objects:
+                log(
+                    "SKIP",
+                    "Ignoring stored object index for inactive object type",
+                    object_type,
+                    "Regenerate Schemas/Indexes/objects.json to remove stale object families",
+                )
+                continue
+            if (
+                not isinstance(object_vocab, dict)
+                or not isinstance(object_vocab.get("metadata"), dict)
+                or not isinstance(object_vocab.get("entries"), dict)
+            ):
+                log(
+                    "WARNING",
+                    "Ignoring malformed stored object index",
+                    object_type,
+                    "Object indexes must expose both metadata and entries before being used as vocabularies",
+                )
+                continue
+            filtered_objects_index[object_type] = object_vocab
+
+        indexes_index["objects"] = filtered_objects_index
+        if filtered_objects_index:
+            index["vocabs"].update(filtered_objects_index)
     
     if not os.path.exists(IndexPaths.REVISIONS_INDEX_PATH):
         log("SKIP", "Not able to find a revisions.json index in Tide instance",

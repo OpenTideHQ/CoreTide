@@ -11,6 +11,20 @@ from Engines.modules.tide import DataTide
 TIDE_INDEXES_PATH = Path(DataTide.Configurations.Global.Paths.Tide.tide_indexes)
 ICONS = DataTide.Configurations.Documentation.icons
 
+
+def _empty_model_vocabulary(object_type):
+    index_name = DataTide.Configurations.Documentation.object_names[object_type]
+    return {
+        "metadata": {
+            "field": object_type,
+            "icon": ICONS.get(object_type, ""),
+            "name": index_name,
+            "description": index_name,
+            "model": True,
+        },
+        "entries": {},
+    }
+
 def run():
 
     log("TITLE", "Generate Vocabularies from Objects Data")
@@ -68,8 +82,6 @@ def run():
                     entry["criticality"] = object_data.get("objective", {}).get("priority")
                 case "cdm":
                     description = object_data.get("detection", {}).get("guidelines")
-                case "bdr":
-                    description = object_data.get("request", {}).get("description")
                 case "mdr":
                     description = object_data.get("description") or ""
                 case _:
@@ -115,20 +127,13 @@ def run():
 
     # Set defaults to accomodate soft transition to DOM.
     if not object_index.get("dom"):
-        object_index["dom"] = {}
-        object_index["dom"]["entries"] = {}
+        object_index["dom"] = _empty_model_vocabulary("dom")
     if not object_index.get("cdm"):
-        object_index["cdm"] = {}
-        object_index["cdm"]["entries"] = {}
-    if not object_index.get("bdr"):
-        object_index["bdr"] = {}
-        object_index["bdr"]["entries"] = {}
+        object_index["cdm"] = _empty_model_vocabulary("cdm")
 
-    # This allows us to merge existing CDM and BDR indexes with the new DOM to allow
-    # MDRs to refer to both during the transitional period
+    # This allows us to merge existing CDM indexes with the new DOM during transition
 
     object_index["dom"]["entries"].update(object_index.get("cdm", {}).get("entries", {}))
-    object_index["dom"]["entries"].update(object_index.get("bdr", {}).get("entries", {}))
 
     with open(TIDE_INDEXES_PATH / INDEX_NAME, "w+", encoding="utf-8") as export:
         export.write("")

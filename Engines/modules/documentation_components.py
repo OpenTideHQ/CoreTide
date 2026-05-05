@@ -256,7 +256,7 @@ def relations_table(
                     None if "dom" not in trunk_data else trunk_data["dom"]
                 )
 
-            if model_type in ["tvm", "dom", "cdm", "bdr"]:
+            if model_type in ["tvm", "dom", "cdm"]:
                 trunk_data["mdr"] = (
                     None if "mdr" not in trunk_data else trunk_data["mdr"]
                 )
@@ -268,26 +268,26 @@ def relations_table(
 
 
         elif direction == "upstream":
-            if "bdr" not in trunk_data:
-                if model_type in ["mdr", "dom", "cdm"]:
-                    trunk_data["tvm"] = (
-                        None if "tvm" not in trunk_data else trunk_data["tvm"]
-                    )
-                if model_type == "signal":
-                    trunk_data["dom"] = (
-                    None if "dom" not in trunk_data else trunk_data["dom"]
-                    )
+            if model_type in ["mdr", "dom", "cdm"]:
+                trunk_data["tvm"] = (
+                    None if "tvm" not in trunk_data else trunk_data["tvm"]
+                )
 
-                if model_type in ["mdr"]:
-                    trunk_data["cdm"] = (
-                        None if "cdm" not in trunk_data else trunk_data["cdm"]
-                    )
-                    trunk_data["dom"] = (
-                        None if "dom" not in trunk_data else trunk_data["dom"]
-                    )
-                    trunk_data["signal"] = (
-                        None if "signal" not in trunk_data else trunk_data["signal"]
-                    )
+            if model_type == "signal":
+                trunk_data["dom"] = (
+                    None if "dom" not in trunk_data else trunk_data["dom"]
+                )
+
+            if model_type in ["mdr"]:
+                trunk_data["cdm"] = (
+                    None if "cdm" not in trunk_data else trunk_data["cdm"]
+                )
+                trunk_data["dom"] = (
+                    None if "dom" not in trunk_data else trunk_data["dom"]
+                )
+                trunk_data["signal"] = (
+                    None if "signal" not in trunk_data else trunk_data["signal"]
+                )
 
         data.append(trunk_data)
 

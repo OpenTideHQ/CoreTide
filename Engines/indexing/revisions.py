@@ -100,8 +100,6 @@ class RevisionIndexer:
                     description = object_data.get("objective", {}).get("description")
                 case "cdm":
                     description = object_data.get("detection", {}).get("guidelines")
-                case "bdr":
-                    description = object_data.get("request", {}).get("description")
                 case "mdr":
                     description = object_data.get("description") or ""
 

@@ -23,6 +23,7 @@ from Engines.modules.systems.defender_for_endpoint import DefenderForEndpointSer
 # and ReportId, but other Defender XDR tables such as Email*, Identity*, and
 # CloudAppEvents do not require DeviceId.
 TIMESTAMP_COLUMNS = {"Timestamp", "TimeGenerated"}
+DEFENDER_XDR_TIMESTAMP_COLUMNS = {"Timestamp"}
 REPORT_ID_COLUMNS = {"ReportId"}
 DEVICE_ID_COLUMNS = {"DeviceId"}
 OBSERVATION_ID_COLUMNS = {"ObservationId"}
@@ -125,7 +126,7 @@ def required_column_groups(query:str)->list[set[str]]:
         for table in tables
     }
 
-    groups = [TIMESTAMP_COLUMNS]
+    groups = [DEFENDER_XDR_TIMESTAMP_COLUMNS if categories else TIMESTAMP_COLUMNS]
 
     if "endpoint" in categories:
         groups.extend([DEVICE_ID_COLUMNS, REPORT_ID_COLUMNS])

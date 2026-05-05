@@ -94,12 +94,20 @@ class SentinelDeploy(DeployMDR):
         if dynamic_properties:=configuration.alert.dynamic_properties:
             alert_dynamic_properties = []
             for property in dynamic_properties:
+                if property.property == "Tactics":
+                    details_overrides.alert_tactics_column_name = property.column
+                    continue
+                if property.property == "Severity":
+                    details_overrides.alert_severity_column_name = property.column
+                    continue
+
                 alert_dynamic_property = service.alert_rules.models.AlertPropertyMapping()
                 alert_dynamic_property.alert_property = property.property
                 alert_dynamic_property.value = property.column
                 alert_dynamic_properties.append(alert_dynamic_property)
 
-            details_overrides.alert_dynamic_properties = alert_dynamic_properties
+            if alert_dynamic_properties:
+                details_overrides.alert_dynamic_properties = alert_dynamic_properties
 
         rule.alert_details_override = details_overrides
 

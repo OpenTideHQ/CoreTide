@@ -93,8 +93,8 @@ class SentinelDeploy(DeployMDR):
 
         if dynamic_properties:=configuration.alert.dynamic_properties:
             alert_dynamic_properties = []
-            alert_dynamic_property = service.alert_rules.models.AlertPropertyMapping()
             for property in dynamic_properties:
+                alert_dynamic_property = service.alert_rules.models.AlertPropertyMapping()
                 alert_dynamic_property.alert_property = property.property
                 alert_dynamic_property.value = property.column
                 alert_dynamic_properties.append(alert_dynamic_property)

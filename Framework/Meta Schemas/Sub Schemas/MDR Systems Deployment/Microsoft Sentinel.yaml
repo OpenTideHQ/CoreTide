@@ -327,7 +327,7 @@ properties:
         title: Alert Dynamic Properties
         icon: 💽
         type: array
-        description: Override alert default properties, select an alert property from the Alert property drop-down list.
+        description: Override alert default properties, select an alert property from the Alert property drop-down list. Tactics and Severity are routed to their dedicated Sentinel alert override fields.
         tide.mdr.parameter: alertDetailsOverride.alertDynamicProperties
         items:
           type: object

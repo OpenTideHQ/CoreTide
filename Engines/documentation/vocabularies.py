@@ -143,7 +143,20 @@ def run():
         if voc in SKIP_VOCABS:
             log("SKIP", f"Skipping vocab as is in skip list",voc)
         else:
-            if  VOCAB_INDEX[voc]["metadata"].get("model", False):
+            vocabulary = VOCAB_INDEX[voc]
+            if (
+                not isinstance(vocabulary, dict)
+                or not isinstance(vocabulary.get("metadata"), dict)
+                or not isinstance(vocabulary.get("entries"), dict)
+            ):
+                log(
+                    "WARNING",
+                    "Skipping malformed vocabulary documentation source",
+                    voc,
+                    "Vocabulary sources must expose both metadata and entries",
+                )
+                continue
+            if  vocabulary["metadata"].get("model", False):
                 log("SKIP",
                     "Not creating vocabulary documentation, was detected as an OpenTIDE model index",
                     voc)
@@ -151,10 +164,10 @@ def run():
             else:
                 icon = get_icon(voc) or ICONS["vocab"] or ""
                 print(f"{icon} Generating Vocabulary Documentation for field : {voc}...")
-                if not VOCAB_INDEX[voc]["entries"]:
+                if not vocabulary["entries"]:
                     log("SKIP", "The vocabulary is empty, will not document", voc)
                 else:
-                    documentation, name = make_vocab_doc(voc, VOCAB_INDEX[voc])
+                    documentation, name = make_vocab_doc(voc, vocabulary)
 
                     output_name = icon + " " + name + ".md"
                     output_path = VOCAB_DOCS_PATH / output_name

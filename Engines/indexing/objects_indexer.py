@@ -11,6 +11,20 @@ from Engines.modules.tide import DataTide
 TIDE_INDEXES_PATH = Path(DataTide.Configurations.Global.Paths.Tide.tide_indexes)
 ICONS = DataTide.Configurations.Documentation.icons
 
+
+def _empty_model_vocabulary(object_type):
+    index_name = DataTide.Configurations.Documentation.object_names[object_type]
+    return {
+        "metadata": {
+            "field": object_type,
+            "icon": ICONS.get(object_type, ""),
+            "name": index_name,
+            "description": index_name,
+            "model": True,
+        },
+        "entries": {},
+    }
+
 def run():
 
     log("TITLE", "Generate Vocabularies from Objects Data")
@@ -113,11 +127,9 @@ def run():
 
     # Set defaults to accomodate soft transition to DOM.
     if not object_index.get("dom"):
-        object_index["dom"] = {}
-        object_index["dom"]["entries"] = {}
+        object_index["dom"] = _empty_model_vocabulary("dom")
     if not object_index.get("cdm"):
-        object_index["cdm"] = {}
-        object_index["cdm"]["entries"] = {}
+        object_index["cdm"] = _empty_model_vocabulary("cdm")
 
     # This allows us to merge existing CDM indexes with the new DOM during transition
 

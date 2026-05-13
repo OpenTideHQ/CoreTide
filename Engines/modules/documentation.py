@@ -130,8 +130,9 @@ def make_json_table(dataframe: pd.DataFrame) -> str:
         "sortable": "true"
     }
 
-    # Dumps as an escaped string
-    json_data = json.dumps(json_data)
+    # Dumps as a compact string — no whitespace separators, UTF-8 literals
+    # kept as-is to avoid multi-byte \uXXXX escape sequences inflating size
+    json_data = json.dumps(json_data, separators=(',', ':'), ensure_ascii=False)
 
     # Markdown block for rendering
     json_table = f"""
@@ -239,12 +240,14 @@ def backlink_resolver(model_uuid:str,
                         raw_link:bool=False,
                         raw_hover:bool=False,
                         hover_length:int=150,
+                        hover:bool=True,
                         current_page:Optional[str]=None):
     """
     Formats a markdown link to the model, using localized paths.
 
     raw_link: returns the raw link, without markdown link formatting
     raw_hover: in combination with raw_link, returns a tuple with the cursor hovering content
+    hover: when False, omits the title tooltip from the markdown link to reduce output size
     """
     model_type = get_type(model_uuid)
     file_link = backlink_name = icon = str()
@@ -258,7 +261,7 @@ def backlink_resolver(model_uuid:str,
         doc_path = "../" + DOCUMENTATION_CONFIG.object_names["dom"] + "/"
     else:
         doc_path = "../" + DOCUMENTATION_CONFIG.object_names[model_type] + "/"
-        hover = ""
+        hover_content = ""
 
     def mdr_statuses(mdr_id):
         mdr_configs = MODELS_INDEX["mdr"][mdr_id]["configurations"]
@@ -271,12 +274,12 @@ def backlink_resolver(model_uuid:str,
         return [f"[{s}] : {status}" for s, status in system_statuses.items()]
 
     if model_type == "tvm":
-        hover = model_value(model_uuid, "description")
+        hover_content = model_value(model_uuid, "description")
     if model_type == "cdm":
-        hover = model_value(model_uuid, "guidelines")
+        hover_content = model_value(model_uuid, "guidelines")
     if model_type == "dom":
         objective_data = DataTide.Models.DOM[model_uuid]
-        hover = objective_data.objective.description
+        hover_content = objective_data.objective.description
 
     if model_type == "signal":
         signal_data = DataTide.Models.Signal[model_uuid]
@@ -285,24 +288,24 @@ def backlink_resolver(model_uuid:str,
             # If we're on the current DOM page, we should just do an anchor and no need to add
             # the full context
             backlink_name = signal_data.name
-            hover = signal_data.description
-            file_link = f"#{signal_data.name.replace(" ", "-").lower()}"
+            hover_content = signal_data.description
+            file_link = f"#{signal_data.name.replace(' ', '-').lower()}"
 
         else:
             backlink_name = objective_data.name + "::" + signal_data.name
-            hover = signal_data.description
+            hover_content = signal_data.description
             # We point to the parent objective wiki page with an anchor to the signal name
-            file_link = objective_data.name + f"#{signal_data.name.replace(" ", "-").lower()}"
+            file_link = objective_data.name + f"#{signal_data.name.replace(' ', '-').lower()}"
     elif model_type == "mdr":
         model_name = model_data["name"]
 
         backlink_name = model_name.replace("_", " ")
-        hover = "&#013;&#010;".join(
+        hover_content = "&#013;&#010;".join(
             mdr_statuses(model_uuid)
-        ) 
+        )
         mdr_description = model_value(model_uuid, "description") or ""
         mdr_description = mdr_description
-        hover += f"&#013;&#010;&#013;&#010;{mdr_description}"
+        hover_content += f"&#013;&#010;&#013;&#010;{mdr_description}"
         file_link = f"{doc_path}{icon} {model_name}"
     else:
         model_name = model_data["name"].strip()
@@ -324,14 +327,17 @@ def backlink_resolver(model_uuid:str,
             file_link += ".md"
 
 
-    hover = sanitize_hover(str(hover))
-    if len(hover) > hover_length:
-        hover = hover[:hover_length] + "..."  
-    backlink = f"[{backlink_name}]({file_link} '{hover}')"
+    hover_text = sanitize_hover(str(hover_content))
+    if len(hover_text) > hover_length:
+        hover_text = hover_text[:hover_length] + "..."
+    if hover:
+        backlink = f"[{backlink_name}]({file_link} '{hover_text}')"
+    else:
+        backlink = f"[{backlink_name}]({file_link})"
     
     if raw_link:
         if raw_hover:
-            return file_link, hover
+            return file_link, hover_content
         return file_link
     
     return backlink

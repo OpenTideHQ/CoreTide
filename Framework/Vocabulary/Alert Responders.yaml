@@ -2,16 +2,39 @@ name: Alert Handling Team
 field: responders
 description: Team responsible to handle incoming security alerts 
 icon: ‍🚒
-keys:
-  - id: AHT0001
-    name: CATCH
-    description: Cybersecurity Analytics, Trending, Correlations & Hunting
-  - id: AHT0002
-    name: CSIRC
-    description: Computer Security Incident Response Centre
-  - id: AHT0003
-    name: MARTI
-    description: Malware Analysis, Research and Threat Intelligence
-  - id: AHT0004
-    name: S1-SA
-    description: Security Assurance and Vulnerability Management
+
+# ──────────────────────────────────────────────────────────────────────────────
+# INTENTIONALLY EMPTY — OpenTide instance-defined vocabulary
+# ──────────────────────────────────────────────────────────────────────────────
+# This vocabulary carries no built-in entries. Alert responder teams are
+# organisation-specific and must be defined locally by each OpenTide instance.
+#
+# HOW TO ADD YOUR TEAMS
+# ─────────────────────
+# Add entries via the [vocabulary] section of your OpenTide instance's
+# Configurations/schema.toml using the [[vocabulary.responders]] table array.
+#
+# Each entry requires:
+#   name        — short identifier used as the field value in MDR YAML files
+#   description — human-readable description of the team
+#
+# Optional fields:
+#   id          — stable identifier (recommended for traceability)
+#
+# Example:
+#
+#   [[vocabulary.responders]]
+#   id          = "AHT0001"
+#   name        = "SOC-T1"
+#   description = "First-line Security Operations Centre triage team"
+#
+#   [[vocabulary.responders]]
+#   id          = "AHT0002"
+#   name        = "CSIRT"
+#   description = "Computer Security Incident Response Team"
+#
+# Entries defined here will appear in VS Code autocomplete and JSON Schema
+# validation alongside any other vocabulary extensions.
+# ──────────────────────────────────────────────────────────────────────────────
+
+keys: []

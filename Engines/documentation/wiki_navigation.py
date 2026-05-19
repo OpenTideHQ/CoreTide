@@ -144,14 +144,14 @@ def build_search(model_type, mdr_status:Optional[Literal["ACTIVE", "DEPRECATED"]
 
 
             if value == "name":
-                object_backlink = str(backlink_resolver(str(model_value_doc(entry, "uuid"))))
+                object_backlink = str(backlink_resolver(str(model_value_doc(entry, "uuid")), hover=False))
                 object_backlink = object_backlink.replace("../", "./")
                 row[value] = object_backlink
 
             elif value == "att&ck":
                 techniques = techniques_resolver(entry)
                 if techniques:
-                    techniques = rich_attack_links(techniques)
+                    techniques = rich_attack_links(techniques, hover=False)
                     if model_type == "mdr":
                         value = mdr_attack_technique
                     row[value] = techniques
@@ -177,8 +177,10 @@ def build_search(model_type, mdr_status:Optional[Literal["ACTIVE", "DEPRECATED"]
                 actors = model_value_doc(entry, "actors") or []
                 for actor in actors:
                     if type(actor) is dict:
-                        actor_name = get_vocab_entry("actors", actor.get("name", "").split("::")[1], "name")
-                        actor_aliases = get_vocab_entry("actors", actor.get("name", "").split("::")[1], "alias")
+                        raw_id = actor.get("name", "").split("::")[1]
+                        clean_id = raw_id.split(" #")[0].strip()
+                        actor_name = get_vocab_entry("actors", clean_id, "name")
+                        actor_aliases = get_vocab_entry("actors", clean_id, "alias")
                         if actor_aliases:
                             actor_aliases = list(set(actor_aliases))
                             actor_name += ", " + ", ".join(actor_aliases)
@@ -194,7 +196,7 @@ def build_search(model_type, mdr_status:Optional[Literal["ACTIVE", "DEPRECATED"]
                     vectors = [vectors] if type(vectors) is str else vectors
                     vectors_links = []
                     for vector in vectors:
-                        object_backlink = str(backlink_resolver(str(vector)))
+                        object_backlink = str(backlink_resolver(str(vector), hover=False))
                         object_backlink = object_backlink.replace("../", "./")
                         vectors_links.append(object_backlink)
                     row[value] = ", ".join(vectors_links)
@@ -207,7 +209,7 @@ def build_search(model_type, mdr_status:Optional[Literal["ACTIVE", "DEPRECATED"]
                     vectors = [vectors] if type(vectors) is str else vectors
                     vectors_links = []
                     for vector in vectors:
-                        object_backlink = str(backlink_resolver(str(vector)))
+                        object_backlink = str(backlink_resolver(str(vector), hover=False))
                         object_backlink = object_backlink.replace("../", "./")
                         vectors_links.append(object_backlink)
                     row[value] = ", ".join(vectors_links)
@@ -254,7 +256,7 @@ def build_search(model_type, mdr_status:Optional[Literal["ACTIVE", "DEPRECATED"]
                 elif value == "detection_model":
                     model_value = model_value_doc(entry, "detection_model")
                     if model_value:
-                        object_backlink = str(backlink_resolver(str(model_value)))
+                        object_backlink = str(backlink_resolver(str(model_value), hover=False))
                         object_backlink = object_backlink.replace("../", "./")
                         row[value] = object_backlink
                     else:

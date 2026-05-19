@@ -240,7 +240,9 @@ def chaining_graph(tvm):
                     if type(data[0]) is dict:
                         clean_data = []
                         for actor in data:
-                            actor_name = get_vocab_entry("actors", actor.get("name").split("::")[1], "name")
+                            raw_id = actor.get("name").split("::")[1]
+                            clean_id = raw_id.split(" #")[0].strip()
+                            actor_name = get_vocab_entry("actors", clean_id, "name")
                             actor_name = actor_name.replace("[Enterprise]", "")
                             actor_name = actor_name.replace("[Mobile]", "")
                             actor_name = actor_name.replace("[ICS]", "")

@@ -69,7 +69,16 @@ def actors_doc(actors:list[dict])->str:
     for actor in actors:
         details = {}
         actor_name:str = actor.get("name", "")
-        actor_data:dict = get_vocab_entry("actors", actor_name.split("::")[1]) #type: ignore
+        # Strip inline comment annotations (e.g. "G0007 #[Mobile] APT28, ...")
+        # to obtain the bare vocabulary identifier (e.g. "G0007")
+        raw_identifier = actor_name.split("::")[1]
+        clean_identifier = raw_identifier.split(" #")[0].strip()
+        actor_data = get_vocab_entry("actors", clean_identifier)
+        if not isinstance(actor_data, dict):
+            log("WARNING",
+                f"Could not retrieve actor data for identifier [{clean_identifier}] — skipping actor",
+                actor_name)
+            continue
         details["Actor"] = actor_data.get("name")
         details["Description"] = str(actor_data.get("description")).replace("\n", "")
         details["Aliases"] = ", ".join(actor_data.get("alias", [])) #type: ignore

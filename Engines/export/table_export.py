@@ -64,8 +64,10 @@ class TableExporter:
     def _flatten_actors(self, actors:list[dict])->list:
        
         def _enrich_actor_name(actor:str)->str:
-            actor_data:dict = get_vocab_entry("actors", actor.split("::")[1]) #type: ignore
-            return str(actor_data.get("name"))
+            raw_id = actor.split("::")[1]
+            clean_id = raw_id.split(" #")[0].strip()
+            actor_data:dict = get_vocab_entry("actors", clean_id) #type: ignore
+            return str(actor_data.get("name")) if isinstance(actor_data, dict) else clean_id
         
         return [_enrich_actor_name(str(actor.get("name"))) for actor in actors]
 

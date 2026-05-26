@@ -1,5 +1,0 @@
-[validation]
-enforce_metadata = true
-naming_convention = "(TIDE)\\_LD\\_\\d{3}\\_[^ ]+"
-true_values = [ "True", "TRUE", "true", "1" ]
-false_values = [ "False", "FALSE", "false", "0" ]

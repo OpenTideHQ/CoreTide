@@ -57,9 +57,6 @@ class SplunkEngineInit(ABC):
         self.SPLUNK_SUBSCHEMA = DataTide.TideSchemas.subschemas["systems"][
             self.DEPLOYER_IDENTIFIER
         ]["properties"]
-        
-        self.LOOKUPS_METADATA_INDEX = DataTide.Lookups.metadata
-        self.LOOKUPS_INDEX = DataTide.Lookups.lookups["splunk"]
 
         self.ALERT_SEVERITY_MAPPING = {
             "Informational": 2,

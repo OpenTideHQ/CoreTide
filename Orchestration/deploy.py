@@ -13,11 +13,9 @@ from Engines.modules.deployment import (enabled_systems,
                                         DeploymentStrategy,
                                         CIEnvironment)
 from Engines.modules.logs import log, ANSI, coretide_intro
-from Engines.modules.tide import DataTide, IndexTide
+from Engines.modules.tide import IndexTide
 from Engines.mutation.promotion import PromoteMDR
 
-
-MDR_METADATA_LOOKUPS_CONFIG = DataTide.Configurations.Deployment.metadata_lookup
 
 os.environ["INDEX_OUTPUT"] = "cache"
 
@@ -68,29 +66,6 @@ IndexTide.reload()
 # Refreshed post-promotion, and thus can correctly set
 # global modules variables.
 from Engines.modules.plugins import DeployTide
-
-if MDR_METADATA_LOOKUPS_CONFIG["enabled"]:
-    log("TITLE", "MDR Metadata Deployment")
-    log("INFO", "Continuously update a lookup with the MDR Data as they deploy")
-    deployment = []
-    lookup_name = MDR_METADATA_LOOKUPS_CONFIG["name"]
-    enabled_systems = MDR_METADATA_LOOKUPS_CONFIG["systems"]
-    for system in deployment_list:
-        deployment.extend(deployment_list[system])
-    deployment = list(set(deployment))  # Dedup, since MDR can have multiple systems
-    for system in enabled_systems:
-        if system in DeployTide.metadata:
-            log("ONGOING", "Deploying metadata on system", system)
-            DeployTide.metadata[system].deploy(
-                deployment=deployment, lookup_name=lookup_name
-            )
-        else:
-            log(
-                "FATAL",
-                f"Cannot find a deployement engine for the target system {system}",
-                "Ensure there is an adequate plugin present in the Tide Instance",
-            )
-            raise (Exception("METADATA DEPLOYMENT ENGINE NOT FOUND"))
 
 for system in deployment_list:
     log("TITLE", "MDR Deployment")

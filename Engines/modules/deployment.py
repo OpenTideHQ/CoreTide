@@ -500,15 +500,6 @@ def diff_calculation(plan: DeploymentStrategy) -> list:
     return scope
 
 
-def enabled_lookup_systems() -> list[str]:
-    enabled_lookup_systems = list()
-    for system in SYSTEMS_CONFIGS_INDEX:
-        if SYSTEMS_CONFIGS_INDEX[system].get("lookups", {}).get("enabled") is True:
-            enabled_lookup_systems.append(system)
-
-    return enabled_lookup_systems
-
-
 def enabled_systems() -> list[str]:
     enabled_systems = list()
     for system in SYSTEMS_CONFIGS_INDEX:

@@ -1309,16 +1309,6 @@ class DataTide:
         """DEPRECATED - Legacy MDR Version for backward compatibility use cases"""
 
     @dataclass(frozen=True)
-    class Lookups:
-        """TIDE Lookups Interface.
-
-        Exposes the lookups data within of the instance
-        """
-
-        lookups = dict(IndexTide.load()["lookups"]["lookups"])
-        metadata = dict(IndexTide.load()["lookups"]["metadata"])
-
-    @dataclass(frozen=True)
     class Configurations:
         Index = dict(IndexTide.load()["configurations"])
         DEBUG = HelperTide.is_debug()
@@ -1393,7 +1383,6 @@ class DataTide:
                     dom = Index.get("dom")
                     cdm = Index["cdm"]
                     mdr = Index["mdr"]
-                    lookups = Index["lookups"]
                     analytics = Index["analytics"]
                     snippet_file = Index["snippet_file"]
                     json_schemas = Index["json_schemas"]
@@ -1412,7 +1401,6 @@ class DataTide:
                 setup = dict(Index["setup"])
                 secrets = dict(Index["secrets"])
                 defaults = dict(Index["defaults"])
-                lookups = dict(Index.get("lookups", {}))
                 modifiers = dict(Index.get("modifiers", {}))
 
             @dataclass(frozen=True)
@@ -1511,7 +1499,6 @@ class DataTide:
             promotion = dict(Index["promotion"])
             default_responders = str(Index["default_responders"])
             proxy = dict(Index["proxy"])
-            metadata_lookup = dict(Index["metadata_lookup"])
             debug = dict(Index["debug"])
 
         @dataclass(frozen=True)
@@ -1522,13 +1509,6 @@ class DataTide:
             assets = visibility.assets if visibility else None
             detectors = visibility.detectors if visibility else None
             logsources = visibility.logsources if visibility else None
-
-        @dataclass(frozen=True)
-        class Lookups:
-            """Lookups feature management"""
-
-            Index = dict(IndexTide.load()["configurations"]["lookups"])
-            validation = dict(Index["validation"])
 
         """TIDE Configuration Interface.
 

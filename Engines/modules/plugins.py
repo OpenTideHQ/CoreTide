@@ -25,17 +25,6 @@ class DeployMDR(DeployEngine):
         """Deploy MDR Objects onto target systems"""
 
 
-class DeployMetadata(DeployEngine):
-    @abstractmethod
-    def deploy(self, deployment: list[str], lookup_name: str):
-        """Deploy MDR Metadata onto target systems"""
-
-
-class DeployLookups(DeployEngine):
-    @abstractmethod
-    def deploy(self, deployment: list[str]):
-        """Deploy Lookups onto target systems"""
-
 class ValidateQuery(ValidationEngine):
     @abstractmethod
     def validate(self, deployment: list[str]):
@@ -116,12 +105,6 @@ class PluginEnginesLoader:
     def mdr_deployers(self) -> dict[str, DeployMDR]:
         return self._generic_loader(identifier="", tier=DeployEngine())
 
-    def lookups_deployers(self) -> dict[str, DeployLookups]:
-        return self._generic_loader(identifier="_lookups", tier=DeployEngine())
-
-    def metadata_deployers(self) -> dict[str, DeployMetadata]:
-        return self._generic_loader(identifier="_metadata", tier=DeployEngine())
-
     def query_validators(self) -> dict[str, ValidateQuery]:
         return self._generic_loader(identifier="_query", tier=ValidationEngine())
 
@@ -129,6 +112,4 @@ class DeployTide:
     """Unified interface to interact with deployment engines plugins"""
 
     mdr = PluginEnginesLoader().mdr_deployers()
-    lookups = PluginEnginesLoader().lookups_deployers()
-    metadata = PluginEnginesLoader().metadata_deployers()
     query_validation = PluginEnginesLoader().query_validators()

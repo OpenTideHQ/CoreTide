@@ -19,9 +19,6 @@ frequency_scheduling = "random" # random | current . Frequencies get generated i
 actions_enabled = ["notable"] # Actions authorized to be allocated by the deployment engine 
 default_actions = ["notable"] # When no actions parameters were identified as part of the deployment, this adds default actions
 
-[lookups]
-enabled = true
-
 [secrets]
 token = "$SPLUNK_TOKEN"
 

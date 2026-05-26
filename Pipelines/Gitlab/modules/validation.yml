@@ -42,11 +42,3 @@
     - changes: 
         - Models Library/Managed Detection Rules/*.yaml
 
-📄 Lookups Validation:
-  stage: ✅ Validation
-  script:
-    - cd $TIDE_CORE_REPO/Engines/validation/
-    - python lookups.py
-  rules:
-    - changes: 
-        - Lookups/*/*

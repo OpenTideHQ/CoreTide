@@ -15,7 +15,7 @@ ROOT = Path(str(git.Repo(".", search_parent_directories=True).working_dir))
 
 TIDE_CONFIG = toml.load(open(ROOT / "Configurations/global.toml", encoding="utf-8"))
 METASCHEMAS = TIDE_CONFIG["metaschemas"]
-SKIPS = ["logsources", "ram", "mdrv2", "lookup_metadata"]
+SKIPS = ["logsources", "ram", "mdrv2"]
 
 PATHS = resolve_paths()
 

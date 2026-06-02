@@ -92,7 +92,7 @@ CoreTide/
 │   │   │   └── configurations.py  # Configurations.Visibility (assets, logsources, detectors)
 │   │   └── systems/        # Per-system helper modules (kql.py, sentinel.py, etc.)
 │   ├── deployment/         # System deployer plugins (one .py per platform)
-│   ├── validation/         # Validators (schema, UUID, query per platform, CVE, lookups)
+│   ├── validation/         # Validators (schema, UUID, query per platform, CVE)
 │   ├── indexing/           # Index generation (objects_indexer, staging, revisions)
 │   ├── framework/          # Framework generators (JSON schemas, templates, VS Code snippets)
 │   ├── documentation/      # Markdown wiki generation (per-object docs, navigation)
@@ -107,7 +107,6 @@ CoreTide/
 │   ├── generate.py         # Index → Templates → Schemas → Revisions → Snippets → Exports
 │   ├── validate.py         # ID uniqueness → UUID format → Schema validation
 │   ├── deploy.py           # Status promotion → Plugin deployment → Metadata sync
-│   ├── deploy_lookups.py   # Lookup-specific deployment
 │   ├── document.py         # Wiki generation orchestration
 │   ├── validate_query.py   # Per-platform query validation
 │   └── mutate.py           # Object mutation operations
@@ -119,7 +118,6 @@ CoreTide/
 │   ├── visibility.toml     # Asset, log source, detector definitions
 │   ├── sharing.toml        # Sharing/export settings
 │   ├── resources.toml      # External framework paths (ATT&CK, D3FEND, NIST)
-│   ├── lookups.toml        # Lookup management configuration
 │   └── systems/            # Per-platform TOML configs (tenants, credentials, feature flags)
 ├── External/               # External framework references (ATT&CK, D3FEND, NIST, ENGAGE, OSM)
 ├── Pipelines/              # CI/CD reusable workflow templates

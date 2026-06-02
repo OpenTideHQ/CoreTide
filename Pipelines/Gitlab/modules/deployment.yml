@@ -57,20 +57,3 @@
   allow_failure:
     exit_codes: 19
 
-📄 Lookups Deployment:
-  stage: 🚀 Deployment
-  environment: Lookups Production
-  script:
-    - export DEPLOYMENT_PLAN=PRODUCTION
-    - git rebase origin/$CI_DEFAULT_BRANCH #Allows to pull latest mutation if there are
-    - cd $TIDE_CORE_REPO/Orchestration/
-    - python deploy_lookups.py
-  rules:
-    - if: $TIDE_DEPLOYMENT == "DISABLED"
-      when: never
-    - if: ($CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH) && ($TIDE_DEPLOYMENT == "ENABLED")
-      changes: 
-        - Lookups/*/*.csv
-  resource_group: deployment
-  needs:
-    - 📄 Lookups Validation

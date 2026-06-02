@@ -17,7 +17,7 @@ from Engines.modules.logs import log
 from Engines.modules.patching import Tide2Patching
 
 def indexer(write_index=False) -> dict:
-    SKIPS = ["ram", "mdrv2", "lookup_metadata"]
+    SKIPS = ["ram", "mdrv2"]
     RESOLVED_CONFIGURATIONS = resolve_configurations()
 
     TIDE_CONFIG = RESOLVED_CONFIGURATIONS["global"]
@@ -42,7 +42,6 @@ def indexer(write_index=False) -> dict:
     RECOMPOSITION = TIDE_CONFIG["recomposition"]
     TEMPLATES_PATH = PATHS["templates"]
     TEMPLATES = TIDE_CONFIG["templates"]
-    LOOKUPS_PATH = PATHS["lookups"]
     TIDE_INDEXES_PATH = PATHS["tide_indexes"]
     
     @dataclass
@@ -338,36 +337,6 @@ def indexer(write_index=False) -> dict:
         indexes_index["revisions"] = revisions_index
 
     index["indexes"] = indexes_index
-    # Lookups indexer
-
-    print("🔎 Indexing Lookups...")
-
-    lookup_index = dict()
-    lookup_index["lookups"] = dict()
-    lookup_index["metadata"] = dict()
-
-    for system in os.listdir(LOOKUPS_PATH):
-        lookup_index["lookups"][system.lower()] = dict()
-        for lookup in os.listdir(LOOKUPS_PATH / system):
-            if lookup.endswith(".csv"):
-                lookup_name = lookup.replace(".csv", "")
-                lookup_content = open(
-                    LOOKUPS_PATH / system / lookup, mode="r", encoding="utf-8"
-                ).read()
-                lookup_index["lookups"][system.lower().replace(" ", "_")][
-                    lookup_name
-                ] = lookup_content
-                obj_counter += 1
-
-            elif lookup.endswith(".metadata.yaml"):
-                metadata_name = lookup.replace(".metadata.yaml", "")
-                metadata_content = yaml.safe_load(
-                    open(LOOKUPS_PATH / system / lookup, encoding="utf-8")
-                )
-                lookup_index["metadata"][metadata_name] = metadata_content
-                obj_counter += 1
-
-    index["lookups"] = lookup_index
 
     # Security Stack Mapping Indexer
 

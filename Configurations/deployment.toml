@@ -54,16 +54,8 @@ proxy_password = "$PROXY_PASSWORD"
 proxy_host = "$PROXY_HOST"
 proxy_port = "$PROXY_PORT"
 
-# If enabled, updates a lookup continuously with MDR Data. Often useful to
-# have access to MDR Data directly on external systems, e.g. for alert enriching
-[metadata_lookup]
-enabled = false
-#name = ""
-#systems = ["splunk"]
-
 [debug]
 mdr_test_uuids = [""] #UUID of MDRs that can be used for Debugging purposes
-lookup_test_files = [""] #File name of MDRs that can be used for Debugging purposes
-metadata_lookup_test_file = [""]
+
 proxy_enabled = false #Global flag to enable or disable proxy configuration when running in debug mode
 ssl_enabled = true #Global flag to enable or disable proxy configuration when running in debug mode

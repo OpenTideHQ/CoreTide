@@ -26,6 +26,8 @@ from Engines.modules.framework import (
     get_vocab_entry,
     vocab_metadata,
     relations_list,
+    childs,
+    keep_active_mdr,
 )
 from Engines.modules.documentation import (
     get_icon,
@@ -34,6 +36,7 @@ from Engines.modules.documentation import (
     backlink_resolver,
     make_vocab_link,
     GitlabMarkdown,
+    object_name,
 )
 from Engines.modules.models import StatusStrategy
 from Engines.modules.logs import log
@@ -42,6 +45,69 @@ from Engines.modules.logs import log
 GET_CVE_DETAILS = CONFIG.Documentation.cve["retrieve_details"]
 CVE_DB_LINK = CONFIG.Documentation.cve["default_db_link"]
 FOOTER_CAPTION = "Generated from CoreTIDE Indexed Data @ "
+DOM_DIRECT_MDR_LABEL = "🔗 Maps against the Detection Objective"
+
+
+def _dom_downstream_rules_table(dom_id: str) -> str:
+    """
+    Build a signal-centric rules coverage table for a Detection Objective.
+    One row per signal with all implementing MDRs grouped in a single cell.
+    Direct-DOM MDRs (no signal link) appear in one fallback row.
+    """
+    signal_ids = sorted(
+        [child for child in childs(dom_id) if get_type(child) == "signal"],
+        key=object_name,
+    )
+    direct_mdr_ids = sorted(
+        [child for child in childs(dom_id) if get_type(child) == "mdr"],
+        key=object_name,
+    )
+
+    rows = []
+    for signal_id in signal_ids:
+        mdr_ids = sorted(keep_active_mdr(childs(signal_id)), key=object_name)
+        rows.append(
+            {
+                "signal": backlink_resolver(signal_id, current_page="dom"),
+                "mdr": (
+                    "<br>".join(
+                        backlink_resolver(mdr_id, current_page="dom")
+                        for mdr_id in mdr_ids
+                    )
+                    if mdr_ids
+                    else None
+                ),
+            }
+        )
+
+    active_direct_mdrs = keep_active_mdr(direct_mdr_ids)
+    if active_direct_mdrs:
+        rows.append(
+            {
+                "signal": DOM_DIRECT_MDR_LABEL,
+                "mdr": "<br>".join(
+                    backlink_resolver(mdr_id, current_page="dom")
+                    for mdr_id in active_direct_mdrs
+                ),
+            }
+        )
+
+    if not rows:
+        return ""
+
+    table = pd.DataFrame(rows, columns=["signal", "mdr"])
+    metrics = relations_list(dom_id, mode="count", direction="downstream")
+
+    no_rules_filler = f"❌ No {CONFIG.Documentation.object_names['mdr']}"
+    table["mdr"] = table["mdr"].fillna(no_rules_filler)
+
+    def column_rename(col):
+        count = f"({metrics.get(col)})" if metrics.get(col, 0) > 1 else ""
+        col_title = CONFIG.Documentation.object_names[col.lower()]
+        return f"{get_icon(col)} {col_title} {count}"
+
+    table = table.rename(columns={col: column_rename(col) for col in table.columns})
+    return table.to_markdown(index=False)
 
 
 def status_enriched(status_name:str)->str:
@@ -194,9 +260,12 @@ def relations_table(
     id: str, direction: Literal["upstream", "downstream"] = "downstream", raw_data=False
 ):
 
-    tree = None
     model_type = get_type(id)
 
+    if model_type == "dom" and direction == "downstream":
+        return _dom_downstream_rules_table(id)
+
+    tree = None
     current_page = "dom" if model_type == "dom" else None
 
     if direction == "downstream":

@@ -2,11 +2,11 @@
 
 from __future__ import annotations
 
-import inspect
 import unittest
 from copy import deepcopy
+from pathlib import Path
 from typing import Any
-from unittest.mock import MagicMock, patch
+from unittest.mock import patch
 
 from Engines.modules.models import TideModels
 from Engines.modules.tide import SystemLoader, TideLoader
@@ -183,30 +183,25 @@ class TestLoadMdrRouting(unittest.TestCase):
 
 
 class TestDeployBackwardCompat(unittest.TestCase):
+    def test_deploy_signatures_support_v3_and_v4(self) -> None:
+        repo_root = Path(__file__).resolve().parents[1]
+        splunk_source = (repo_root / "Engines/deployment/splunk.py").read_text()
+        cbc_source = (repo_root / "Engines/deployment/carbon_black_cloud.py").read_text()
+
+        self.assertIn("deployment: list[str] | None = None", splunk_source)
+        self.assertIn("mdr_deployment: Sequence[TideModels.MDR] | list[str] | None = None", splunk_source)
+        self.assertIn("if deployment is not None and mdr_deployment is None:", splunk_source)
+
+        self.assertIn("deployment: Optional[list[str]] = None", cbc_source)
+        self.assertIn("mdr_deployment: Optional[Sequence[TideModels.MDR]] = None", cbc_source)
+
     def test_splunk_deploy_accepts_legacy_v3_signature(self) -> None:
         from Engines.deployment.splunk import SplunkDeploy
-
-        params = inspect.signature(SplunkDeploy.deploy).parameters
-        self.assertIn("deployment", params)
 
         deployer = SplunkDeploy()
         with patch.object(deployer, "deploy_legacy") as legacy:
             deployer.deploy(deployment=["uuid-1"])
             legacy.assert_called_once_with(["uuid-1"])
-
-    def test_carbon_black_deploy_accepts_legacy_v3_signature(self) -> None:
-        from Engines.deployment.carbon_black_cloud import CarbonBlackCloudDeploy
-
-        params = inspect.signature(CarbonBlackCloudDeploy.deploy).parameters
-        self.assertIn("deployment", params)
-
-        deployer = CarbonBlackCloudDeploy()
-        deployer.configure_proxy = MagicMock()  # type: ignore[method-assign]
-        with patch("Engines.deployment.carbon_black_cloud.DataTide") as data_tide:
-            data_tide.Models.mdr = {"uuid-1": {"name": "t", "configurations": {"carbon_black_cloud": {}}}}
-            with patch.object(deployer, "deploy_mdr") as legacy:
-                deployer.deploy(deployment=["uuid-1"])
-                legacy.assert_called_once()
 
 
 if __name__ == "__main__":

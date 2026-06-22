@@ -660,8 +660,8 @@ class TideDeployment:
 
     def system_configuration_resolver(self, system: DetectionSystems):  # type:ignore
         match system:
-            # case DetectionSystems.SPLUNK:
-            #    return DataTide.Configurations.Systems.Splunk
+            case DetectionSystems.SPLUNK:
+                return DataTide.Configurations.Systems.Splunk
             # case DetectionSystems.CARBON_BLACK_CLOUD:
             #    return DataTide.Configurations.Systems.CarbonBlackCloud
             case DetectionSystems.SENTINEL:
@@ -691,6 +691,8 @@ class TideDeployment:
                 mdr_config = data.configurations.crowdstrike
             case DetectionSystems.HARFANGLAB:
                 mdr_config = data.configurations.harfanglab
+            case DetectionSystems.SPLUNK:
+                mdr_config = data.configurations.splunk
             case _:
                 log(
                     "FATAL",

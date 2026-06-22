@@ -1198,6 +1198,7 @@ class TideLoader:
                                                             organisation=organisation)
         
         response_config = mdr.pop("response", {})
+        procedure = None
         if response_config:
             procedure = response_config.pop("procedure", None)
             if procedure:
@@ -1209,8 +1210,8 @@ class TideLoader:
                         searches.append(TideModels.MDR.Response.Procedure.Search(**search))
                 procedure = TideModels.MDR.Response.Procedure(**procedure,
                                                               searches=searches)
-            response = TideModels.MDR.Response(**response_config,
-                                               procedure=procedure)
+        response = TideModels.MDR.Response(**(response_config or {}),
+                                           procedure=procedure)
 
         references = TideDefinitionsModels.TideObjectReferences(**mdr.pop("references", {}))
 

@@ -757,6 +757,7 @@ class SystemLoader:
         advanced = mdr_config.pop("advanced", None)
 
         # ── Normalise flat v2.x scheduling into nested structure ──────
+        scheduling = None
         scheduling_data = mdr_config.pop("scheduling", None)
         if scheduling_data:
             # Detect flat layout: schedule sub-keys live directly in scheduling
@@ -822,7 +823,6 @@ class SystemLoader:
 
         # Parse trigger
         trigger = None
-        trigger_data = mdr_config.pop("trigger", None)
         if trigger_data:
             throttling = None
             throttling_data = trigger_data.pop("throttling", None)
@@ -836,7 +836,6 @@ class SystemLoader:
 
         # Parse actions
         actions = None
-        actions_data = mdr_config.pop("actions", None)
         if actions_data:
             notable = None
             notable_data = actions_data.pop("notable", None)

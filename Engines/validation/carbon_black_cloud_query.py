@@ -14,12 +14,27 @@ from Engines.modules.carbon_black_cloud import CarbonBlackCloudEngineInit
 
 class CarbonBlackCloudValidateQuery(CarbonBlackCloudEngineInit, ValidateQuery):
 
-    def check_query(self, mdr:dict, service:CBCloudAPI):
-        query:str = mdr["configurations"]["carbon_black_cloud"].get("query")
-        mdr_uuid = mdr.get('uuid') or mdr["metadata"]["uuid"]
+    def check_query(self, mdr, service:CBCloudAPI):
+        # MDRv4 typed access
+        if hasattr(mdr, "configurations") and hasattr(mdr, "metadata"):
+            config = mdr.configurations.carbon_black_cloud
+            if config and hasattr(config, "query"):
+                query = config.query
+                mdr_uuid = mdr.metadata.uuid
+                mdr_name = mdr.name
+            else:
+                os.environ["VALIDATION_ERROR_RAISED"] = "True"
+                log("FATAL", "Missing CBC configuration in MDR", mdr.name)
+                return
+        else:
+            # TODO: DEPRECATED [carbon-black-cloud-mdrv4] — Legacy dict access
+            query = mdr["configurations"]["carbon_black_cloud"].get("query")
+            mdr_uuid = mdr.get('uuid') or mdr["metadata"]["uuid"]
+            mdr_name = mdr.get("name", "unknown")
+
         if not query:
             os.environ["VALIDATION_ERROR_RAISED"] = "True"
-            log("FATAL", "Missing query in MDR", f"{mdr.get('name')} ({mdr_uuid})")
+            log("FATAL", "Missing query in MDR", f"{mdr_name} ({mdr_uuid})")
             return
 
         try:
@@ -28,8 +43,7 @@ class CarbonBlackCloudValidateQuery(CarbonBlackCloudEngineInit, ValidateQuery):
                 log("SUCCESS", "The query is a valid CBC search")
             else:
                 log("FATAL",
-                    f"The CBC query is invalid for : {mdr['name']} ({mdr_uuid})",
-                    # Same error message as displayed on the GUI
+                    f"The CBC query is invalid for : {mdr_name} ({mdr_uuid})",
                     "Ensure a value is included and slashes, colons, and spaces are manually escaped")
         except Exception as error:
             log("FATAL", "Failed to validate the query on the CBC tenant")
@@ -56,24 +70,27 @@ class CarbonBlackCloudValidateQuery(CarbonBlackCloudEngineInit, ValidateQuery):
             self.VALIDATION_ORGANIZATION,
         )
 
-        # Start deployment routine
         for mdr in deployment:
-            mdr_data:dict = DataTide.Models.mdr[mdr]
-            mdr_uuid = mdr_data.get('uuid') or mdr_data["metadata"]["uuid"]
+            mdr_data = DataTide.Models.mdr[mdr]
 
-            # Check if modified MDR contains a platform entry (by safety, but should not happen since
-            # the orchestrator will filter for the platform)
-            if self.DEPLOYER_IDENTIFIER in mdr_data["configurations"].keys():
-                # Connection routine, if not connected yet.
-                log("ONGOING",
-                    "Validating CBC Lucene Query",
-                    f"{mdr_data['name']} ({mdr_uuid}")
-                self.check_query(mdr_data, service)
+            # Handle both typed MDR objects and legacy dicts
+            if hasattr(mdr_data, "configurations"):
+                # MDRv4 typed object
+                if mdr_data.configurations.carbon_black_cloud:
+                    log("ONGOING", "Validating CBC Lucene Query",
+                        f"{mdr_data.name} ({mdr_data.metadata.uuid})")
+                    self.check_query(mdr_data, service)
+                else:
+                    log("SKIP", f"🛑 Skipping {mdr_data.name} as does not contain a CBC configuration section")
             else:
-                log(
-                    "SKIP",
-                    f"🛑 Skipping {mdr_data.get('name')} as does not contain a Splunk configuration section",
-                )
+                # TODO: DEPRECATED [carbon-black-cloud-mdrv4] — Legacy dict access
+                mdr_uuid = mdr_data.get('uuid') or mdr_data["metadata"]["uuid"]
+                if self.DEPLOYER_IDENTIFIER in mdr_data["configurations"].keys():
+                    log("ONGOING", "Validating CBC Lucene Query",
+                        f"{mdr_data['name']} ({mdr_uuid})")
+                    self.check_query(mdr_data, service)
+                else:
+                    log("SKIP", f"🛑 Skipping {mdr_data.get('name')} as does not contain a CBC configuration section")
 
 
 def declare():

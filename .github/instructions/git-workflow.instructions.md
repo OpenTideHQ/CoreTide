@@ -1,6 +1,5 @@
 ---
 description: "Use when creating commits, branches, pull requests, issues, or any Git/GitHub workflow operations. Covers conventional commits, branching strategy, PR standards, and issue management."
-applyTo: ""
 ---
 
 # Git Workflow & Conventional Commits

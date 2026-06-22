@@ -347,7 +347,7 @@ def log(
         print(log_message, flush=True)
 
 
-def coretide_intro():
+def print_banner():
     BLUE = ANSI.Colors.DARK_BLUE
     YELLOW = ANSI.Colors.ORANGE
     STOP = ANSI.Formatting.STOP
@@ -371,3 +371,6 @@ def coretide_intro():
 """
 
     return intro
+
+
+coretide_intro = print_banner

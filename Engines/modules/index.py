@@ -29,10 +29,9 @@ from Engines.modules.logs import log
 from Engines.modules.patching import Tide2Patching
 
 ROOT = Path(str(git.Repo(".", search_parent_directories=True).working_dir))
-class IndexTide:
+class IndexManager:
     """
-    Helper class for callable Index related functions. Designed to power
-    `DataTide` initialization routine.
+    Index lifecycle manager for OpenTide initialization.
     """
     @staticmethod
     def reload():
@@ -49,10 +48,10 @@ class IndexTide:
         actions; callers should ensure that it is safe to reload the module in
         their runtime environment.
         """
-        log("WARNING", "DataTide re-indexation")
-        log("INFO", "The repository will be reindexed to update DataTide")
+        log("WARNING", "OpenTide re-indexation")
+        log("INFO", "The repository will be reindexed to update OpenTide")
         del sys.modules["Engines.modules.tide"]
-        from Engines.modules.tide import DataTide
+        from Engines.modules.tide import OpenTide
 
     @cache #Memoization as load() is called multiple times as DataTide initializes
     @staticmethod
@@ -84,7 +83,7 @@ class IndexTide:
                 raise Exception("INDEX COULD NOT BE LOADED IN MEMORY")
         
         # Reconcile with staging index if present
-        _tide_index = IndexTide.reconcile_staging(_tide_index)
+        _tide_index = IndexManager.reconcile_staging(_tide_index)
         return _tide_index
 
     @staticmethod
@@ -208,10 +207,12 @@ class IndexTide:
         """
 
         if tier == "all":
-            return IndexTide.load()["paths"]
+            return IndexManager.load()["paths"]
         if tier == "core":
-            return IndexTide.load()["paths"]["core"]
+            return IndexManager.load()["paths"]["core"]
         if tier == "tide":
-            return IndexTide.load()["paths"]["tide"]
+            return IndexManager.load()["paths"]["tide"]
 
-                
+
+# Legacy alias
+IndexTide = IndexManager

@@ -36,8 +36,8 @@ from Engines.modules.datamodels.configurations import Configurations
 
 ROOT = Path(str(git.Repo(".", search_parent_directories=True).working_dir))
 from Engines.modules.environment import HelperTide
-from Engines.modules.loaders.system_loader import SystemLoader
-class TideLoader:
+from Engines.modules.loaders.system_loader import PlatformConfigLoader
+class ObjectLoader:
 
     @staticmethod
     def load_signal(signal: dict) -> Objects.DetectionObjective.Objective.Signal:
@@ -161,7 +161,7 @@ class TideLoader:
         files and transforms nested fields into the project's typed model
         classes. It handles metadata, optional organisation metadata,
         response/procedure/searches conversion, references and per-system
-        configurations by delegating to the SystemLoader helpers.
+        configurations by delegating to the PlatformConfigLoader helpers.
 
         Args:
             mdr: A dictionary representing an MDR entry from the index. The
@@ -203,15 +203,15 @@ class TideLoader:
         configurations = TideModels.MDR.Configurations()
         system_configurations:dict[str,Any] = mdr.pop("configurations")
         if system_configurations.get("sentinel"):
-            configurations.sentinel = SystemLoader.sentinel(system_configurations.pop("sentinel"))
+            configurations.sentinel = PlatformConfigLoader.sentinel(system_configurations.pop("sentinel"))
         if system_configurations.get("defender_for_endpoint"):
-            configurations.defender_for_endpoint = SystemLoader.defender_for_endpoint(system_configurations.pop("defender_for_endpoint"))
+            configurations.defender_for_endpoint = PlatformConfigLoader.defender_for_endpoint(system_configurations.pop("defender_for_endpoint"))
         if system_configurations.get("sentinel_one"):
-            configurations.sentinel_one = SystemLoader.sentinel_one(system_configurations.pop("sentinel_one"))
+            configurations.sentinel_one = PlatformConfigLoader.sentinel_one(system_configurations.pop("sentinel_one"))
         if system_configurations.get("crowdstrike"):
-            configurations.crowdstrike = SystemLoader.crowdstrike(system_configurations.pop("crowdstrike"))
+            configurations.crowdstrike = PlatformConfigLoader.crowdstrike(system_configurations.pop("crowdstrike"))
         if system_configurations.get("harfanglab"):
-            configurations.harfanglab = SystemLoader.harfanglab(system_configurations.pop("harfanglab"))
+            configurations.harfanglab = PlatformConfigLoader.harfanglab(system_configurations.pop("harfanglab"))
 
         return TideModels.MDR(**mdr,
                                 metadata=metadata,
@@ -393,3 +393,9 @@ class TideLoader:
                                                parameters=parameters)) #type: ignore
 
         return tenants
+
+
+# Legacy aliases
+TideLoader = ObjectLoader
+ObjectLoader.load_rule = staticmethod(ObjectLoader.load_mdr)  # type: ignore[method-assign]
+ObjectLoader.load_objective = staticmethod(ObjectLoader.load_dom)  # type: ignore[method-assign]

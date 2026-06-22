@@ -36,7 +36,7 @@ from Engines.modules.datamodels.objects import Objects
 from Engines.modules.datamodels.configurations import Configurations
 
 ROOT = Path(str(git.Repo(".", search_parent_directories=True).working_dir))
-class SystemLoader:
+class PlatformConfigLoader:
 
     @staticmethod
     def _base_configuration(mdr_config:dict[str, Any])->Tuple[dict[str, Any], TideDefinitionsModels.SystemConfigurationModel]:
@@ -448,3 +448,5 @@ class SystemLoader:
             rule_id_bundle=rule_id_bundle if rule_id_bundle else None  # type: ignore
         )
 
+
+SystemLoader = PlatformConfigLoader

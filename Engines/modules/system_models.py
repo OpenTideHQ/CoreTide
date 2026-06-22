@@ -12,7 +12,7 @@ sys.path.append(str(git.Repo(".", search_parent_directories=True).working_dir))
 from Engines.modules.logs import log
 
 from Engines.modules.enums import DeploymentStrategy
-from Engines.modules.object_models import TideModels
+from Engines.modules.object_models import DetectionRule
 
 @dataclass
 class SystemConfig:
@@ -66,13 +66,16 @@ class SystemConfig:
     modifiers: Optional[Sequence[Modifiers]] = None
 
 @dataclass
-class TenantDeploymentModel:
+class DeploymentBatch:
     """
     Base common dataclass used to construct tenant deployment
     per system
     """
     tenant: SystemConfig.Tenant
-    rules: Sequence[TideModels.MDR]
+    rules: Sequence[DetectionRule]
+
+
+TenantDeploymentModel = DeploymentBatch
 
 
 from Engines.modules.config_models import TideConfigs
@@ -81,29 +84,29 @@ from Engines.modules.config_models import TideConfigs
 class TenantDeployment:
 
     @dataclass
-    class Splunk(TenantDeploymentModel):
+    class Splunk(DeploymentBatch):
         tenant: TideConfigs.Systems.DefenderForEndpoint.Tenant
 
     @dataclass
-    class Sentinel(TenantDeploymentModel):
+    class Sentinel(DeploymentBatch):
         tenant: TideConfigs.Systems.Sentinel.Tenant
 
     @dataclass
-    class CarbonBlackCloud(TenantDeploymentModel):
+    class CarbonBlackCloud(DeploymentBatch):
         tenant: TideConfigs.Systems.DefenderForEndpoint.Tenant
 
     @dataclass
-    class SentinelOne(TenantDeploymentModel):
+    class SentinelOne(DeploymentBatch):
         tenant: TideConfigs.Systems.SentinelOne.Tenant
 
     @dataclass
-    class DefenderForEndpoint(TenantDeploymentModel):
+    class DefenderForEndpoint(DeploymentBatch):
         tenant: TideConfigs.Systems.DefenderForEndpoint.Tenant
 
     @dataclass
-    class Crowdstrike(TenantDeploymentModel):
+    class Crowdstrike(DeploymentBatch):
         tenant: TideConfigs.Systems.Crowdstrike.Tenant
 
     @dataclass
-    class HarfangLab(TenantDeploymentModel):
+    class HarfangLab(DeploymentBatch):
         tenant: TideConfigs.Systems.HarfangLab.Tenant

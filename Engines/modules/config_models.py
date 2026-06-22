@@ -14,7 +14,7 @@ from Engines.modules.logs import log
 from Engines.modules.enums import StatusStrategy
 from Engines.modules.system_models import SystemConfig
 @dataclass
-class TideConfigs:
+class ConfigurationModels:
 
     @dataclass
     class Deployment:
@@ -132,3 +132,5 @@ class TideConfigs:
 
             tenants: Optional[Sequence[Tenant]]
 
+
+TideConfigs = ConfigurationModels

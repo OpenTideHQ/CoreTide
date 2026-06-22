@@ -19,7 +19,7 @@ class StatusStrategy(Enum):
     DELETION = "Deployment from the default branch, but removes the rule from the target system."
     UNIVERSAL = "Deployment from both Pull/Merge Requests, and default branch pipelines."
 
-class DetectionSystems(Enum):
+class DetectionPlatforms(Enum):
     DEFENDER_FOR_ENDPOINT = auto()
     CARBON_BLACK_CLOUD = auto()
     SPLUNK = auto()
@@ -27,6 +27,10 @@ class DetectionSystems(Enum):
     SENTINEL_ONE = auto()
     CROWDSTRIKE = auto()
     HARFANGLAB = auto()
+
+
+# Legacy alias
+DetectionSystems = DetectionPlatforms
 
 class DeploymentStrategy(Enum):
     STAGING = "Deployment allowed during a Pull (or Merge) Request Pipeline"

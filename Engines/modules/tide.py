@@ -1,8 +1,19 @@
 # Engines/modules/tide.py — backward compatibility shim
-from Engines.modules.registry import DataTide
-from Engines.modules.index import IndexTide
-from Engines.modules.environment import HelperTide
-from Engines.modules.models import DetectionSystems
-from Engines.modules.loaders.object_loader import TideLoader
+from Engines.modules.registry import OpenTide, DataTide
+from Engines.modules.index import IndexManager, IndexTide
+from Engines.modules.environment import HelperTide, debug_enabled
+from Engines.modules.enums import DetectionPlatforms, DetectionSystems
+from Engines.modules.loaders.object_loader import ObjectLoader, TideLoader
 
-__all__ = ["DataTide", "IndexTide", "HelperTide", "DetectionSystems", "TideLoader"]
+__all__ = [
+    "OpenTide",
+    "DataTide",
+    "IndexManager",
+    "IndexTide",
+    "HelperTide",
+    "debug_enabled",
+    "DetectionPlatforms",
+    "DetectionSystems",
+    "ObjectLoader",
+    "TideLoader",
+]

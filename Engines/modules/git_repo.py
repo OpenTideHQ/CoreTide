@@ -15,7 +15,7 @@ sys.path.append(str(git.Repo(".", search_parent_directories=True).working_dir))
 
 from Engines.modules.ci import CIEnvironment
 
-class TideRepo:
+class GitRepository:
 
     def __init__(self):
         self.repository = self._initialize_repository()
@@ -59,3 +59,4 @@ class TideRepo:
                                  author = str(commit.author.name),
                                  sha = str(commit.hexsha))
 
+TideRepo = GitRepository

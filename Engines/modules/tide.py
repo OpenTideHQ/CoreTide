@@ -948,7 +948,7 @@ class SystemLoader:
             report=report,
             tags=tags,
             rule_id_bundle=rule_id_bundle if rule_id_bundle else None  # type: ignore
-        )        )
+        )
 
 
 class ConfigurationsLoader:

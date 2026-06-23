@@ -5,6 +5,7 @@ import sys
 sys.path.append(str(git.Repo(".", search_parent_directories=True).working_dir))
 
 from Engines.modules.tide import DataTide
+from Engines.modules.logs import log
 
 playbook_mapping = list()
 
@@ -21,9 +22,9 @@ for mdr in DataTide.Models.mdr:
         row["Playbook"] = content.get("tags", {}).get("playbook") or ""
 
         if row["Playbook"] == "":
-            print(f"❌ No playbook entry for {content['title']}")
+            log("WARNING", f"No playbook entry for {content['title']}")
         else:
-            print(f"👣 Found playbook entry for {content['title']}")
+            log("INFO", f"Found playbook entry for {content['title']}")
 
         playbook_mapping.append(row)
 

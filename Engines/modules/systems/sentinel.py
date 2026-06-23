@@ -60,7 +60,7 @@ def iso_duration_timedelta(duration: str) -> timedelta:
             delta = timedelta(days=count)
         case _:
             raise Exception(
-                f"☢️ [FATAL] Duration {duration} is not in supported unit (m, h or d)"
+                f" [FATAL] Duration {duration} is not in supported unit (m, h or d)"
             )
 
     return delta

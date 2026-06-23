@@ -93,7 +93,7 @@ class CarbonBlackCloudDeploy(CarbonBlackCloudEngineInit, DeployMDR):
 
             except:
                 raise Exception(
-                    f"⚠️ [FAILURE] Service could not be reached for organization {org}"
+                    f"[FAILURE] Service could not be reached for organization {org}"
                 )
 
             config_data = data["configurations"][self.DEPLOYER_IDENTIFIER]
@@ -149,7 +149,7 @@ class CarbonBlackCloudDeploy(CarbonBlackCloudEngineInit, DeployMDR):
                             report = r
                 else:
                     raise Exception(
-                        "⚠️ [FATAL] The CBC Deployer cannot create a detection in a non"
+                        "[FATAL] The CBC Deployer cannot create a detection in a non"
                         f"existent Watchlist : {selected_watchlist}. Make sure to create"
                         "one on the console before retriggering the deployment"
                     )
@@ -307,7 +307,7 @@ class CarbonBlackCloudDeploy(CarbonBlackCloudEngineInit, DeployMDR):
                         report = r
             else:
                 raise Exception(
-                    f"⚠️ [FATAL] The CBC Deployer cannot create a detection in a non-"
+                    f"[FATAL] The CBC Deployer cannot create a detection in a non-"
                     f"existent Watchlist: {selected_watchlist}. Make sure to create "
                     "one on the console before retriggering the deployment"
                 )
@@ -416,7 +416,7 @@ class CarbonBlackCloudDeploy(CarbonBlackCloudEngineInit, DeployMDR):
                 else:
                     log(
                         "SKIP",
-                        f"🛑 Skipping as does not contain a CBC rule",
+                        f"Skipping as does not contain a CBC rule",
                         mdr_data.get("name"),
                     )
 

@@ -11,4 +11,5 @@ carbon-black-cloud-sdk
 toml
 azure-mgmt-securityinsight==2.0.0b2
 azure-identity
-azure-monitor-query
+structlog
+rich

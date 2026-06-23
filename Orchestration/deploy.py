@@ -12,19 +12,14 @@ from Engines.modules.deployment import (enabled_systems,
                                         make_deploy_plan,
                                         DeploymentStrategy,
                                         CIEnvironment)
-from Engines.modules.logs import log, ANSI, coretide_intro
+from Engines.modules.logs import log, print_banner
 from Engines.modules.tide import IndexTide
 from Engines.mutation.promotion import PromoteMDR
 
 
 os.environ["INDEX_OUTPUT"] = "cache"
 
-print(coretide_intro())
-print(f"""
-{ANSI.Colors.BLUE}{ANSI.Formatting.ITALICS}{ANSI.Formatting.BOLD}
-CoreTide Detection Deployment
-{ANSI.Formatting.STOP}
-""")
+print_banner("CoreTide Detection Deployment")
 
 DEPLOYMENT_PLAN = DeploymentStrategy.load_from_environment()
 

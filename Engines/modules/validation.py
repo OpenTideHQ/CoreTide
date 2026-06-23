@@ -86,7 +86,7 @@ def indicator_validation(
                 return True
         case _:
             log("FATAL", "Indicators validation received invalid type", type)
-            raise Exception("💥 Invalid Type")
+            raise Exception("Invalid Type")
 
     if verbose:
         log(

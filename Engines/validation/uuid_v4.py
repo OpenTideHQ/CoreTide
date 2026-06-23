@@ -44,7 +44,7 @@ def run():
         os.environ["VALIDATION_ERROR_RAISED"] = "True"
         log(
             "WARNING",
-            f"⚠️ Successfully validated {counter} tide_objects but found",
+            f"Successfully validated {counter} tide_objects but found",
             f"{len(error_registry)} invalid ones",
         )
         error_table = pd.DataFrame(error_registry).to_markdown(

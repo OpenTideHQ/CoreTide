@@ -394,7 +394,7 @@ def run():
             out.write(nav_index)
 
     time_to_execute = "%.2f" % (time.time() - start_time)
-    print("\n⏱️ Generated navigation index in {} seconds".format(time_to_execute))
+    log("SUCCESS", f"Generated navigation index in {time_to_execute} seconds")
 
 
 if __name__ == "__main__":

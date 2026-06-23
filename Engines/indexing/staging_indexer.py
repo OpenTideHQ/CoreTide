@@ -32,7 +32,7 @@ SCRIPT_DESCRIPTION = (
 )
 
 print("\n\n" + SCRIPT_NAME.center(80, "="))
-print("\n ⚙️" + SCRIPT_DESCRIPTION + "\n")
+log("INFO", SCRIPT_DESCRIPTION)
 
 log("TITLE", "Staging Index Reconcilier")
 log("INFO", "Loads a version of the index which adds data from mdr in staging.")
@@ -41,7 +41,7 @@ mdr_to_index = modified_mdr_files(DeploymentStrategy.STAGING)
 
 if len(mdr_to_index) == 0:  # In case of no deployments possible
     try:
-        print("🛑 No deployment possible, could not identify MDRs that can be deployed")
+        log("FAILURE", "No deployment possible, could not identify MDRs that can be deployed")
         raise Exception("NO_DEPLOYMENT_FOUND")
     except:
         traceback.print_exc()
@@ -62,12 +62,12 @@ for mdr in mdr_to_index:
     current_stg_index[uuid] = mdr_data
 
 if not os.path.exists(STG_INDEX_PATH):
-    print("🌟 Could not find a staging index file, will create one")
+    log("INFO", "Could not find a staging index file, will create one")
     with open(STG_INDEX_PATH, "w+") as out:
         json.dump(current_stg_index, out, default=str)
 
 else:
-    print("🔔 Found MDR index, extending it with latest values")
+    log("INFO", "Found MDR index, extending it with latest values")
 
     stg_index = json.load(open(Path(STG_INDEX_PATH)))
     stg_index.update(current_stg_index)
@@ -80,4 +80,4 @@ print("\n" + "Execution Report".center(80, "="))
 time_to_execute = datetime.now() - toolchain_start_time
 time_to_execute = "%.2f" % time_to_execute.total_seconds()
 
-print("\n⌛ Exported Staging index in {} seconds".format(time_to_execute))
+log("SUCCESS", f"Exported Staging index in {time_to_execute} seconds")

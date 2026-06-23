@@ -80,7 +80,7 @@ def indexer(write_index=False) -> dict:
 
     index["configurations"] = RESOLVED_CONFIGURATIONS
 
-    print("📒 Indexing Vocabularies...")
+    log("ONGOING", "Indexing Vocabularies...")
 
     # Data structures like the vocabularies, but need to be
     # indexed from different locations
@@ -114,7 +114,7 @@ def indexer(write_index=False) -> dict:
     index["vocabs"] = voc_index
 
     # JSON Schemas Indexer
-    print("🛠️ Indexing JSON Schemas...")
+    log("ONGOING", "Indexing JSON Schemas...")
 
     json_index = dict()
 
@@ -131,7 +131,7 @@ def indexer(write_index=False) -> dict:
     index["json_schemas"] = json_index
 
     # Metaschema Indexer
-    print("🛠️ Indexing Metaschemas...")
+    log("ONGOING", "Indexing Metaschemas...")
 
     meta_index = dict()
 
@@ -146,7 +146,7 @@ def indexer(write_index=False) -> dict:
     index["metaschemas"] = meta_index
 
     # Definitions Indexer
-    print("🛠️ Indexing Definitions...")
+    log("ONGOING", "Indexing Definitions...")
 
     definition_index = dict()
 

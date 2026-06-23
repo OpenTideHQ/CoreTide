@@ -174,12 +174,12 @@ class IndexTide:
         EXPECTED_INDEX_PATH = ROOT / "index.json"
         INDEX_PATH = Path(os.getenv("INDEX_PATH") or EXPECTED_INDEX_PATH)
 
-        print("📂 Index not found in memory, first seeking index file...")
+        log("WARNING", "Index not found in memory, first seeking index file...")
         if os.path.isfile(INDEX_PATH):
             _tide_index = json.load(open(INDEX_PATH))
         else:
             # Generate index in memory
-            print("💽 Could not find index file, generating it in memory")
+            log("INFO", "Could not find index file, generating it in memory")
             _tide_index = indexer()
             if not _tide_index:
                 raise Exception("INDEX COULD NOT BE LOADED IN MEMORY")
@@ -246,7 +246,7 @@ class IndexTide:
 
                 if stg_version > main_version:
                     log("INFO",
-                        f"🔄 Replacing MDR {mdr_name} from prod index with"
+                        f"Replacing MDR {mdr_name} from prod index with"
                         f" staging data, as version is higher (main : v{main_version}"
                         f" staging : v{stg_version})"
                     )

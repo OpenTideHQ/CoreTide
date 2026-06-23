@@ -7,7 +7,7 @@ from pathlib import Path
 
 sys.path.append(str(git.Repo(".", search_parent_directories=True).working_dir))
 
-from Engines.modules.logs import log, ANSI, coretide_intro
+from Engines.modules.logs import log, print_banner
 from Engines.validation import (
     tide_schema,
     id_uniqueness,
@@ -16,12 +16,7 @@ from Engines.validation import (
 )
 from Engines.modules.deployment import CIEnvironment
 
-print(coretide_intro())
-print(f"""
-{ANSI.Colors.BLUE}{ANSI.Formatting.ITALICS}{ANSI.Formatting.BOLD}
-CoreTide Object Data Validation
-{ANSI.Formatting.STOP}
-""")
+print_banner("CoreTide Object Data Validation")
 
 os.environ["VALIDATION_ERROR_RAISED"] = ""
 os.environ["VALIDATION_WARNING_RAISED"] = ""

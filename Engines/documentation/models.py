@@ -212,7 +212,7 @@ def run():
             shutil.rmtree(doc_type_path)
         log(
             "INFO",
-            "📁 Creating documentation folder : {}... ".format(str(doc_type_path)),
+            "Creating documentation folder : {}... ".format(str(doc_type_path)),
         )
         doc_type_path.mkdir(parents=True)
 

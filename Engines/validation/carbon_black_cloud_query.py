@@ -81,7 +81,7 @@ class CarbonBlackCloudValidateQuery(CarbonBlackCloudEngineInit, ValidateQuery):
                         f"{mdr_data.name} ({mdr_data.metadata.uuid})")
                     self.check_query(mdr_data, service)
                 else:
-                    log("SKIP", f"🛑 Skipping {mdr_data.name} as does not contain a CBC configuration section")
+                    log("SKIP", f"Skipping {mdr_data.name} as does not contain a CBC configuration section")
             else:
                 # TODO: DEPRECATED [carbon-black-cloud-mdrv4] — Legacy dict access
                 mdr_uuid = mdr_data.get('uuid') or mdr_data["metadata"]["uuid"]
@@ -90,7 +90,7 @@ class CarbonBlackCloudValidateQuery(CarbonBlackCloudEngineInit, ValidateQuery):
                         f"{mdr_data['name']} ({mdr_uuid})")
                     self.check_query(mdr_data, service)
                 else:
-                    log("SKIP", f"🛑 Skipping {mdr_data.get('name')} as does not contain a CBC configuration section")
+                    log("SKIP", f"Skipping {mdr_data.get('name')} as does not contain a CBC configuration section")
 
 
 def declare():

@@ -22,8 +22,9 @@ def unroll_dot_dict(dot_dict, separator="."):
     can be merged into another config dictionary.
     """
     if len(dot_dict.keys()) > 1:
-        print(
-            f"⚠️ Cannot process dictionary {str(dot_dict)}, expecting a single item dictionary"
+        log(
+            "WARNING",
+            f"Cannot process dictionary {str(dot_dict)}, expecting a single item dictionary",
         )
         return None
 
@@ -312,8 +313,9 @@ def get_vocab_entry(vocab, identifier, field=None, newlines=False):
             else:
                 return data
         else:
-            print(
-                f"⚠️ Could not retrieve parameter [ {field} ] for entry with identifier [ {identifier} ] from vocabulary data of : {vocab}"
+            log(
+                "WARNING",
+                f"Could not retrieve parameter [ {field} ] for entry with identifier [ {identifier} ] from vocabulary data of : {vocab}",
             )
             return ""
 
@@ -336,8 +338,9 @@ def get_vocab_entry(vocab, identifier, field=None, newlines=False):
                     else:
                         return data
 
-    print(
-        f"⚠️ Could not retrieve identifier [ {identifier} ] from vocabulary data of : {vocab}"
+    log(
+        "WARNING",
+        f"Could not retrieve identifier [ {identifier} ] from vocabulary data of : {vocab}",
     )
     return ""
 

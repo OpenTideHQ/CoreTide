@@ -80,7 +80,7 @@ for sub in SYSTEMS_SUBSCHEMAS.copy():
 
 if DOCUMENTATION_TARGET in TARGET_WITH_DASH_PATHS:
     MDR_WIKI_PATH = Path(str(MDR_WIKI_PATH).replace(" ", "-"))
-    print("🦊 Configured to use Gitlab Flavored Markdown")
+    log("INFO", "Configured to use Gitlab Flavored Markdown")
 
 start_time = time.time()
 

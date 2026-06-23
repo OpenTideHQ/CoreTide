@@ -10,17 +10,12 @@ from Engines.modules.deployment import (
     DeploymentStrategy,
     CIEnvironment,
 )
-from Engines.modules.logs import log, ANSI, coretide_intro
+from Engines.modules.logs import log, print_banner
 from Engines.modules.plugins import DeployTide
 from Engines.modules.tide import DataTide
 from Engines.modules.framework import keep_active_mdr
 
-print(coretide_intro())
-print(f"""
-{ANSI.Colors.BLUE}{ANSI.Formatting.ITALICS}{ANSI.Formatting.BOLD}
-CoreTide Detection Rules Query Validation
-{ANSI.Formatting.STOP}
-""")
+print_banner("CoreTide Detection Rules Query Validation")
 
 DEPLOYMENT_PLAN = DeploymentStrategy.load_from_environment()
 

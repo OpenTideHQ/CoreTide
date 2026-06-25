@@ -815,8 +815,12 @@ class SystemLoader:
             if timerange_data:
                 timerange = Splunk.Scheduling.Timerange(**timerange_data)
 
+            # Only pass fields that Scheduling actually accepts
+            _scheduling_fields = {"type", "expires"}
+            scheduling_kwargs = {k: v for k, v in scheduling_data.items() if k in _scheduling_fields}
+
             scheduling = Splunk.Scheduling(
-                **scheduling_data,
+                **scheduling_kwargs,
                 schedule=schedule,
                 timerange=timerange
             )

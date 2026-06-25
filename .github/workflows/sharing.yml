@@ -1,0 +1,65 @@
+name: MISP Sharing Pipeline
+
+on:
+  workflow_call:
+    inputs:
+      coretide_repo:
+        type: string
+        description: "GitHub repository (owner/name) to clone CoreTide from"
+        required: false
+        default: OpenTideHQ/CoreTide
+      coretide_path:
+        type: string
+        description: "Path where CoreTide needs to be cloned into"
+        required: false
+        default: coretide
+      coretide_ref:
+        type: string
+        description: "Ref to clone CoreTide from"
+        required: false
+        default: development
+      python_version:
+        type: string
+        description: "Python version to use"
+        required: false
+        default: "3.12"
+      requirements_file:
+        type: string
+        description: "Requirements file path"
+        required: false
+        default: "coretide/Engines/requirements.txt"
+      opentide_secrets:
+        type: string
+        description: "Content of the OpenTide secrets file"
+        required: false
+
+jobs:
+  Sharing:
+    name: MISP Sharing
+    runs-on: ubuntu-latest
+    if: ${{ github.ref_name == github.event.repository.default_branch }}
+    steps:
+      - name: Checkout Tide Instance
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+          ref: ${{ github.ref }}
+
+      - name: Checkout CoreTide
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ inputs.coretide_repo }}
+          path: ${{ inputs.coretide_path }}
+          ref: refs/heads/${{ inputs.coretide_ref }}
+
+      - name: Tide Setup
+        uses: ./coretide/Pipelines/GitHub/tide-setup
+        id: tide_setup
+        with:
+          python_version: ${{ inputs.python_version }}
+          requirements_file: ${{ inputs.requirements_file }}
+          opentide_secrets: ${{ inputs.opentide_secrets }}
+
+      - uses: ./coretide/Pipelines/GitHub/sharing
+        name: MISP Sharing
+        id: misp_sharing

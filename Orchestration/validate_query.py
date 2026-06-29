@@ -13,7 +13,6 @@ from Engines.modules.deployment import (
 from Engines.modules.logs import log, ANSI, coretide_intro
 from Engines.modules.plugins import DeployTide
 from Engines.modules.tide import DataTide
-from Engines.modules.framework import keep_active_mdr
 
 print(coretide_intro())
 print(f"""
@@ -37,11 +36,8 @@ if len(deployment_list) == 0:  # In case of no deployments possible, fail gracio
         "Nothing could deploy, no MDR can be addressed within this deployment context",
     )
     traceback.print_exc()
-    # TODO: Remove this once we have a proper way to handle this
-    # sys.exit(19)
 
 for system in deployment_list:
-    # TODO Temp support while we support both MDRv3 and MDRv4 deployers
     try:
         system_name = DataTide.Configurations.Systems.Index[system]["tide"]["name"]
     except:
@@ -52,16 +48,10 @@ for system in deployment_list:
 
     if system in DeployTide.query_validation:
         log("ONGOING", f"Validating the query against {system_name}")
-        try:
-            DeployTide.query_validation[system].validate(
-                deployment=deployment_list[system]
-            )
-        except:
-            log("WARNING", "Trying MDRv4 style method")
-            DeployTide.query_validation[system].validate(
-                mdr_deployment=deployment_list[system], deployment_plan=DEPLOYMENT_PLAN #type: ignore
-            )
-
+        DeployTide.query_validation[system].validate(
+            mdr_deployment=deployment_list[system],
+            deployment_plan=DEPLOYMENT_PLAN
+        )
     else:
         log(
             "SKIP",

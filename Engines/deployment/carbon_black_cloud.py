@@ -20,7 +20,7 @@ from Engines.modules.models import (StatusStrategy,
                                     TenantDeployment)
 from Engines.modules.systems.carbon_black_cloud import CarbonBlackCloudService
 
-from typing import Sequence, Optional
+from typing import Sequence
 
 class CarbonBlackCloudDeploy(CarbonBlackCloudEngineInit, DeployMDR):
 
@@ -368,61 +368,42 @@ class CarbonBlackCloudDeploy(CarbonBlackCloudEngineInit, DeployMDR):
         return True
 
     def deploy(self,
-               deployment: Optional[list[str]] = None,
-               mdr_deployment: Optional[Sequence[TideModels.MDR]] = None,
-               deployment_plan: Optional[DeploymentStrategy] = None):
+               mdr_deployment: Sequence[TideModels.MDR] | list[str],
+               deployment_plan: DeploymentStrategy):
 
         self.configure_proxy()
 
-        if mdr_deployment is not None:
-            # MDRv4 typed deployment path — aligned with TideDeployment contract
-            loaded_mdr = []
-            for mdr in mdr_deployment:
-                if type(mdr) is str:
-                    loaded_mdr.append(DataTide.Models.MDR[mdr])
-                elif type(mdr) is TideModels.MDR:
-                    loaded_mdr.append(mdr)
-            mdr_deployment = loaded_mdr
+        loaded_mdr = []
+        for mdr in mdr_deployment:
+            if type(mdr) is str:
+                loaded_mdr.append(DataTide.Models.MDR[mdr])
+            elif type(mdr) is TideModels.MDR:
+                loaded_mdr.append(mdr)
+        mdr_deployment = loaded_mdr
 
-            if not mdr_deployment:
-                log("SKIP", "No MDRs to deploy for Carbon Black Cloud")
-                return
+        if not mdr_deployment:
+            log("SKIP", "No MDRs to deploy for Carbon Black Cloud")
+            return
 
-            deployment_resolution = TideDeployment(
-                deployment=mdr_deployment,
-                system=DetectionSystems.CARBON_BLACK_CLOUD,
-                strategy=deployment_plan)
+        deployment_resolution = TideDeployment(
+            deployment=mdr_deployment,
+            system=DetectionSystems.CARBON_BLACK_CLOUD,
+            strategy=deployment_plan)
 
-            for tenant_deployment in deployment_resolution.rule_deployment:  # type: ignore
-                tenant_deployment: TenantDeployment.CarbonBlackCloud
-                log("ONGOING", "Currently targeting tenant", tenant_deployment.tenant.name)
-                cbc_service = CarbonBlackCloudService(tenant_deployment.tenant)
-                for mdr in tenant_deployment.rules:
-                    log("ONGOING", "Processing rule", mdr.name, mdr.metadata.uuid)
-                    self.deploy_mdr_v4(data=mdr,
-                                       service=cbc_service.service,
-                                       tenant_config=tenant_deployment.tenant)
-
-        else:
-            # TODO: DEPRECATED [carbon-black-cloud-mdrv4] — Legacy MDRv3 deployment path
-            if not deployment:
-                raise Exception("DEPLOYMENT NOT FOUND")
-
-            for mdr in deployment:
-                mdr_data = DataTide.Models.mdr[mdr]
-
-                if self.DEPLOYER_IDENTIFIER in mdr_data["configurations"].keys():
-                    self.deploy_mdr(mdr_data)
-                else:
-                    log(
-                        "SKIP",
-                        f"🛑 Skipping as does not contain a CBC rule",
-                        mdr_data.get("name"),
-                    )
+        for tenant_deployment in deployment_resolution.rule_deployment:  # type: ignore
+            tenant_deployment: TenantDeployment.CarbonBlackCloud
+            log("ONGOING", "Currently targeting tenant", tenant_deployment.tenant.name)
+            cbc_service = CarbonBlackCloudService(tenant_deployment.tenant)
+            for mdr in tenant_deployment.rules:
+                log("ONGOING", "Processing rule", mdr.name, mdr.metadata.uuid)
+                self.deploy_mdr_v4(data=mdr,
+                                   service=cbc_service.service,
+                                   tenant_config=tenant_deployment.tenant)
 
 
 def declare():
     return CarbonBlackCloudDeploy()
 
 if __name__ == "__main__" and DebugEnvironment.ENABLED:
-    CarbonBlackCloudDeploy().deploy(DebugEnvironment.MDR_DEPLOYMENT_TEST_UUIDS)
+    CarbonBlackCloudDeploy().deploy(
+        DebugEnvironment.MDR_DEPLOYMENT_TEST_UUIDS, DeploymentStrategy.DEBUG)

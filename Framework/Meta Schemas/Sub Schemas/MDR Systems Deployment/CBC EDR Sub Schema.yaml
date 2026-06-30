@@ -28,13 +28,13 @@ properties:
       type: string
       format: email
 
-  organizations: 
-    title: Organizations
+  tenants: 
+    title: Target Tenants
     icon: 🏢
-    description: Override the default organizations the deployment will configure the reports onto.
+    description: Override the default tenants the deployment will configure the reports onto.
     type: array
     tide.template.hide: True
-    tide.config.parameter-list: systems.carbon_black_cloud.setup.organizations
+    tide.config.system.tenants: carbon_black_cloud
 
   watchlist: 
     title: Watchlist

@@ -30,6 +30,14 @@ properties:
       type: string
       format: email
 
+  tenants: 
+    title: Target Tenants
+    icon: 🏢
+    description: Override the default tenants the deployment will target.
+    type: array
+    tide.template.hide: True
+    tide.config.system.tenants: splunk
+
   threshold: 
     title: Event threshold
     type: integer

@@ -1,5 +1,3 @@
-# === New MDRv4 Format ===
-
 [platform]
 enabled = false
 identifier = "carbon_black_cloud"
@@ -13,7 +11,7 @@ flags = []
 # [[tenants]]
 # name = "org_name"
 # description = "Organisation description"
-# deployment = "PRODUCTION"
+# deployment = "ALWAYS"
 # [tenants.setup]
 # proxy = false
 # ssl = true
@@ -21,40 +19,11 @@ flags = []
 # org_key = "$CBC_ORG_KEY"
 # token = "$CBC_TOKEN"
 # watchlist = "CoreTide"
-# organizations = []
 
 # [[modifiers]]
 # name = "example_modifier"
 # description = "Example deployment modifier"
 # [modifiers.conditions]
-# status = ["Production"]
+# status = ["PRODUCTION"]
 # [modifiers.modifications]
 # key = "value"
-
-# === Legacy Format (deprecated) ===
-# TODO: DEPRECATED [carbon-black-cloud-mdrv4] — Remove after full migration
-
-[tide]
-enabled = false
-identifier = "carbon_black_cloud"
-name = "Carbon Black Cloud Enterprise EDR"
-subschema = "CBC EDR Sub Schema"
-description = """VMware Carbon Black Enterprise EDR is an advanced threat hunting
-and incident response solution delivering continuous visibility for top security
-operations centres (SOCs) and incident response (IR) teams."""
-
-[setup]
-proxy = false
-ssl = true #Disable SSL in case of connectivity issues (only in trusted environment)
-url = "$CBC_URL"
-watchlist = "" #Can be overriden by MDR schema
-#Default organizations the MDR can deploy to. Can be overriden by MDR schema
-organizations = [] 
-
-[validation]
-organization = "" #The org where the query validation is executed on
-
-[secrets]
-# For every organization, add org.org_key and org.token pointing to envvars
-#org.org_key = "$CBC_ORG_KEY_DWP"
-#org.token = "$CBC_TOKEN_DWP"

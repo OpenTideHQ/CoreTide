@@ -1,68 +1,68 @@
-[tide]
+[platform]
 enabled = false
 identifier = "splunk"
 name = "Splunk Enterprise"
 subschema = "Splunk Sub Schema"
-description = """Splunk Enterprise enables you to search, analyze and 
+description = """Splunk Enterprise enables you to search, analyze and
 visualize your data to quickly act on insights from across your technology landscape."""
+flags = []
 
-[setup]
-proxy = false
-ssl = false #Disable SSL in case of connectivity issues (only in trusted environment)
-url = "$SPLUNK_URL"
-port = "$SPLUNK_PORT"
-app = "$SPLUNK_APP" # App the searches will be deployed to.
-correlation_searches = true # Enables or disable saved search also being correlation searches
-#allow_skew         # :str Time Skewing Setup, for example "10%". See: https://docs.splunk.com/Documentation/SplunkCloud/latest/Report/Skewscheduledreportstarttimes
-#schedule_offset    # :int Adds a constant offset after the skew calculation to dispatch.earliest_time, for example 5 (5mins) .
-frequency_scheduling = "random" # random | current . Frequencies get generated into a cron expression. Hour and minutes can be randomized, or anchored on the current time when the query was made
-actions_enabled = ["notable"] # Actions authorized to be allocated by the deployment engine 
-default_actions = ["notable"] # When no actions parameters were identified as part of the deployment, this adds default actions
+# [[tenants]]
+# name = "Default"
+# description = "Default Splunk deployment target"
+# deployment = "ALWAYS"
+# [tenants.setup]
+# proxy = false
+# ssl = false
+# url = "$SPLUNK_URL"
+# port = "$SPLUNK_PORT"
+# token = "$SPLUNK_TOKEN"
+# app = "$SPLUNK_APP"
+# correlation_searches = true
+# enterprise_security = true
+# allow_skew = "20%"
+# schedule_offset = 5
+# frequency_scheduling = "random"
+# actions_enabled = ["notable"]
+# default_actions = ["notable"]
 
-[secrets]
-token = "$SPLUNK_TOKEN"
+# [[modifiers]]
+# name = "Example Modifier"
+# description = "Example deployment modifier"
+# [modifiers.conditions]
+# status = ["DEVELOPMENT"]
+# [modifiers.modifications]
+# allowed_actions = false
+# "alert.severity" = 1
 
-[modifiers]
-# Modifiers are used to change the deployment behaviour based on the status of a MDR.
-# Status modifiers are added last in the deployment pipeline, and override the MDR Config. 
-# 
-# Usage : <MDR STATUS>."<Splunk savedsearches.conf attribute>"" = value
-#                        |-> Keep double quotes if attribute contains dots
-#
-# Using <MDR STATUS>.allowed_actions, you can deny all actions by setting it to false, 
-# Or only specify specific actions (which must be a subset of actions_enabled). By default,
-# all the actions enabled under actions_enabled will be allocated by the deployer, 
-# if the MDR Config contains
-# 
-# Examples:
-# DEVELOPMENT.allowed_actions = false # false or [] , list of actions allowed for this status
-# DEVELOPMENT.alert_severity = 1
-
-[defaults]
-# Be mindful that dotted (.) strings in TOML are significant and represent a dict nesting.
-# Use Double Quote to avoid changing the data type as Splunk uses a flat dict.
-"request.ui_dispatch_app" = "SplunkEnterpriseSecuritySuite"
-"dispatch.latest_time" = "-5m@m"
-"dispatch.index_latest" = ""
-disabled = "false"
-description = "Default description for an alert"
-cron_schedule = "0 * * * *"
-"alert.severity" = "3"
-"alert.suppress.fields" = ""
-is_scheduled = "true"
-"action.customsearchbuilder.spec" = "{}"
-"action.notable.param.verbose" = "0"
-"action.notable.param.security_domain" = "threat"
-"alert.digest_mode" = "1"
-"alert.expires" = "2h"
-"alert.suppress" = "0"
-"alert.track" = "1"
-alert_comparator = "greater than"
-alert_threshold = "0"
-alert_type = "number of events"
-realtime_schedule = "0"
-"request.ui_dispatch_view" = "search"
-schedule_window = "auto"
-schedule_priority = "default"
-"dispatch.earliest_time" = ""
-"dispatch.index_earliest" = ""
+# [[modifiers]]
+# name = "Platform Defaults"
+# description = "Default Splunk parameters applied to all rules"
+# [modifiers.conditions]
+# default = true
+# [modifiers.modifications]
+# "request.ui_dispatch_app" = "SplunkEnterpriseSecuritySuite"
+# "dispatch.latest_time" = "-5m@m"
+# "dispatch.index_latest" = ""
+# disabled = "false"
+# description = "Default description for an alert"
+# cron_schedule = "0 * * * *"
+# "alert.severity" = "3"
+# "alert.suppress.fields" = ""
+# is_scheduled = "true"
+# "action.customsearchbuilder.spec" = "{}"
+# "action.notable.param.verbose" = "0"
+# "action.notable.param.security_domain" = "threat"
+# "alert.digest_mode" = "1"
+# "alert.expires" = "2h"
+# "alert.suppress" = "0"
+# "alert.track" = "1"
+# alert_comparator = "greater than"
+# alert_threshold = "0"
+# alert_type = "number of events"
+# realtime_schedule = "0"
+# "request.ui_dispatch_view" = "search"
+# schedule_window = "auto"
+# schedule_priority = "default"
+# "dispatch.earliest_time" = ""
+# "dispatch.index_earliest" = ""

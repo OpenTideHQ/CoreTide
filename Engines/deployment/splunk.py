@@ -669,12 +669,29 @@ class SplunkDeploy(SplunkEngineInit, DeployMDR):
         if enable_correlation:
             name += " - Rule"
 
-        # Status modifiers
+        # Status modifiers — resolve from typed MDRv4 modifiers list
         status_allowed_actions = self.SPLUNK_ACTIONS
-        status_modifiers = (self.STATUS_MODIFIERS or {}).get(status) or {}
+        status_modifiers: dict = {}
+
+        if self.STATUS_MODIFIERS:
+            for mod in self.STATUS_MODIFIERS:
+                match = False
+                if mod.conditions.default and mod.conditions.default is True:
+                    match = True
+                if mod.conditions.status and status in mod.conditions.status:
+                    match = True
+                if mod.conditions.tenants:
+                    if tenant_config.name in mod.conditions.tenants:
+                        match = True
+                    else:
+                        match = False
+
+                if match:
+                    log("INFO", f"Modifier matched: {mod.name or 'unnamed'}",
+                        str(mod.conditions))
+                    status_modifiers.update(mod.modifications)
 
         if status_modifiers:
-            status_modifiers = dict(status_modifiers)
             if "allowed_actions" in status_modifiers:
                 allowed_actions_config = status_modifiers.pop("allowed_actions")
                 if allowed_actions_config in [False, None]:

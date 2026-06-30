@@ -3,12 +3,14 @@ import sys
 import git
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
+from typing import Sequence, Union
 
 sys.path.append(str(git.Repo(".", search_parent_directories=True).working_dir))
 
 from Engines.modules.tide import DataTide
 from Engines.modules.logs import log
 from Engines.modules.deployment import enabled_systems
+from Engines.modules.models import TideModels, DeploymentStrategy
 
 class PluginTide(ABC):
     pass
@@ -21,13 +23,17 @@ class ValidationEngine(PluginTide):
 
 class DeployMDR(DeployEngine):
     @abstractmethod
-    def deploy(self, deployment: list[str]):
+    def deploy(self,
+               mdr_deployment: Union[Sequence[TideModels.MDR], Sequence[str]],
+               deployment_plan: DeploymentStrategy):
         """Deploy MDR Objects onto target systems"""
 
 
 class ValidateQuery(ValidationEngine):
     @abstractmethod
-    def validate(self, deployment: list[str]):
+    def validate(self,
+                 mdr_deployment: Union[Sequence[TideModels.MDR], Sequence[str]],
+                 deployment_plan: DeploymentStrategy):
         """Validate that the query can be run by the target system"""
 
 

@@ -782,65 +782,13 @@ class SplunkDeploy(SplunkEngineInit, DeployMDR):
         return True
 
     # ─── Legacy MDRv3 deploy ──────────────────────────────────────────
-    # TODO: DEPRECATED [splunk-mdrv4] — Remove after full migration to splunk::3.0
-
-    def deploy_legacy(self, deployment: list[str]):
-        """MDRv3 deployment path for pre-3.0 Splunk MDRs using dict-based access."""
-
-        if not deployment:
-            raise Exception("DEPLOYMENT NOT FOUND")
-
-        self.configure_proxy()
-
-        service = connect_splunk(
-            host=self.SPLUNK_URL,
-            port=self.SPLUNK_PORT,
-            token=self.SPLUNK_TOKEN,
-            app=self.SPLUNK_APP,
-            ssl_enabled=self.SSL_ENABLED
-        )
-
-        # Start deployment routine
-        for mdr in deployment:
-            mdr_data = DataTide.Models.mdr[mdr]
-
-            # Check if modified MDR contains a platform entry (by safety, but should not happen since
-            # the orchestrator will filter for the platform)
-            if self.DEPLOYER_IDENTIFIER in mdr_data["configurations"].keys():
-                # Connection routine, if not connected yet.
-                log("ONGOING", f"🔥 Currently deploying MDR {mdr_data['name']}...")
-                self.deploy_mdr(mdr_data, service)
-            else:
-                log(
-                    "SKIP",
-                    f"🛑 Skipping {mdr_data.get('name')} as does not contain a Splunk rule",
-                )
-
-    # ─── Unified deploy supporting both v3 and v4 ────────────────────
-
     def deploy(
         self,
-        mdr_deployment: Sequence[TideModels.MDR] | list[str] | None = None,
-        deployment_plan: DeploymentStrategy | None = None,
-        deployment: list[str] | None = None,
+        mdr_deployment: Sequence[TideModels.MDR] | list[str],
+        deployment_plan: DeploymentStrategy,
     ):
-        """Deploy Splunk MDRs — supports both MDRv3 (list of UUIDs) and MDRv4 (typed) signatures.
+        """Deploy Splunk MDRs via MDRv4 typed deployment path."""
 
-        The orchestrator calls either:
-          - deploy(deployment=["uuid1", ...])  (v3 path)
-          - deploy(mdr_deployment=[...], deployment_plan=PRODUCTION)  (v4 path)
-        """
-
-        # ── MDRv3 fallback: called with deployment= keyword ──────────
-        if deployment is not None and mdr_deployment is None:
-            log("INFO", "Using legacy MDRv3 deployment path for Splunk")
-            self.deploy_legacy(deployment)
-            return
-
-        if mdr_deployment is None:
-            raise Exception("No deployment target provided")
-
-        # ── MDRv4 path ────────────────────────────────────────────────
         self.configure_proxy()
 
         loaded_mdr = []
@@ -850,6 +798,10 @@ class SplunkDeploy(SplunkEngineInit, DeployMDR):
             elif type(mdr) is TideModels.MDR:
                 loaded_mdr.append(mdr)
         mdr_deployment = loaded_mdr
+
+        if not mdr_deployment:
+            log("SKIP", "No MDRs to deploy for Splunk")
+            return
 
         deployment_obj = TideDeployment(
             deployment=mdr_deployment,
@@ -868,7 +820,7 @@ class SplunkDeploy(SplunkEngineInit, DeployMDR):
                 port=tenant.setup.port,
                 token=tenant.setup.token,
                 app=tenant.setup.app,
-                ssl_enabled=self.SSL_ENABLED,
+                ssl_enabled=tenant.setup.ssl,
             )
 
             for mdr in tenant_deployment.rules:
@@ -883,4 +835,5 @@ def declare():
     return SplunkDeploy()
 
 if __name__ == "__main__" and DebugEnvironment.ENABLED:
-    SplunkDeploy().deploy(DebugEnvironment.MDR_DEPLOYMENT_TEST_UUIDS)
+    SplunkDeploy().deploy(
+        DebugEnvironment.MDR_DEPLOYMENT_TEST_UUIDS, DeploymentStrategy.DEBUG)

@@ -75,21 +75,11 @@ for system in deployment_list:
     )
 
     if system in DeployTide.mdr:
-        try:
-            # TODO: DEPRECATED [splunk-mdrv4] — v3 path will be removed once all systems are migrated
-            log("ONGOING",
-                "Deploying MDR for target system",
-                system,
-                "Using MDRv3 standard methods")
-            DeployTide.mdr[system].deploy(deployment=deployment_list[system])
-        except TypeError:
-            log("WARNING", "Switching to MDRv4 new methods")
-            log("ONGOING",
-                "Deploying MDR for target system",
-                system,
-                "Using MDRv4 new methods")
-            DeployTide.mdr[system].deploy(mdr_deployment=deployment_list[system], #type: ignore
-                                          deployment_plan=DEPLOYMENT_PLAN) #type: ignore
+        log("ONGOING",
+            "Deploying MDR for target system",
+            system)
+        DeployTide.mdr[system].deploy(mdr_deployment=deployment_list[system],
+                                      deployment_plan=DEPLOYMENT_PLAN)
 
     else:
         log(

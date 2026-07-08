@@ -166,10 +166,7 @@ def documentation(mdr):
         if searches:
             rows = ""
             for search in searches:
-                try:
-                    system_name = SYSTEMS_CONFIG[search.get("system")]["tide"]["name"]
-                except:
-                    system_name = SYSTEMS_CONFIG[search.get("system")]["platform"]["name"]
+                system_name = search.get("system")
 
                 rows += "<tr>\n"
                 rows += "\n<td>" + search.get("purpose") + "\n</td>"

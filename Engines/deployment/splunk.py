@@ -441,8 +441,8 @@ class SplunkDeploy(SplunkEngineInit, DeployMDR):
         deploy_config.update(actions_config)
         deploy_config["search"] = query
 
-        log("INFO", "The following configuration was compiled")
-        print(json.dumps(deploy_config, indent=1, sort_keys=True, default=str))
+        log("DEBUG", "The following configuration was compiled",
+            json.dumps(deploy_config, indent=1, sort_keys=True, default=str))
 
         # ── Two-stage attribute deployment ────────────────────────────
         # In Splunk, some configurations are coupled with others. The update()

@@ -443,7 +443,6 @@ _Vocabulary_ : `{source_vocab}`
             key = parts[0]
             while key != parts[-1]:
                 if key == "tenants":
-                    print(config_index)
                     param_key = parts[parts.index(key) + 1]
                     result: list[str] = []
                     for tenant in config_index["tenants"]:

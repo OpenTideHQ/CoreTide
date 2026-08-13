@@ -44,7 +44,6 @@ class RevisionIndexer:
 
     def run(self):
         new_index = self._create_index()
-        print(new_index)
         new_index = {k:asdict(v) for k,v in new_index.items()}
         self._export(new_index)
 

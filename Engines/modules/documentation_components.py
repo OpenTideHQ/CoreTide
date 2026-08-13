@@ -279,10 +279,8 @@ def relations_table(
 
     if direction == "downstream":
         tree = relations_downstream(id)
-        print(tree)
     elif direction == "upstream":
         tree = relations_upstream(id)
-        print(tree)
 
     if not tree:
         return ""

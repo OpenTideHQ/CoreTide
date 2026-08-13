@@ -25,12 +25,10 @@ class IndentFullDumper(yaml.Dumper):
 
 
 def fetch_config_template(dot_path:str)->str:
-    print(dot_path)
     config_index = DataTide.Configurations.Index
     config_path = dot_path.split(".")
     key = config_path[0]
     while key != config_path[-1]:
-        print(config_index)
         if key in config_index:
             config_index = config_index[key]
             key = config_path[config_path.index(key) + 1]

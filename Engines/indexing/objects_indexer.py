@@ -119,7 +119,6 @@ def run():
                         for k, v in entry.items()
                     }
 
-                    print(entry)
                     entries[signal_uuid] = entry
 
 

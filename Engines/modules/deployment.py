@@ -613,7 +613,6 @@ class ExternalIdHelper:
                 updated_content.append(line)
 
         with open(file_path, "w", encoding="utf-8") as mdr_file:
-            print(updated_content)
             mdr_file.writelines(updated_content)
             log(
                 "SUCCESS",

@@ -33,10 +33,10 @@ runs:
       shell: bash
       run: |
         echo "::group::Configuring Git identity"
-        git config --global user.name "${{ github.actor }}"
-        git config --global user.email "${{ github.actor }}@users.noreply.github.com"
+        git config --global user.name "github-actions[bot]"
+        git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
         echo "::endgroup::"
-        echo "::notice::Git configured for ${{ github.actor }}"
+        echo "::notice::Git configured for github-actions[bot]"
 
     - name: Restore env vars from string
       shell: bash

@@ -32,6 +32,13 @@ on:
         type: string
         description: "Content of the OpenTide secrets file"
         required: false
+    secrets:
+      github_app_id:
+        description: "GitHub App ID used to push framework commits when the default branch is protected. Optional; falls back to GITHUB_TOKEN. Add this App to the branch ruleset bypass list. GITHUB_TOKEN cannot bypass required pull requests or status checks."
+        required: false
+      github_app_private_key:
+        description: "GitHub App private key (PEM) used with github_app_id"
+        required: false
 
 jobs:
   Framework:
@@ -40,13 +47,24 @@ jobs:
     concurrency:
       group: framework
       cancel-in-progress: false
+    env:
+      HAS_GITHUB_APP: ${{ secrets.github_app_id && secrets.github_app_private_key && 'true' || 'false' }}
     if: ${{ github.ref_name == github.event.repository.default_branch }}
     steps:
+      - name: Generate GitHub App Token
+        id: generate_token
+        if: ${{ env.HAS_GITHUB_APP == 'true' }}
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ secrets.github_app_id }}
+          private-key: ${{ secrets.github_app_private_key }}
+
       - name: Checkout Tide Instance
         uses: actions/checkout@v4
         with:
           fetch-depth: 100
           ref: ${{ github.ref }}
+          token: ${{ steps.generate_token.outputs.token || github.token }}
 
       - name: Checkout CoreTide
         uses: actions/checkout@v4

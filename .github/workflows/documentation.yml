@@ -62,10 +62,10 @@ on:
         description: "Personal Access Token to push to the Wiki repository (use this OR github_app_id/github_app_private_key)"
         required: false
       github_app_id:
-        description: "GitHub App ID for generating installation token (alternative to wiki_token)"
+        description: "GitHub App ID for generating an installation token to push wiki commits (alternative to wiki_token). Add this App to the wiki repository ruleset bypass list if that branch is protected."
         required: false
       github_app_private_key:
-        description: "GitHub App Private Key for generating installation token (alternative to wiki_token)"
+        description: "GitHub App private key (PEM) used with github_app_id"
         required: false
 
 jobs:

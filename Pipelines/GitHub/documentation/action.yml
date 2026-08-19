@@ -76,8 +76,6 @@ runs:
         echo "::group::Commit Documentation"
         cd ${{ inputs.wiki_repo_name }}
         [[ $(git status --porcelain) ]] || { echo "::warning::No documentation changes to commit — skipping"; echo "::endgroup::"; exit 0; }
-        git config user.name "github-actions[bot]"
-        git config user.email "github-actions[bot]@users.noreply.github.com"
         echo "::notice::Documentation changes detected — committing"
         git pull origin ${{ inputs.wiki_repo_branch }}
         git add -A

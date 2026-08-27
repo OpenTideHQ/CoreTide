@@ -1,0 +1,29 @@
+name: MISP Sharing
+description: Share OpenTIDE objects to configured MISP instances
+
+inputs:
+  coretide_path:
+    description: "Path where coretide has been cloned"
+    required: false
+    default: coretide
+
+runs:
+  using: "composite"
+  steps:
+    - name: Generate Tide Index
+      shell: bash
+      run: |
+        echo "::group::Generate Tide Index"
+        cd ${{ inputs.coretide_path }}/Engines/indexing/
+        python ./indexer.py
+        echo "::endgroup::"
+        echo "::notice::Tide index generated"
+
+    - name: Run MISP Sharing Pipeline
+      shell: bash
+      run: |
+        echo "::group::MISP Sharing Pipeline"
+        cd ${{ inputs.coretide_path }}/Orchestration
+        python share.py
+        echo "::endgroup::"
+        echo "::notice::MISP sharing pipeline completed"

@@ -1,3 +1,5 @@
+> **This repository is archived.** The engine is now [`opentide`](https://github.com/OpenTideHQ/opentide). Pinned checkouts of this tree still work. New work: [opentide.org](https://opentide.org) · [migration guide](https://opentide.org/docs/usage/migration/).
+
 <table align="center"><tr><td align="center" width="9999">
 <img src="coretide-logo.png" align="center" width="150" alt="Project icon">
 
